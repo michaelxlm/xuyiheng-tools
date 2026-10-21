@@ -3,8 +3,9 @@
 /* ==========================================================================
    build-llms.js · 生成 llms.txt + robots.txt（零依赖）
    --------------------------------------------------------------------------
-   读 data/site.json + data/pages.json：
-     - llms.txt：面向 LLM/搜索引擎的站点导览（H1 站名 + 简介 + 关键页 + 分类链接）
+   读 data/site.json + data/pages.json + data/llms-api.json：
+     - llms.txt：面向 LLM/搜索引擎的站点导览（H1 站名 + 简介 + 关键页 + 分类链接
+       + WO-124 ## Datasets 开放数据 API 区块）
      - robots.txt：放行全站、指向 sitemap
    用法：node scripts/build-llms.js
    ========================================================================== */
@@ -16,6 +17,33 @@ const { urlPathOf } = require('./prerender');
 const ROOT = path.resolve(__dirname, '..');
 const site = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'site.json'), 'utf8'));
 const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'pages.json'), 'utf8'));
+
+// WO-124 DaaS 免费曝光腿：开放数据集清单的站点侧镜像（事实源见文件 _note）
+const api = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'llms-api.json'), 'utf8'));
+
+/* 与 main-api/scripts/gen-llms.js 的 buildDatasets() 逐字同步，改格式两处一起改 */
+function buildDatasets(a) {
+  const lines = [];
+  if (!a || !Array.isArray(a.datasets) || !a.datasets.length) return lines;
+  const base = (a.base || '').replace(/\/$/, '');
+  lines.push('## Datasets');
+  lines.push('');
+  lines.push('> ' + (a.access || '开放数据 API（供 LLM / Agent 只读调用）。'));
+  lines.push('');
+  a.datasets.forEach(function (ds) {
+    const params = ds.params && ds.params !== '-' ? '（入参：' + ds.params + '）' : '';
+    lines.push('- [' + ds.label + '](' + base + ds.path + '): ' + ds.id + ' 数据集' + params + '；鉴权 ' + (a.auth || 'x-api-key') + '。');
+  });
+  if (a.mcp && a.mcp.endpoint) {
+    const tools = (a.mcp.tools || []).join(' / ');
+    lines.push('- [MCP Server](' + base + a.mcp.endpoint + '): ' + a.mcp.protocol + '。工具：' + tools + '。');
+  }
+  if (a.portal) {
+    lines.push('- 接入与 Key 申请：开发者门户 ' + base + a.portal);
+  }
+  lines.push('');
+  return lines;
+}
 
 function run() {
   const origin = site.url.replace(/\/+$/, '');
@@ -50,6 +78,8 @@ function run() {
     });
     llms += '\n';
   });
+  // WO-124：面向 LLM / Agent 的开放数据集目录（端点 + 入参 + 免费接入，不含单价 / 档位）
+  llms += buildDatasets(api).join('\n') + '\n';
   fs.writeFileSync(path.join(ROOT, 'llms.txt'), llms);
 
   console.log('build-llms：写入 robots.txt + llms.txt（' + routes.length + ' 页）');

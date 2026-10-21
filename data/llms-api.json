@@ -1,0 +1,18 @@
+{
+  "_note": "WO-124 DaaS 免费曝光腿：开放数据集清单的站点侧镜像，供 scripts/build-llms.js 在 llms.txt 生成 ## Datasets 区块。事实源 = main-api/config/config.default.js 的 config.apiGateway.match + config.mcp.datasets，镜像口径 = main-api/scripts/llms.sites.json 的 api 块；新增/下线数据集时同步此处并跑 node scripts/build-llms.js。单价 / 档位不落入本清单（本期免费接入、收费不对客）。",
+  "base": "https://api.xuyiheng.com",
+  "auth": "x-api-key 请求头",
+  "access": "本期免费接入（面向 LLM / Agent 只读调用）；档位单价与付费结算暂未对客开放，计费能力已对接",
+  "portal": "/developer.html",
+  "mcp": {
+    "endpoint": "/api/v1/mcp",
+    "protocol": "JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额",
+    "tools": [ "history_of_today", "history_list", "dream_search", "color_list" ]
+  },
+  "datasets": [
+    { "id": "history", "label": "历史上的今天", "path": "/api/v1/front/automate/history/", "params": "mdmm（可选，MMDD）" },
+    { "id": "dream", "label": "周公解梦", "path": "/api/v1/front/automate/dream/", "params": "keyword" },
+    { "id": "color", "label": "中国传统色彩", "path": "/api/v1/front/automate/color/", "params": "-" },
+    { "id": "documents", "label": "文档解析数据集（AI 摘要 + 元信息）", "path": "/api/v1/front/documents/", "params": "-" }
+  ]
+}

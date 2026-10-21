@@ -60,3 +60,14 @@
 - [双色球随机选号](https://xuyiheng.com/lotto/): 双色球随机模拟选号工具，一键生成随机号码，仅供娱乐参考。
 - [实用工具箱](https://xuyiheng.com/tools/): 精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。
 
+## Datasets
+
+> 本期免费接入（面向 LLM / Agent 只读调用）；档位单价与付费结算暂未对客开放，计费能力已对接
+
+- [历史上的今天](https://api.xuyiheng.com/api/v1/front/automate/history/): history 数据集（入参：mdmm（可选，MMDD））；鉴权 x-api-key 请求头。
+- [周公解梦](https://api.xuyiheng.com/api/v1/front/automate/dream/): dream 数据集（入参：keyword）；鉴权 x-api-key 请求头。
+- [中国传统色彩](https://api.xuyiheng.com/api/v1/front/automate/color/): color 数据集；鉴权 x-api-key 请求头。
+- [文档解析数据集（AI 摘要 + 元信息）](https://api.xuyiheng.com/api/v1/front/documents/): documents 数据集；鉴权 x-api-key 请求头。
+- [MCP Server](https://api.xuyiheng.com/api/v1/mcp): JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额。工具：history_of_today / history_list / dream_search / color_list。
+- 接入与 Key 申请：开发者门户 https://api.xuyiheng.com/developer.html
+

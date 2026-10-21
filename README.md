@@ -15,7 +15,7 @@
 ## 目录结构
 
 ```
-data/            站点与路由配置（site.json / pages.json）
+data/            站点与路由配置（site.json / pages.json）+ 开放数据集镜像（llms-api.json）
 templates/pages/ 各页正文模板（构建期注入外壳）
 assets/          css / js / img 源资源（构建期压缩 + fingerprint）
 scripts/         构建与门禁脚本（见下）
@@ -29,7 +29,7 @@ robots.txt / llms.txt / sitemap.xml / site.webmanifest / og-cover.png  根级公
 1. `minify.js` — 压缩 CSS/JS
 2. `fingerprint.js` — 资源内容哈希版本化，产出 manifest
 3. `prerender.js` — 逐路由生成 HTML（head SEO/OG/Twitter/canonical/JSON-LD、header/sidebar/footer/广告券位、FOUC 防护）
-4. `build-sitemap.js` / `build-llms.js` — 生成 sitemap.xml / llms.txt
+4. `build-sitemap.js` / `build-llms.js` — 生成 sitemap.xml / llms.txt（llms.txt 含 `## Datasets` 开放数据 API 区块，读 `data/llms-api.json`，WO-124 DaaS 免费曝光腿）
 5. `inject-scripts.js` — 公共脚本注入守卫
 6. `check-links.js` — 站内死链门禁（缺目标页则构建失败）
 
@@ -61,4 +61,5 @@ npm run check:encoding # UTF-8 编码门禁（禁 GBK/双重乱码/BOM）
 | 广告 | `assets/js/ad-slots.min.js` + `data-ad-slot` 标记，`ad_site_key = main-tool` |
 | 优惠券位 | `assets/js/coupon-slot.min.js` + `data-coupon-slot` 标记 |
 | 后端 API | `assets/js/http-api.js` → `https://api.xuyiheng.com`，带 `X-Source-Guard` 头 |
+| 开放数据集（DaaS） | `llms.txt` 的 `## Datasets` 区块由 `scripts/build-llms.js` 读 `data/llms-api.json` 生成（事实源 = main-api `config.apiGateway.match` + `config.mcp.datasets`，本期免费接入、不含单价 · WO-124）；Key 申请走 `https://api.xuyiheng.com/developer.html` |
 | 结构化数据 | 构建期写入 JSON-LD（WebSite/Organization/WebApplication/BreadcrumbList） |
