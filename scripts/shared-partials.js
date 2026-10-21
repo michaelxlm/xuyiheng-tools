@@ -13,6 +13,15 @@ function escapeHtml(input) {
     .replace(/"/g, '&quot;');
 }
 
+/* 分类 → 色相键（与 theme.css 的 [data-cat] 规则对应） */
+const CAT_KEY = { '计算器': 'calc', '日历工具': 'cal', '场景组合': 'combo', '其他工具': 'other' };
+function catKey(label) { return CAT_KEY[label] || ''; }
+
+/* 内联 SVG 图标（stroke=currentColor，随主题变色） */
+const ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>';
+const ICON_SUN = '<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+const ICON_MOON = '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>';
+
 /**
  * 渲染站点头部（sticky header）
  * @param {Object} site - site.json 配置
@@ -26,7 +35,7 @@ function renderHeader(site, page) {
     return `<a href="${escapeHtml(n.url)}"${cls}>${escapeHtml(n.label)}</a>`;
   }).join('\n        ');
 
-  return `<header class="site-header">
+  return `<header class="site-header" id="top">
   <div class="header-inner">
     <a class="brand" href="/">
       <span class="brand-icon" aria-hidden="true">Y</span>
@@ -35,9 +44,13 @@ function renderHeader(site, page) {
     <nav class="site-nav" aria-label="主导航">
         ${navLinks}
     </nav>
+    <form class="header-search" action="/search/" method="get" role="search">
+      ${ICON_SEARCH}
+      <input type="search" name="q" placeholder="搜索工具…" aria-label="搜索工具" autocomplete="off">
+    </form>
     <div class="header-actions">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
-      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">${ICON_SEARCH}</a>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">${ICON_SUN}${ICON_MOON}</button>
     </div>
   </div>
 </header>`;
@@ -55,8 +68,8 @@ function renderSidebar(site, page) {
       const cls = isActive ? ' class="active"' : '';
       return `      <a href="${escapeHtml(item.url)}"${cls}>${escapeHtml(item.label)}</a>`;
     }).join('\n');
-    return `    <div class="sidebar-group">
-    <div class="sidebar-title">${escapeHtml(cat.label)}</div>
+    return `    <div class="sidebar-group"${catKey(cat.label) ? ' data-cat="' + catKey(cat.label) + '"' : ''}>
+    <div class="sidebar-title"><span class="dot" aria-hidden="true"></span>${escapeHtml(cat.label)}</div>
     <nav class="sidebar-nav">
 ${items}
     </nav>
@@ -109,10 +122,15 @@ ${links}
 
   return `<footer class="site-footer">
   <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href="/"><span class="brand-icon" aria-hidden="true">Y</span>${escapeHtml(site.short_name || site.site_name)}</a>
+      <p class="footer-blurb">${escapeHtml(site.description || '')}</p>
+    </div>
 ${sections}
   </div>
   <div class="footer-bottom">
-    ${escapeHtml(footer.copyright || '')}
+    <span>${escapeHtml(footer.copyright || '')}</span>
+    <a href="#top">回到顶部 ↑</a>
   </div>
 </footer>`;
 }
@@ -135,6 +153,7 @@ function renderCouponSlot(placement) {
 
 module.exports = {
   escapeHtml,
+  catKey,
   renderHeader,
   renderSidebar,
   renderBottomNav,

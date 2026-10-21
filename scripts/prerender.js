@@ -153,28 +153,67 @@ function routesIndex() {
 }
 
 const CATEGORY_ICON = { '计算器': '🧮', '日历工具': '📅', '场景组合': '🧩', '其他工具': '🛠️' };
+const FEATURED = ['/calculator/tax/', '/calendar/', '/calculator/prepay/', '/combo/health-check/', '/combo/buy-house/', '/combo/color-lab/'];
+const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>';
+
+function toolCardHtml(item, catLabel, idx, wide) {
+  const r = idx[item.url] || {};
+  const icon = CATEGORY_ICON[catLabel] || '🔧';
+  const key = P.catKey(catLabel);
+  return '          <a class="tool-card' + (wide ? ' is-wide' : '') + '"' + (key ? ' data-cat="' + key + '"' : '') + ' href="' + P.escapeHtml(item.url) + '">' +
+    '<span class="tool-card-icon" aria-hidden="true">' + icon + '</span>' +
+    '<span class="tool-card-title">' + P.escapeHtml(item.label) + '</span>' +
+    '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
+}
 
 function buildHomeContent(site) {
   const idx = routesIndex();
-  const sections = (site.sidebar_categories || []).map((cat) => {
-    const cards = (cat.items || []).map((item) => {
-      const r = idx[item.url] || {};
-      const icon = CATEGORY_ICON[cat.label] || '🔧';
-      return '          <a class="tool-card" href="' + P.escapeHtml(item.url) + '">' +
-        '<span class="tool-card-icon" aria-hidden="true">' + icon + '</span>' +
-        '<span class="tool-card-title">' + P.escapeHtml(item.label) + '</span>' +
-        '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
-    }).join('\n');
-    return '        <section class="home-section">\n' +
-      '          <h2 class="section-title">' + P.escapeHtml(cat.label) + '</h2>\n' +
+  const cats = site.sidebar_categories || [];
+  const flat = {};
+  cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label }; }));
+  const total = Object.keys(flat).length;
+
+  const chips = cats.map((cat) => {
+    const key = P.catKey(cat.label);
+    return '<a href="#cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '"' : '') + '><span class="dot" aria-hidden="true"></span>' + P.escapeHtml(cat.label) + '</a>';
+  }).join('');
+
+  const hero = [
+    '        <section class="hero">',
+    '          <span class="hero-badge">✦ ' + total + ' 个免费在线工具 · 纯本地运行</span>',
+    '          <h1>' + P.escapeHtml(site.site_name) + '</h1>',
+    '          <p class="hero-sub">' + P.escapeHtml(site.description) + '</p>',
+    '          <form class="hero-search" action="/search/" method="get" role="search">',
+    '            ' + SEARCH_ICON,
+    '            <input type="search" name="q" placeholder="搜索：个税、房贷、万年历、BMI…" aria-label="搜索工具" autocomplete="off">',
+    '            <button class="btn btn-primary" type="submit">搜索</button>',
+    '          </form>',
+    '          <div class="hero-chips">' + chips + '</div>',
+    '        </section>',
+  ].join('\n');
+
+  const featCards = FEATURED.filter((u) => flat[u]).map((u, i) =>
+    toolCardHtml({ url: u, label: flat[u].label }, flat[u].cat, idx, i === 0)
+  ).join('\n');
+  const featured = [
+    '        <section class="home-section" id="featured">',
+    '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>热门工具</h2>',
+    '          <div class="tool-grid">',
+    featCards,
+    '          </div>',
+    '        </section>',
+  ].join('\n');
+
+  const sections = cats.map((cat) => {
+    const key = P.catKey(cat.label);
+    const cards = (cat.items || []).map((item) => toolCardHtml(item, cat.label, idx, false)).join('\n');
+    return '        <section class="home-section" id="cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '"' : '') + '>\n' +
+      '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>' + P.escapeHtml(cat.label) + '<span class="count">' + (cat.items || []).length + '</span></h2>\n' +
       '          <div class="tool-grid">\n' + cards + '\n          </div>\n' +
       '        </section>';
   }).join('\n');
 
-  return '        <section class="page-heading">\n' +
-    '          <h1>' + P.escapeHtml(site.site_name) + '</h1>\n' +
-    '          <p>' + P.escapeHtml(site.description) + '</p>\n' +
-    '        </section>\n' + sections;
+  return hero + '\n' + featured + '\n' + sections;
 }
 
 /* ---------------------------- 主渲染 ---------------------------- */

@@ -29,12 +29,12 @@
   <link rel="manifest" href="/site.webmanifest">
   <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
     <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
-    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=d49fc6d066">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","name":"搜索工具 - 一珩成长笔记","url":"https://xuyiheng.com/search/","description":"搜索一珩成长笔记全站实用工具，快速找到你想要的在线计算与查询工具。","inLanguage":"zh-CN","isPartOf":{"@id":"https://xuyiheng.com/#website"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"搜索工具","item":"https://xuyiheng.com/search/"}]}]}</script>
 </head>
 <body data-page="search" data-page-id="search">
 <a class="skip-link" href="#main">跳至内容</a>
-<header class="site-header">
+<header class="site-header" id="top">
   <div class="header-inner">
     <a class="brand" href="/">
       <span class="brand-icon" aria-hidden="true">Y</span>
@@ -46,16 +46,20 @@
         <a href="/search/" class="active" aria-current="page">搜索</a>
         <a href="/about/">关于</a>
     </nav>
+    <form class="header-search" action="/search/" method="get" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>
+      <input type="search" name="q" placeholder="搜索工具…" aria-label="搜索工具" autocomplete="off">
+    </form>
     <div class="header-actions">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
-      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg></a>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg></button>
     </div>
   </div>
 </header>
 <div class="site-body">
 <aside class="site-sidebar" aria-label="工具分类">
-      <div class="sidebar-group">
-    <div class="sidebar-title">计算器</div>
+      <div class="sidebar-group" data-cat="calc">
+    <div class="sidebar-title"><span class="dot" aria-hidden="true"></span>计算器</div>
     <nav class="sidebar-nav">
       <a href="/calculator/tax/">个税计算器</a>
       <a href="/calculator/unit/">单位换算</a>
@@ -81,16 +85,16 @@
       <a href="/calculator/secret-message/">密语</a>
     </nav>
   </div>
-      <div class="sidebar-group">
-    <div class="sidebar-title">日历工具</div>
+      <div class="sidebar-group" data-cat="cal">
+    <div class="sidebar-title"><span class="dot" aria-hidden="true"></span>日历工具</div>
     <nav class="sidebar-nav">
       <a href="/calendar/">万年历·老黄历</a>
       <a href="/calendar/daily-guide/">今日指南</a>
       <a href="/calendar/countdown/">倒计时·纪念日</a>
     </nav>
   </div>
-      <div class="sidebar-group">
-    <div class="sidebar-title">场景组合</div>
+      <div class="sidebar-group" data-cat="combo">
+    <div class="sidebar-title"><span class="dot" aria-hidden="true"></span>场景组合</div>
     <nav class="sidebar-nav">
       <a href="/combo/buy-house/">买房全攻略</a>
       <a href="/combo/buy-car/">买车全攻略</a>
@@ -101,8 +105,8 @@
       <a href="/combo/color-lab/">色彩研究所</a>
     </nav>
   </div>
-      <div class="sidebar-group">
-    <div class="sidebar-title">其他工具</div>
+      <div class="sidebar-group" data-cat="other">
+    <div class="sidebar-title"><span class="dot" aria-hidden="true"></span>其他工具</div>
     <nav class="sidebar-nav">
       <a href="/probability/">概率计算器</a>
       <a href="/random/">随机数生成</a>
@@ -230,6 +234,10 @@
 </nav>
 <footer class="site-footer">
   <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="brand" href="/"><span class="brand-icon" aria-hidden="true">Y</span>一珩工具</a>
+      <p class="footer-blurb">纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。</p>
+    </div>
     <div class="footer-section">
     <h3>热门工具</h3>
       <a href="/calculator/tax/">个税计算器</a>
@@ -251,7 +259,8 @@
   </div>
   </div>
   <div class="footer-bottom">
-    © 一珩成长笔记
+    <span>© 一珩成长笔记</span>
+    <a href="#top">回到顶部 ↑</a>
   </div>
 </footer>
     <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
