@@ -1,0 +1,71 @@
+        <section class="page-heading">
+          <h1>日期计算器</h1>
+          <p>支持三种常用场景：计算两个日期间隔天数、由某日期加减天数推算目标日期、查询任意日期是星期几及年内第几天。</p>
+        </section>
+
+        <form class="card" id="dcForm">
+          <div class="form-group">
+            <label class="form-label" for="dc-mode">计算方式</label>
+            <select class="form-select" id="dc-mode">
+              <option value="diff">日期间隔（两日期相差天数）</option>
+              <option value="add">日期推算（加减天数）</option>
+              <option value="weekday">星期查询（某日是星期几）</option>
+            </select>
+          </div>
+          <div class="form-group" id="dc-g1"><label class="form-label" for="dc-d1" id="dc-l1">开始日期</label><input class="form-input" id="dc-d1" type="date"></div>
+          <div class="form-group" id="dc-g2"><label class="form-label" for="dc-d2">结束日期</label><input class="form-input" id="dc-d2" type="date"></div>
+          <div class="form-group" id="dc-gd"><label class="form-label" for="dc-days">加减天数（负数为向前）</label><div class="input-with-unit"><input class="form-input" id="dc-days" type="number" inputmode="numeric" placeholder="如 100"><span class="unit-tag">天</span></div></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"date-calc"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="dc-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="dc-rlabel">结果</div><div class="result-value" id="dc-rvalue">--</div></div></div>
+          <dl class="result-detail" id="dc-detail"></dl>
+        </div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var WD = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            var DAY = 86400000;
+            function parseDate(id) { var v = $(id).value; if (!v) return null; var p = v.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+            function fmt(d) { var pad = function (x) { return (x < 10 ? '0' : '') + x; }; return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+            function dayOfYear(d) { var s = new Date(d.getFullYear(), 0, 0); return Math.floor((d - s) / DAY); }
+            var G = { diff: ['dc-g1', 'dc-g2'], add: ['dc-g1', 'dc-gd'], weekday: ['dc-g1'] };
+            function syncMode() {
+              var m = $('dc-mode').value, on = G[m];
+              ['dc-g1', 'dc-g2', 'dc-gd'].forEach(function (id) { $(id).hidden = on.indexOf(id) < 0; });
+              $('dc-l1').textContent = m === 'add' ? '起始日期' : '日期';
+            }
+            $('dc-mode').addEventListener('change', syncMode); syncMode();
+            $('dcForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var m = $('dc-mode').value, d1 = parseDate('dc-d1'), label = '', out = '', detail = '';
+              if (!d1) { alert('请选择日期'); return; }
+              if (m === 'diff') {
+                var d2 = parseDate('dc-d2'); if (!d2) { alert('请选择结束日期'); return; }
+                var days = Math.round(Math.abs(d2 - d1) / DAY);
+                label = '相差天数'; out = U.thousands(days) + ' 天';
+                detail = row('约合', U.round(days / 7, 1) + ' 周 / ' + U.round(days / 30, 1) + ' 个月') + row('含工作日', Math.ceil(days / 7) * 5 + '（近似）');
+              } else if (m === 'add') {
+                var n = U.numInput($('dc-days')); if (!Number.isFinite(n)) { alert('请输入天数'); return; }
+                var r = new Date(d1.getTime() + n * DAY);
+                label = n >= 0 ? '推算日期' : '回退日期'; out = fmt(r);
+                detail = row('星期', WD[r.getDay()]) + row('年内第几天', dayOfYear(r) + ' 天');
+              } else {
+                label = fmt(d1); out = WD[d1.getDay()];
+                detail = row('年内第几天', dayOfYear(d1)) + row('剩余天数', 365 - dayOfYear(d1) + '（平年）');
+              }
+              $('dc-rlabel').textContent = label; $('dc-rvalue').textContent = out;
+              $('dc-detail').innerHTML = detail; $('dc-result').hidden = false;
+              U.track('calc_result', { tool: 'date-calc', mode: m });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>个人所得税计算器 - 工资税后收入计算</title>
+  <meta name="description" content="在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。">
+  <meta name="keywords" content="个税计算器,个人所得税,税后工资,工资计算,一珩成长笔记">
+  <link rel="canonical" href="https://xuyiheng.com/calculator/tax/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="个人所得税计算器 - 工资税后收入计算">
+  <meta property="og:description" content="在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。">
+  <meta property="og:url" content="https://xuyiheng.com/calculator/tax/">
+  <meta property="og:site_name" content="一珩成长笔记">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/img/favicon.svg">
+  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
+    <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"个人所得税计算器 - 工资税后收入计算","url":"https://xuyiheng.com/calculator/tax/","description":"在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"个人所得税计算器","item":"https://xuyiheng.com/calculator/tax/"}]}]}</script>
+</head>
+<body data-page="calculator-tax" data-page-id="calculator-tax">
+<a class="skip-link" href="#main">跳至内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon" aria-hidden="true">Y</span>
+      一珩工具
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+        <a href="/">首页</a>
+        <a href="/discover/">发现</a>
+        <a href="/search/">搜索</a>
+        <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+    </div>
+  </div>
+</header>
+<div class="site-body">
+<aside class="site-sidebar" aria-label="工具分类">
+      <div class="sidebar-group">
+    <div class="sidebar-title">计算器</div>
+    <nav class="sidebar-nav">
+      <a href="/calculator/tax/" class="active">个税计算器</a>
+      <a href="/calculator/unit/">单位换算</a>
+      <a href="/calculator/prepay/">房贷提前还款</a>
+      <a href="/calculator/pension/">养老金计算器</a>
+      <a href="/calculator/social-insurance/">五险一金</a>
+      <a href="/calculator/discount/">折扣计算</a>
+      <a href="/calculator/percentage/">百分比</a>
+      <a href="/calculator/overtime/">加班费</a>
+      <a href="/calculator/body-fat/">基础代谢体脂</a>
+      <a href="/calculator/pace/">跑步配速</a>
+      <a href="/calculator/date-calc/">日期计算</a>
+      <a href="/calculator/word-count/">字数统计</a>
+      <a href="/calculator/timezone/">时区转换</a>
+      <a href="/calculator/size/">衣服尺码</a>
+      <a href="/calculator/decoration/">装修预算</a>
+      <a href="/calculator/due-date/">预产期</a>
+      <a href="/calculator/height-predict/">儿童身高预测</a>
+      <a href="/calculator/pet-age/">宠物年龄</a>
+      <a href="/calculator/fuel-cost/">油耗计算</a>
+      <a href="/calculator/ip-query/">IP地址查询</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+      <a href="/calculator/secret-message/">密语</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">日历工具</div>
+    <nav class="sidebar-nav">
+      <a href="/calendar/">万年历·老黄历</a>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/calendar/countdown/">倒计时·纪念日</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">场景组合</div>
+    <nav class="sidebar-nav">
+      <a href="/combo/buy-house/">买房全攻略</a>
+      <a href="/combo/buy-car/">买车全攻略</a>
+      <a href="/combo/health-check/">健康体检站</a>
+      <a href="/combo/fun-test/">趣味测试</a>
+      <a href="/combo/finance-toolkit/">理财百宝箱</a>
+      <a href="/combo/life-plan/">人生规划</a>
+      <a href="/combo/color-lab/">色彩研究所</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">其他工具</div>
+    <nav class="sidebar-nav">
+      <a href="/probability/">概率计算器</a>
+      <a href="/random/">随机数生成</a>
+      <a href="/vision/">视力测试</a>
+      <a href="/lotto/">双色球</a>
+      <a href="/tools/">实用工具箱</a>
+    </nav>
+  </div>
+</aside>
+  <main class="site-main" id="main">
+    <div class="main-inner">
+        <nav class="breadcrumb" aria-label="面包屑"><a href="/">首页</a><span class="breadcrumb-sep" aria-hidden="true">/</span><span>个人所得税计算器</span></nav>
+<section class="page-heading">
+          <h1>个税计算器</h1>
+          <p>输入工资与专项附加扣除，按 2019 年起施行的月度累进税率，精准计算个人所得税与税后收入，支持年终奖「单独计税 / 并入当月工资」两种方式。</p>
+        </section>
+
+        <form class="card" id="taxForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tax-salary">税前月收入</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-salary" type="number" inputmode="decimal" min="0" placeholder="请输入税前月收入" required>
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tax-insurance">五险一金</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-insurance" type="number" inputmode="decimal" min="0" placeholder="请输入五险一金">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="tax-d1">子女教育</label><input class="form-input" id="tax-d1" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d2">继续教育</label><input class="form-input" id="tax-d2" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d3">住房贷款利息</label><input class="form-input" id="tax-d3" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d4">住房租金</label><input class="form-input" id="tax-d4" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d5">赡养老人</label><input class="form-input" id="tax-d5" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d6">大病医疗</label><input class="form-input" id="tax-d6" data-deduct type="number" min="0" placeholder="0"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tax-threshold">起征点</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-threshold" type="number" min="0" value="5000">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tax-bonus">年终奖</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-bonus" type="number" min="0" value="0">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tax-bonusMode">年终奖计税方式</label>
+            <select class="form-select" id="tax-bonusMode">
+              <option value="0">单独计税（全年一次性奖金）</option>
+              <option value="1">并入当月工资</option>
+            </select>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tax"}'>算个税</button>
+            <button class="btn btn-secondary" type="button" id="tax-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="tax-result" hidden>
+          <div class="result-row">
+            <div>
+              <div class="result-label">税后收入</div>
+              <div class="result-value" id="tax-afterTax">--</div>
+            </div>
+            <div>
+              <div class="result-label">应纳税额</div>
+              <div class="result-value" id="tax-tax">--</div>
+            </div>
+          </div>
+          <dl class="result-detail" id="tax-detail"></dl>
+        </div>
+
+        <div class="info-box">
+          <span aria-hidden="true">ℹ️</span>
+          <span>依据《个人所得税法》2019 年施行的综合所得月度税率表；全年一次性奖金单独计税优惠延续至 2027-12-31（财税〔2018〕164 号）。结果仅供参考。</span>
+        </div>
+        <div class="ad-slot" data-ad-slot="inline"></div>
+        <div class="coupon-slot" data-coupon-slot="strip"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="底部导航">
+    <a href="/"><span class="bottom-nav-icon">🏠</span>首页</a>
+    <a href="/discover/"><span class="bottom-nav-icon">🧭</span>发现</a>
+    <a href="/search/"><span class="bottom-nav-icon">🔍</span>搜索</a>
+</nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-section">
+    <h3>热门工具</h3>
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calendar/">万年历</a>
+      <a href="/calculator/prepay/">房贷计算</a>
+      <a href="/calculator/unit/">单位换算</a>
+  </div>
+    <div class="footer-section">
+    <h3>生活工具</h3>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/combo/buy-house/">买房攻略</a>
+      <a href="/combo/health-check/">健康体检</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+  </div>
+    <div class="footer-section">
+    <h3>关于</h3>
+      <a href="/about/">关于我们</a>
+      <a href="/privacy/">隐私政策</a>
+  </div>
+  </div>
+  <div class="footer-bottom">
+    © 一珩成长笔记
+  </div>
+</footer>
+    <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
+    <script src="/assets/js/ad-slots.min.js?v=2e89d0fe5c" defer></script>
+    <script src="/assets/js/coupon-slot.min.js?v=183e636953" defer></script>
+    <script src="/assets/js/utils.min.js?v=08436666a1" defer></script>
+    <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
+    <script src="/assets/js/pages/calculator-tax.min.js?v=fea99f15f5" defer></script>
+</body>

@@ -1,0 +1,109 @@
+        <section class="page-heading">
+          <h1>理财百宝箱</h1>
+          <p>常用理财计算四合一：复利终值、定期存款利息、通胀购买力分析、实时汇率换算。选择标签切换工具，帮你把每一分钱算清楚。</p>
+        </section>
+
+        <div class="chips" role="tablist">
+          <button type="button" class="chip active" data-tab="ci" role="tab">📈 复利计算</button>
+          <button type="button" class="chip" data-tab="dep" role="tab">🏦 定期存款</button>
+          <button type="button" class="chip" data-tab="inf" role="tab">💹 通胀分析</button>
+          <button type="button" class="chip" data-tab="fx" role="tab">💱 汇率换算</button>
+        </div>
+
+        <form class="card" id="ciForm">
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="ci-p">初始本金</label><div class="input-with-unit"><input class="form-input" id="ci-p" type="number" inputmode="decimal" placeholder="元"></div></div>
+            <div class="form-group"><label class="form-label" for="ci-m">每年追加</label><div class="input-with-unit"><input class="form-input" id="ci-m" type="number" inputmode="decimal" placeholder="元/年"></div></div>
+            <div class="form-group"><label class="form-label" for="ci-r">年化收益率</label><div class="input-with-unit"><input class="form-input" id="ci-r" type="number" inputmode="decimal" step="0.1" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="ci-y">投资年限</label><div class="input-with-unit"><input class="form-input" id="ci-y" type="number" inputmode="numeric" placeholder="年"><span class="unit-tag">年</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算终值</button></div>
+        </form>
+
+        <form class="card" id="depForm" hidden>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="dep-p">存款金额</label><div class="input-with-unit"><input class="form-input" id="dep-p" type="number" inputmode="decimal" placeholder="元"></div></div>
+            <div class="form-group"><label class="form-label" for="dep-r">年利率</label><div class="input-with-unit"><input class="form-input" id="dep-r" type="number" inputmode="decimal" step="0.01" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="dep-m">存期</label><div class="input-with-unit"><input class="form-input" id="dep-m" type="number" inputmode="numeric" placeholder="月"><span class="unit-tag">月</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算利息</button></div>
+        </form>
+
+        <form class="card" id="infForm" hidden>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="inf-a">当前金额</label><div class="input-with-unit"><input class="form-input" id="inf-a" type="number" inputmode="decimal" placeholder="元"></div></div>
+            <div class="form-group"><label class="form-label" for="inf-r">年通胀率</label><div class="input-with-unit"><input class="form-input" id="inf-r" type="number" inputmode="decimal" step="0.1" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="inf-y">年数</label><div class="input-with-unit"><input class="form-input" id="inf-y" type="number" inputmode="numeric" placeholder="年"><span class="unit-tag">年</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">分析购买力</button></div>
+        </form>
+
+        <form class="card" id="fxForm" hidden>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="fx-amt">金额</label><div class="input-with-unit"><input class="form-input" id="fx-amt" type="number" inputmode="decimal" value="100"></div></div>
+            <div class="form-group"><label class="form-label" for="fx-from">源币种</label><input class="form-input" id="fx-from" type="text" value="USD" maxlength="6"></div>
+            <div class="form-group"><label class="form-label" for="fx-to">目标币种</label><input class="form-input" id="fx-to" type="text" value="CNY" maxlength="6"></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"finance-toolkit","mode":"fx"}'>换算</button></div>
+        </form>
+
+        <div class="result-box" id="fx-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="fx-rlabel">换算结果</div><div class="result-value" id="fx-rvalue">--</div></div></div>
+          <dl class="result-detail" id="fx-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>复利终值 = 本金×(1+r)ⁿ + 年投入×((1+r)ⁿ−1)/r；定期利息按单利；通胀反映同额资金的未来购买力。汇率数据经中台接口实时获取，若不可达会提示。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var FORMS = { ci: 'ciForm', dep: 'depForm', inf: 'infForm', fx: 'fxForm' };
+            U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () {
+              U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active');
+              var t = b.getAttribute('data-tab'); Object.keys(FORMS).forEach(function (k) { $(FORMS[k]).hidden = k !== t; });
+              $('fx-result').hidden = t !== 'fx';
+            }); });
+            $('ciForm').addEventListener('submit', function (e) { e.preventDefault();
+              var p = U.numInput($('ci-p')) || 0, m = U.numInput($('ci-m')) || 0, r = (U.numInput($('ci-r')) || 0) / 100, y = U.numInput($('ci-y')) || 0;
+              if (!(y > 0) || (p <= 0 && m <= 0)) { alert('请输入本金/追加与年限'); return; }
+              var fv = p * Math.pow(1 + r, y) + (r > 0 ? m * (Math.pow(1 + r, y) - 1) / r : m * y);
+              var invested = p + m * y;
+              show('终值', U.money(fv), row('总投入', U.money(invested)) + row('累计收益', U.money(fv - invested)) + row('收益率', (invested > 0 ? U.round((fv - invested) / invested * 100, 1) : 0) + '%'));
+              U.track('calc_result', { tool: 'finance-toolkit', mode: 'ci' });
+            });
+            $('depForm').addEventListener('submit', function (e) { e.preventDefault();
+              var p = U.numInput($('dep-p')), r = (U.numInput($('dep-r')) || 0) / 100, mth = U.numInput($('dep-m')) || 0;
+              if (!(p > 0 && mth > 0)) { alert('请输入金额与存期'); return; }
+              var interest = p * r / 12 * mth;
+              show('到期本息', U.money(p + interest), row('存款本金', U.money(p)) + row('存款利息', U.money(interest)) + row('存期', mth + ' 个月'));
+              U.track('calc_result', { tool: 'finance-toolkit', mode: 'dep' });
+            });
+            $('infForm').addEventListener('submit', function (e) { e.preventDefault();
+              var a = U.numInput($('inf-a')), r = (U.numInput($('inf-r')) || 0) / 100, y = U.numInput($('inf-y')) || 0;
+              if (!(a > 0 && y > 0)) { alert('请输入金额与年数'); return; }
+              var future = a * Math.pow(1 + r, y);
+              show('未来物价需', U.money(future), row('现金额', U.money(a)) + row('y 年后购买力', '相当于今天的 ' + U.money(a / Math.pow(1 + r, y))) + row('累计涨价', U.money(future - a)));
+              U.track('calc_result', { tool: 'finance-toolkit', mode: 'inf' });
+            });
+            $('fxForm').addEventListener('submit', function (e) { e.preventDefault();
+              var amt = U.numInput($('fx-amt')) || 0, from = $('fx-from').value.trim().toUpperCase(), to = $('fx-to').value.trim().toUpperCase();
+              if (!from || !to) { alert('请填写币种'); return; }
+              show('换算中…', '请稍候', row('说明', '正在向中台请求 ' + from + '→' + to + ' 汇率'));
+              var API = window.API; if (!API) { show('不可用', '接口未就绪', ''); return; }
+              API.get(API.endpoints.exchange, { from: from, to: to, amount: amt }).then(function (res) {
+                var d = (res && res.data) || res || {};
+                var rate = d.rate || d.exchangeRate || d.result;
+                var out = d.amount != null ? d.amount : (Number.isFinite(rate) ? amt * rate : null);
+                if (out == null) { show('解析失败', JSON.stringify(d).slice(0, 60), ''); return; }
+                show(from + ' → ' + to, U.round(out, 2) + ' ' + to, row('汇率', '1 ' + from + ' = ' + (Number.isFinite(rate) ? rate : '--') + ' ' + to) + row('换算金额', U.round(amt, 2) + ' ' + from));
+              }).catch(function () { show('查询失败', '网络不可达', row('提示', '请稍后重试或检查网络')); });
+              U.track('calc_result', { tool: 'finance-toolkit', mode: 'fx' });
+            });
+            function show(label, value, detail) { $('fx-rlabel').textContent = label; $('fx-rvalue').textContent = value; $('fx-detail').innerHTML = detail || ''; $('fx-result').hidden = false; }
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

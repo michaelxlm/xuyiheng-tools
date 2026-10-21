@@ -1,0 +1,94 @@
+        <section class="page-heading">
+          <h1>时区转换器</h1>
+          <p>选择源时区与目标时区，输入日期时刻即可换算到另一地的当地时间（自动跨日），并附世界主要城市当前时钟对照，出国旅行、跨时区会议约时间必备。</p>
+        </section>
+
+        <form class="card" id="tzForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="tz-date">日期</label><input class="form-input" id="tz-date" type="date"></div>
+            <div class="form-group"><label class="form-label" for="tz-time">时间</label><input class="form-input" id="tz-time" type="time"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="tz-from">源时区</label><select class="form-select" id="tz-from"></select></div>
+            <div class="form-group"><label class="form-label" for="tz-to">目标时区</label><select class="form-select" id="tz-to"></select></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="tz-swap">⇄ 交换时区</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"timezone"}'>换算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="tz-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label" id="tz-slabel">源时间</div><div class="result-value" id="tz-src" style="font-size:var(--text-lg)">--</div></div>
+            <div><div class="result-label" id="tz-tlabel">目标时间</div><div class="result-value" id="tgt" style="font-size:var(--text-lg)">--</div></div>
+          </div>
+          <dl class="result-detail" id="tz-detail"></dl>
+        </div>
+
+        <h3 class="card-title mt-4">🌍 世界时钟（现在）</h3>
+        <div class="clock-grid" id="tz-clocks"></div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>时区偏移为常见标准值（不含夏令时自动调整），换算以「所选时刻即该地墙上时间」为基准换算到目标时区，可能跨日。精确到具体城市夏令时时请结合当地公告。</div></div>
+
+        <style>
+        .clock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-3); }
+        .clock-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-3) var(--space-4); text-align: center; }
+        .clock-item .c-city { color: var(--color-muted); font-size: var(--text-sm); }
+        .clock-item .c-time { font-weight: 700; font-size: var(--text-lg); font-variant-numeric: tabular-nums; }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var ZONES = [
+              { name: '北京 (UTC+8)', off: 8 }, { name: '伦敦 (UTC+0)', off: 0 }, { name: '纽约 (UTC-5)', off: -5 },
+              { name: '洛杉矶 (UTC-8)', off: -8 }, { name: '巴黎 (UTC+1)', off: 1 }, { name: '东京 (UTC+9)', off: 9 },
+              { name: '悉尼 (UTC+10)', off: 10 }, { name: '孟买 (UTC+5.5)', off: 5.5 }, { name: '迪拜 (UTC+4)', off: 4 }, { name: '莫斯科 (UTC+3)', off: 3 },
+            ];
+            function fill(sel, idx) {
+              sel.innerHTML = ZONES.map(function (z, i) { return '<option value="' + i + '"' + (i === idx ? ' selected' : '') + '>' + z.name + '</option>'; }).join('');
+            }
+            fill($('tz-from'), 0); fill($('tz-to'), 2);
+            function pad(n) { return (n < 10 ? '0' : '') + n; }
+            function setDefault() {
+              var n = new Date();
+              $('tz-date').value = n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate());
+              $('tz-time').value = pad(n.getHours()) + ':' + pad(n.getMinutes());
+            }
+            function wallToUtc(y, mo, d, h, mi, off) { return Date.UTC(y, mo - 1, d, h, mi) - off * 3600000; }
+            function fmtWall(utcMs, off) {
+              var dt = new Date(utcMs + off * 3600000);
+              return dt.getUTCFullYear() + '-' + pad(dt.getUTCMonth() + 1) + '-' + pad(dt.getUTCDate()) + ' ' + pad(dt.getUTCHours()) + ':' + pad(dt.getUTCMinutes());
+            }
+            function calc() {
+              if (!$('tz-date').value || !$('tz-time').value) { alert('请选择日期与时间'); return; }
+              var p = $('tz-date').value.split('-').map(Number), t = $('tz-time').value.split(':').map(Number);
+              var fromOff = ZONES[$('tz-from').value].off, toOff = ZONES[$('tz-to').value].off;
+              var utc = wallToUtc(p[0], p[1], p[2], t[0], t[1], fromOff);
+              $('tz-slabel').textContent = ZONES[$('tz-from').value].name;
+              $('tz-tlabel').textContent = ZONES[$('tz-to').value].name;
+              $('tz-src').textContent = fmtWall(utc, fromOff);
+              $('tgt').textContent = fmtWall(utc, toOff);
+              var diff = toOff - fromOff;
+              $('tz-detail').innerHTML = row('时差', (diff >= 0 ? '+' : '') + diff + ' 小时') + row('说明', diff >= 0 ? '目标比源时区晚（更东）' : '目标比源时区早（更西）');
+              $('tz-result').hidden = false;
+              U.track('calc_result', { tool: 'timezone' });
+            }
+            $('tzForm').addEventListener('submit', function (e) { e.preventDefault(); calc(); });
+            $('tz-swap').addEventListener('click', function () { var a = $('tz-from').value; $('tz-from').value = $('tz-to').value; $('tz-to').value = a; if (!$('tz-result').hidden) calc(); });
+            function clocks() {
+              var now = new Date(), uh = now.getUTCHours(), min = now.getUTCMinutes();
+              $('tz-clocks').innerHTML = ZONES.slice(0, 8).map(function (z) {
+                var h = (uh + z.off) % 24; if (h < 0) h += 24;
+                return '<div class="clock-item"><div class="c-city">' + z.name.split(' ')[0] + '</div><div class="c-time">' + pad(Math.floor(h)) + ':' + pad(min) + '</div></div>';
+              }).join('');
+            }
+            setDefault(); clocks(); setInterval(clocks, 30000);
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

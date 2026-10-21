@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>折扣到手价计算 - 折上折满减叠加省钱计算</title>
+  <meta name="description" content="在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。">
+  <meta name="keywords" content="折扣计算,到手价,折上折,满减叠加,省钱计算,一珩成长笔记">
+  <link rel="canonical" href="https://xuyiheng.com/calculator/discount/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="折扣到手价计算 - 折上折满减叠加省钱计算">
+  <meta property="og:description" content="在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。">
+  <meta property="og:url" content="https://xuyiheng.com/calculator/discount/">
+  <meta property="og:site_name" content="一珩成长笔记">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/img/favicon.svg">
+  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
+    <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"折扣到手价计算 - 折上折满减叠加省钱计算","url":"https://xuyiheng.com/calculator/discount/","description":"在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"折扣到手价计算","item":"https://xuyiheng.com/calculator/discount/"}]}]}</script>
+</head>
+<body data-page="calculator-discount" data-page-id="calculator-discount">
+<a class="skip-link" href="#main">跳至内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon" aria-hidden="true">Y</span>
+      一珩工具
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+        <a href="/">首页</a>
+        <a href="/discover/">发现</a>
+        <a href="/search/">搜索</a>
+        <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+    </div>
+  </div>
+</header>
+<div class="site-body">
+<aside class="site-sidebar" aria-label="工具分类">
+      <div class="sidebar-group">
+    <div class="sidebar-title">计算器</div>
+    <nav class="sidebar-nav">
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calculator/unit/">单位换算</a>
+      <a href="/calculator/prepay/">房贷提前还款</a>
+      <a href="/calculator/pension/">养老金计算器</a>
+      <a href="/calculator/social-insurance/">五险一金</a>
+      <a href="/calculator/discount/" class="active">折扣计算</a>
+      <a href="/calculator/percentage/">百分比</a>
+      <a href="/calculator/overtime/">加班费</a>
+      <a href="/calculator/body-fat/">基础代谢体脂</a>
+      <a href="/calculator/pace/">跑步配速</a>
+      <a href="/calculator/date-calc/">日期计算</a>
+      <a href="/calculator/word-count/">字数统计</a>
+      <a href="/calculator/timezone/">时区转换</a>
+      <a href="/calculator/size/">衣服尺码</a>
+      <a href="/calculator/decoration/">装修预算</a>
+      <a href="/calculator/due-date/">预产期</a>
+      <a href="/calculator/height-predict/">儿童身高预测</a>
+      <a href="/calculator/pet-age/">宠物年龄</a>
+      <a href="/calculator/fuel-cost/">油耗计算</a>
+      <a href="/calculator/ip-query/">IP地址查询</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+      <a href="/calculator/secret-message/">密语</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">日历工具</div>
+    <nav class="sidebar-nav">
+      <a href="/calendar/">万年历·老黄历</a>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/calendar/countdown/">倒计时·纪念日</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">场景组合</div>
+    <nav class="sidebar-nav">
+      <a href="/combo/buy-house/">买房全攻略</a>
+      <a href="/combo/buy-car/">买车全攻略</a>
+      <a href="/combo/health-check/">健康体检站</a>
+      <a href="/combo/fun-test/">趣味测试</a>
+      <a href="/combo/finance-toolkit/">理财百宝箱</a>
+      <a href="/combo/life-plan/">人生规划</a>
+      <a href="/combo/color-lab/">色彩研究所</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">其他工具</div>
+    <nav class="sidebar-nav">
+      <a href="/probability/">概率计算器</a>
+      <a href="/random/">随机数生成</a>
+      <a href="/vision/">视力测试</a>
+      <a href="/lotto/">双色球</a>
+      <a href="/tools/">实用工具箱</a>
+    </nav>
+  </div>
+</aside>
+  <main class="site-main" id="main">
+    <div class="main-inner">
+        <nav class="breadcrumb" aria-label="面包屑"><a href="/">首页</a><span class="breadcrumb-sep" aria-hidden="true">/</span><span>折扣到手价计算</span></nav>
+<section class="page-heading">
+          <h1>折扣计算器</h1>
+          <p>支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于打了几折。</p>
+        </section>
+
+        <form class="card" id="discForm">
+          <div class="form-group">
+            <label class="form-label" for="disc-mode">计算模式</label>
+            <select class="form-select" id="disc-mode">
+              <option value="single">单折扣</option>
+              <option value="double">折上折</option>
+              <option value="reduce">满减叠加</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="disc-price">商品原价</label>
+            <div class="input-with-unit"><input class="form-input" id="disc-price" type="number" inputmode="decimal" min="0" placeholder="请输入原价" required><span class="unit-tag">元</span></div>
+          </div>
+
+          <div class="disc-single">
+            <div class="form-group"><label class="form-label" for="disc-d1">折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d1" type="number" inputmode="decimal" min="0" max="10" placeholder="如 8.5"><span class="unit-tag">折</span></div></div>
+          </div>
+          <div class="disc-double" hidden>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="disc-d1b">第一道折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d1b" type="number" inputmode="decimal" min="0" max="10" placeholder="如 8"><span class="unit-tag">折</span></div></div>
+              <div class="form-group"><label class="form-label" for="disc-d2">第二道折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d2" type="number" inputmode="decimal" min="0" max="10" placeholder="如 9"><span class="unit-tag">折</span></div></div>
+            </div>
+          </div>
+          <div class="disc-reduce" hidden>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="disc-full">每满</label><div class="input-with-unit"><input class="form-input" id="disc-full" type="number" inputmode="decimal" min="0" placeholder="如 300"><span class="unit-tag">元</span></div></div>
+              <div class="form-group"><label class="form-label" for="disc-minus">减</label><div class="input-with-unit"><input class="form-input" id="disc-minus" type="number" inputmode="decimal" min="0" placeholder="如 50"><span class="unit-tag">元</span></div></div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"discount"}'>计算</button>
+            <button class="btn btn-secondary" type="button" id="disc-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="disc-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">到手价</div><div class="result-value" id="disc-final">--</div></div>
+            <div><div class="result-label">共省</div><div class="result-value" id="disc-save" style="color:var(--color-success)">--</div></div>
+          </div>
+          <dl class="result-detail" id="disc-detail"></dl>
+        </div>
+        <div class="ad-slot" data-ad-slot="inline"></div>
+        <div class="coupon-slot" data-coupon-slot="strip"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="底部导航">
+    <a href="/"><span class="bottom-nav-icon">🏠</span>首页</a>
+    <a href="/discover/"><span class="bottom-nav-icon">🧭</span>发现</a>
+    <a href="/search/"><span class="bottom-nav-icon">🔍</span>搜索</a>
+</nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-section">
+    <h3>热门工具</h3>
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calendar/">万年历</a>
+      <a href="/calculator/prepay/">房贷计算</a>
+      <a href="/calculator/unit/">单位换算</a>
+  </div>
+    <div class="footer-section">
+    <h3>生活工具</h3>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/combo/buy-house/">买房攻略</a>
+      <a href="/combo/health-check/">健康体检</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+  </div>
+    <div class="footer-section">
+    <h3>关于</h3>
+      <a href="/about/">关于我们</a>
+      <a href="/privacy/">隐私政策</a>
+  </div>
+  </div>
+  <div class="footer-bottom">
+    © 一珩成长笔记
+  </div>
+</footer>
+    <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
+    <script src="/assets/js/ad-slots.min.js?v=2e89d0fe5c" defer></script>
+    <script src="/assets/js/coupon-slot.min.js?v=183e636953" defer></script>
+    <script src="/assets/js/utils.min.js?v=08436666a1" defer></script>
+    <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
+    <script src="/assets/js/pages/calculator-discount.min.js?v=a6ec41dfe2" defer></script>
+</body>

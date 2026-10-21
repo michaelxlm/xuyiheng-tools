@@ -1,0 +1,111 @@
+        <section class="page-heading">
+          <h1>重要日子 · 倒计时</h1>
+          <p>记录考试、纪念日、生日、旅行、截止日期等重要日子，自动计算还有多少天；支持每年重复，实时倒数。数据保存在本机浏览器，只属于你。</p>
+        </section>
+
+        <form class="card" id="cdForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="cd-name">名称</label><input class="form-input" id="cd-name" type="text" maxlength="20" placeholder="如：生日 / 考试"></div>
+            <div class="form-group"><label class="form-label" for="cd-type">类型</label><select class="form-select" id="cd-type"><option value="birthday">🎂 生日</option><option value="anniversary">💝 纪念日</option><option value="exam">📝 考试</option><option value="travel">✈️ 旅行</option><option value="deadline">🎯 截止</option><option value="custom">⭐ 自定义</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="cd-date">日期</label><input class="form-input" id="cd-date" type="date"></div>
+            <div class="form-group"><label class="form-label" for="cd-repeat">重复</label><select class="form-select" id="cd-repeat"><option value="0">不重复（一次性）</option><option value="1">每年重复</option></select></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"countdown"}'>添加日子</button></div>
+        </form>
+
+        <div class="card">
+          <h3 class="card-title">⏳ 我的重要日子</h3>
+          <div id="cd-list"><p class="cd-empty">还没有记录，添加一个吧。</p></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">🧮 天数快算</h3>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="cd-a">起始日期</label><input class="form-input" id="cd-a" type="date"></div>
+            <div class="form-group"><label class="form-label" for="cd-b">目标日期</label><input class="form-input" id="cd-b" type="date"></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="cd-diff">计算间隔天数</button></div>
+          <dl class="result-detail" id="cd-diff-out"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>🔒</span><div>所有日子仅保存在你当前浏览器的 localStorage，不会上传服务器；清除浏览器数据将一并删除，重要日子请自行留意。</div></div>
+
+        <style>
+        .cd-empty { color: var(--color-muted); margin: 0; }
+        .cd-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border); }
+        .cd-item:last-child { border-bottom: 0; }
+        .cd-item .ic { font-size: 22px; }
+        .cd-item .body { flex: 1; min-width: 0; }
+        .cd-item .nm { font-weight: 700; }
+        .cd-item .dt { color: var(--color-muted); font-size: var(--text-sm); }
+        .cd-item .days { text-align: right; font-weight: 800; }
+        .cd-item .days small { display: block; font-weight: 400; font-size: 11px; color: var(--color-muted); }
+        .cd-item .del { flex: none; border: 0; background: transparent; color: var(--color-muted); cursor: pointer; font-size: 18px; }
+        .cd-item .del:hover { color: #dc2626; }
+        .days.soon { color: #dc2626; } .days.done { color: var(--color-muted); }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var ICON = { birthday: '🎂', anniversary: '💝', exam: '📝', travel: '✈️', deadline: '🎯', custom: '⭐' };
+            var DAY = 86400000;
+            var STORE = 'xh-countdown';
+            function load() { try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch (e) { return []; } }
+            function save(a) { try { localStorage.setItem(STORE, JSON.stringify(a)); } catch (e) {} }
+            function startOfDay(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+            function nextOcc(item, today) {
+              var d = new Date(item.date + 'T00:00:00');
+              if (!item.repeat) return d;
+              var cand = new Date(today.getFullYear(), d.getMonth(), d.getDate());
+              if (cand < today) cand = new Date(today.getFullYear() + 1, d.getMonth(), d.getDate());
+              return cand;
+            }
+            function render() {
+              var items = load(), today = startOfDay(new Date());
+              if (!items.length) { $('cd-list').innerHTML = '<p class="cd-empty">还没有记录，添加一个吧。</p>'; return; }
+              items.forEach(function (it) { it._target = nextOcc(it, today); it._diff = Math.round((it._target - today) / DAY); });
+              items.sort(function (a, b) { return a._diff - b._diff; });
+              $('cd-list').innerHTML = items.map(function (it) {
+                var cls = it._diff === 0 ? 'soon' : (it._diff <= 7 ? 'soon' : (it._diff < 0 ? 'done' : ''));
+                var label = it._diff === 0 ? '就是今天！' : (it._diff > 0 ? it._diff + ' 天后' : (-it._diff) + ' 天前');
+                var dtTxt = it._target.getFullYear() + '-' + String(it._target.getMonth() + 1).padStart(2, '0') + '-' + String(it._target.getDate()).padStart(2, '0') + (it.repeat ? '（每年）' : '');
+                return '<div class="cd-item"><span class="ic">' + (ICON[it.type] || '⭐') + '</span><div class="body"><div class="nm">' + esc(it.name) + '</div><div class="dt">' + dtTxt + '</div></div><div class="days ' + cls + '">' + label + (it._diff > 0 ? '<small>剩 ' + it._diff + ' 天</small>' : '') + '</div><button class="del" data-id="' + it.id + '" aria-label="删除">×</button></div>';
+              }).join('');
+              U.qsa('#cd-list .del').forEach(function (b) { b.addEventListener('click', function () { save(load().filter(function (x) { return String(x.id) !== b.getAttribute('data-id'); })); render(); U.track('countdown_delete', {}); }); });
+            }
+            function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+            $('cdForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var name = $('cd-name').value.trim(), date = $('cd-date').value;
+              if (!name || !date) { alert('请填写名称与日期'); return; }
+              var items = load();
+              items.push({ id: Date.now(), name: name, type: $('cd-type').value, date: date, repeat: $('cd-repeat').value === '1' });
+              save(items); render();
+              $('cd-name').value = ''; $('cd-date').value = '';
+              U.track('calc_result', { tool: 'countdown', action: 'add' });
+            });
+            $('cd-a').value = new Date().toISOString().slice(0, 10);
+            $('cd-diff').addEventListener('click', function () {
+              var a = $('cd-a').value, b = $('cd-b').value;
+              if (!a || !b) { alert('请选择起止日期'); return; }
+              var da = startOfDay(new Date(a + 'T00:00:00')), db = startOfDay(new Date(b + 'T00:00:00'));
+              var diff = Math.round((db - da) / DAY), wd = 0;
+              var cur = new Date(da), step = diff >= 0 ? 1 : -1, n = Math.abs(diff);
+              for (var i = 0; i <= n; i++) { var g = cur.getDay(); if (g !== 0 && g !== 6) wd++; cur = new Date(cur.getTime() + step * DAY); }
+              var months = Math.floor(n / 30.44);
+              $('cd-diff-out').innerHTML =
+                '<div class="result-detail-row"><dt>相差天数</dt><dd>' + Math.abs(diff) + ' 天</dd></div>' +
+                '<div class="result-detail-row"><dt>约合</dt><dd>' + (months >= 1 ? months + ' 个月（约）' : '不足 1 个月') + '</dd></div>' +
+                '<div class="result-detail-row"><dt>其中工作日</dt><dd>' + wd + ' 天（不含法定节假日调休）</dd></div>';
+              U.track('calc_result', { tool: 'countdown', mode: 'diff' });
+            });
+            render();
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

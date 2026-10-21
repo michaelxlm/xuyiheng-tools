@@ -1,0 +1,54 @@
+        <section class="page-heading">
+          <h1>双色球随机选号</h1>
+          <p>一键生成双色球随机号码：红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个。可批量生成多注，仅供娱乐参考，理性购彩。</p>
+        </section>
+
+        <form class="card" id="ltForm">
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="lt-count">生成注数</label><div class="input-with-unit"><input class="form-input" id="lt-count" type="number" inputmode="numeric" min="1" max="20" value="5"><span class="unit-tag">注</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"lotto"}'>机选号码</button>
+          </div>
+        </form>
+
+        <div class="ticket-wrap" id="lt-result" hidden>
+          <div id="lt-tickets"></div>
+        </div>
+
+        <div class="info-box mt-4"><span>🎱</span><div>本工具为模拟随机选号，与开奖结果毫无关联，不构成任何中奖预测。彩票是公益与娱乐，请量力而行。中奖规则以官方公告为准。</div></div>
+
+        <style>
+        .ticket { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; padding: var(--space-3) var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); margin-bottom: var(--space-3); box-shadow: var(--shadow-sm); }
+        .ticket-idx { font-weight: 700; color: var(--color-muted); min-width: 42px; }
+        .ball { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); color: #fff; }
+        .ball-red { background: #e23b3b; }
+        .ball-blue { background: #2563eb; margin-left: auto; }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function pick(n, k) { var pool = []; for (var i = 1; i <= n; i++) pool.push(i); var out = []; for (var j = 0; j < k; j++) { var idx = Math.floor(Math.random() * pool.length); out.push(pool[idx]); pool.splice(idx, 1); } return out.sort(function (a, b) { return a - b; }); }
+            function pad(x) { return (x < 10 ? '0' : '') + x; }
+            $('ltForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var count = Math.floor(U.numInput($('lt-count')) || 1);
+              if (count < 1) count = 1; if (count > 20) count = 20;
+              var html = '';
+              for (var t = 0; t < count; t++) {
+                var reds = pick(33, 6), blue = 1 + Math.floor(Math.random() * 16);
+                html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' +
+                  reds.map(function (r) { return '<span class="ball ball-red">' + pad(r) + '</span>'; }).join('') +
+                  '<span class="ball ball-blue">' + pad(blue) + '</span></div>';
+              }
+              $('lt-tickets').innerHTML = html;
+              $('lt-result').hidden = false;
+              U.track('calc_result', { tool: 'lotto', count: count });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

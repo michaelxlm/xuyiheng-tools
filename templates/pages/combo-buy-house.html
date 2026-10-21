@@ -1,0 +1,67 @@
+        <section class="page-heading">
+          <h1>买房全攻略</h1>
+          <p>一站算清买房核心账目：首付与贷款额度、等额本息月供与总利息、契税与主要交易税费，帮你在签约前对总预算心里有数。</p>
+        </section>
+
+        <form class="card" id="bhForm">
+          <div class="form-group"><label class="form-label" for="bh-price">房屋总价</label><div class="input-with-unit"><input class="form-input" id="bh-price" type="number" inputmode="decimal" min="0" placeholder="如 2000000"><span class="unit-tag">元</span></div></div>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="bh-down">首付比例</label><div class="input-with-unit"><input class="form-input" id="bh-down" type="number" inputmode="decimal" min="15" max="80" value="30"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-rate">贷款年利率</label><div class="input-with-unit"><input class="form-input" id="bh-rate" type="number" inputmode="decimal" min="0" step="0.01" value="3.85"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-years">贷款年限</label><div class="input-with-unit"><input class="form-input" id="bh-years" type="number" inputmode="numeric" min="1" max="30" value="30"><span class="unit-tag">年</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bh-area">建筑面积</label><div class="input-with-unit"><input class="form-input" id="bh-area" type="number" inputmode="decimal" min="0" placeholder="㎡"><span class="unit-tag">㎡</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-count">购房套数</label><select class="form-select" id="bh-count"><option value="1">首套</option><option value="2">二套</option></select></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"buy-house"}'>开始测算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="bh-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">月供（等额本息）</div><div class="result-value" id="bh-monthly">--</div></div>
+            <div><div class="result-label">首付金额</div><div class="result-value" id="bh-downamt">--</div></div>
+            <div><div class="result-label">购房总花费</div><div class="result-value" id="bh-total">--</div></div>
+          </div>
+          <dl class="result-detail" id="bh-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>契税按常见政策估算：首套 ≤90㎡ 1%、>90㎡ 1.5%；二套 3%（各地不同）。月供按等额本息公式计算。实际税费、中介费与贷款利率以当地政策及银行合同为准。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('bhForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var price = U.numInput($('bh-price'));
+              if (!(price > 0)) { alert('请输入房屋总价'); return; }
+              var down = U.numInput($('bh-down')); if (!Number.isFinite(down)) down = 30;
+              var rate = U.numInput($('bh-rate')) || 0, years = U.numInput($('bh-years')) || 30, area = U.numInput($('bh-area')) || 0, count = $('bh-count').value;
+              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12), r = rate / 100 / 12;
+              var monthly = r > 0 ? loan * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : loan / n;
+              var totalInterest = monthly * n - loan;
+              var deedRate = count === '1' ? (area > 90 ? 0.015 : 0.01) : 0.03;
+              var deed = price * deedRate;
+              var agent = price * 0.01;
+              var total = downAmt + monthly * n + deed + agent;
+              $('bh-monthly').textContent = U.money(monthly);
+              $('bh-downamt').textContent = U.money(downAmt);
+              $('bh-total').textContent = U.money(total);
+              $('bh-detail').innerHTML =
+                row('贷款总额', U.money(loan)) +
+                row('还款总期数', n + ' 期（' + years + ' 年）') +
+                row('支付总利息', U.money(totalInterest)) +
+                row('契税（' + (deedRate * 100) + '%）', U.money(deed)) +
+                row('中介费（约 1%）', U.money(agent));
+              $('bh-result').hidden = false;
+              U.track('calc_result', { tool: 'buy-house' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

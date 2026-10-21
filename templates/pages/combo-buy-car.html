@@ -1,0 +1,66 @@
+        <section class="page-heading">
+          <h1>买车全攻略</h1>
+          <p>购车落地价一站测算：首付与车贷月供、购置税（新能源减免）、交强险与商业险、车船税估算，看清全款还是贷款更划算、总共要花多少钱。</p>
+        </section>
+
+        <form class="card" id="bcForm">
+          <div class="form-group"><label class="form-label" for="bc-price">车辆指导价（开票价）</label><div class="input-with-unit"><input class="form-input" id="bc-price" type="number" inputmode="decimal" min="0" placeholder="如 150000"><span class="unit-tag">元</span></div></div>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="bc-down">首付比例</label><div class="input-with-unit"><input class="form-input" id="bc-down" type="number" inputmode="decimal" min="0" max="100" value="30"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="bc-rate">车贷年利率</label><div class="input-with-unit"><input class="form-input" id="bc-rate" type="number" inputmode="decimal" min="0" step="0.01" value="4.5"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="bc-years">贷款期限</label><div class="input-with-unit"><input class="form-input" id="bc-years" type="number" inputmode="numeric" min="1" max="5" value="3"><span class="unit-tag">年</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bc-energy">能源类型</label><select class="form-select" id="bc-energy"><option value="fuel">燃油车</option><option value="ev">新能源（纯电/插混）</option></select></div>
+            <div class="form-group"><label class="form-label" for="bc-disp">排量（燃油车）</label><select class="form-select" id="bc-disp"><option value="1.0">1.0L 及以下</option><option value="1.6" selected>1.0-1.6L</option><option value="2.0">1.6-2.0L</option><option value="2.5">2.0-2.5L</option></select></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"buy-car"}'>测算落地价</button></div>
+        </form>
+
+        <div class="result-box" id="bc-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">月供（等额本息）</div><div class="result-value" id="bc-monthly">--</div></div>
+            <div><div class="result-label">首付金额</div><div class="result-value" id="bc-downamt">--</div></div>
+            <div><div class="result-label">落地总价</div><div class="result-value" id="bc-total">--</div></div>
+          </div>
+          <dl class="result-detail" id="bc-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>购置税 ≈ 开票价 ÷ 1.13 × 10%（新能源按政策减免）。交强险家用 6 座以下 950 元/年；商业险按车价约 4% 首年估算；车船税按排量分档。数值为参考，实际以 4S 店与保险报价为准。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var TAXI = { '1.0': 300, '1.6': 360, '2.0': 420, '2.5': 660 };
+            $('bcForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var price = U.numInput($('bc-price'));
+              if (!(price > 0)) { alert('请输入车辆指导价'); return; }
+              var down = U.numInput($('bc-down')); if (!Number.isFinite(down)) down = 30;
+              var rate = U.numInput($('bc-rate')) || 0, years = U.numInput($('bc-years')) || 3, ev = $('bc-energy').value === 'ev';
+              var loan = price * (1 - down / 100), n = Math.round(years * 12), r = rate / 100 / 12;
+              var monthly = r > 0 ? loan * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : loan / n;
+              var interest = monthly * n - loan;
+              var purchase = ev ? 0 : price / 1.13 * 0.10;
+              var comp = price * 0.04, force = 950, vessel = ev ? 0 : (TAXI[$('bc-disp').value] || 360);
+              var total = price * down / 100 + monthly * n + purchase + comp + force + vessel;
+              $('bc-monthly').textContent = U.money(monthly);
+              $('bc-downamt').textContent = U.money(price * down / 100);
+              $('bc-total').textContent = U.money(total);
+              $('bc-detail').innerHTML =
+                row('贷款金额', U.money(loan)) +
+                row('贷款总利息', U.money(interest)) +
+                row('购置税', U.money(purchase) + (ev ? '（新能源减免）' : '')) +
+                row('商业险（首年估）', U.money(comp)) +
+                row('交强险', U.money(force)) +
+                row('车船税（估）', U.money(vessel));
+              $('bc-result').hidden = false;
+              U.track('calc_result', { tool: 'buy-car', energy: $('bc-energy').value });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

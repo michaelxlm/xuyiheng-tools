@@ -1,0 +1,84 @@
+        <section class="page-heading">
+          <h1>宝宝取名</h1>
+          <p>输入姓氏、选择性别与心仪风格，从寓意美好的常用字库中智能组合推荐名字，并逐字给出寓意解读，帮新生儿起一个朗朗好名。</p>
+        </section>
+
+        <form class="card" id="bnForm">
+          <div class="form-group"><label class="form-label" for="bn-surname">姓氏</label><input class="form-input" id="bn-surname" type="text" maxlength="2" placeholder="如 李 / 欧阳"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bn-gender">性别</label><select class="form-select" id="bn-gender"><option value="boy">男孩</option><option value="girl">女孩</option><option value="both">中性</option></select></div>
+            <div class="form-group"><label class="form-label" for="bn-count">名字字数</label><select class="form-select" id="bn-count"><option value="1">单字名</option><option value="2" selected>双字名</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">风格偏好</label>
+            <div class="chips" id="bn-styles">
+              <button type="button" class="chip active" data-i="0">文雅诗意</button>
+              <button type="button" class="chip" data-i="1">大气磅礴</button>
+              <button type="button" class="chip" data-i="2">温柔甜美</button>
+              <button type="button" class="chip" data-i="3">阳光活泼</button>
+              <button type="button" class="chip" data-i="4">寓意吉祥</button>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"baby-name"}'>推荐名字</button>
+            <button class="btn btn-secondary" type="button" id="bn-refresh">换一批</button>
+          </div>
+        </form>
+
+        <div class="name-list" id="bn-result" hidden></div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>名字由字库按风格加权随机组合，同一批次不重复，寓意取单字常见释义。正式取名请结合生辰、家族辈分与姓名规范再斟酌。</div></div>
+
+        <style>
+        .name-list { display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-top: var(--space-4); }
+        @media (min-width: 640px) { .name-list { grid-template-columns: 1fr 1fr; } }
+        .name-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); }
+        .name-card .nm { font-size: var(--text-xl); font-weight: 700; color: var(--color-primary); }
+        .name-card .mean { color: var(--color-muted); font-size: var(--text-sm); margin-top: 4px; }
+        .name-card .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .name-card .tag { background: var(--color-surface-2); border-radius: 999px; padding: 2px 10px; font-size: var(--text-xs); color: var(--color-muted); }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var BOY = [['睿','智慧通达',['智慧','通达']],['浩','浩然正气',['大气','正气']],['宇','气宇轩昂',['气度','宽广']],['辰','星辰璀璨',['星辰','美好']],['泽','恩泽润物',['仁慈','润泽']],['博','博学多才',['学识','广博']],['恒','持之以恒',['坚持','恒心']],['昊','昊天广大',['天空','宏大']],['霖','甘霖润物',['恩泽','福泽']],['轩','气宇轩昂',['气度','高雅']],['煜','煜煜生辉',['光明','灿烂']],['铭','铭记于心',['记忆','深刻']],['远','志存高远',['志向','远方']],['翔','翱翔天际',['自由','飞翔']],['瑞','瑞气祥云',['吉祥','美好']],['晨','朝气蓬勃',['早晨','希望']],['朗','朗若星辰',['明朗','清朗']],['逸','飘逸洒脱',['自由','超凡']],['鸿','鸿鹄之志',['志向','远大']],['哲','哲思明辨',['智慧','思辨']]];
+            var GIRL = [['婉','婉约温柔',['温柔','婉约']],['瑶','瑶池仙子',['美玉','珍贵']],['萱','萱草忘忧',['快乐','忘忧']],['晴','晴空万里',['晴朗','美好']],['悦','心悦诚服',['喜悦','愉悦']],['溪','溪流潺潺',['清澈','灵动']],['语','语笑嫣然',['言语','温柔']],['涵','涵养深厚',['内涵','修养']],['萌','萌动生机',['可爱','生机']],['颖','聪颖出众',['聪慧','出众']],['芷','芷若兰芷',['兰草','清雅']],['妍','妍丽多姿',['美丽','妍丽']],['若','若兰幽谷',['优雅','清新']],['诗','诗情画意',['诗意','文艺']],['彤','彤云初染',['红色','美好']],['瑾','怀瑾握瑜',['美玉','品德']],['昕','昕光初照',['黎明','希望']],['琳','琳琅满目',['美玉','珍贵']],['悠','悠然自得',['悠然','从容']],['汐','潮汐涨落',['水潮','灵动']]];
+            var STYLE = [['诗意','文艺','清雅','吉祥','美好'],['大气','宏大','远大','天空','志向','远方','广博'],['温柔','可爱','美好','婉约','愉悦','优雅'],['希望','生机','明朗','灿烂','早晨','光明'],['吉祥','美好','珍贵','福泽','如意']];
+            var styleIdx = 0;
+            $('bn-styles').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (!b) return; U.qsa('#bn-styles .chip').forEach(function (c) { c.classList.remove('active'); }); b.classList.add('active'); styleIdx = Number(b.getAttribute('data-i')); });
+
+            function gen() {
+              if (!$('bn-surname').value.trim()) { alert('请输入姓氏'); return; }
+              var g = $('bn-gender').value, n = Number($('bn-count').value);
+              var chars = g === 'girl' ? GIRL : g === 'boy' ? BOY : BOY.concat(GIRL);
+              var tags = STYLE[styleIdx] || [];
+              var hit = chars.filter(function (c) { return c[2].some(function (t) { return tags.indexOf(t) >= 0; }); });
+              var rest = chars.filter(function (c) { return hit.indexOf(c) < 0; });
+              function pick(excl) {
+                var useHit = hit.length && Math.random() < 0.85;
+                var src = useHit ? hit : (rest.length ? rest : hit);
+                for (var k = 0; k < src.length * 2; k++) { var c = src[Math.floor(Math.random() * src.length)]; if (!excl.has(c[0])) return c; }
+                for (var j = 0; j < chars.length; j++) if (!excl.has(chars[j][0])) return chars[j];
+                return null;
+              }
+              var sn = $('bn-surname').value.trim(), out = [], seen = {};
+              for (var i = 0; i < 80 && out.length < 6; i++) {
+                var used = new Set(), picked = [];
+                for (var k = 0; k < n; k++) { var c = pick(used); if (!c) break; used.add(c[0]); picked.push(c); }
+                if (picked.length < n) continue;
+                var name = picked.map(function (c) { return c[0]; }).join('');
+                if (seen[name]) continue; seen[name] = 1;
+                var tg = []; picked.forEach(function (c) { c[2].forEach(function (t) { if (tg.indexOf(t) < 0) tg.push(t); }); });
+                out.push('<div class="name-card"><div class="nm">' + sn + name + '</div><div class="mean">' + picked.map(function (c) { return c[0] + '：' + c[1]; }).join('　') + '</div><div class="tags">' + tg.slice(0, 4).map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div></div>');
+              }
+              $('bn-result').innerHTML = out.join(''); $('bn-result').hidden = false;
+              U.track('calc_result', { tool: 'baby-name', style: styleIdx });
+            }
+            $('bnForm').addEventListener('submit', function (e) { e.preventDefault(); gen(); });
+            $('bn-refresh').addEventListener('click', function () { if (!$('bn-result').hidden) gen(); });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

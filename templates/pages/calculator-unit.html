@@ -1,0 +1,48 @@
+        <section class="page-heading">
+          <h1>单位换算</h1>
+          <p>长度、重量、面积、温度、速度、存储六类常用单位一键互转，输入即实时换算。温度支持摄氏、华氏、开尔文三向互转。</p>
+        </section>
+
+        <form class="card" id="unitForm">
+          <div class="form-group">
+            <label class="form-label" for="unit-category">换算类别</label>
+            <select class="form-select" id="unit-category"></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="unit-source">源单位</label>
+              <select class="form-select" id="unit-source"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="unit-target">目标单位</label>
+              <select class="form-select" id="unit-target"></select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="unit-value">数值</label>
+            <input class="form-input" id="unit-value" type="number" inputmode="decimal" placeholder="请输入要换算的数值">
+          </div>
+
+          <div class="chips" id="unit-chips"></div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" id="unit-swap" data-track="click" data-track-props='{"tool":"unit","act":"swap"}'>⇄ 交换源 / 目标单位</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="unit-result" hidden>
+          <div class="result-row">
+            <div>
+              <div class="result-label" id="unit-result-label">换算结果</div>
+              <div class="result-value" id="unit-result-value">--</div>
+            </div>
+          </div>
+          <dl class="result-detail" id="unit-detail"></dl>
+        </div>
+
+        <div class="info-box">
+          <span aria-hidden="true">ℹ️</span>
+          <span>换算结果按有效数字自适应展示，可能存在极小的浮点舍入误差。</span>
+        </div>

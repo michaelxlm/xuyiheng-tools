@@ -1,0 +1,39 @@
+name: Deploy xuyiheng-tools
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64, static-deploy]
+    steps:
+      - name: Configure SSH for GitHub checkout
+        shell: bash
+        run: |
+          git config --system url."git@github.com:".insteadOf "https://github.com/"
+          mkdir -p /root/.ssh && chmod 700 /root/.ssh
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> /root/.ssh/known_hosts 2>/dev/null
+
+      - uses: actions/checkout@v4
+
+      - name: Encoding gate
+        shell: bash
+        run: |
+          NODE=/www/server/nodejs/v20.18.3/bin/node
+          [ -x "$NODE" ] || NODE=node
+          $NODE scripts/check-encoding.js
+
+      - name: Build
+        shell: bash
+        run: |
+          NODE=/www/server/nodejs/v20.18.3/bin/node
+          [ -x "$NODE" ] || NODE=node
+          $NODE scripts/build.js
+          $NODE scripts/check-links.js
+
+      - name: Sync to /www/wwwroot/uni-web
+        shell: bash
+        run: |
+          tar cf - --exclude=.git --exclude=.github --exclude=.user.ini . | ssh -i /root/.ssh/admin.xuyiheng.com_id_ed25519 -o StrictHostKeyChecking=accept-new root@39.107.225.222 "mkdir -p /www/wwwroot/uni-web ; cd /www/wwwroot/uni-web ; tar xmf -"

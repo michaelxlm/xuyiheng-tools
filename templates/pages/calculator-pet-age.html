@@ -1,0 +1,62 @@
+        <section class="page-heading">
+          <h1>宠物年龄换算</h1>
+          <p>输入猫或狗的实际年龄，按通行对照口径换算为 Equivalent 人类年龄，并给出所处生命阶段提示。</p>
+        </section>
+
+        <form class="card" id="paForm">
+          <div class="form-group">
+            <label class="form-label" for="pa-type">宠物类型</label>
+            <select class="form-select" id="pa-type">
+              <option value="cat">猫咪</option>
+              <option value="dog">狗狗</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="pa-age">实际年龄</label>
+            <div class="input-with-unit"><input class="form-input" id="pa-age" type="number" inputmode="decimal" min="0" max="30" placeholder="如 2"><span class="unit-tag">岁</span></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"pet-age"}'>换算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="pa-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="pa-label">人类年龄</div><div class="result-value" id="pa-human">--</div></div></div>
+          <dl class="result-detail" id="pa-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>换算口径：犬猫出生后第一年约相当于人类 15 岁，第二年约 +9 岁（合计 24 岁），此后猫每年 +4 岁、犬每年 +5 岁。个体差异较大，仅供趣味参考。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function stage(human) {
+              if (human < 15) return '幼年期';
+              if (human < 24) return '青少年期';
+              if (human < 45) return '成年期';
+              if (human < 65) return '熟年期';
+              return '老年期';
+            }
+            function calc() {
+              var type = $('pa-type').value;
+              var age = U.numInput($('pa-age'));
+              if (!Number.isFinite(age) || age < 0) { alert('请输入有效年龄'); return; }
+              var human;
+              if (age <= 1) human = age * 15;
+              else if (age <= 2) human = 15 + (age - 1) * 9;
+              else human = 24 + (age - 2) * (type === 'cat' ? 4 : 5);
+              human = Math.round(human);
+              $('pa-label').textContent = (type === 'cat' ? '猫咪' : '狗狗') + '「' + age + ' 岁」相当于人类';
+              $('pa-human').textContent = human + ' 岁';
+              $('pa-detail').innerHTML = row('生命阶段', stage(human)) + row('换算规则', age <= 1 ? '首年 15 岁/年' : age <= 2 ? '次年 9 岁/年' : (type === 'cat' ? '此后 4 岁/年' : '此后 5 岁/年'));
+              $('pa-result').hidden = false;
+              U.track('calc_result', { tool: 'pet-age', type: type });
+            }
+            $('paForm').addEventListener('submit', function (e) { e.preventDefault(); calc(); });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

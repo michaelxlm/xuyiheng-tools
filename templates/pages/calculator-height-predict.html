@@ -1,0 +1,52 @@
+        <section class="page-heading">
+          <h1>儿童身高预测</h1>
+          <p>基于遗传靶身高（Mid-parental Height）公式，输入父母身高与孩子性别，预测孩子成年后的目标身高及合理波动区间。</p>
+        </section>
+
+        <form class="card" id="hpForm">
+          <div class="form-group">
+            <label class="form-label" for="hp-sex">孩子性别</label>
+            <select class="form-select" id="hp-sex">
+              <option value="boy">男孩</option>
+              <option value="girl">女孩</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="hp-dad">父亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-dad" type="number" inputmode="decimal" min="120" max="220" placeholder="如 175"><span class="unit-tag">cm</span></div></div>
+            <div class="form-group"><label class="form-label" for="hp-mom">母亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-mom" type="number" inputmode="decimal" min="120" max="220" placeholder="如 165"><span class="unit-tag">cm</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"height-predict"}'>预测身高</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="hp-result" hidden>
+          <div class="result-row"><div><div class="result-label">遗传靶身高</div><div class="result-value" id="hp-target">--</div></div></div>
+          <dl class="result-detail" id="hp-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>靶身高公式：男孩 =（父 + 母 + 13）÷ 2；女孩 =（父 + 母 − 13）÷ 2，正常波动范围约为 ±5cm。遗传约占成年身高的 70%，营养、睡眠与运动同样关键。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('hpForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var dad = U.numInput($('hp-dad')), mom = U.numInput($('hp-mom'));
+              if (!Number.isFinite(dad) || !Number.isFinite(mom)) { alert('请输入父母身高'); return; }
+              var boy = $('hp-sex').value === 'boy';
+              var target = boy ? (dad + mom + 13) / 2 : (dad + mom - 13) / 2;
+              $('hp-target').textContent = U.round(target, 1) + ' cm';
+              $('hp-detail').innerHTML =
+                row('范围（±5cm）', U.round(target - 5, 1) + ' ~ ' + U.round(target + 5, 1) + ' cm') +
+                row('计算公式', boy ? '（' + dad + ' + ' + mom + ' + 13）÷ 2' : '（' + dad + ' + ' + mom + ' − 13）÷ 2');
+              $('hp-result').hidden = false;
+              U.track('calc_result', { tool: 'height-predict', sex: boy ? 'boy' : 'girl' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

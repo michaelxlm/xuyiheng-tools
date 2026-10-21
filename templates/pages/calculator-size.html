@@ -1,0 +1,82 @@
+        <section class="page-heading">
+          <h1>衣服尺码对照表</h1>
+          <p>网购衣服不再选错码。覆盖男/女装常见尺码，提供中国 CN、国际、美国 US、欧洲 EU、英国 UK、日本 JP 六套标准对照，输入任一脚码即可高亮对应整行。</p>
+        </section>
+
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="sz-gender">服装类别</label>
+              <select class="form-select" id="sz-gender">
+                <option value="men">男装 · 上装</option>
+                <option value="women">女装 · 上装</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="sz-query">输入你的尺码（如 40 / M / 170）</label>
+              <input class="form-input" id="sz-query" type="text" placeholder="支持 CN / US / EU / UK / JP / 国际码">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="sz-table">
+            <thead><tr><th>国际</th><th>中国 CN</th><th>美国 US</th><th>欧洲 EU</th><th>英国 UK</th><th>日本 JP</th><th>参考胸围(cm)</th></tr></thead>
+            <tbody id="sz-body"></tbody>
+          </table>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>各品牌版型差异较大，本表为通用参考。胸围/腰围实测数据最可靠：软尺水平绕胸部最丰满处一周即为胸围。命中行已高亮，如无匹配请核对标准体系。</div></div>
+
+        <style>
+        .table-wrap { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; background: var(--color-surface); border-radius: var(--radius); overflow: hidden; font-size: var(--text-sm); }
+        .data-table th, .data-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
+        .data-table th { background: var(--color-surface-2); color: var(--color-muted); font-weight: 600; }
+        .data-table tr.match td { background: var(--color-primary-light); font-weight: 600; }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var DATA = {
+              men: [
+                ['XS', '165/84A', '34', '44', '34', 'S', '81-84'],
+                ['S', '170/88A', '36', '46', '36', 'M', '85-89'],
+                ['M', '175/92A', '38-40', '48-50', '38-40', 'L', '90-96'],
+                ['L', '180/100A', '42', '52', '42', 'XL', '101-106'],
+                ['XL', '185/108A', '44-46', '54-56', '44-46', '2L', '107-113'],
+                ['XXL', '190/116A', '48', '58', '48', '3L', '114-119'],
+              ],
+              women: [
+                ['XS', '155/80A', '0-2', '34', '4-6', '5S', '78-81'],
+                ['S', '160/84A', '4-6', '36', '8-10', '7S', '82-85'],
+                ['M', '165/88A', '8-10', '38-40', '12-14', '9M', '86-91'],
+                ['L', '170/92A', '12-14', '42', '16', '11L', '92-97'],
+                ['XL', '175/100A', '16', '44', '18', '13LL', '98-104'],
+                ['XXL', '180/108A', '18', '46', '20', '4L', '105-112'],
+              ],
+            };
+            function render() {
+              var rows = DATA[$('sz-gender').value];
+              $('sz-body').innerHTML = rows.map(function (r) {
+                return '<tr><td>' + r.join('</td><td>') + '</td></tr>';
+              }).join('');
+              highlight();
+            }
+            function highlight() {
+              var q = String($('sz-query').value).trim().toUpperCase();
+              U.qsa('#sz-body tr').forEach(function (tr) {
+                var hit = q && Array.prototype.some.call(tr.children, function (td) { return td.textContent.toUpperCase().indexOf(q) >= 0; });
+                tr.classList.toggle('match', !!hit);
+              });
+            }
+            $('sz-gender').addEventListener('change', render);
+            $('sz-query').addEventListener('input', highlight);
+            render();
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

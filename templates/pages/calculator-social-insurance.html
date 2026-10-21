@@ -1,0 +1,58 @@
+        <section class="page-heading">
+          <h1>五险一金计算器</h1>
+          <p>输入缴费基数与公积金比例，一键算出个人与单位的养老、医疗、失业、工伤、生育及公积金逐月缴费明细，清楚到手工资如何构成。</p>
+        </section>
+
+        <form class="card" id="siForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="si-base">缴费基数</label><div class="input-with-unit"><input class="form-input" id="si-base" type="number" inputmode="decimal" min="0" placeholder="如 10000"><span class="unit-tag">元/月</span></div></div>
+            <div class="form-group"><label class="form-label" for="si-fund">公积金比例（个人）</label><div class="input-with-unit"><input class="form-input" id="si-fund" type="number" inputmode="decimal" min="5" max="12" value="12"><span class="unit-tag">%</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"social-insurance"}'>计算明细</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="si-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">个人月缴合计</div><div class="result-value" id="si-personal">--</div></div>
+            <div><div class="result-label">单位月缴合计</div><div class="result-value" id="si-company">--</div></div>
+            <div><div class="result-label">公积金账户入账</div><div class="result-value" id="si-account">--</div></div>
+          </div>
+          <dl class="result-detail" id="si-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>采用常见基准费率：个人 养老 8%、医疗 2%、失业 0.5%、公积金按所选比例；单位 养老 16%、医疗 9.5%、失业 0.5%、工伤 0.4%、生育 0.8%、公积金与个人同比例。各地政策不同，结果仅供参考。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('siForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var base = U.numInput($('si-base'));
+              if (!(base > 0)) { alert('请输入有效缴费基数'); return; }
+              var fund = U.numInput($('si-fund')); if (!Number.isFinite(fund)) fund = 12;
+              var p = { pension: base * 0.08, medical: base * 0.02, unemploy: base * 0.005, fund: base * fund / 100 };
+              var c = { pension: base * 0.16, medical: base * 0.095, unemploy: base * 0.005, injury: base * 0.004, maternity: base * 0.008, fund: base * fund / 100 };
+              var pTotal = p.pension + p.medical + p.unemploy + p.fund;
+              var cTotal = c.pension + c.medical + c.unemploy + c.injury + c.maternity + c.fund;
+              $('si-personal').textContent = U.money(pTotal);
+              $('si-company').textContent = U.money(cTotal);
+              $('si-account').textContent = U.money(p.fund + c.fund);
+              $('si-detail').innerHTML =
+                row('养老保险（个 8% / 单 16%）', U.money(p.pension) + ' / ' + U.money(c.pension)) +
+                row('医疗保险（个 2% / 单 9.5%）', U.money(p.medical) + ' / ' + U.money(c.medical)) +
+                row('失业保险（个 0.5% / 单 0.5%）', U.money(p.unemploy) + ' / ' + U.money(c.unemploy)) +
+                row('工伤保险（单 0.4%）', '— / ' + U.money(c.injury)) +
+                row('生育保险（单 0.8%）', '— / ' + U.money(c.maternity)) +
+                row('住房公积金（' + fund + '%）', U.money(p.fund) + ' / ' + U.money(c.fund));
+              $('si-result').hidden = false;
+              U.track('calc_result', { tool: 'social-insurance' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

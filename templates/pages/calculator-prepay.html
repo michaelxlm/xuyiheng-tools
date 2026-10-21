@@ -1,0 +1,114 @@
+        <section class="page-heading">
+          <h1>房贷提前还款计算器</h1>
+          <p>输入贷款总额、年利率、期限与已还期数，算清等额本息 / 等额本金的月供与剩余本金，并对比提前部分还款后「缩短年限」与「减少月供」两种方案能省多少利息。</p>
+        </section>
+
+        <form class="card" id="ppForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="pp-loan">贷款总额</label><div class="input-with-unit"><input class="form-input" id="pp-loan" type="number" inputmode="decimal" min="0" placeholder="如 1000000"><span class="unit-tag">元</span></div></div>
+            <div class="form-group"><label class="form-label" for="pp-rate">年利率</label><div class="input-with-unit"><input class="form-input" id="pp-rate" type="number" inputmode="decimal" min="0" step="0.01" placeholder="如 4.2"><span class="unit-tag">%</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="pp-term">贷款期限</label><div class="input-with-unit"><input class="form-input" id="pp-term" type="number" inputmode="decimal" min="1" placeholder="如 30"><span class="unit-tag">年</span></div></div>
+            <div class="form-group"><label class="form-label" for="pp-paid">已还期数</label><div class="input-with-unit"><input class="form-input" id="pp-paid" type="number" inputmode="numeric" min="0" placeholder="如 24"><span class="unit-tag">月</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="pp-method">还款方式</label><select class="form-select" id="pp-method"><option value="equal">等额本息</option><option value="principal">等额本金</option></select></div>
+            <div class="form-group"><label class="form-label" for="pp-prepay">提前还款金额（选填）</label><div class="input-with-unit"><input class="form-input" id="pp-prepay" type="number" inputmode="decimal" min="0" placeholder="如 200000"><span class="unit-tag">元</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"prepay"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="pp-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label" id="pp-p1label">月供</div><div class="result-value" id="pp-p1">--</div></div>
+            <div><div class="result-label">已还期后剩余本金</div><div class="result-value" id="pp-bal">--</div></div>
+          </div>
+          <dl class="result-detail" id="pp-detail"></dl>
+          <div id="pp-prepay-box" hidden>
+            <h3 class="card-title mt-4">提前还款方案对比</h3>
+            <dl class="result-detail" id="pp-prepay-detail"></dl>
+          </div>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>等额本息月供固定；等额本金首月最多、逐月递减。提前还款按「已还期数后的剩余本金」扣除还款额重算：缩短年限保持月供不变、减少月供保持剩余期限不变。实际以贷款银行合同为准。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function annuityPay(bal, r, n) { return r > 0 ? bal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : bal / n; }
+            function balanceAfter(L, r, n, k, method) {
+              if (method === 'principal') return L * (1 - k / n);
+              if (r <= 0) return L * (1 - k / n);
+              var P = annuityPay(L, r, n);
+              return L * Math.pow(1 + r, k) - P * (Math.pow(1 + r, k) - 1) / r;
+            }
+            function nFromPay(bal, r, pay) { if (r <= 0) return bal / pay; var v = pay / (pay - bal * r); if (v <= 0) return NaN; return Math.log(v) / Math.log(1 + r); }
+            $('ppForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var L = U.numInput($('pp-loan')), rate = U.numInput($('pp-rate')), term = U.numInput($('pp-term')), k = U.numInput($('pp-paid')) || 0, method = $('pp-method').value;
+              if (!(L > 0 && term > 0)) { alert('请输入贷款总额与期限'); return; }
+              if (!Number.isFinite(rate) || rate < 0) rate = 0;
+              var n = Math.round(term * 12), r = rate / 100 / 12;
+              k = Math.min(Math.max(0, Math.round(k)), n - 1);
+              var detail = '';
+              if (method === 'equal') {
+                var P = annuityPay(L, r, n);
+                $('pp-p1label').textContent = '月供'; $('pp-p1').textContent = U.money(P);
+                var paidInterest = P * k - (L - balanceAfter(L, r, n, k, method));
+                detail = row('总还款额', U.money(P * n)) + row('总利息', U.money(P * n - L)) + row('已还利息（' + k + ' 期）', U.money(paidInterest));
+              } else {
+                var first = L / n + L * r, last = L / n + (L / n) * r, totalI = (L * r * (n + 1)) / 2;
+                $('pp-p1label').textContent = '首月月供'; $('pp-p1').textContent = U.money(first);
+                detail = row('每月递减', U.money(L / n * r)) + row('末月月供', U.money(last)) + row('总利息', U.money(totalI));
+              }
+              var bal = balanceAfter(L, r, n, k, method);
+              $('pp-bal').textContent = U.money(bal);
+              $('pp-detail').innerHTML = detail;
+
+              var pre = U.numInput($('pp-prepay'));
+              var box = $('pp-prepay-box');
+              if (Number.isFinite(pre) && pre > 0 && pre < bal) {
+                var newBal = bal - pre;
+                var remainN = n - k;
+                var origRemainInterest, shortPay, shortN, shortInterest, savedMonths, newMonthly, reduceInterest;
+                if (method === 'equal') {
+                  shortPay = P_of();
+                  origRemainInterest = shortPay * remainN - bal;
+                  shortN = nFromPay(newBal, r, shortPay);
+                  shortInterest = Number.isFinite(shortN) ? shortPay * shortN - newBal : NaN;
+                  savedMonths = Number.isFinite(shortN) ? Math.round(remainN - shortN) : NaN;
+                  newMonthly = annuityPay(newBal, r, remainN);
+                  reduceInterest = newMonthly * remainN - newBal;
+                } else {
+                  // 等额本金：直接按剩余本金重算
+                  origRemainInterest = bal * r * (remainN + 1) / 2;
+                  newMonthly = newBal / remainN + newBal * r;
+                  reduceInterest = newBal * r * (remainN + 1) / 2;
+                  shortN = remainN; // 缩短年限下等额本金保持月供变化复杂，此处按减少月供为主
+                  shortInterest = reduceInterest; savedMonths = NaN;
+                }
+                var pd = row('提前还款后剩余本金', U.money(newBal));
+                if (method === 'equal' && Number.isFinite(savedMonths)) {
+                  pd += row('方案一 · 缩短年限', '月供基本不变，剩余 ' + Math.round(shortN) + ' 期（缩短约 ' + savedMonths + ' 个月）') +
+                    row('　缩短年限后利息', U.money(shortInterest) + '（省 ' + U.money(origRemainInterest - shortInterest) + '）');
+                }
+                pd += row('方案二 · 减少月供', '期限不变 ' + remainN + ' 期，新月供 ' + U.money(newMonthly)) +
+                  row('　减少月供后利息', U.money(reduceInterest) + '（省 ' + U.money(origRemainInterest - reduceInterest) + '）');
+                $('pp-prepay-detail').innerHTML = pd;
+                box.hidden = false;
+              } else { box.hidden = true; }
+
+              function P_of() { return annuityPay(L, r, n); }
+              $('pp-result').hidden = false;
+              U.track('calc_result', { tool: 'prepay', method: method });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

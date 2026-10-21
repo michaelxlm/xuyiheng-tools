@@ -1,0 +1,70 @@
+        <section class="page-heading">
+          <h1>装修材料计算器</h1>
+          <p>输入房间长宽与层高，选择瓷砖 / 地板 / 油漆 / 壁纸等材料类型，估算所需用量（含损耗率）与预估费用，装修采购前先心里有数。</p>
+        </section>
+
+        <form class="card" id="decForm">
+          <h3 class="card-title">📏 房间尺寸</h3>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="dec-len">房间长度</label><div class="input-with-unit"><input class="form-input" id="dec-len" type="number" inputmode="decimal" min="0" step="0.1" placeholder="米"><span class="unit-tag">m</span></div></div>
+            <div class="form-group"><label class="form-label" for="dec-wid">房间宽度</label><div class="input-with-unit"><input class="form-input" id="dec-wid" type="number" inputmode="decimal" min="0" step="0.1" placeholder="米"><span class="unit-tag">m</span></div></div>
+            <div class="form-group"><label class="form-label" for="dec-hei">房间高度</label><div class="input-with-unit"><input class="form-input" id="dec-hei" type="number" inputmode="decimal" min="0" step="0.1" value="2.8"><span class="unit-tag">m</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="dec-mat">材料类型</label>
+              <select class="form-select" id="dec-mat"><option value="0">瓷砖（60×60cm）</option><option value="1">地板</option><option value="2">油漆</option><option value="3">壁纸</option></select>
+            </div>
+            <div class="form-group"><label class="form-label" for="dec-price">材料单价</label><div class="input-with-unit"><input class="form-input" id="dec-price" type="number" inputmode="decimal" min="0" step="0.1" placeholder="元"><span class="unit-tag">元</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"decoration"}'>估算用量</button>
+            <button class="btn btn-secondary" type="button" id="dec-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="dec-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">所需数量</div><div class="result-value"><span id="dec-qty">--</span> <span id="dec-unit" class="text-sm"></span></div></div>
+            <div><div class="result-label">预估费用</div><div class="result-value" id="dec-cost">--</div></div>
+          </div>
+          <dl class="result-detail" id="dec-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>💡</span><div>结果已含 5–10% 损耗率，实际购买建议再多备一些。瓷砖按整块向上取整，油漆按墙面面积 × 12㎡/L 覆盖估算，壁纸按每卷 5.3㎡ 计。不同品牌规格用量会有差异。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('decForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var len = U.numInput($('dec-len')), wid = U.numInput($('dec-wid')), hei = U.numInput($('dec-hei'));
+              var mat = Number($('dec-mat').value), price = U.numInput($('dec-price')) || 0;
+              if (!(len > 0 && wid > 0)) { alert('请填写房间长和宽'); return; }
+              if (!(hei > 0)) hei = 2.8;
+              var floor = len * wid, wall = (len + wid) * 2 * hei;
+              var base = 0, waste = 0, unit = '';
+              if (mat === 0) { base = Math.ceil(floor / (0.6 * 0.6)); waste = 5; unit = '块'; }
+              else if (mat === 1) { base = Number(floor.toFixed(2)); waste = 5; unit = '㎡'; }
+              else if (mat === 2) { base = Math.ceil(wall * 12 / 1000); waste = 10; unit = '升'; }
+              else { base = Math.ceil(wall / 5.3); waste = 10; unit = '卷'; }
+              var qty = Math.ceil(base * (1 + waste / 100));
+              $('dec-qty').textContent = U.thousands(qty);
+              $('dec-unit').textContent = unit;
+              $('dec-cost').textContent = U.money(qty * price);
+              $('dec-detail').innerHTML =
+                row('房间面积', U.round(floor, 2) + ' ㎡') +
+                row('墙面面积', U.round(wall, 2) + ' ㎡') +
+                row('基础用量', base + ' ' + unit) +
+                row('损耗率', waste + '%');
+              $('dec-result').hidden = false;
+              U.track('calc_result', { tool: 'decoration', mat: mat });
+            });
+            $('dec-clear').addEventListener('click', function () { $('decForm').reset(); $('dec-hei').value = '2.8'; $('dec-result').hidden = true; });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

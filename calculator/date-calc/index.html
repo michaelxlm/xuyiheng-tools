@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>日期计算器 - 日期间隔天数/日期加减/星期查询</title>
+  <meta name="description" content="在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。">
+  <meta name="keywords" content="日期计算器,日期间隔,日期推算,星期查询,天数计算,一珩成长笔记">
+  <link rel="canonical" href="https://xuyiheng.com/calculator/date-calc/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="日期计算器 - 日期间隔天数/日期加减/星期查询">
+  <meta property="og:description" content="在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。">
+  <meta property="og:url" content="https://xuyiheng.com/calculator/date-calc/">
+  <meta property="og:site_name" content="一珩成长笔记">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/img/favicon.svg">
+  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
+    <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"日期计算器 - 日期间隔天数/日期加减/星期查询","url":"https://xuyiheng.com/calculator/date-calc/","description":"在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"日期计算器","item":"https://xuyiheng.com/calculator/date-calc/"}]}]}</script>
+</head>
+<body data-page="calculator-date-calc" data-page-id="calculator-date-calc">
+<a class="skip-link" href="#main">跳至内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon" aria-hidden="true">Y</span>
+      一珩工具
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+        <a href="/">首页</a>
+        <a href="/discover/">发现</a>
+        <a href="/search/">搜索</a>
+        <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+    </div>
+  </div>
+</header>
+<div class="site-body">
+<aside class="site-sidebar" aria-label="工具分类">
+      <div class="sidebar-group">
+    <div class="sidebar-title">计算器</div>
+    <nav class="sidebar-nav">
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calculator/unit/">单位换算</a>
+      <a href="/calculator/prepay/">房贷提前还款</a>
+      <a href="/calculator/pension/">养老金计算器</a>
+      <a href="/calculator/social-insurance/">五险一金</a>
+      <a href="/calculator/discount/">折扣计算</a>
+      <a href="/calculator/percentage/">百分比</a>
+      <a href="/calculator/overtime/">加班费</a>
+      <a href="/calculator/body-fat/">基础代谢体脂</a>
+      <a href="/calculator/pace/">跑步配速</a>
+      <a href="/calculator/date-calc/" class="active">日期计算</a>
+      <a href="/calculator/word-count/">字数统计</a>
+      <a href="/calculator/timezone/">时区转换</a>
+      <a href="/calculator/size/">衣服尺码</a>
+      <a href="/calculator/decoration/">装修预算</a>
+      <a href="/calculator/due-date/">预产期</a>
+      <a href="/calculator/height-predict/">儿童身高预测</a>
+      <a href="/calculator/pet-age/">宠物年龄</a>
+      <a href="/calculator/fuel-cost/">油耗计算</a>
+      <a href="/calculator/ip-query/">IP地址查询</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+      <a href="/calculator/secret-message/">密语</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">日历工具</div>
+    <nav class="sidebar-nav">
+      <a href="/calendar/">万年历·老黄历</a>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/calendar/countdown/">倒计时·纪念日</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">场景组合</div>
+    <nav class="sidebar-nav">
+      <a href="/combo/buy-house/">买房全攻略</a>
+      <a href="/combo/buy-car/">买车全攻略</a>
+      <a href="/combo/health-check/">健康体检站</a>
+      <a href="/combo/fun-test/">趣味测试</a>
+      <a href="/combo/finance-toolkit/">理财百宝箱</a>
+      <a href="/combo/life-plan/">人生规划</a>
+      <a href="/combo/color-lab/">色彩研究所</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">其他工具</div>
+    <nav class="sidebar-nav">
+      <a href="/probability/">概率计算器</a>
+      <a href="/random/">随机数生成</a>
+      <a href="/vision/">视力测试</a>
+      <a href="/lotto/">双色球</a>
+      <a href="/tools/">实用工具箱</a>
+    </nav>
+  </div>
+</aside>
+  <main class="site-main" id="main">
+    <div class="main-inner">
+        <nav class="breadcrumb" aria-label="面包屑"><a href="/">首页</a><span class="breadcrumb-sep" aria-hidden="true">/</span><span>日期计算器</span></nav>
+<section class="page-heading">
+          <h1>日期计算器</h1>
+          <p>支持三种常用场景：计算两个日期间隔天数、由某日期加减天数推算目标日期、查询任意日期是星期几及年内第几天。</p>
+        </section>
+
+        <form class="card" id="dcForm">
+          <div class="form-group">
+            <label class="form-label" for="dc-mode">计算方式</label>
+            <select class="form-select" id="dc-mode">
+              <option value="diff">日期间隔（两日期相差天数）</option>
+              <option value="add">日期推算（加减天数）</option>
+              <option value="weekday">星期查询（某日是星期几）</option>
+            </select>
+          </div>
+          <div class="form-group" id="dc-g1"><label class="form-label" for="dc-d1" id="dc-l1">开始日期</label><input class="form-input" id="dc-d1" type="date"></div>
+          <div class="form-group" id="dc-g2"><label class="form-label" for="dc-d2">结束日期</label><input class="form-input" id="dc-d2" type="date"></div>
+          <div class="form-group" id="dc-gd"><label class="form-label" for="dc-days">加减天数（负数为向前）</label><div class="input-with-unit"><input class="form-input" id="dc-days" type="number" inputmode="numeric" placeholder="如 100"><span class="unit-tag">天</span></div></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"date-calc"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="dc-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="dc-rlabel">结果</div><div class="result-value" id="dc-rvalue">--</div></div></div>
+          <dl class="result-detail" id="dc-detail"></dl>
+        </div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var WD = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            var DAY = 86400000;
+            function parseDate(id) { var v = $(id).value; if (!v) return null; var p = v.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+            function fmt(d) { var pad = function (x) { return (x < 10 ? '0' : '') + x; }; return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+            function dayOfYear(d) { var s = new Date(d.getFullYear(), 0, 0); return Math.floor((d - s) / DAY); }
+            var G = { diff: ['dc-g1', 'dc-g2'], add: ['dc-g1', 'dc-gd'], weekday: ['dc-g1'] };
+            function syncMode() {
+              var m = $('dc-mode').value, on = G[m];
+              ['dc-g1', 'dc-g2', 'dc-gd'].forEach(function (id) { $(id).hidden = on.indexOf(id) < 0; });
+              $('dc-l1').textContent = m === 'add' ? '起始日期' : '日期';
+            }
+            $('dc-mode').addEventListener('change', syncMode); syncMode();
+            $('dcForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var m = $('dc-mode').value, d1 = parseDate('dc-d1'), label = '', out = '', detail = '';
+              if (!d1) { alert('请选择日期'); return; }
+              if (m === 'diff') {
+                var d2 = parseDate('dc-d2'); if (!d2) { alert('请选择结束日期'); return; }
+                var days = Math.round(Math.abs(d2 - d1) / DAY);
+                label = '相差天数'; out = U.thousands(days) + ' 天';
+                detail = row('约合', U.round(days / 7, 1) + ' 周 / ' + U.round(days / 30, 1) + ' 个月') + row('含工作日', Math.ceil(days / 7) * 5 + '（近似）');
+              } else if (m === 'add') {
+                var n = U.numInput($('dc-days')); if (!Number.isFinite(n)) { alert('请输入天数'); return; }
+                var r = new Date(d1.getTime() + n * DAY);
+                label = n >= 0 ? '推算日期' : '回退日期'; out = fmt(r);
+                detail = row('星期', WD[r.getDay()]) + row('年内第几天', dayOfYear(r) + ' 天');
+              } else {
+                label = fmt(d1); out = WD[d1.getDay()];
+                detail = row('年内第几天', dayOfYear(d1)) + row('剩余天数', 365 - dayOfYear(d1) + '（平年）');
+              }
+              $('dc-rlabel').textContent = label; $('dc-rvalue').textContent = out;
+              $('dc-detail').innerHTML = detail; $('dc-result').hidden = false;
+              U.track('calc_result', { tool: 'date-calc', mode: m });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+        <div class="ad-slot" data-ad-slot="inline"></div>
+        <div class="coupon-slot" data-coupon-slot="strip"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="底部导航">
+    <a href="/"><span class="bottom-nav-icon">🏠</span>首页</a>
+    <a href="/discover/"><span class="bottom-nav-icon">🧭</span>发现</a>
+    <a href="/search/"><span class="bottom-nav-icon">🔍</span>搜索</a>
+</nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-section">
+    <h3>热门工具</h3>
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calendar/">万年历</a>
+      <a href="/calculator/prepay/">房贷计算</a>
+      <a href="/calculator/unit/">单位换算</a>
+  </div>
+    <div class="footer-section">
+    <h3>生活工具</h3>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/combo/buy-house/">买房攻略</a>
+      <a href="/combo/health-check/">健康体检</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+  </div>
+    <div class="footer-section">
+    <h3>关于</h3>
+      <a href="/about/">关于我们</a>
+      <a href="/privacy/">隐私政策</a>
+  </div>
+  </div>
+  <div class="footer-bottom">
+    © 一珩成长笔记
+  </div>
+</footer>
+    <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
+    <script src="/assets/js/ad-slots.min.js?v=2e89d0fe5c" defer></script>
+    <script src="/assets/js/coupon-slot.min.js?v=183e636953" defer></script>
+    <script src="/assets/js/utils.min.js?v=08436666a1" defer></script>
+    <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
+</body>

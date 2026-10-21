@@ -1,0 +1,91 @@
+        <section class="page-heading">
+          <h1>基础代谢与体脂率计算器</h1>
+          <p>采用 Mifflin-St Jeor 公式计算基础代谢率 BMR 与每日总消耗 TDEE，并用美国海军体脂法（围度测量）估算体脂率与理想体重区间。</p>
+        </section>
+
+        <form class="card" id="bfForm">
+          <div class="form-group">
+            <label class="form-label" for="bf-sex">性别</label>
+            <select class="form-select" id="bf-sex">
+              <option value="male">男</option>
+              <option value="female">女</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label" for="bf-age">年龄</label><div class="input-with-unit"><input class="form-input" id="bf-age" type="number" inputmode="numeric" min="10" max="100" placeholder="岁"></div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bf-height">身高</label><div class="input-with-unit"><input class="form-input" id="bf-height" type="number" inputmode="decimal" min="80" placeholder="cm"><span class="unit-tag">厘米</span></div></div>
+            <div class="form-group"><label class="form-label" for="bf-weight">体重</label><div class="input-with-unit"><input class="form-input" id="bf-weight" type="number" inputmode="decimal" min="20" placeholder="kg"><span class="unit-tag">公斤</span></div></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bf-activity">活动水平</label>
+            <select class="form-select" id="bf-activity">
+              <option value="1.2">久坐（几乎不运动）</option>
+              <option value="1.375">轻度（每周 1-3 天）</option>
+              <option value="1.55" selected>中度（每周 3-5 天）</option>
+              <option value="1.725">高度（每周 6-7 天）</option>
+              <option value="1.9">极高（体力劳动/专业训练）</option>
+            </select>
+          </div>
+          <details class="mt-2"><summary class="text-sm text-muted">填写围度以估算体脂率（选填）</summary>
+            <div class="field-grid mt-2">
+              <div class="form-group"><label class="form-label" for="bf-neck">颈围</label><div class="input-with-unit"><input class="form-input" id="bf-neck" type="number" inputmode="decimal" placeholder="cm"></div></div>
+              <div class="form-group"><label class="form-label" for="bf-waist">腰围</label><div class="input-with-unit"><input class="form-input" id="bf-waist" type="number" inputmode="decimal" placeholder="cm"></div></div>
+              <div class="form-group" id="bf-hip-wrap"><label class="form-label" for="bf-hip">臀围</label><div class="input-with-unit"><input class="form-input" id="bf-hip" type="number" inputmode="decimal" placeholder="cm"></div></div>
+            </div>
+          </details>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"body-fat"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="bf-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">基础代谢 BMR</div><div class="result-value" id="bf-bmr">--</div></div>
+            <div><div class="result-label">每日消耗 TDEE</div><div class="result-value" id="bf-tdee">--</div></div>
+            <div><div class="result-label">体脂率</div><div class="result-value" id="bf-bf">--</div></div>
+          </div>
+          <dl class="result-detail" id="bf-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>BMR（Mifflin-St Jeor）：男 = 10×体重 + 6.25×身高 − 5×年龄 + 5；女 = 同式 − 161。体脂率采用美国海军法（对数围度公式），需颈围、腰围（女性加臀围），单位厘米。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('bf-sex').addEventListener('change', function () { $('bf-hip-wrap').style.display = $('bf-sex').value === 'female' ? '' : 'none'; });
+            $('bf-hip-wrap').style.display = 'none';
+            function bodyFat(sex, h, neck, waist, hip) {
+              if (!(h > 0 && neck > 0 && waist > 0)) return NaN;
+              if (sex === 'male') return 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(h) + 36.76;
+              if (!(hip > 0)) return NaN;
+              return 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(h) - 78.387;
+            }
+            $('bfForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var sex = $('bf-sex').value, age = U.numInput($('bf-age')), h = U.numInput($('bf-height')), w = U.numInput($('bf-weight')), act = Number($('bf-activity').value);
+              if (!(h > 0 && w > 0 && age > 0)) { alert('请填写年龄、身高与体重'); return; }
+              var bmr = 10 * w + 6.25 * h - 5 * age + (sex === 'male' ? 5 : -161);
+              var tdee = bmr * act;
+              $('bf-bmr').textContent = Math.round(bmr) + ' kcal';
+              $('bf-tdee').textContent = Math.round(tdee) + ' kcal';
+              var detail = row('BMI', U.round(w / (h / 100) / (h / 100), 1)) + row('活动系数', act + ' 倍');
+              var neck = U.numInput($('bf-neck')), waist = U.numInput($('bf-waist')), hip = U.numInput($('bf-hip'));
+              var bf = bodyFat(sex, h, neck, waist, hip);
+              if (Number.isFinite(bf) && bf > 0 && bf < 75) {
+                $('bf-bf').textContent = U.round(bf, 1) + '%';
+                var fatMass = w * bf / 100;
+                detail += row('脂肪重量', U.round(fatMass, 1) + ' kg') + row('去脂体重', U.round(w - fatMass, 1) + ' kg');
+              } else {
+                $('bf-bf').textContent = '需围度';
+              }
+              $('bf-detail').innerHTML = detail;
+              $('bf-result').hidden = false;
+              U.track('calc_result', { tool: 'body-fat', sex: sex });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

@@ -1,0 +1,54 @@
+        <section class="page-heading">
+          <h1>健康体检站</h1>
+          <p>快速自我健康评估：BMI 体质指数与分级、理想体重区间、基础代谢率 BMR 与每日消耗参考，几分钟了解自己的身体状况。</p>
+        </section>
+
+        <form class="card" id="hcForm">
+          <div class="form-group"><label class="form-label" for="hc-sex">性别</label><select class="form-select" id="hc-sex"><option value="male">男</option><option value="female">女</option></select></div>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="hc-age">年龄</label><div class="input-with-unit"><input class="form-input" id="hc-age" type="number" inputmode="numeric" min="5" max="100" placeholder="岁"></div></div>
+            <div class="form-group"><label class="form-label" for="hc-height">身高</label><div class="input-with-unit"><input class="form-input" id="hc-height" type="number" inputmode="decimal" min="80" placeholder="cm"><span class="unit-tag">厘米</span></div></div>
+            <div class="form-group"><label class="form-label" for="hc-weight">体重</label><div class="input-with-unit"><input class="form-input" id="hc-weight" type="number" inputmode="decimal" min="20" placeholder="kg"><span class="unit-tag">公斤</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"health-check"}'>评估</button></div>
+        </form>
+
+        <div class="result-box" id="hc-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">BMI</div><div class="result-value" id="hc-bmi">--</div></div>
+            <div><div class="result-label">体型评级</div><div class="result-value" id="hc-cat" style="font-size:var(--text-lg)">--</div></div>
+          </div>
+          <dl class="result-detail" id="hc-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>评级采用中国成人标准：BMI &lt;18.5 偏瘦、18.5–23.9 正常、24–27.9 超重、≥28 肥胖。理想体重用 Devine 公式，BMR 用 Mifflin-St Jeor 公式。本工具仅为参考，不能替代医学诊断。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function cat(bmi) { return bmi < 18.5 ? '偏瘦' : bmi < 24 ? '正常' : bmi < 28 ? '超重' : '肥胖'; }
+            $('hcForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var sex = $('hc-sex').value, age = U.numInput($('hc-age')), h = U.numInput($('hc-height')), w = U.numInput($('hc-weight'));
+              if (!(h > 0 && w > 0)) { alert('请填写身高与体重'); return; }
+              if (!Number.isFinite(age)) age = 30;
+              var bmi = w / (h / 100) / (h / 100);
+              var ideal = sex === 'male' ? 50 + 2.3 * ((h - 152.4) / 2.54) : 45.5 + 2.3 * ((h - 152.4) / 2.54);
+              var bmr = 10 * w + 6.25 * h - 5 * age + (sex === 'male' ? 5 : -161);
+              $('hc-bmi').textContent = U.round(bmi, 1);
+              $('hc-cat').textContent = cat(bmi);
+              $('hc-detail').innerHTML =
+                row('理想体重（Devine）', U.round(ideal, 1) + ' kg（参考 ±10%）') +
+                row('健康体重区间（BMI 18.5–24）', U.round(18.5 * (h / 100) * (h / 100), 1) + ' ~ ' + U.round(24 * (h / 100) * (h / 100), 1) + ' kg') +
+                row('基础代谢 BMR', Math.round(bmr) + ' kcal/天') +
+                row('每日消耗参考（中度活动）', Math.round(bmr * 1.55) + ' kcal/天');
+              $('hc-result').hidden = false;
+              U.track('calc_result', { tool: 'health-check', sex: sex });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

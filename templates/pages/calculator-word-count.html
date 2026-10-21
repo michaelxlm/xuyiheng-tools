@@ -1,0 +1,59 @@
+        <section class="page-heading">
+          <h1>字数统计器</h1>
+          <p>实时统计文本的字符数、汉字数、英文单词数、数字与段落数，写作、公文、发帖前的字数核对工具，输入即更新。</p>
+        </section>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="wc-text">请输入或粘贴文本</label>
+            <textarea class="form-input" id="wc-text" rows="10" placeholder="在此输入文本，下方实时显示统计结果……" style="resize:vertical"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="wc-clear">清空</button>
+          </div>
+        </div>
+
+        <div class="result-box">
+          <div class="result-row">
+            <div><div class="result-label">字符数（含空格）</div><div class="result-value" id="wc-chars">0</div></div>
+            <div><div class="result-label">字符数（不含空格）</div><div class="result-value" id="wc-chars-ns">0</div></div>
+            <div><div class="result-label">汉字数</div><div class="result-value" id="wc-cn">0</div></div>
+            <div><div class="result-label">英文单词</div><div class="result-value" id="wc-en">0</div></div>
+          </div>
+          <dl class="result-detail">
+            <div class="result-detail-row"><dt>数字字符</dt><dd id="wc-num">0</dd></div>
+            <div class="result-detail-row"><dt>段落数</dt><dd id="wc-para">0</dd></div>
+            <div class="result-detail-row"><dt>行数</dt><dd id="wc-lines">0</dd></div>
+          </dl>
+        </div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function count() {
+              var t = $('wc-text').value || '';
+              var chars = t.length;
+              var charsNs = t.replace(/\s/g, '').length;
+              var cn = (t.match(/[\u4e00-\u9fa5]/g) || []).length;
+              var en = (t.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || []).length;
+              var num = (t.match(/[0-9]/g) || []).length;
+              var lines = t === '' ? 0 : t.split(/\n/).length;
+              var para = t === '' ? 0 : t.split(/\n\s*\n/).filter(function (s) { return s.trim(); }).length || (t.trim() ? 1 : 0);
+              $('wc-chars').textContent = chars;
+              $('wc-chars-ns').textContent = charsNs;
+              $('wc-cn').textContent = cn;
+              $('wc-en').textContent = en;
+              $('wc-num').textContent = num;
+              $('wc-lines').textContent = lines;
+              $('wc-para').textContent = para;
+            }
+            var debounced = U.debounce(function () { U.track('calc_result', { tool: 'word-count' }); }, 800);
+            $('wc-text').addEventListener('input', function () { count(); debounced(); });
+            $('wc-clear').addEventListener('click', function () { $('wc-text').value = ''; count(); });
+            count();
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

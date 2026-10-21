@@ -1,0 +1,53 @@
+        <section class="page-heading">
+          <h1>油耗计算器</h1>
+          <p>输入行驶里程、加油量与油价，计算百公里油耗、每公里油费与油费总额，反向也可由百公里油耗推算耗油量。</p>
+        </section>
+
+        <form class="card" id="fcForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="fc-dist">行驶里程</label><div class="input-with-unit"><input class="form-input" id="fc-dist" type="number" inputmode="decimal" min="0" placeholder="如 480"><span class="unit-tag">km</span></div></div>
+            <div class="form-group"><label class="form-label" for="fc-fuel">消耗燃油</label><div class="input-with-unit"><input class="form-input" id="fc-fuel" type="number" inputmode="decimal" min="0" placeholder="如 36"><span class="unit-tag">L</span></div></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fc-price">当前油价</label>
+            <div class="input-with-unit"><input class="form-input" id="fc-price" type="number" inputmode="decimal" min="0" placeholder="如 7.85"><span class="unit-tag">元/升</span></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fuel-cost"}'>计算油耗</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="fc-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">百公里油耗</div><div class="result-value" id="fc-per100">--</div></div>
+            <div><div class="result-label">每公里油费</div><div class="result-value" id="fc-perkm">--</div></div>
+          </div>
+          <dl class="result-detail" id="fc-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>百公里油耗 = 消耗燃油 ÷ 行驶里程 × 100。每公里油费 = 百公里油耗 ÷ 100 × 油价。建议加满油前后各记录一次里程与油量以获得更准结果。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('fcForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var dist = U.numInput($('fc-dist')), fuel = U.numInput($('fc-fuel')), price = U.numInput($('fc-price'));
+              if (!Number.isFinite(dist) || dist <= 0 || !Number.isFinite(fuel) || fuel <= 0) { alert('请输入有效里程与加油量'); return; }
+              var per100 = fuel / dist * 100;
+              var hasPrice = Number.isFinite(price) && price > 0;
+              var perKm = hasPrice ? per100 / 100 * price : NaN;
+              $('fc-per100').textContent = U.round(per100, 2) + ' L';
+              $('fc-perkm').textContent = hasPrice ? U.money(perKm) + ' /km' : '需填油价';
+              var detail = row('总油费', hasPrice ? U.money(fuel * price) : '--') + row('总耗油', U.round(fuel, 2) + ' L');
+              $('fc-detail').innerHTML = detail;
+              $('fc-result').hidden = false;
+              U.track('calc_result', { tool: 'fuel-cost' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

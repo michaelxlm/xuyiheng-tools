@@ -1,0 +1,130 @@
+        <section class="page-heading">
+          <h1>今日指南</h1>
+          <p>每天生活三合一速览：今日老黄历宜忌、星座运势打分、午餐吃什么推荐，再配一句今日寄语，帮你轻松开启一天。运势与宜忌仅供参考娱乐。</p>
+        </section>
+
+        <div class="card guide-hero">
+          <div class="gh-date"><b id="ghDay">--</b><span id="ghWeek">--</span></div>
+          <div class="gh-quote" id="ghQuote">--</div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">📅 今日黄历</h3>
+          <div class="lunar-line" id="gdLunar">--</div>
+          <div class="gd-yj"><span class="yj-tag yi">宜</span><span id="gdYi">--</span></div>
+          <div class="gd-yj"><span class="yj-tag ji">忌</span><span id="gdJi">--</span></div>
+          <a class="gd-more" href="/calendar/">查看完整老黄历 →</a>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">⭐ 星座运势</h3>
+          <div class="form-group"><label class="form-label" for="gdAstro">选择星座</label><select class="form-select" id="gdAstro"></select></div>
+          <div class="fortune" id="gdFortune"><p style="color:var(--color-muted);margin:0">正在加载今日运势…</p></div>
+          <div class="fortune-tip" id="gdFortuneTip"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">🍚 午餐吃什么</h3>
+          <div class="food-name" id="gdFood">--</div>
+          <div class="food-desc" id="gdFoodDesc"></div>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="gdFoodBtn">换一道</button></div>
+        </div>
+
+        <div class="info-box mt-4"><span>🍀</span><div>黄历宜忌、星座运势来自在线数据；接口不可达时按当日日期生成稳定的本地参考内容。本页面为娱乐向，请理性看待。</div></div>
+
+        <style>
+        .guide-hero { background: linear-gradient(135deg, var(--color-primary), #1e40af); color: #fff; }
+        .gh-date { display: flex; align-items: baseline; gap: var(--space-3); }
+        .gh-date b { font-size: var(--text-2xl); }
+        .gh-quote { margin-top: var(--space-2); opacity: .92; font-style: italic; }
+        .lunar-line { font-weight: 700; margin-bottom: var(--space-3); }
+        .gd-yj { display: flex; gap: var(--space-2); align-items: flex-start; margin-bottom: var(--space-2); }
+        .yj-tag { flex: none; width: 26px; height: 26px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: var(--text-sm); }
+        .yj-tag.yi { background: #16a34a; } .yj-tag.ji { background: #dc2626; }
+        .gd-more { display: inline-block; margin-top: var(--space-2); color: var(--color-primary); font-size: var(--text-sm); }
+        .fortune-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--color-border); }
+        .fortune-item:last-child { border-bottom: 0; }
+        .fi-label { width: 52px; } .fi-stars { color: #f59e0b; letter-spacing: 2px; }
+        .fortune-tip { margin-top: var(--space-2); color: var(--color-muted); font-size: var(--text-sm); }
+        .food-name { font-size: var(--text-2xl); font-weight: 800; color: var(--color-primary); }
+        .food-desc { color: var(--color-muted); margin-top: var(--space-1); }
+        </style>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var CONST = ['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'];
+            var YI = ['出行','嫁娶','开业','搬家','签约','装修','动土','祈福','祭祀','纳财','开市','修造','入学','求医','入宅','安床','交易','栽种'];
+            var JI = ['破土','安葬','开仓','掘井','词讼','伐木','作灶','行丧','开渠','探病','造桥','修坟','安门','立碑','破屋','坏垣'];
+            var FOODS = [['麻辣烫','暖胃又暖心，适合忙碌的一天'],['红烧牛肉面','满满一碗都是料，补充能量'],['黄焖鸡米饭','经典搭配，怎么吃都不腻'],['酸菜鱼','酸辣开胃，今天的好选择'],['日料寿司','精致一餐，犒劳自己'],['饺子','好吃不过饺子，来一盘吧'],['火锅','没有什么是一顿火锅解决不了的'],['轻食沙拉','健康饮食，给身体放个假'],['煲仔饭','锅巴焦香，一口入魂'],['咖喱鸡饭','异域风味，给味蕾来点刺激'],['烤鱼','外酥里嫩，配上米饭绝了'],['兰州拉面','一清二白三红四绿五黄'],['冒菜','一个人的火锅，照样精彩'],['烧鸭饭','皮脆肉嫩，酱汁浓郁'],['螺蛳粉','臭到上瘾，欲罢不能']];
+            var QUOTES = ['生活不是等待暴风雨过去，而是学会在雨中跳舞。','每一个不曾起舞的日子，都是对生命的辜负。','把每一天都当成生命的最后一天来过，总有一天你会是对的。','保持热爱，奔赴山海。','你只管努力，剩下的交给时间。','慢慢来，比较快。','人生没有彩排，每一天都是现场直播。','努力的意义，是让以后满眼都是喜欢的人和事。'];
+            var WK = ['周日','周一','周二','周三','周四','周五','周六'];
+            var now = new Date();
+            var key = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
+            function hash(str){var h=0;for(var i=0;i<str.length;i++){h=((h<<5)-h+str.charCodeAt(i))|0;}return Math.abs(h);}
+            function pick(list,count,seed){var a=list.slice(),out=[];for(var i=0;i<count&&a.length;i++){out.push(a.splice((seed+i*7)%a.length,1)[0]);}return out;}
+            // 本地农历（寿星压缩表 1900–2050）
+            var LI=[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,0x14b63];
+            var MN=1900,BA=Date.UTC(1900,0,31),DM=86400000,GA=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'],ZH=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'],AN=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'],MO=['正','二','三','四','五','六','七','八','九','十','冬','腊'],DN=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+            function yD(y){var s=348;for(var i=0x8000;i>0x8;i>>=1)s+=(LI[y-MN]&i)?1:0;return s+lD(y);}
+            function lM(y){return LI[y-MN]&0xf;}
+            function lD(y){return lM(y)?((LI[y-MN]&0x10000)?30:29):0;}
+            function mD(y,m){return (LI[y-MN]&(0x10000>>m))?30:29;}
+            function toLunar(y,m,d){if(y<MN||y>2050)return null;var off=Math.floor((Date.UTC(y,m-1,d)-BA)/DM);if(off<0)return null;var i,t=0;for(i=MN;i<=2050&&off>0;i++){t=yD(i);off-=t;}if(off<0){off+=t;i--;}var ly=i,leap=lM(ly),il=false,mo;for(mo=1;mo<13&&off>0;mo++){if(leap>0&&mo===leap+1&&!il){mo--;il=true;t=lD(ly);}else t=mD(ly,mo);if(il&&mo===leap+1)il=false;off-=t;}if(off===0&&leap>0&&mo===leap+1){if(il)il=false;else{il=true;mo--;}}if(off<0){off+=t;mo--;}return{lub:(il?'闰':'')+MO[mo-1]+'月',day:DN[off],gz:GA[((ly-4)%10+10)%10]+ZH[((ly-4)%12+12)%12],ani:AN[(((ly-4)%12)+12)%12]};}
+            var localLunar=toLunar(now.getFullYear(),now.getMonth()+1,now.getDate());
+            function lunarLine(l,extra){return l?('农历'+l.lub+l.day+' · '+l.gz+'年（'+l.ani+'）'+(extra||'')):('今日 · '+WK[now.getDay()]);}
+            $('gdLunar').textContent=lunarLine(localLunar);
+
+            $('ghDay').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+            $('ghWeek').textContent=WK[now.getDay()];
+            $('ghQuote').textContent='“'+QUOTES[hash(key)%QUOTES.length]+'”';
+            $('gdAstro').innerHTML=CONST.map(function(c,i){return '<option value="'+(i+1)+'">'+c+'</option>';}).join('');
+
+            // 宜忌：先本地兜底，再用接口覆盖
+            function localYJ(){var s=hash(key);$('gdYi').textContent=pick(YI,3+(s%3),s).join(' · ');$('gdJi').textContent=pick(JI,2+(s%2),s+17).join(' · ');}
+            localYJ();
+            var API=window.API;
+            if(API){
+              API.get(API.endpoints.tianapi,{type:'lunar',date:key}).then(function(res){
+                var d=(res&&res.data)||{};
+                if(String(res&&res.code)==='0'&&(d.lubarmonth||localLunar)){
+                  var gz=(d.tiangandizhiyear||(localLunar&&localLunar.gz))||'';
+                  var sx=(d.shengxiao||(localLunar&&localLunar.ani))||'';
+                  var lb=(d.lubarmonth&&d.lunarday)?('农历'+d.lubarmonth+d.lunarday):(localLunar?('农历'+localLunar.lub+localLunar.day):'');
+                  $('gdLunar').textContent=lb+(gz?' · '+gz+'年':'')+(sx?'（'+sx+'）':'')+(d.jieqi?' · '+d.jieqi:'');
+                  var yi=(d.fitness||'').trim(),ji=(d.taboo||'').trim();
+                  if(yi)$('gdYi').textContent=yi; if(ji)$('gdJi').textContent=ji;
+                }
+              }).catch(function(){});
+            }
+
+            // 星座运势
+            function stars(n){n=Math.max(0,Math.min(5,n));return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n);}
+            function localFortune(idx){var s=hash(key+idx);var dims=[['💰','财运'],['❤️','爱情'],['💼','事业'],['🩺','健康']];$('gdFortune').innerHTML=dims.map(function(d,i){return '<div class="fortune-item"><span>'+d[0]+'</span><span class="fi-label">'+d[1]+'</span><span class="fi-stars">'+stars(1+((s>>(i*2))%5))+'</span></div>';}).join('');$('gdFortuneTip').textContent='（本地生成，仅供参考）';}
+            function loadFortune(){
+              var idx=+$('gdAstro').value;
+              if(!API){localFortune(idx);return;}
+              $('gdFortune').innerHTML='<p style="color:var(--color-muted);margin:0">正在加载今日运势…</p>';
+              API.get(API.endpoints.jisuapi,{type:'fortune',astroid:String(idx),date:now.getFullYear(),month:now.getMonth()+1,day:now.getDate()}).then(function(res){
+                var d=(res&&res.data&&res.data.today)||null;
+                if(!d){localFortune(idx);return;}
+                var toS=function(v){if(typeof v==='number')return v>=1&&v<=5?v:Math.min(5,Math.max(1,Math.round(v/20)));var s=String(v||'');var f=(s.match(/★/g)||[]).length;if(f)return Math.min(5,f);var n=Number(s.replace(/%/g,''));return Number.isFinite(n)?(n>=1&&n<=5?n:Math.min(5,Math.max(1,Math.round(n/20)))):0;};
+                var items=[['💰','财运',d.money],['❤️','爱情',d.love],['💼','事业',d.career||d.work],['🩺','健康',d.health]];
+                $('gdFortune').innerHTML=items.map(function(it){return '<div class="fortune-item"><span>'+it[0]+'</span><span class="fi-label">'+it[1]+'</span><span class="fi-stars">'+stars(toS(it[2]))+'</span></div>';}).join('');
+                $('gdFortuneTip').textContent=d.presummary||d.summary||d.notice||'';
+              }).catch(function(){localFortune(idx);});
+            }
+            $('gdAstro').addEventListener('change',loadFortune);
+            loadFortune();
+
+            // 午餐
+            var foodIdx=hash(key)%FOODS.length;
+            function showFood(){$('gdFood').textContent=FOODS[foodIdx][0];$('gdFoodDesc').textContent=FOODS[foodIdx][1];}
+            showFood();
+            $('gdFoodBtn').addEventListener('click',function(){foodIdx=(foodIdx+1)%FOODS.length;showFood();U.track('daily_lunch_change',{});});
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

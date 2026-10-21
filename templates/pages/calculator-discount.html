@@ -1,0 +1,49 @@
+        <section class="page-heading">
+          <h1>折扣计算器</h1>
+          <p>支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于打了几折。</p>
+        </section>
+
+        <form class="card" id="discForm">
+          <div class="form-group">
+            <label class="form-label" for="disc-mode">计算模式</label>
+            <select class="form-select" id="disc-mode">
+              <option value="single">单折扣</option>
+              <option value="double">折上折</option>
+              <option value="reduce">满减叠加</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="disc-price">商品原价</label>
+            <div class="input-with-unit"><input class="form-input" id="disc-price" type="number" inputmode="decimal" min="0" placeholder="请输入原价" required><span class="unit-tag">元</span></div>
+          </div>
+
+          <div class="disc-single">
+            <div class="form-group"><label class="form-label" for="disc-d1">折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d1" type="number" inputmode="decimal" min="0" max="10" placeholder="如 8.5"><span class="unit-tag">折</span></div></div>
+          </div>
+          <div class="disc-double" hidden>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="disc-d1b">第一道折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d1b" type="number" inputmode="decimal" min="0" max="10" placeholder="如 8"><span class="unit-tag">折</span></div></div>
+              <div class="form-group"><label class="form-label" for="disc-d2">第二道折扣</label><div class="input-with-unit"><input class="form-input" id="disc-d2" type="number" inputmode="decimal" min="0" max="10" placeholder="如 9"><span class="unit-tag">折</span></div></div>
+            </div>
+          </div>
+          <div class="disc-reduce" hidden>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="disc-full">每满</label><div class="input-with-unit"><input class="form-input" id="disc-full" type="number" inputmode="decimal" min="0" placeholder="如 300"><span class="unit-tag">元</span></div></div>
+              <div class="form-group"><label class="form-label" for="disc-minus">减</label><div class="input-with-unit"><input class="form-input" id="disc-minus" type="number" inputmode="decimal" min="0" placeholder="如 50"><span class="unit-tag">元</span></div></div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"discount"}'>计算</button>
+            <button class="btn btn-secondary" type="button" id="disc-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="disc-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">到手价</div><div class="result-value" id="disc-final">--</div></div>
+            <div><div class="result-label">共省</div><div class="result-value" id="disc-save" style="color:var(--color-success)">--</div></div>
+          </div>
+          <dl class="result-detail" id="disc-detail"></dl>
+        </div>

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>基础代谢与体脂率计算器 - BMR TDEE 在线计算</title>
+  <meta name="description" content="在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。">
+  <meta name="keywords" content="基础代谢,BMR,体脂率,TDEE,每日消耗计算,一珩成长笔记">
+  <link rel="canonical" href="https://xuyiheng.com/calculator/body-fat/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="基础代谢与体脂率计算器 - BMR TDEE 在线计算">
+  <meta property="og:description" content="在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。">
+  <meta property="og:url" content="https://xuyiheng.com/calculator/body-fat/">
+  <meta property="og:site_name" content="一珩成长笔记">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/img/favicon.svg">
+  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
+    <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"基础代谢与体脂率计算器 - BMR TDEE 在线计算","url":"https://xuyiheng.com/calculator/body-fat/","description":"在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"基础代谢与体脂率计算器","item":"https://xuyiheng.com/calculator/body-fat/"}]}]}</script>
+</head>
+<body data-page="calculator-body-fat" data-page-id="calculator-body-fat">
+<a class="skip-link" href="#main">跳至内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon" aria-hidden="true">Y</span>
+      一珩工具
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+        <a href="/">首页</a>
+        <a href="/discover/">发现</a>
+        <a href="/search/">搜索</a>
+        <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+    </div>
+  </div>
+</header>
+<div class="site-body">
+<aside class="site-sidebar" aria-label="工具分类">
+      <div class="sidebar-group">
+    <div class="sidebar-title">计算器</div>
+    <nav class="sidebar-nav">
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calculator/unit/">单位换算</a>
+      <a href="/calculator/prepay/">房贷提前还款</a>
+      <a href="/calculator/pension/">养老金计算器</a>
+      <a href="/calculator/social-insurance/">五险一金</a>
+      <a href="/calculator/discount/">折扣计算</a>
+      <a href="/calculator/percentage/">百分比</a>
+      <a href="/calculator/overtime/">加班费</a>
+      <a href="/calculator/body-fat/" class="active">基础代谢体脂</a>
+      <a href="/calculator/pace/">跑步配速</a>
+      <a href="/calculator/date-calc/">日期计算</a>
+      <a href="/calculator/word-count/">字数统计</a>
+      <a href="/calculator/timezone/">时区转换</a>
+      <a href="/calculator/size/">衣服尺码</a>
+      <a href="/calculator/decoration/">装修预算</a>
+      <a href="/calculator/due-date/">预产期</a>
+      <a href="/calculator/height-predict/">儿童身高预测</a>
+      <a href="/calculator/pet-age/">宠物年龄</a>
+      <a href="/calculator/fuel-cost/">油耗计算</a>
+      <a href="/calculator/ip-query/">IP地址查询</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+      <a href="/calculator/secret-message/">密语</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">日历工具</div>
+    <nav class="sidebar-nav">
+      <a href="/calendar/">万年历·老黄历</a>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/calendar/countdown/">倒计时·纪念日</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">场景组合</div>
+    <nav class="sidebar-nav">
+      <a href="/combo/buy-house/">买房全攻略</a>
+      <a href="/combo/buy-car/">买车全攻略</a>
+      <a href="/combo/health-check/">健康体检站</a>
+      <a href="/combo/fun-test/">趣味测试</a>
+      <a href="/combo/finance-toolkit/">理财百宝箱</a>
+      <a href="/combo/life-plan/">人生规划</a>
+      <a href="/combo/color-lab/">色彩研究所</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">其他工具</div>
+    <nav class="sidebar-nav">
+      <a href="/probability/">概率计算器</a>
+      <a href="/random/">随机数生成</a>
+      <a href="/vision/">视力测试</a>
+      <a href="/lotto/">双色球</a>
+      <a href="/tools/">实用工具箱</a>
+    </nav>
+  </div>
+</aside>
+  <main class="site-main" id="main">
+    <div class="main-inner">
+        <nav class="breadcrumb" aria-label="面包屑"><a href="/">首页</a><span class="breadcrumb-sep" aria-hidden="true">/</span><span>基础代谢与体脂率计算器</span></nav>
+<section class="page-heading">
+          <h1>基础代谢与体脂率计算器</h1>
+          <p>采用 Mifflin-St Jeor 公式计算基础代谢率 BMR 与每日总消耗 TDEE，并用美国海军体脂法（围度测量）估算体脂率与理想体重区间。</p>
+        </section>
+
+        <form class="card" id="bfForm">
+          <div class="form-group">
+            <label class="form-label" for="bf-sex">性别</label>
+            <select class="form-select" id="bf-sex">
+              <option value="male">男</option>
+              <option value="female">女</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label" for="bf-age">年龄</label><div class="input-with-unit"><input class="form-input" id="bf-age" type="number" inputmode="numeric" min="10" max="100" placeholder="岁"></div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bf-height">身高</label><div class="input-with-unit"><input class="form-input" id="bf-height" type="number" inputmode="decimal" min="80" placeholder="cm"><span class="unit-tag">厘米</span></div></div>
+            <div class="form-group"><label class="form-label" for="bf-weight">体重</label><div class="input-with-unit"><input class="form-input" id="bf-weight" type="number" inputmode="decimal" min="20" placeholder="kg"><span class="unit-tag">公斤</span></div></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bf-activity">活动水平</label>
+            <select class="form-select" id="bf-activity">
+              <option value="1.2">久坐（几乎不运动）</option>
+              <option value="1.375">轻度（每周 1-3 天）</option>
+              <option value="1.55" selected>中度（每周 3-5 天）</option>
+              <option value="1.725">高度（每周 6-7 天）</option>
+              <option value="1.9">极高（体力劳动/专业训练）</option>
+            </select>
+          </div>
+          <details class="mt-2"><summary class="text-sm text-muted">填写围度以估算体脂率（选填）</summary>
+            <div class="field-grid mt-2">
+              <div class="form-group"><label class="form-label" for="bf-neck">颈围</label><div class="input-with-unit"><input class="form-input" id="bf-neck" type="number" inputmode="decimal" placeholder="cm"></div></div>
+              <div class="form-group"><label class="form-label" for="bf-waist">腰围</label><div class="input-with-unit"><input class="form-input" id="bf-waist" type="number" inputmode="decimal" placeholder="cm"></div></div>
+              <div class="form-group" id="bf-hip-wrap"><label class="form-label" for="bf-hip">臀围</label><div class="input-with-unit"><input class="form-input" id="bf-hip" type="number" inputmode="decimal" placeholder="cm"></div></div>
+            </div>
+          </details>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"body-fat"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="bf-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">基础代谢 BMR</div><div class="result-value" id="bf-bmr">--</div></div>
+            <div><div class="result-label">每日消耗 TDEE</div><div class="result-value" id="bf-tdee">--</div></div>
+            <div><div class="result-label">体脂率</div><div class="result-value" id="bf-bf">--</div></div>
+          </div>
+          <dl class="result-detail" id="bf-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>BMR（Mifflin-St Jeor）：男 = 10×体重 + 6.25×身高 − 5×年龄 + 5；女 = 同式 − 161。体脂率采用美国海军法（对数围度公式），需颈围、腰围（女性加臀围），单位厘米。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('bf-sex').addEventListener('change', function () { $('bf-hip-wrap').style.display = $('bf-sex').value === 'female' ? '' : 'none'; });
+            $('bf-hip-wrap').style.display = 'none';
+            function bodyFat(sex, h, neck, waist, hip) {
+              if (!(h > 0 && neck > 0 && waist > 0)) return NaN;
+              if (sex === 'male') return 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(h) + 36.76;
+              if (!(hip > 0)) return NaN;
+              return 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(h) - 78.387;
+            }
+            $('bfForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var sex = $('bf-sex').value, age = U.numInput($('bf-age')), h = U.numInput($('bf-height')), w = U.numInput($('bf-weight')), act = Number($('bf-activity').value);
+              if (!(h > 0 && w > 0 && age > 0)) { alert('请填写年龄、身高与体重'); return; }
+              var bmr = 10 * w + 6.25 * h - 5 * age + (sex === 'male' ? 5 : -161);
+              var tdee = bmr * act;
+              $('bf-bmr').textContent = Math.round(bmr) + ' kcal';
+              $('bf-tdee').textContent = Math.round(tdee) + ' kcal';
+              var detail = row('BMI', U.round(w / (h / 100) / (h / 100), 1)) + row('活动系数', act + ' 倍');
+              var neck = U.numInput($('bf-neck')), waist = U.numInput($('bf-waist')), hip = U.numInput($('bf-hip'));
+              var bf = bodyFat(sex, h, neck, waist, hip);
+              if (Number.isFinite(bf) && bf > 0 && bf < 75) {
+                $('bf-bf').textContent = U.round(bf, 1) + '%';
+                var fatMass = w * bf / 100;
+                detail += row('脂肪重量', U.round(fatMass, 1) + ' kg') + row('去脂体重', U.round(w - fatMass, 1) + ' kg');
+              } else {
+                $('bf-bf').textContent = '需围度';
+              }
+              $('bf-detail').innerHTML = detail;
+              $('bf-result').hidden = false;
+              U.track('calc_result', { tool: 'body-fat', sex: sex });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+        <div class="ad-slot" data-ad-slot="inline"></div>
+        <div class="coupon-slot" data-coupon-slot="strip"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="底部导航">
+    <a href="/"><span class="bottom-nav-icon">🏠</span>首页</a>
+    <a href="/discover/"><span class="bottom-nav-icon">🧭</span>发现</a>
+    <a href="/search/"><span class="bottom-nav-icon">🔍</span>搜索</a>
+</nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-section">
+    <h3>热门工具</h3>
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calendar/">万年历</a>
+      <a href="/calculator/prepay/">房贷计算</a>
+      <a href="/calculator/unit/">单位换算</a>
+  </div>
+    <div class="footer-section">
+    <h3>生活工具</h3>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/combo/buy-house/">买房攻略</a>
+      <a href="/combo/health-check/">健康体检</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+  </div>
+    <div class="footer-section">
+    <h3>关于</h3>
+      <a href="/about/">关于我们</a>
+      <a href="/privacy/">隐私政策</a>
+  </div>
+  </div>
+  <div class="footer-bottom">
+    © 一珩成长笔记
+  </div>
+</footer>
+    <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
+    <script src="/assets/js/ad-slots.min.js?v=2e89d0fe5c" defer></script>
+    <script src="/assets/js/coupon-slot.min.js?v=183e636953" defer></script>
+    <script src="/assets/js/utils.min.js?v=08436666a1" defer></script>
+    <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
+</body>

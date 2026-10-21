@@ -1,0 +1,69 @@
+        <section class="page-heading">
+          <h1>趣味测试合集</h1>
+          <p>娱乐向小测试：输入双方生日测星座契合度（缘分指数），以及生日数字生命灵数解读。纯属娱乐，给生活添点乐趣，请勿当真。</p>
+        </section>
+
+        <div class="chips" role="tablist">
+          <button type="button" class="chip active" data-tab="love" role="tab">💕 星座速配</button>
+          <button type="button" class="chip" data-tab="num" role="tab">🔢 生命灵数</button>
+        </div>
+
+        <form class="card" id="loveForm">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="lv-a">我的生日</label><input class="form-input" id="lv-a" type="date"></div>
+            <div class="form-group"><label class="form-label" for="lv-b">TA 的生日</label><input class="form-input" id="lv-b" type="date"></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fun-test","mode":"love"}'>测契合度</button></div>
+        </form>
+
+        <form class="card" id="numForm" hidden>
+          <div class="form-group"><label class="form-label" for="nm-date">你的出生日期</label><input class="form-input" id="nm-date" type="date"></div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fun-test","mode":"num"}'>测算灵数</button></div>
+        </form>
+
+        <div class="result-box" id="ft-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="ft-rlabel">结果</div><div class="result-value" id="ft-rvalue">--</div></div></div>
+          <dl class="result-detail" id="ft-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>🎈</span><div>本工具结果为趣味内容，非科学结论，仅供娱乐参考。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var Z = [['摩羯','土',1,20],['水瓶','风',2,19],['双鱼','水',3,21],['白羊','火',4,20],['金牛','土',5,21],['双子','风',6,22],['巨蟹','水',7,23],['狮子','火',8,23],['处女','土',9,23],['天秤','风',10,24],['天蝎','水',11,23],['射手','火',12,22],['摩羯','土',1,20]];
+            function sign(m, d) { for (var i = 0; i < 12; i++) { var s = Z[i], nx = Z[i + 1]; if (m === s[2] && d >= s[3]) return s; if (m === nx[2] && d < nx[3]) return s; } return m === 1 ? Z[11] : Z[0]; }
+            var FLOW = { 土: { 土: 88, 风: 62, 水: 90, 火: 68 }, 风: { 土: 62, 风: 85, 水: 66, 火: 90 }, 水: { 土: 90, 风: 66, 水: 86, 火: 72 }, 火: { 土: 68, 风: 90, 水: 72, 火: 84 } };
+            var NUM = { 1: '领导者 · 独立开创', 2: '协调者 · 温柔体贴', 3: '表达者 · 乐观创意', 4: '建设者 · 稳健务实', 5: '自由人 · 适应力强', 6: '奉献者 · 重视家庭', 7: '思想者 · 理性钻研', 8: '掌控者 · 目标驱动', 9: '理想家 · 博爱慷慨', 11: '大师数 · 直觉洞察', 22: '大师数 · 宏大构建', 33: '大师数 · 大爱导师' };
+            U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active'); var t = b.getAttribute('data-tab'); $('loveForm').hidden = t !== 'love'; $('numForm').hidden = t !== 'num'; $('ft-result').hidden = true; }); });
+            $('loveForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              if (!$('lv-a').value || !$('lv-b').value) { alert('请选择两个生日'); return; }
+              var a = $('lv-a').value.split('-'), b = $('lv-b').value.split('-');
+              var sa = sign(+a[1], +a[2]), sb = sign(+b[1], +b[2]);
+              var score = FLOW[sa[1]][sb[1]] - (sa[0] === sb[0] ? -3 : 0);
+              $('ft-rlabel').textContent = sa[0] + ' ♥ ' + sb[0];
+              $('ft-rvalue').textContent = '契合度 ' + score + '%';
+              $('ft-detail').innerHTML = row('缘分评级', score >= 88 ? '天作之合 ✨' : score >= 75 ? '相当合拍 😊' : score >= 65 ? '需要磨合 🤝' : '个性差异大 😅') + row('元素', sa[1] + '象 与 ' + sb[1] + '象');
+              $('ft-result').hidden = false;
+              U.track('calc_result', { tool: 'fun-test', mode: 'love' });
+            });
+            $('numForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              if (!$('nm-date').value) { alert('请选择出生日期'); return; }
+              var ds = $('nm-date').value.replace(/-/g, ''), s = 0;
+              for (var i = 0; i < ds.length; i++) s += +ds[i];
+              while (s > 9 && s !== 11 && s !== 22 && s !== 33) { s = String(s).split('').reduce(function (a, c) { return a + +c; }, 0); }
+              $('ft-rlabel').textContent = '生命灵数';
+              $('ft-rvalue').textContent = s;
+              $('ft-detail').innerHTML = row('解读', NUM[s] || '独特数字');
+              $('ft-result').hidden = false;
+              U.track('calc_result', { tool: 'fun-test', mode: 'num' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

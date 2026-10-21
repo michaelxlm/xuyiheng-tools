@@ -1,0 +1,81 @@
+        <section class="page-heading">
+          <h1>个税计算器</h1>
+          <p>输入工资与专项附加扣除，按 2019 年起施行的月度累进税率，精准计算个人所得税与税后收入，支持年终奖「单独计税 / 并入当月工资」两种方式。</p>
+        </section>
+
+        <form class="card" id="taxForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tax-salary">税前月收入</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-salary" type="number" inputmode="decimal" min="0" placeholder="请输入税前月收入" required>
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tax-insurance">五险一金</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-insurance" type="number" inputmode="decimal" min="0" placeholder="请输入五险一金">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="tax-d1">子女教育</label><input class="form-input" id="tax-d1" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d2">继续教育</label><input class="form-input" id="tax-d2" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d3">住房贷款利息</label><input class="form-input" id="tax-d3" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d4">住房租金</label><input class="form-input" id="tax-d4" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d5">赡养老人</label><input class="form-input" id="tax-d5" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-d6">大病医疗</label><input class="form-input" id="tax-d6" data-deduct type="number" min="0" placeholder="0"></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tax-threshold">起征点</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-threshold" type="number" min="0" value="5000">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tax-bonus">年终奖</label>
+              <div class="input-with-unit">
+                <input class="form-input" id="tax-bonus" type="number" min="0" value="0">
+                <span class="unit-tag">元</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tax-bonusMode">年终奖计税方式</label>
+            <select class="form-select" id="tax-bonusMode">
+              <option value="0">单独计税（全年一次性奖金）</option>
+              <option value="1">并入当月工资</option>
+            </select>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tax"}'>算个税</button>
+            <button class="btn btn-secondary" type="button" id="tax-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="tax-result" hidden>
+          <div class="result-row">
+            <div>
+              <div class="result-label">税后收入</div>
+              <div class="result-value" id="tax-afterTax">--</div>
+            </div>
+            <div>
+              <div class="result-label">应纳税额</div>
+              <div class="result-value" id="tax-tax">--</div>
+            </div>
+          </div>
+          <dl class="result-detail" id="tax-detail"></dl>
+        </div>
+
+        <div class="info-box">
+          <span aria-hidden="true">ℹ️</span>
+          <span>依据《个人所得税法》2019 年施行的综合所得月度税率表；全年一次性奖金单独计税优惠延续至 2027-12-31（财税〔2018〕164 号）。结果仅供参考。</span>
+        </div>

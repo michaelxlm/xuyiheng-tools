@@ -1,0 +1,62 @@
+# 一珩成长笔记
+
+> 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。
+
+本站为纯在线工具站，无需注册登录，打开即用。以下按分类列出全部页面（Markdown 链接）。
+
+## 首页
+- [首页](https://xuyiheng.com/): 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。
+
+## 核心页面
+- [发现](https://xuyiheng.com/discover/): 探索一珩成长笔记的精彩发现页面，发现更多有趣内容、实用计算器、日历工具、趣味测试和生活服务。
+- [搜索工具](https://xuyiheng.com/search/): 搜索一珩成长笔记全站实用工具，快速找到你想要的在线计算与查询工具。
+
+## 关于
+- [关于一珩成长笔记](https://xuyiheng.com/about/): 了解一珩成长笔记——纯实用工具站，提供万年历、各类计算器、星座运势、老黄历等20+在线工具，打开即用，无需下载。
+- [隐私政策](https://xuyiheng.com/privacy/): 一珩成长笔记隐私政策：无登录态设计，不收集账号与身份信息，仅采集匿名浏览数据，说明数据收集、使用、存储与第三方服务情况。
+
+## 计算器
+- [个人所得税计算器](https://xuyiheng.com/calculator/tax/): 在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。
+- [单位换算](https://xuyiheng.com/calculator/unit/): 在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。
+- [养老金计算器](https://xuyiheng.com/calculator/pension/): 在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。
+- [字数统计器](https://xuyiheng.com/calculator/word-count/): 在线字数统计工具，实时统计文字数量、字符数、段落数，写作必备工具。
+- [时区转换器](https://xuyiheng.com/calculator/timezone/): 在线时区转换器，支持全球主要时区之间的时间转换，出国旅行必备。
+- [装修计算器](https://xuyiheng.com/calculator/decoration/): 在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。
+- [宝宝取名](https://xuyiheng.com/calculator/baby-name/): 宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。
+- [IP地址查询](https://xuyiheng.com/calculator/ip-query/): 在线IP地址查询工具，快速查询IP地址的归属地、运营商等信息。
+- [密语](https://xuyiheng.com/calculator/secret-message/): 密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。
+- [衣服尺码对照表](https://xuyiheng.com/calculator/size/): 国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。
+- [基础代谢与体脂率计算器](https://xuyiheng.com/calculator/body-fat/): 在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。
+- [折扣到手价计算](https://xuyiheng.com/calculator/discount/): 在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。
+- [日期计算器](https://xuyiheng.com/calculator/date-calc/): 在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。
+- [房贷提前还款计算器](https://xuyiheng.com/calculator/prepay/): 在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。
+- [五险一金计算器](https://xuyiheng.com/calculator/social-insurance/): 在线五险一金计算器，输入缴费基数与公积金比例，一键算出个人与单位月缴费明细。
+- [预产期计算器](https://xuyiheng.com/calculator/due-date/): 在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。
+- [跑步配速计算器](https://xuyiheng.com/calculator/pace/): 在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。
+- [宠物年龄换算](https://xuyiheng.com/calculator/pet-age/): 在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。
+- [百分比计算器](https://xuyiheng.com/calculator/percentage/): 在线百分比计算器，支持占比计算、增长率计算、百分比值计算与按变化幅度还原原值。
+- [加班费计算器](https://xuyiheng.com/calculator/overtime/): 在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。
+- [儿童身高预测](https://xuyiheng.com/calculator/height-predict/): 在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。
+- [油耗计算器](https://xuyiheng.com/calculator/fuel-cost/): 在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。
+
+## 日历工具
+- [万年历老黄历查询](https://xuyiheng.com/calendar/): 在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。
+- [今日指南](https://xuyiheng.com/calendar/daily-guide/): 每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。
+- [重要日子](https://xuyiheng.com/calendar/countdown/): 在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。
+
+## 场景组合
+- [买房全攻略](https://xuyiheng.com/combo/buy-house/): 买房全攻略工具，整合房贷计算、税费估算、装修预算，买房决策一站搞定。
+- [买车全攻略](https://xuyiheng.com/combo/buy-car/): 买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。
+- [健康体检站](https://xuyiheng.com/combo/health-check/): 在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础代谢率 BMR 与每日消耗，快速自我健康评估。
+- [趣味测试合集](https://xuyiheng.com/combo/fun-test/): 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。
+- [理财百宝箱](https://xuyiheng.com/combo/finance-toolkit/): 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。
+- [人生规划计算器](https://xuyiheng.com/combo/life-plan/): 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。
+- [色彩研究所](https://xuyiheng.com/combo/color-lab/): 色彩研究所整合颜色搭配方案、中国传统色彩、颜色性格测试，探索色彩的魅力。
+
+## 其他工具
+- [概率计算器](https://xuyiheng.com/probability/): 在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。
+- [随机数生成器](https://xuyiheng.com/random/): 在线随机数生成器，快速生成指定范围的随机数字，实用小工具。
+- [在线视力测试](https://xuyiheng.com/vision/): 免费在线视力测试，快速检测视力水平，支持动态视力检测。
+- [双色球随机选号](https://xuyiheng.com/lotto/): 双色球随机模拟选号工具，一键生成随机号码，仅供娱乐参考。
+- [实用工具箱](https://xuyiheng.com/tools/): 精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。
+

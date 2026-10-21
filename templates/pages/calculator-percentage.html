@@ -1,0 +1,80 @@
+        <section class="page-heading">
+          <h1>百分比计算器</h1>
+          <p>支持占比计算、增长率计算、百分比值计算，以及按变化幅度还原原值，覆盖日常最常见的百分比场景。</p>
+        </section>
+
+        <form class="card" id="pctForm">
+          <div class="form-group">
+            <label class="form-label" for="pct-mode">计算方式</label>
+            <select class="form-select" id="pct-mode">
+              <option value="share">A 是 B 的百分之几（占比）</option>
+              <option value="growth">从 A 到 B 的增长率</option>
+              <option value="value">B 的 X% 是多少（百分比值）</option>
+              <option value="restore">已知变化率 r，由结果 B 还原原值 A</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" id="pct-l1" for="pct-a">数值 A</label><input class="form-input" id="pct-a" type="number" inputmode="decimal" placeholder="请输入"></div>
+            <div class="form-group"><label class="form-label" id="pct-l2" for="pct-b">数值 B</label><input class="form-input" id="pct-b" type="number" inputmode="decimal" placeholder="请输入"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"percentage"}'>计算</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="pct-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="pct-rlabel">结果</div><div class="result-value" id="pct-rvalue">--</div></div></div>
+          <dl class="result-detail" id="pct-detail"></dl>
+        </div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function n(id) { return U.numInput($(id)); }
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            var LABELS = {
+              share: ['数值 A', '数值 B（整体）'],
+              growth: ['原值 A', '新值 B'],
+              value: ['百分比 X（%）', '基准值 B'],
+              restore: ['变化率 r（%，正为增长）', '变化后的值 B'],
+            };
+            function syncLabels() {
+              var m = $('pct-mode').value;
+              $('pct-l1').textContent = LABELS[m][0];
+              $('pct-l2').textContent = LABELS[m][1];
+            }
+            $('pct-mode').addEventListener('change', syncLabels);
+            syncLabels();
+            $('pctForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var m = $('pct-mode').value, a = n('pct-a'), b = n('pct-b'), out, label, detail = '';
+              if (!Number.isFinite(a) || !Number.isFinite(b)) { alert('请输入两个数值'); return; }
+              if (m === 'share') {
+                if (b === 0) { alert('整体值不能为 0'); return; }
+                out = (a / b * 100).toFixed(2) + '%'; label = '占比';
+                detail = row('算式', a + ' ÷ ' + b + ' × 100%');
+              } else if (m === 'growth') {
+                if (a === 0) { alert('原值不能为 0'); return; }
+                var g = (b - a) / a * 100;
+                out = (g >= 0 ? '+' : '') + g.toFixed(2) + '%'; label = '增长率';
+                detail = row('变化量', U.round(b - a, 2) + '　' + (g >= 0 ? '增长' : '下降'));
+              } else if (m === 'value') {
+                out = U.money ? String(U.round(b * a / 100, 4)) : b * a / 100; label = '百分比值';
+                detail = row('算式', a + '% × ' + b);
+              } else {
+                var base = b / (1 + a / 100);
+                out = String(U.round(base, 4)); label = '还原原值 A';
+                detail = row('算式', b + ' ÷ (1 + ' + a + '%)');
+              }
+              $('pct-rlabel').textContent = label;
+              $('pct-rvalue').textContent = out;
+              $('pct-detail').innerHTML = detail;
+              $('pct-result').hidden = false;
+              U.track('calc_result', { tool: 'percentage', mode: m });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

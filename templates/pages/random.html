@@ -1,0 +1,74 @@
+        <section class="page-heading">
+          <h1>随机数生成器</h1>
+          <p>生成指定范围的随机整数或小数，支持一次生成多个、去重、不走回头路。可用于抽签、分组、抽奖、取样、密码随机数等场景。</p>
+        </section>
+
+        <form class="card" id="rndForm">
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="rnd-min">最小值</label><div class="input-with-unit"><input class="form-input" id="rnd-min" type="number" inputmode="numeric" value="1"></div></div>
+            <div class="form-group"><label class="form-label" for="rnd-max">最大值</label><div class="input-with-unit"><input class="form-input" id="rnd-max" type="number" inputmode="numeric" value="100"></div></div>
+            <div class="form-group"><label class="form-label" for="rnd-count">生成个数</label><div class="input-with-unit"><input class="form-input" id="rnd-count" type="number" inputmode="numeric" min="1" max="1000" value="1"><span class="unit-tag">个</span></div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="rnd-type">数值类型</label><select class="form-select" id="rnd-type"><option value="int">整数</option><option value="float">小数（2 位）</option></select></div>
+            <div class="form-group"><label class="form-label" for="rnd-unique">重复设置</label><select class="form-select" id="rnd-unique"><option value="allow">允许重复</option><option value="norep">整数不重复</option></select></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"random"}'>生成随机数</button></div>
+        </form>
+
+        <div class="result-box" id="rnd-result" hidden>
+          <div class="result-row"><div><div class="result-label">生成结果</div><div class="result-value" id="rnd-out" style="font-size:var(--text-xl);word-break:break-all">--</div></div></div>
+          <dl class="result-detail" id="rnd-detail"></dl>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="rnd-copy">复制结果</button></div>
+        </div>
+
+        <div class="info-box mt-4"><span>🎲</span><div>结果由浏览器加密级随机源 crypto.getRandomValues（不可用时退回 Math.random）生成。「整数不重复」时，取值范围需 ≥ 生成个数。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function randInt(min, max) {
+              if (window.crypto && crypto.getRandomValues) {
+                var span = max - min + 1, buf = new Uint32Array(1);
+                var limit = Math.floor(4294967296 / span) * span;
+                do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
+                return min + (buf[0] % span);
+              }
+              return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            var last = [];
+            $('rndForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var min = Math.floor(U.numInput($('rnd-min'))), max = Math.floor(U.numInput($('rnd-max'))), count = Math.floor(U.numInput($('rnd-count')) || 1);
+              var type = $('rnd-type').value, norep = $('rnd-unique').value === 'norep';
+              if (!Number.isFinite(min) || !Number.isFinite(max)) { alert('请填写最小值与最大值'); return; }
+              if (min > max) { var t = min; min = max; max = t; }
+              if (count < 1) count = 1; if (count > 1000) count = 1000;
+              var range = max - min + 1;
+              if (type === 'int' && norep && count > range) { alert('不重复个数超过取值范围（范围共 ' + range + ' 个），请减少个数'); return; }
+              var out = [], guard = 0;
+              if (type === 'float') {
+                for (var i = 0; i < count; i++) out.push(U.round(min + Math.random() * (max - min), 2));
+              } else if (norep) {
+                var pool = []; for (var v = min; v <= max; v++) pool.push(v);
+                for (var j = 0; j < count; j++) { var idx = randInt(0, pool.length - 1); out.push(pool[idx]); pool.splice(idx, 1); }
+              } else {
+                while (out.length < count && guard++ < 100000) out.push(randInt(min, max));
+              }
+              last = out;
+              $('rnd-out').textContent = out.join(', ');
+              $('rnd-detail').innerHTML = row('范围', min + ' ~ ' + max) + row('个数', out.length) + row('类型', type === 'float' ? '小数' : (norep ? '整数·不重复' : '整数·可重复'));
+              $('rnd-result').hidden = false;
+              U.track('calc_result', { tool: 'random', count: out.length });
+            });
+            $('rnd-copy').addEventListener('click', function () {
+              if (!last.length || !navigator.clipboard) return;
+              navigator.clipboard.writeText(last.join(', ')).then(function () { U.track('random_copy', {}); });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

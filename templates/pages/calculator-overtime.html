@@ -1,0 +1,60 @@
+        <section class="page-heading">
+          <h1>加班费计算器</h1>
+          <p>依据《劳动法》倍率标准：工作日加班 1.5 倍、休息日 2 倍、法定节假日 3 倍，输入月工资与各类加班时长，一键算清应得加班费。</p>
+        </section>
+
+        <form class="card" id="otForm">
+          <div class="form-group">
+            <label class="form-label" for="ot-salary">月工资（加班费计算基数）</label>
+            <div class="input-with-unit"><input class="form-input" id="ot-salary" type="number" inputmode="decimal" min="0" placeholder="如 8000" required><span class="unit-tag">元</span></div>
+          </div>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="ot-weekday">工作日加班时长</label><div class="input-with-unit"><input class="form-input" id="ot-weekday" type="number" inputmode="decimal" min="0" placeholder="小时"><span class="unit-tag">时</span></div></div>
+            <div class="form-group"><label class="form-label" for="ot-weekend">休息日加班时长</label><div class="input-with-unit"><input class="form-input" id="ot-weekend" type="number" inputmode="decimal" min="0" placeholder="小时"><span class="unit-tag">时</span></div></div>
+            <div class="form-group"><label class="form-label" for="ot-holiday">法定节假日加班时长</label><div class="input-with-unit"><input class="form-input" id="ot-holiday" type="number" inputmode="decimal" min="0" placeholder="小时"><span class="unit-tag">时</span></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"overtime"}'>计算加班费</button>
+            <button class="btn btn-secondary" type="button" id="ot-clear">清空</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="ot-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">加班费合计</div><div class="result-value" id="ot-total">--</div></div>
+            <div><div class="result-label">小时工资基数</div><div class="result-value" id="ot-hourly">--</div></div>
+          </div>
+          <dl class="result-detail" id="ot-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>月计薪天数按 <b>21.75 天</b>、每日 <b>8 小时</b> 折算小时工资：小时工资 = 月工资 ÷ 21.75 ÷ 8。实际基数以劳动合同约定为准。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function n(id) { return U.numInput($(id)); }
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            $('otForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var salary = n('ot-salary');
+              if (!Number.isFinite(salary) || salary <= 0) { alert('请输入有效月工资'); return; }
+              var hourly = salary / 21.75 / 8;
+              var wd = n('ot-weekday') || 0, we = n('ot-weekend') || 0, ho = n('ot-holiday') || 0;
+              var pWd = hourly * 1.5 * wd, pWe = hourly * 2 * we, pHo = hourly * 3 * ho;
+              var total = pWd + pWe + pHo;
+              $('ot-total').textContent = U.money(total);
+              $('ot-hourly').textContent = U.money(hourly);
+              $('ot-detail').innerHTML =
+                row('工作日加班（1.5 倍）', wd + ' 时 · ' + U.money(pWd)) +
+                row('休息日加班（2 倍）', we + ' 时 · ' + U.money(pWe)) +
+                row('法定节假日（3 倍）', ho + ' 时 · ' + U.money(pHo));
+              $('ot-result').hidden = false;
+              U.track('calc_result', { tool: 'overtime' });
+            });
+            $('ot-clear').addEventListener('click', function () { $('otForm').reset(); $('ot-result').hidden = true; });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

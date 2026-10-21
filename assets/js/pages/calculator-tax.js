@@ -1,0 +1,98 @@
+/* calculator-tax.js · 个税计算器交互逻辑（IIFE，零依赖） */
+(function () {
+  'use strict';
+  var U = window.U;
+
+  var BRACKETS = [
+    { limit: 3000, rate: 0.03, qd: 0 },
+    { limit: 12000, rate: 0.1, qd: 210 },
+    { limit: 25000, rate: 0.2, qd: 1410 },
+    { limit: 35000, rate: 0.25, qd: 2660 },
+    { limit: 55000, rate: 0.3, qd: 4410 },
+    { limit: 80000, rate: 0.35, qd: 7160 },
+    { limit: Infinity, rate: 0.45, qd: 15160 },
+  ];
+
+  function findBracket(income) {
+    for (var i = 0; i < BRACKETS.length; i++) {
+      if (income <= BRACKETS[i].limit) return BRACKETS[i];
+    }
+    return BRACKETS[BRACKETS.length - 1];
+  }
+  function progressive(income) {
+    var b = findBracket(income);
+    return Math.max(0, income * b.rate - b.qd);
+  }
+  function bonusTax(bonus) {
+    var b = findBracket(bonus / 12);
+    return Math.max(0, bonus * b.rate - b.qd);
+  }
+
+  function val(id) { return U.numInput(document.getElementById(id)) || 0; }
+
+  function detailRow(label, value) {
+    return '<div class="result-detail-row"><dt>' + label + '</dt><dd>' + value + '</dd></div>';
+  }
+
+  function calc() {
+    var salary = val('tax-salary');
+    var insurance = val('tax-insurance');
+    var threshold = val('tax-threshold') || 5000;
+    var bonus = val('tax-bonus');
+    var mode = document.getElementById('tax-bonusMode').value;
+
+    var deduct = 0;
+    U.qsa('[data-deduct]').forEach(function (el) { deduct += U.numInput(el) || 0; });
+
+    var salaryTaxable = salary - insurance - threshold - deduct;
+    var sTax, bTax;
+    if (mode === '0') {
+      sTax = salaryTaxable > 0 ? progressive(salaryTaxable) : 0;
+      bTax = bonus > 0 ? bonusTax(bonus) : 0;
+    } else {
+      var combined = salaryTaxable + bonus;
+      sTax = combined > 0 ? progressive(combined) : 0;
+      bTax = 0;
+    }
+    var tax = sTax + bTax;
+    var afterTax = salary - insurance + bonus - tax;
+
+    document.getElementById('tax-afterTax').textContent = U.money(afterTax);
+    document.getElementById('tax-tax').textContent = U.money(tax);
+
+    var detail = [
+      detailRow('税前收入', U.money(salary)),
+      detailRow('五险一金', U.money(insurance)),
+      detailRow('起征点', U.money(threshold)),
+      detailRow('专项附加扣除', U.money(deduct)),
+    ];
+    if (bonus > 0) {
+      detail.push(detailRow('年终奖', U.money(bonus)));
+      detail.push(detailRow('年终奖计税方式', mode === '0' ? '单独计税' : '并入当月工资'));
+      if (mode === '0') detail.push(detailRow('工资个税 / 年终奖个税', U.money(sTax) + ' / ' + U.money(bTax)));
+    }
+    document.getElementById('tax-detail').innerHTML = detail.join('');
+    document.getElementById('tax-result').hidden = false;
+    U.track('calc_result', { tool: 'tax', tax: Math.round(tax) });
+  }
+
+  function init() {
+    var form = document.getElementById('taxForm');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!val('tax-salary')) { alert('请填写税前月收入'); return; }
+      calc();
+    });
+    document.getElementById('tax-clear').addEventListener('click', function () {
+      form.reset();
+      document.getElementById('tax-threshold').value = 5000;
+      document.getElementById('tax-bonus').value = 0;
+      document.getElementById('tax-result').hidden = true;
+      document.getElementById('tax-detail').innerHTML = '';
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();

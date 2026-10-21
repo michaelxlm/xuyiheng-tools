@@ -1,0 +1,88 @@
+{
+  "site_name": "一珩成长笔记",
+  "short_name": "一珩工具",
+  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。",
+  "url": "https://xuyiheng.com",
+  "api_base": "https://api.xuyiheng.com",
+  "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
+  "ad_site_key": "main-tool",
+  "tracker_project": "main-tool",
+  "logo": "/assets/img/logo.svg",
+  "favicon": "/assets/img/favicon.svg",
+  "author": "一珩成长笔记",
+  "lang": "zh-CN",
+  "nav": [
+    { "label": "首页", "url": "/" },
+    { "label": "发现", "url": "/discover/" },
+    { "label": "搜索", "url": "/search/" },
+    { "label": "关于", "url": "/about/" }
+  ],
+  "sidebar_categories": [
+    { "label": "计算器", "items": [
+      { "label": "个税计算器", "url": "/calculator/tax/" },
+      { "label": "单位换算", "url": "/calculator/unit/" },
+      { "label": "房贷提前还款", "url": "/calculator/prepay/" },
+      { "label": "养老金计算器", "url": "/calculator/pension/" },
+      { "label": "五险一金", "url": "/calculator/social-insurance/" },
+      { "label": "折扣计算", "url": "/calculator/discount/" },
+      { "label": "百分比", "url": "/calculator/percentage/" },
+      { "label": "加班费", "url": "/calculator/overtime/" },
+      { "label": "基础代谢体脂", "url": "/calculator/body-fat/" },
+      { "label": "跑步配速", "url": "/calculator/pace/" },
+      { "label": "日期计算", "url": "/calculator/date-calc/" },
+      { "label": "字数统计", "url": "/calculator/word-count/" },
+      { "label": "时区转换", "url": "/calculator/timezone/" },
+      { "label": "衣服尺码", "url": "/calculator/size/" },
+      { "label": "装修预算", "url": "/calculator/decoration/" },
+      { "label": "预产期", "url": "/calculator/due-date/" },
+      { "label": "儿童身高预测", "url": "/calculator/height-predict/" },
+      { "label": "宠物年龄", "url": "/calculator/pet-age/" },
+      { "label": "油耗计算", "url": "/calculator/fuel-cost/" },
+      { "label": "IP地址查询", "url": "/calculator/ip-query/" },
+      { "label": "宝宝取名", "url": "/calculator/baby-name/" },
+      { "label": "密语", "url": "/calculator/secret-message/" }
+    ]},
+    { "label": "日历工具", "items": [
+      { "label": "万年历·老黄历", "url": "/calendar/" },
+      { "label": "今日指南", "url": "/calendar/daily-guide/" },
+      { "label": "倒计时·纪念日", "url": "/calendar/countdown/" }
+    ]},
+    { "label": "场景组合", "items": [
+      { "label": "买房全攻略", "url": "/combo/buy-house/" },
+      { "label": "买车全攻略", "url": "/combo/buy-car/" },
+      { "label": "健康体检站", "url": "/combo/health-check/" },
+      { "label": "趣味测试", "url": "/combo/fun-test/" },
+      { "label": "理财百宝箱", "url": "/combo/finance-toolkit/" },
+      { "label": "人生规划", "url": "/combo/life-plan/" },
+      { "label": "色彩研究所", "url": "/combo/color-lab/" }
+    ]},
+    { "label": "其他工具", "items": [
+      { "label": "概率计算器", "url": "/probability/" },
+      { "label": "随机数生成", "url": "/random/" },
+      { "label": "视力测试", "url": "/vision/" },
+      { "label": "双色球", "url": "/lotto/" },
+      { "label": "实用工具箱", "url": "/tools/" }
+    ]}
+  ],
+  "footer": {
+    "sections": [
+      { "title": "热门工具", "links": [
+        { "label": "个税计算器", "url": "/calculator/tax/" },
+        { "label": "万年历", "url": "/calendar/" },
+        { "label": "房贷计算", "url": "/calculator/prepay/" },
+        { "label": "单位换算", "url": "/calculator/unit/" }
+      ]},
+      { "title": "生活工具", "links": [
+        { "label": "今日指南", "url": "/calendar/daily-guide/" },
+        { "label": "买房攻略", "url": "/combo/buy-house/" },
+        { "label": "健康体检", "url": "/combo/health-check/" },
+        { "label": "宝宝取名", "url": "/calculator/baby-name/" }
+      ]},
+      { "title": "关于", "links": [
+        { "label": "关于我们", "url": "/about/" },
+        { "label": "隐私政策", "url": "/privacy/" }
+      ]}
+    ],
+    "copyright": "© 一珩成长笔记"
+  }
+}

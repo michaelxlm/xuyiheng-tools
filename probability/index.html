@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>概率计算器 - 数学概率在线计算</title>
+  <meta name="description" content="在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。">
+  <meta name="keywords" content="概率计算,数学概率,概率统计,数学工具,一珩成长笔记">
+  <link rel="canonical" href="https://xuyiheng.com/probability/">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="概率计算器 - 数学概率在线计算">
+  <meta property="og:description" content="在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。">
+  <meta property="og:url" content="https://xuyiheng.com/probability/">
+  <meta property="og:site_name" content="一珩成长笔记">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/img/favicon.svg">
+  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
+    <link rel="stylesheet" href="/assets/css/tokens.min.css?v=a0d18f5150">
+    <link rel="stylesheet" href="/assets/css/theme.min.css?v=7eea62384c">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"概率计算器 - 数学概率在线计算","url":"https://xuyiheng.com/probability/","description":"在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"概率计算器","item":"https://xuyiheng.com/probability/"}]}]}</script>
+</head>
+<body data-page="probability" data-page-id="probability">
+<a class="skip-link" href="#main">跳至内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon" aria-hidden="true">Y</span>
+      一珩工具
+    </a>
+    <nav class="site-nav" aria-label="主导航">
+        <a href="/">首页</a>
+        <a href="/discover/">发现</a>
+        <a href="/search/">搜索</a>
+        <a href="/about/">关于</a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">☀</button>
+      <a href="/search/" class="search-toggle" aria-label="搜索工具">🔍</a>
+    </div>
+  </div>
+</header>
+<div class="site-body">
+<aside class="site-sidebar" aria-label="工具分类">
+      <div class="sidebar-group">
+    <div class="sidebar-title">计算器</div>
+    <nav class="sidebar-nav">
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calculator/unit/">单位换算</a>
+      <a href="/calculator/prepay/">房贷提前还款</a>
+      <a href="/calculator/pension/">养老金计算器</a>
+      <a href="/calculator/social-insurance/">五险一金</a>
+      <a href="/calculator/discount/">折扣计算</a>
+      <a href="/calculator/percentage/">百分比</a>
+      <a href="/calculator/overtime/">加班费</a>
+      <a href="/calculator/body-fat/">基础代谢体脂</a>
+      <a href="/calculator/pace/">跑步配速</a>
+      <a href="/calculator/date-calc/">日期计算</a>
+      <a href="/calculator/word-count/">字数统计</a>
+      <a href="/calculator/timezone/">时区转换</a>
+      <a href="/calculator/size/">衣服尺码</a>
+      <a href="/calculator/decoration/">装修预算</a>
+      <a href="/calculator/due-date/">预产期</a>
+      <a href="/calculator/height-predict/">儿童身高预测</a>
+      <a href="/calculator/pet-age/">宠物年龄</a>
+      <a href="/calculator/fuel-cost/">油耗计算</a>
+      <a href="/calculator/ip-query/">IP地址查询</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+      <a href="/calculator/secret-message/">密语</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">日历工具</div>
+    <nav class="sidebar-nav">
+      <a href="/calendar/">万年历·老黄历</a>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/calendar/countdown/">倒计时·纪念日</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">场景组合</div>
+    <nav class="sidebar-nav">
+      <a href="/combo/buy-house/">买房全攻略</a>
+      <a href="/combo/buy-car/">买车全攻略</a>
+      <a href="/combo/health-check/">健康体检站</a>
+      <a href="/combo/fun-test/">趣味测试</a>
+      <a href="/combo/finance-toolkit/">理财百宝箱</a>
+      <a href="/combo/life-plan/">人生规划</a>
+      <a href="/combo/color-lab/">色彩研究所</a>
+    </nav>
+  </div>
+      <div class="sidebar-group">
+    <div class="sidebar-title">其他工具</div>
+    <nav class="sidebar-nav">
+      <a href="/probability/" class="active">概率计算器</a>
+      <a href="/random/">随机数生成</a>
+      <a href="/vision/">视力测试</a>
+      <a href="/lotto/">双色球</a>
+      <a href="/tools/">实用工具箱</a>
+    </nav>
+  </div>
+</aside>
+  <main class="site-main" id="main">
+    <div class="main-inner">
+        <nav class="breadcrumb" aria-label="面包屑"><a href="/">首页</a><span class="breadcrumb-sep" aria-hidden="true">/</span><span>概率计算器</span></nav>
+<section class="page-heading">
+          <h1>概率计算器</h1>
+          <p>常见概率一站式计算：单次事件概率、多个独立事件同时发生、重复试验「至少一次」命中概率，以及从 n 个中选 k 个的组合数。辅助学习与决策，结果即时可查。</p>
+        </section>
+
+        <div class="chips" role="tablist">
+          <button type="button" class="chip active" data-tab="single" role="tab">🎲 单次概率</button>
+          <button type="button" class="chip" data-tab="joint" role="tab">🔗 同时发生</button>
+          <button type="button" class="chip" data-tab="least" role="tab">🔁 至少一次</button>
+          <button type="button" class="chip" data-tab="comb" role="tab">🧮 组合数</button>
+        </div>
+
+        <form class="card" id="p-single">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="ps-fav">有利结果数</label><div class="input-with-unit"><input class="form-input" id="ps-fav" type="number" inputmode="numeric" min="0" placeholder="如 1"></div></div>
+            <div class="form-group"><label class="form-label" for="ps-total">总结果数</label><div class="input-with-unit"><input class="form-input" id="ps-total" type="number" inputmode="numeric" min="1" placeholder="如 6"></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算概率</button></div>
+        </form>
+
+        <form class="card" id="p-joint" hidden>
+          <p class="hint" style="margin:0 0 var(--space-3);color:var(--color-muted)">输入每个独立事件发生的概率（%），自动求同时发生的概率。</p>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="pj-a">事件 A 概率</label><div class="input-with-unit"><input class="form-input" id="pj-a" type="number" inputmode="decimal" min="0" max="100" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="pj-b">事件 B 概率</label><div class="input-with-unit"><input class="form-input" id="pj-b" type="number" inputmode="decimal" min="0" max="100" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="pj-c">事件 C（选填）</label><div class="input-with-unit"><input class="form-input" id="pj-c" type="number" inputmode="decimal" min="0" max="100" placeholder="%"><span class="unit-tag">%</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算联合概率</button></div>
+        </form>
+
+        <form class="card" id="p-least" hidden>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="pl-p">单次命中概率</label><div class="input-with-unit"><input class="form-input" id="pl-p" type="number" inputmode="decimal" min="0" max="100" placeholder="%"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="pl-n">重复次数</label><div class="input-with-unit"><input class="form-input" id="pl-n" type="number" inputmode="numeric" min="1" placeholder="次"><span class="unit-tag">次</span></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算至少一次</button></div>
+        </form>
+
+        <form class="card" id="p-comb" hidden>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="pc-n">总数 n</label><div class="input-with-unit"><input class="form-input" id="pc-n" type="number" inputmode="numeric" min="0" max="170" placeholder="n"></div></div>
+            <div class="form-group"><label class="form-label" for="pc-k">选取 k</label><div class="input-with-unit"><input class="form-input" id="pc-k" type="number" inputmode="numeric" min="0" max="170" placeholder="k"></div></div>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit">计算 C(n,k)</button></div>
+        </form>
+
+        <div class="result-box" id="pr-result" hidden>
+          <div class="result-row"><div><div class="result-label" id="pr-label">结果</div><div class="result-value" id="pr-value">--</div></div></div>
+          <dl class="result-detail" id="pr-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>公式：单次 P=有利/总数；独立事件同时发生 P=A×B×…；n 次至少一次命中 P=1−(1−p)ⁿ；组合数 C(n,k)=n!/[k!(n−k)!]。抽奖、游戏等场景请理性看待概率。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function pct(p) { return U.round(p * 100, 2) + '%'; }
+            function show(label, value, detail) { $('pr-label').textContent = label; $('pr-value').textContent = value; $('pr-detail').innerHTML = detail || ''; $('pr-result').hidden = false; }
+            var FORMS = { single: 'p-single', joint: 'p-joint', least: 'p-least', comb: 'p-comb' };
+            U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () {
+              U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active');
+              var t = b.getAttribute('data-tab'); Object.keys(FORMS).forEach(function (k) { $(FORMS[k]).hidden = k !== t; });
+            }); });
+            $('p-single').addEventListener('submit', function (e) { e.preventDefault();
+              var f = U.numInput($('ps-fav')), n = U.numInput($('ps-total'));
+              if (!(n > 0) || f < 0 || f > n) { alert('请输入有效数值（有利≤总数）'); return; }
+              var p = f / n;
+              show('事件概率', pct(p), row('有利/总数', f + ' / ' + n) + row('小数表示', U.round(p, 4)) + row('赔率(1:P)', '1 : ' + (p > 0 ? U.round(1 / p, 2) : '∞')));
+              U.track('calc_result', { tool: 'probability', mode: 'single' });
+            });
+            $('p-joint').addEventListener('submit', function (e) { e.preventDefault();
+              var a = U.numInput($('pj-a')), b = U.numInput($('pj-b')), c = U.numInput($('pj-c'));
+              var list = [a, b].concat(Number.isFinite(c) && c >= 0 ? [c] : []);
+              if (list.some(function (x) { return !Number.isFinite(x); })) { alert('请至少填写 A、B 概率'); return; }
+              var p = list.reduce(function (acc, x) { return acc * (x / 100); }, 1);
+              show('同时发生', pct(p), row('各事件', list.map(function (x) { return x + '%'; }).join(' × ')) + row('小数表示', U.round(p, 6)));
+              U.track('calc_result', { tool: 'probability', mode: 'joint' });
+            });
+            $('p-least').addEventListener('submit', function (e) { e.preventDefault();
+              var p = U.numInput($('pl-p')) / 100, n = U.numInput($('pl-n'));
+              if (!(p >= 0 && p <= 1) || !(n >= 1)) { alert('请输入有效概率与次数'); return; }
+              var hit = 1 - Math.pow(1 - p, n);
+              show('至少一次', pct(hit), row('单次概率', (p * 100) + '%') + row('重复次数', n + ' 次') + row('一次都不中', pct(Math.pow(1 - p, n))));
+              U.track('calc_result', { tool: 'probability', mode: 'least' });
+            });
+            function comb(n, k) { if (k > n) return 0; k = Math.min(k, n - k); var r = 1; for (var i = 0; i < k; i++) r = r * (n - i) / (i + 1); return Math.round(r); }
+            $('p-comb').addEventListener('submit', function (e) { e.preventDefault();
+              var n = U.numInput($('pc-n')), k = U.numInput($('pc-k'));
+              if (!(n >= 0) || !(k >= 0) || k > n || n > 170) { alert('请输入 0≤k≤n≤170'); return; }
+              var c = comb(n, k);
+              show('组合数 C(n,k)', U.thousands(c), row('含义', '从 ' + n + ' 个中取 ' + k + ' 个的方法数') + row('排列数 A(n,k)', U.thousands(comb(n, k) * factorial(k))));
+              U.track('calc_result', { tool: 'probability', mode: 'comb' });
+            });
+            function factorial(k) { var r = 1; for (var i = 2; i <= k; i++) r *= i; return r; }
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+        <div class="ad-slot" data-ad-slot="inline"></div>
+        <div class="coupon-slot" data-coupon-slot="strip"></div>
+    </div>
+  </main>
+</div>
+<nav class="bottom-nav" aria-label="底部导航">
+    <a href="/"><span class="bottom-nav-icon">🏠</span>首页</a>
+    <a href="/discover/"><span class="bottom-nav-icon">🧭</span>发现</a>
+    <a href="/search/"><span class="bottom-nav-icon">🔍</span>搜索</a>
+</nav>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-section">
+    <h3>热门工具</h3>
+      <a href="/calculator/tax/">个税计算器</a>
+      <a href="/calendar/">万年历</a>
+      <a href="/calculator/prepay/">房贷计算</a>
+      <a href="/calculator/unit/">单位换算</a>
+  </div>
+    <div class="footer-section">
+    <h3>生活工具</h3>
+      <a href="/calendar/daily-guide/">今日指南</a>
+      <a href="/combo/buy-house/">买房攻略</a>
+      <a href="/combo/health-check/">健康体检</a>
+      <a href="/calculator/baby-name/">宝宝取名</a>
+  </div>
+    <div class="footer-section">
+    <h3>关于</h3>
+      <a href="/about/">关于我们</a>
+      <a href="/privacy/">隐私政策</a>
+  </div>
+  </div>
+  <div class="footer-bottom">
+    © 一珩成长笔记
+  </div>
+</footer>
+    <script src="/assets/js/tracker.min.js?v=69a6321d14" defer></script>
+    <script src="/assets/js/ad-slots.min.js?v=2e89d0fe5c" defer></script>
+    <script src="/assets/js/coupon-slot.min.js?v=183e636953" defer></script>
+    <script src="/assets/js/utils.min.js?v=08436666a1" defer></script>
+    <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
+</body>
