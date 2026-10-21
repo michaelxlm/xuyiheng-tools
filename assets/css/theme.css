@@ -451,6 +451,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .footer-bottom a { color: var(--color-muted); text-decoration: none; }
 .footer-bottom a:hover { color: var(--color-text); }
+.footer-legal { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+.footer-sister a { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- 面包屑 ---------- */
 .breadcrumb {
@@ -519,7 +521,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .site-nav { display: flex; }
   .bottom-nav { display: none; }
   .site-main { padding-bottom: var(--space-8); }
-  .footer-inner { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+  .footer-inner { grid-template-columns: repeat(4, 1fr); }
   .footer-brand { grid-column: 1 / -1; }
 }
 

@@ -120,17 +120,37 @@ ${links}
   </div>`;
   }).join('\n');
 
+  // 更多站点（兄弟站互推，外链）
+  const sister = (footer.sister_sites || []);
+  let sisterSection = '';
+  if (sister.length) {
+    const sLinks = sister.map(l =>
+      `      <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a>`
+    ).join('\n');
+    sisterSection = `\n    <div class="footer-section footer-sister">
+    <h3>更多站点</h3>
+${sLinks}
+  </div>`;
+  }
+
+  // 备案号（合规文本，链工信部）
+  const beian = footer.icp
+    ? `    <a class="site-beian" href="${escapeHtml(footer.icp_url || 'https://beian.miit.gov.cn/')}" target="_blank" rel="noopener noreferrer">${escapeHtml(footer.icp)}</a>`
+    : '';
+
   return `<footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-brand">
       <a class="brand" href="/"><span class="brand-icon" aria-hidden="true">Y</span>${escapeHtml(site.short_name || site.site_name)}</a>
       <p class="footer-blurb">${escapeHtml(site.description || '')}</p>
     </div>
-${sections}
+${sections}${sisterSection}
   </div>
   <div class="footer-bottom">
     <span>${escapeHtml(footer.copyright || '')}</span>
-    <a href="#top">回到顶部 ↑</a>
+    <div class="footer-legal">
+${beian ? beian + '\n' : ''}      <a href="#top">回到顶部 ↑</a>
+    </div>
   </div>
 </footer>`;
 }
