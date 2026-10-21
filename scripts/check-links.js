@@ -38,7 +38,7 @@ function resolveTarget(href) {
   p = decodeURIComponent(p).replace(/^\/+/, '');
   if (!p) return path.join(ROOT, 'index.html');
   if (/\/$/.test(p)) return path.join(ROOT, p, 'index.html');
-  if (/\.(html|css|js|json|xml|svg|png|jpg|jpeg|webp|ico|txt)$/.test(p)) return path.join(ROOT, p);
+  if (/\.(html|css|js|json|xml|svg|png|jpg|jpeg|webp|ico|txt|webmanifest)$/.test(p)) return path.join(ROOT, p);
   // 无扩展无斜杠：按目录路由处理（补 /index.html）
   return path.join(ROOT, p, 'index.html');
 }

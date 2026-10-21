@@ -21,6 +21,9 @@ const P = require('./shared-partials');
 const ROOT = path.resolve(__dirname, '..');
 const TPL_DIR = path.join(ROOT, 'templates', 'pages');
 
+/** 品牌图标（apple-touch-icon / manifest 共用，字体无关的内联 SVG） */
+const BRAND_ICON_URI = 'data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%2796%27%20fill%3D%27%232563eb%27%2F%3E%3Crect%20x%3D%27120%27%20y%3D%27120%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23fff%27%2F%3E%3Crect%20x%3D%27280%27%20y%3D%27120%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23bcd0ff%27%2F%3E%3Crect%20x%3D%27120%27%20y%3D%27280%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23bcd0ff%27%2F%3E%3Crect%20x%3D%27280%27%20y%3D%27280%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23fff%27%2F%3E%3C%2Fsvg%3E';
+
 /** 路由 → 语义 slug（模板/页面资源文件名） */
 function slugOf(route) {
   const o = String(route.output || '')
@@ -182,6 +185,7 @@ function renderRoute(site, route, ctx) {
   const urlPath = urlPathOf(route);
   const origin = site.url.replace(/\/+$/, '');
   const canonical = origin + urlPath;
+  const ogImage = site.og_image || (origin + '/og-cover.png');
   const indexable = route.indexable !== false;
 
   // head 资源
@@ -221,8 +225,19 @@ function renderRoute(site, route, ctx) {
     '  <meta property="og:url" content="' + P.escapeHtml(canonical) + '">',
     '  <meta property="og:site_name" content="' + P.escapeHtml(site.site_name) + '">',
     '  <meta property="og:locale" content="zh_CN">',
-    '  <meta name="theme-color" content="#2563eb">',
+    '  <meta property="og:image" content="' + P.escapeHtml(ogImage) + '">',
+    '  <meta property="og:image:type" content="image/png">',
+    '  <meta property="og:image:width" content="1200">',
+    '  <meta property="og:image:height" content="630">',
+    '  <meta name="twitter:card" content="summary_large_image">',
+    '  <meta name="twitter:title" content="' + P.escapeHtml(route.title) + '">',
+    '  <meta name="twitter:description" content="' + P.escapeHtml(route.description || '') + '">',
+    '  <meta name="twitter:image" content="' + P.escapeHtml(ogImage) + '">',
+    '  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">',
+    '  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">',
     '  <link rel="icon" href="' + (site.favicon || '/assets/img/favicon.svg') + '">',
+    '  <link rel="apple-touch-icon" href="' + BRAND_ICON_URI + '">',
+    '  <link rel="manifest" href="/site.webmanifest">',
     '  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>',
     cssLinks.join('\n'),
     '  <script type="application/ld+json">' + ldJson + '</script>',
