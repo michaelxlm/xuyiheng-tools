@@ -48,9 +48,16 @@ function buildDatasets(a) {
 function run() {
   const origin = site.url.replace(/\/+$/, '');
 
-  // robots.txt
+  // 约定 AI 搜索爬虫 UA（GEO / LLM-SEO · WO-96 全网放行，与 main-api config.siteGeo.aiBots 一致）
+  const AI_BOTS = [ 'GPTBot', 'ChatGPT-User', 'OAI-SearchBot', 'ClaudeBot', 'anthropic-ai', 'PerplexityBot', 'Google-Extended', 'CCBot' ];
+
+  // robots.txt：通用放行 + 显式列出 AI 爬虫 UA 段（收录观测看板逐条校验其存在）
   const robots = [
     'User-agent: *',
+    'Allow: /',
+    '',
+    '# AI 搜索爬虫（GEO / LLM-SEO · WO-96 全网放行）：允许读取公共内容页',
+    ...AI_BOTS.map((ua) => 'User-agent: ' + ua),
     'Allow: /',
     '',
     'Sitemap: ' + origin + '/sitemap.xml',
