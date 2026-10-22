@@ -234,10 +234,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 /* 头部右侧操作 */
 .header-actions { display: flex; align-items: center; gap: var(--space-1); margin-left: auto; }
 
+/* 图标钮触控区按样式审计 T5 提档到 44×44（原 38×38，视觉图标尺寸不变） */
 .icon-btn,
 .search-toggle,
 .theme-toggle {
-  width: 38px; height: 38px; border: 1px solid transparent; background: transparent;
+  width: 44px; height: 44px; border: 1px solid transparent; background: transparent;
   color: var(--color-muted); border-radius: var(--radius-sm); cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; font-size: 16px;
   transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);

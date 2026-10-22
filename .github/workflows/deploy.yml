@@ -25,6 +25,14 @@ jobs:
           [ -x "$NODE" ] || NODE=node
           $NODE scripts/check-encoding.js
 
+      - name: WCAG gate (brand contrast)
+        shell: bash
+        run: |
+          # 样式审计 T4：品牌主色反色字对比度 ≥4.5:1 + 载体不得用未验证辅助色
+          NODE=/www/server/nodejs/v20.18.3/bin/node
+          [ -x "$NODE" ] || NODE=node
+          $NODE scripts/check-wcag.js
+
       - name: Build
         shell: bash
         run: |
