@@ -63,3 +63,16 @@ npm run check:encoding # UTF-8 编码门禁（禁 GBK/双重乱码/BOM）
 | 后端 API | `assets/js/http-api.js` → `https://api.xuyiheng.com`，带 `X-Source-Guard` 头 |
 | 开放数据集（DaaS） | `llms.txt` 的 `## Datasets` 区块由 `scripts/build-llms.js` 读 `data/llms-api.json` 生成（事实源 = main-api `config.apiGateway.match` + `config.mcp.datasets`，本期免费接入、不含单价 · WO-124）；Key 申请走 `https://api.xuyiheng.com/developer.html` |
 | 结构化数据 | 构建期写入 JSON-LD（WebSite/Organization/WebApplication/BreadcrumbList） |
+
+## 页脚与站点公共内容（对齐全站）
+
+页脚由 `scripts/shared-partials.js` 的 `renderFooter` 统一生成，数据源为 `data/site.json` 的 `footer`，与八站页脚范式保持一致：
+
+- **结构**：品牌栏（`footer-brand` + 简介 `footer-blurb`）→ 导航分区（热门工具 / 生活工具 / 关于）→ **更多站点** → 底栏（版权 + 备案号 + 回到顶部）。≥768px 为 brand 满宽一行 + 4 等分列。
+- **更多站点（兄弟站互推）**：`footer.sister_sites`，取自 fleet 单一事实源 `main-api/shared/partials` 的 `SISTER_SITES` 并**排除本站域名**，共 9 个外链（明先生日常 / cs调色盘 / 访客小站 / 小满美图 / 小满手记 / 实测手记 / 年表拾遗 / 小满券仓 / 东北电动车汇），格式「名称 · 域名」，`target="_blank" rel="noopener"`。
+- **备案号**：`footer.icp` = **`京ICP备18062653号-13`**，链向 `https://beian.miit.gov.cn/`。该号为权威值——来源生产库 `main.projects` 集合中 `url=xuyiheng.com` 记录的 `beian` 字段（与旧 `main-tool` H5 页脚读取 `project.beian` 同源）。⚠️ 同一主体号 `京ICP备18062653号` 下各站后缀不同，改动须查库或核对兄弟站，**禁止臆造**。
+- **head 公共 meta**：`prerender.js` 为每页写入 `og:image`（`/og-cover.png` 1200×630）+ `twitter:card/…`、双 `theme-color`、`apple-touch-icon`、`manifest`（`/site.webmanifest`）。
+
+## 视觉与布局
+
+对标一线工具站的极简克制风：毛玻璃吸顶头部 + 顶栏搜索、首页 Hero 搜索 + 热门 Bento 卡墙 + 分类色相系统（`data-cat` 驱动图标/圆点着色）、靛紫主色 `#4f46e5` + 青绿点缀 `#0d9488`、完整深色模式与 `reduced-motion` 适配。品牌/布局令牌 override 全放 `assets/css/theme.css`，`tokens.css` 保持六站共享不动；改版严格保留 42 页依赖的类名契约，故工具页零改动即刷新观感。
