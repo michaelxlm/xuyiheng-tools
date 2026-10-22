@@ -17,6 +17,7 @@
 const fs = require('fs');
 const path = require('path');
 const P = require('./shared-partials');
+const I = require('./icons');
 
 const ROOT = path.resolve(__dirname, '..');
 const TPL_DIR = path.join(ROOT, 'templates', 'pages');
@@ -152,16 +153,15 @@ function routesIndex() {
   return _routesIndex;
 }
 
-const CATEGORY_ICON = { '计算器': '🧮', '日历工具': '📅', '场景组合': '🧩', '其他工具': '🛠️' };
-const FEATURED = ['/calculator/tax/', '/calendar/', '/calculator/prepay/', '/combo/health-check/', '/combo/buy-house/', '/combo/color-lab/'];
 const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>';
+const FEATURED = ['/calculator/tax/', '/calendar/', '/calculator/prepay/', '/combo/health-check/', '/combo/buy-house/', '/combo/color-lab/'];
 
 function toolCardHtml(item, catLabel, idx, wide) {
   const r = idx[item.url] || {};
-  const icon = CATEGORY_ICON[catLabel] || '🔧';
+  const iconMarkup = I.iconRef(item.icon);
   const key = P.catKey(catLabel);
   return '          <a class="tool-card' + (wide ? ' is-wide' : '') + '"' + (key ? ' data-cat="' + key + '"' : '') + ' href="' + P.escapeHtml(item.url) + '">' +
-    '<span class="tool-card-icon" aria-hidden="true">' + icon + '</span>' +
+    '<span class="tool-card-icon">' + iconMarkup + '</span>' +
     '<span class="tool-card-title">' + P.escapeHtml(item.label) + '</span>' +
     '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
 }
@@ -170,7 +170,7 @@ function buildHomeContent(site) {
   const idx = routesIndex();
   const cats = site.sidebar_categories || [];
   const flat = {};
-  cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label }; }));
+  cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label, icon: it.icon }; }));
   const total = Object.keys(flat).length;
 
   const chips = cats.map((cat) => {
@@ -193,7 +193,7 @@ function buildHomeContent(site) {
   ].join('\n');
 
   const featCards = FEATURED.filter((u) => flat[u]).map((u, i) =>
-    toolCardHtml({ url: u, label: flat[u].label }, flat[u].cat, idx, i === 0)
+    toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0)
   ).join('\n');
   const featured = [
     '        <section class="home-section" id="featured">',
@@ -298,6 +298,7 @@ function renderRoute(site, route, ctx) {
 
   const body = [
     '<body data-page="' + P.escapeHtml(slug) + '" data-page-id="' + P.escapeHtml(slug) + '">',
+    I.fullSprite(),
     '<a class="skip-link" href="#main">跳至内容</a>',
     header,
     '<div class="site-body">',

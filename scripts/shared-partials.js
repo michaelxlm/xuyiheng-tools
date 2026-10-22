@@ -13,6 +13,8 @@ function escapeHtml(input) {
     .replace(/"/g, '&quot;');
 }
 
+const I = require('./icons');
+
 /* 分类 → 色相键（与 theme.css 的 [data-cat] 规则对应） */
 const CAT_KEY = { '计算器': 'calc', '日历工具': 'cal', '场景组合': 'combo', '其他工具': 'other' };
 function catKey(label) { return CAT_KEY[label] || ''; }
@@ -88,15 +90,15 @@ ${items}
  */
 function renderBottomNav(site, page) {
   const tabs = [
-    { label: '首页', url: '/', icon: '🏠' },
-    { label: '发现', url: '/discover/', icon: '🧭' },
-    { label: '搜索', url: '/search/', icon: '🔍' }
+    { label: '首页', url: '/', icon: 'home' },
+    { label: '发现', url: '/discover/', icon: 'compass' },
+    { label: '搜索', url: '/search/', icon: 'search' }
   ];
   const links = tabs.map(t => {
     const isActive = (t.url === '/' && !page.path) ||
       (page.path && t.url === '/' + page.path + '/');
     const cls = isActive ? ' class="active"' : '';
-    return `    <a href="${escapeHtml(t.url)}"${cls}><span class="bottom-nav-icon">${t.icon}</span>${escapeHtml(t.label)}</a>`;
+    return `    <a href="${escapeHtml(t.url)}"${cls}><span class="bottom-nav-ico">${I.iconRef(t.icon)}</span>${escapeHtml(t.label)}</a>`;
   }).join('\n');
 
   return `<nav class="bottom-nav" aria-label="底部导航">

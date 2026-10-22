@@ -34,6 +34,10 @@
   --color-danger: #dc2626;
   --color-success: #16a34a;
 
+  /* 搜索命中高亮 */
+  --mark-bg: #fde68a;
+  --mark-ink: inherit;
+
   /* 分类色（低饱和） */
   --cat-calc-bg: #eef2ff;   --cat-calc-ink: #4f46e5;
   --cat-cal-bg:  #ecfdf5;   --cat-cal-ink:  #0d9488;
@@ -86,6 +90,9 @@
 
   --color-danger: #f87171;
   --color-success: #4ade80;
+
+  --mark-bg: #92600e;
+  --mark-ink: #fde68a;
 
   --cat-calc-bg: rgba(129, 140, 248, 0.14); --cat-calc-ink: #a5b4fc;
   --cat-cal-bg:  rgba(45, 212, 191, 0.14);  --cat-cal-ink:  #5eead4;
@@ -145,6 +152,18 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- 图标（内联 SVG 雪碧图 + 线性图标基线） ---------- */
+/* 雪碧图容器：仅供 <use> 引用，不参与布局 */
+.svg-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* 所有语义图标：描边随 currentColor（即随主题色 / 分类色），几何在 symbol 内 */
+.ico {
+  width: 1.25em; height: 1.25em; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+  vertical-align: -0.18em;
 }
 
 /* ---------- 跳转辅助 ---------- */
@@ -319,7 +338,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .form-input, .form-select {
   width: 100%; padding: 10px 13px; border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm); background: var(--color-surface); color: var(--color-text);
-  font-size: var(--text-base); font-family: inherit; appearance: none;
+  font-size: var(--text-base); font-family: inherit; line-height: 1.5; appearance: none;
+  font-variant-numeric: tabular-nums;
   transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 .form-select {
@@ -332,10 +352,18 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .form-input[type="range"] { padding: 0; border: none; box-shadow: none; accent-color: var(--color-primary); height: 36px; background-image: none; }
 
+/* 数字输入：去原生 spinner（与自定义控件统一），等宽数字 */
+input.form-input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+input.form-input::-webkit-outer-spin-button,
+input.form-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* 搜索输入：去浏览器自带清除按钮（用自定义“清除”） */
+input.form-input[type="search"]::-webkit-search-cancel-button,
+input.form-input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+
 /* ---------- 按钮 ---------- */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 9px 18px; border: 1px solid transparent; border-radius: var(--radius-sm);
+  padding: 9px 18px; min-height: 42px; border: 1px solid transparent; border-radius: var(--radius-sm);
   font-size: var(--text-sm); font-weight: 600; font-family: inherit; cursor: pointer;
   transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast), transform var(--dur-fast);
   text-decoration: none; line-height: 1.2;
@@ -352,7 +380,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   background: var(--color-surface); border: 1px solid var(--color-border);
   border-radius: var(--radius); padding: var(--space-5) var(--space-6); margin-top: var(--space-5);
 }
-.result-value { font-size: clamp(1.4rem, 3vw, 1.75rem); font-weight: 700; color: var(--color-primary); letter-spacing: -0.02em; }
+.result-value { font-size: clamp(1.4rem, 3vw, 1.75rem); font-weight: 700; color: var(--color-primary); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .result-label { font-size: var(--text-sm); color: var(--color-muted); margin-bottom: 4px; }
 
 /* ---------- 工具网格 / Bento ---------- */
@@ -372,17 +400,22 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   text-decoration: none; border-color: var(--color-border-strong);
   box-shadow: var(--shadow-hover); transform: translateY(-2px);
 }
+.tool-card:hover .tool-card-icon { transform: scale(1.04); }
 .tool-card-icon {
   width: 42px; height: 42px; border-radius: 11px;
   background: var(--color-surface-2); color: var(--color-text);
-  display: grid; place-items: center; font-size: 20px;
+  display: grid; place-items: center;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 12%, transparent);
+  transition: transform var(--dur-base) var(--ease);
 }
+.tool-card-icon .ico { width: 22px; height: 22px; }
 .tool-card-title { font-weight: 600; font-size: var(--text-base); letter-spacing: -0.01em; }
 .tool-card-desc { font-size: var(--text-sm); color: var(--color-muted); line-height: 1.45; }
 
 /* Bento 宽卡（热门首卡跨列） */
 @media (min-width: 560px) { .tool-card.is-wide { grid-column: span 2; } }
-.tool-card.is-wide .tool-card-icon { width: 52px; height: 52px; font-size: 24px; }
+.tool-card.is-wide .tool-card-icon { width: 52px; height: 52px; }
+.tool-card.is-wide .tool-card-icon .ico { width: 26px; height: 26px; }
 .tool-card.is-wide .tool-card-title { font-size: var(--text-lg); }
 
 /* 分类着色（图标块） */
@@ -426,7 +459,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .bottom-nav a:hover { text-decoration: none; }
 .bottom-nav a.active { color: var(--color-primary); font-weight: 600; }
-.bottom-nav-icon { font-size: 19px; line-height: 1; }
+.bottom-nav-ico { display: inline-flex; }
+.bottom-nav-ico .ico { width: 20px; height: 20px; }
 
 /* ---------- 页脚 ---------- */
 .site-footer {
@@ -473,8 +507,13 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .field-grid .form-group { margin-bottom: 0; }
 
 .input-with-unit { display: flex; align-items: center; gap: 8px; }
-.input-with-unit .form-input { flex: 1; }
-.input-with-unit .unit-tag { color: var(--color-muted); font-size: var(--text-sm); white-space: nowrap; }
+.input-with-unit .form-input { flex: 1; min-width: 0; }
+.input-with-unit .unit-tag {
+  color: var(--color-muted); font-size: var(--text-sm); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  padding: 0 10px; min-height: 42px; display: inline-flex; align-items: center;
+  background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+}
 
 .btn-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-2); }
 
@@ -485,7 +524,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .result-detail-row { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--text-sm); }
 .result-detail-row dt { color: var(--color-muted); }
-.result-detail-row dd { margin: 0; font-weight: 600; }
+.result-detail-row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* 快捷标签 */
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
@@ -515,6 +554,26 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .dh-text h2 { margin: 0 0 var(--space-2); font-size: var(--text-xl); letter-spacing: -0.02em; }
 .dh-text p { margin: 0; color: var(--color-muted); max-width: 46ch; }
 .dh-btns { display: flex; gap: var(--space-2); }
+
+/* ---------- 搜索页 ---------- */
+.search-bar { display: flex; align-items: center; gap: var(--space-2); }
+.search-bar .form-input { flex: 1; min-width: 0; }
+.search-ic { width: 18px; height: 18px; color: var(--color-faint); }
+.hot-words { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.search-meta { color: var(--color-muted); font-size: var(--text-sm); margin-bottom: var(--space-3); }
+.search-meta b { color: var(--color-text); font-variant-numeric: tabular-nums; }
+
+/* 搜索命中高亮 */
+.tool-card mark { background: var(--mark-bg); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; }
+
+/* 空态 */
+.search-empty { text-align: center; color: var(--color-muted); padding: var(--space-7) var(--space-5); }
+.search-empty .empty-ico { width: 30px; height: 30px; color: var(--color-faint); margin-bottom: var(--space-3); }
+.search-empty p { margin: 0; }
+
+/* ---------- 信息块图标 ---------- */
+.info-box > :first-child { display: inline-flex; align-items: center; line-height: 1.6; }
+.info-box .ico { width: 18px; height: 18px; color: var(--color-primary); }
 
 /* ---------- 响应式：768px+ ---------- */
 @media (min-width: 768px) {

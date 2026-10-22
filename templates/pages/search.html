@@ -5,7 +5,7 @@
 
         <div class="card">
           <div class="search-bar">
-            <span class="search-ic" aria-hidden="true">🔍</span>
+            <svg class="ico search-ic" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
             <input class="form-input" id="searchInput" type="search" placeholder="搜索：个税、房贷、万年历、BMI、汇率…" autocomplete="off" aria-label="搜索工具">
             <button class="btn btn-secondary" type="button" id="searchClear" hidden>清除</button>
           </div>
@@ -14,20 +14,12 @@
 
         <div class="search-meta" id="searchMeta">共收录 <b>--</b> 个工具</div>
         <div class="tool-grid" id="searchResults"></div>
-        <div class="card" id="searchEmpty" hidden><p style="margin:0;color:var(--color-muted)">没有找到匹配的工具，换个关键词试试。</p></div>
+        <div class="card search-empty" id="searchEmpty" hidden>
+          <svg class="ico empty-ico" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
+          <p>没有找到匹配的工具，换个关键词试试。</p>
+        </div>
 
-        <div class="info-box mt-4"><span>💡</span><div>搜索在本页浏览器内即时匹配，不经过服务器，保护隐私。</div></div>
-
-        <style>
-        .search-bar { display: flex; align-items: center; gap: var(--space-2); }
-        .search-bar .form-input { flex: 1; }
-        .search-ic { font-size: 18px; }
-        .hot-words { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
-        .search-meta { color: var(--color-muted); font-size: var(--text-sm); margin-bottom: var(--space-3); }
-        .tool-card { text-decoration: none; color: inherit; }
-        .tool-card mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
-        :root[data-theme="dark"] .tool-card mark { background: #92600e; }
-        </style>
+        <div class="info-box mt-4"><span aria-hidden="true">💡</span><div>搜索在本页浏览器内即时匹配，不经过服务器，保护隐私。</div></div>
 
         <script>
         (function () {
@@ -35,46 +27,45 @@
             var U = window.U; if (!U) return;
             var $ = function (id) { return document.getElementById(id); };
             var CAT = [
-              { t: '个税计算器', u: '/calculator/tax/', c: '计算器', d: '工资税后收入与应缴税额' },
-              { t: '单位换算', u: '/calculator/unit/', c: '计算器', d: '长度重量面积温度速度存储互转' },
-              { t: '房贷提前还款', u: '/calculator/prepay/', c: '计算器', d: '提前还清能省多少利息' },
-              { t: '养老金计算器', u: '/calculator/pension/', c: '计算器', d: '退休养老金估算' },
-              { t: '五险一金', u: '/calculator/social-insurance/', c: '计算器', d: '社保公积金缴费明细' },
-              { t: '折扣计算', u: '/calculator/discount/', c: '计算器', d: '折上折满减到手价' },
-              { t: '百分比', u: '/calculator/percentage/', c: '计算器', d: '占比增长率百分比' },
-              { t: '加班费', u: '/calculator/overtime/', c: '计算器', d: '工作日周末节假日加班工资' },
-              { t: '基础代谢体脂', u: '/calculator/body-fat/', c: '计算器', d: 'BMR TDEE 体脂率' },
-              { t: '跑步配速', u: '/calculator/pace/', c: '计算器', d: '配速完赛时间时速互算' },
-              { t: '日期计算', u: '/calculator/date-calc/', c: '计算器', d: '日期间隔天数与推算' },
-              { t: '字数统计', u: '/calculator/word-count/', c: '计算器', d: '在线字数字符统计' },
-              { t: '时区转换', u: '/calculator/timezone/', c: '计算器', d: '世界时间时差换算' },
-              { t: '衣服尺码', u: '/calculator/size/', c: '计算器', d: '国际尺码对照换算' },
-              { t: '装修预算', u: '/calculator/decoration/', c: '计算器', d: '瓷砖地板油漆用量' },
-              { t: '预产期', u: '/calculator/due-date/', c: '计算器', d: '孕周与预产期推算' },
-              { t: '儿童身高预测', u: '/calculator/height-predict/', c: '计算器', d: '遗传靶身高' },
-              { t: '宠物年龄', u: '/calculator/pet-age/', c: '计算器', d: '猫狗年龄换算人类年龄' },
-              { t: '油耗计算', u: '/calculator/fuel-cost/', c: '计算器', d: '百公里油耗与油费' },
-              { t: 'IP地址查询', u: '/calculator/ip-query/', c: '计算器', d: 'IP 归属地查询' },
-              { t: '宝宝取名', u: '/calculator/baby-name/', c: '计算器', d: '寓意美好的名字推荐' },
-              { t: '密语', u: '/calculator/secret-message/', c: '计算器', d: '生成加密链接分享悄悄话' },
-              { t: '万年历·老黄历', u: '/calendar/', c: '日历工具', d: '公历农历对照宜忌节气' },
-              { t: '今日指南', u: '/calendar/daily-guide/', c: '日历工具', d: '黄历运势午餐一站查' },
-              { t: '倒计时·纪念日', u: '/calendar/countdown/', c: '日历工具', d: '重要日子天数倒数' },
-              { t: '买房全攻略', u: '/combo/buy-house/', c: '场景组合', d: '房贷月供税费一站算' },
-              { t: '买车全攻略', u: '/combo/buy-car/', c: '场景组合', d: '车贷购置税保险落地价' },
-              { t: '健康体检站', u: '/combo/health-check/', c: '场景组合', d: 'BMI 理想体重 BMR' },
-              { t: '趣味测试', u: '/combo/fun-test/', c: '场景组合', d: '星座速配生命灵数' },
-              { t: '理财百宝箱', u: '/combo/finance-toolkit/', c: '场景组合', d: '复利存款通胀汇率' },
-              { t: '人生规划', u: '/combo/life-plan/', c: '场景组合', d: '储蓄率财务自由全景' },
-              { t: '色彩研究所', u: '/combo/color-lab/', c: '场景组合', d: '配色传统色颜色性格' },
-              { t: '概率计算器', u: '/probability/', c: '其他工具', d: '单次联合至少一次组合数' },
-              { t: '随机数生成', u: '/random/', c: '其他工具', d: '范围随机整数小数' },
-              { t: '视力测试', u: '/vision/', c: '其他工具', d: 'E 字视力自测' },
-              { t: '双色球', u: '/lotto/', c: '其他工具', d: '随机机选号码' },
-              { t: '关于我们', u: '/about/', c: '关于', d: '了解一珩成长笔记' },
-              { t: '隐私政策', u: '/privacy/', c: '关于', d: '数据收集与使用说明' }
+              { t: '个税计算器', u: '/calculator/tax/', c: '计算器', i: 'file-text', d: '工资税后收入与应缴税额' },
+              { t: '单位换算', u: '/calculator/unit/', c: '计算器', i: 'repeat', d: '长度重量面积温度速度存储互转' },
+              { t: '房贷提前还款', u: '/calculator/prepay/', c: '计算器', i: 'home', d: '提前还清能省多少利息' },
+              { t: '养老金计算器', u: '/calculator/pension/', c: '计算器', i: 'dollar-sign', d: '退休养老金估算' },
+              { t: '五险一金', u: '/calculator/social-insurance/', c: '计算器', i: 'shield', d: '社保公积金缴费明细' },
+              { t: '折扣计算', u: '/calculator/discount/', c: '计算器', i: 'tag', d: '折上折满减到手价' },
+              { t: '百分比', u: '/calculator/percentage/', c: '计算器', i: 'percent', d: '占比增长率百分比' },
+              { t: '加班费', u: '/calculator/overtime/', c: '计算器', i: 'clock', d: '工作日周末节假日加班工资' },
+              { t: '基础代谢体脂', u: '/calculator/body-fat/', c: '计算器', i: 'heart', d: 'BMR TDEE 体脂率' },
+              { t: '跑步配速', u: '/calculator/pace/', c: '计算器', i: 'activity', d: '配速完赛时间时速互算' },
+              { t: '日期计算', u: '/calculator/date-calc/', c: '计算器', i: 'calendar', d: '日期间隔天数与推算' },
+              { t: '字数统计', u: '/calculator/word-count/', c: '计算器', i: 'type', d: '在线字数字符统计' },
+              { t: '时区转换', u: '/calculator/timezone/', c: '计算器', i: 'globe', d: '世界时间时差换算' },
+              { t: '衣服尺码', u: '/calculator/size/', c: '计算器', i: 'shirt', d: '国际尺码对照换算' },
+              { t: '装修预算', u: '/calculator/decoration/', c: '计算器', i: 'edit-3', d: '瓷砖地板油漆用量' },
+              { t: '预产期', u: '/calculator/due-date/', c: '计算器', i: 'gift', d: '孕周与预产期推算' },
+              { t: '儿童身高预测', u: '/calculator/height-predict/', c: '计算器', i: 'trending-up', d: '遗传靶身高' },
+              { t: '宠物年龄', u: '/calculator/pet-age/', c: '计算器', i: 'paw', d: '猫狗年龄换算人类年龄' },
+              { t: '油耗计算', u: '/calculator/fuel-cost/', c: '计算器', i: 'droplet', d: '百公里油耗与油费' },
+              { t: 'IP地址查询', u: '/calculator/ip-query/', c: '计算器', i: 'map-pin', d: 'IP 归属地查询' },
+              { t: '宝宝取名', u: '/calculator/baby-name/', c: '计算器', i: 'star', d: '寓意美好的名字推荐' },
+              { t: '密语', u: '/calculator/secret-message/', c: '计算器', i: 'lock', d: '生成加密链接分享悄悄话' },
+              { t: '万年历·老黄历', u: '/calendar/', c: '日历工具', i: 'calendar', d: '公历农历对照宜忌节气' },
+              { t: '今日指南', u: '/calendar/daily-guide/', c: '日历工具', i: 'sun', d: '黄历运势午餐一站查' },
+              { t: '倒计时·纪念日', u: '/calendar/countdown/', c: '日历工具', i: 'clock', d: '重要日子天数倒数' },
+              { t: '买房全攻略', u: '/combo/buy-house/', c: '场景组合', i: 'home', d: '房贷月供税费一站算' },
+              { t: '买车全攻略', u: '/combo/buy-car/', c: '场景组合', i: 'car', d: '车贷购置税保险落地价' },
+              { t: '健康体检站', u: '/combo/health-check/', c: '场景组合', i: 'heart', d: 'BMI 理想体重 BMR' },
+              { t: '趣味测试', u: '/combo/fun-test/', c: '场景组合', i: 'smile', d: '星座速配生命灵数' },
+              { t: '理财百宝箱', u: '/combo/finance-toolkit/', c: '场景组合', i: 'bar-chart-2', d: '复利存款通胀汇率' },
+              { t: '人生规划', u: '/combo/life-plan/', c: '场景组合', i: 'compass', d: '储蓄率财务自由全景' },
+              { t: '色彩研究所', u: '/combo/color-lab/', c: '场景组合', i: 'droplet', d: '配色传统色颜色性格' },
+              { t: '概率计算器', u: '/probability/', c: '其他工具', i: 'target', d: '单次联合至少一次组合数' },
+              { t: '随机数生成', u: '/random/', c: '其他工具', i: 'shuffle', d: '范围随机整数小数' },
+              { t: '视力测试', u: '/vision/', c: '其他工具', i: 'eye', d: 'E 字视力自测' },
+              { t: '双色球', u: '/lotto/', c: '其他工具', i: 'star', d: '随机机选号码' },
+              { t: '关于我们', u: '/about/', c: '关于', i: 'info', d: '了解一珩成长笔记' },
+              { t: '隐私政策', u: '/privacy/', c: '关于', i: 'lock', d: '数据收集与使用说明' }
             ];
-            var ICON = { '计算器': '🧮', '日历工具': '📅', '场景组合': '🧩', '其他工具': '🛠️', '关于': 'ℹ️' };
             $('searchMeta').querySelector('b').textContent = CAT.length;
             var HOT = ['个税', '房贷', '万年历', 'BMI', '汇率', '字数', '配速', '倒计时'];
             $('hotWords').innerHTML = HOT.map(function (w) { return '<button type="button" class="chip" data-w="' + w + '">' + w + '</button>'; }).join('');
@@ -86,7 +77,7 @@
               var list = q ? CAT.filter(function (x) { return (x.t + x.d + x.c).toLowerCase().indexOf(q.toLowerCase()) >= 0; }) : CAT;
               $('searchEmpty').hidden = list.length > 0;
               $('searchResults').innerHTML = list.map(function (x) {
-                return '<a class="tool-card" href="' + x.u + '"><span class="tool-card-icon" aria-hidden="true">' + (ICON[x.c] || '🔧') + '</span><span class="tool-card-title">' + hl(x.t, q) + '</span><span class="tool-card-desc">' + hl(x.d, q) + '</span></a>';
+                return '<a class="tool-card" href="' + x.u + '"><span class="tool-card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-' + x.i + '"></use></svg></span><span class="tool-card-title">' + hl(x.t, q) + '</span><span class="tool-card-desc">' + hl(x.d, q) + '</span></a>';
               }).join('');
               $('searchClear').hidden = !q;
             }
