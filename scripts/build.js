@@ -7,7 +7,7 @@
      1. 读 data/site.json + data/pages.json
      2. minify    → 生成 assets 下各 .min 压缩产物
      3. fingerprint → 生成 assets/manifest.json（资源版本 token）
-     4. prerender → 逐路由渲染静态 HTML，写入 ROOT/<output>（根级 index.html + 目录路由）
+     4. prerender → 逐路由渲染静态 HTML，写入 ROOT/<output>（根级 index.html + 显式 .html 页）
      5. build-sitemap → sitemap.xml
      6. inject-scripts（守卫）+ check-links（死链）；任一失败 exit 1
    产物即部署内容：仓库根目录 = 站点根（deploy 同步 . → /www/wwwroot/uni-web/）。
@@ -30,11 +30,30 @@ function readJson(rel) {
 
 function writeRoute(route, site, ctx) {
   const html = renderRoute(site, route, ctx);
-  const out = route.output || (route.path === 'index' ? 'index.html' : route.path + '/index.html');
+  const out = route.output || (route.path === 'index' ? 'index.html' : route.path + '.html');
   const abs = path.join(ROOT, out.replace(/\//g, path.sep));
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, html);
   return out;
+}
+
+/** 清理旧版目录路由产物（<path>/index.html），避免新旧 URL 双份内容 */
+function cleanLegacyOutputs(routes) {
+  const removeEmpty = (dir) => {
+    let cur = dir;
+    while (cur !== ROOT && cur.indexOf(ROOT) === 0 && fs.existsSync(cur) && fs.readdirSync(cur).length === 0) {
+      fs.rmdirSync(cur);
+      cur = path.dirname(cur);
+    }
+  };
+  routes.forEach((route) => {
+    const p = String(route.path || '');
+    if (!p || p === 'index') return;
+    const dir = path.join(ROOT, p);
+    const legacy = path.join(dir, 'index.html');
+    if (fs.existsSync(legacy)) fs.unlinkSync(legacy);
+    removeEmpty(dir);
+  });
 }
 
 function main() {
@@ -49,6 +68,8 @@ function main() {
   minify.run();
   const manifest = fingerprint.run();
   const ctx = { manifest };
+
+  cleanLegacyOutputs(routes);
 
   let written = 0;
   routes.forEach((route) => {

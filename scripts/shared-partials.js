@@ -32,7 +32,7 @@ const ICON_MOON = '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke
 function renderHeader(site, page) {
   const navLinks = (site.nav || []).map(n => {
     const isActive = page.path === '' && n.url === '/' ||
-      (page.path && n.url === '/' + page.path + '/');
+      (page.path && n.url === '/' + page.path + '.html');
     const cls = isActive ? ' class="active" aria-current="page"' : '';
     return `<a href="${escapeHtml(n.url)}"${cls}>${escapeHtml(n.label)}</a>`;
   }).join('\n        ');
@@ -46,12 +46,12 @@ function renderHeader(site, page) {
     <nav class="site-nav" aria-label="主导航">
         ${navLinks}
     </nav>
-    <form class="header-search" action="/search/" method="get" role="search">
+    <form class="header-search" action="/search.html" method="get" role="search">
       ${ICON_SEARCH}
       <input type="search" name="q" placeholder="搜索工具…" aria-label="搜索工具" autocomplete="off">
     </form>
     <div class="header-actions">
-      <a href="/search/" class="search-toggle" aria-label="搜索工具">${ICON_SEARCH}</a>
+      <a href="/search.html" class="search-toggle" aria-label="搜索工具">${ICON_SEARCH}</a>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">${ICON_SUN}${ICON_MOON}</button>
     </div>
   </div>
@@ -66,7 +66,7 @@ function renderHeader(site, page) {
 function renderSidebar(site, page) {
   const categories = (site.sidebar_categories || []).map(cat => {
     const items = (cat.items || []).map(item => {
-      const isActive = page.path && item.url === '/' + page.path + '/';
+      const isActive = page.path && item.url === '/' + page.path + '.html';
       const cls = isActive ? ' class="active"' : '';
       return `      <a href="${escapeHtml(item.url)}"${cls}>${escapeHtml(item.label)}</a>`;
     }).join('\n');
@@ -91,12 +91,12 @@ ${items}
 function renderBottomNav(site, page) {
   const tabs = [
     { label: '首页', url: '/', icon: 'home' },
-    { label: '发现', url: '/discover/', icon: 'compass' },
-    { label: '搜索', url: '/search/', icon: 'search' }
+    { label: '发现', url: '/discover.html', icon: 'compass' },
+    { label: '搜索', url: '/search.html', icon: 'search' }
   ];
   const links = tabs.map(t => {
     const isActive = (t.url === '/' && !page.path) ||
-      (page.path && t.url === '/' + page.path + '/');
+      (page.path && t.url === '/' + page.path + '.html');
     const cls = isActive ? ' class="active"' : '';
     return `    <a href="${escapeHtml(t.url)}"${cls}><span class="bottom-nav-ico">${I.iconRef(t.icon)}</span>${escapeHtml(t.label)}</a>`;
   }).join('\n');

@@ -13,74 +13,74 @@
   "lang": "zh-CN",
   "nav": [
     { "label": "首页", "url": "/" },
-    { "label": "发现", "url": "/discover/" },
-    { "label": "搜索", "url": "/search/" },
-    { "label": "关于", "url": "/about/" }
+    { "label": "发现", "url": "/discover.html" },
+    { "label": "搜索", "url": "/search.html" },
+    { "label": "关于", "url": "/about.html" }
   ],
   "sidebar_categories": [
     { "label": "计算器", "items": [
-      { "label": "个税计算器", "url": "/calculator/tax/", "icon": "file-text" },
-      { "label": "单位换算", "url": "/calculator/unit/", "icon": "repeat" },
-      { "label": "房贷提前还款", "url": "/calculator/prepay/", "icon": "home" },
-      { "label": "养老金计算器", "url": "/calculator/pension/", "icon": "dollar-sign" },
-      { "label": "五险一金", "url": "/calculator/social-insurance/", "icon": "shield" },
-      { "label": "折扣计算", "url": "/calculator/discount/", "icon": "tag" },
-      { "label": "百分比", "url": "/calculator/percentage/", "icon": "percent" },
-      { "label": "加班费", "url": "/calculator/overtime/", "icon": "clock" },
-      { "label": "基础代谢体脂", "url": "/calculator/body-fat/", "icon": "heart" },
-      { "label": "跑步配速", "url": "/calculator/pace/", "icon": "activity" },
-      { "label": "日期计算", "url": "/calculator/date-calc/", "icon": "calendar" },
-      { "label": "字数统计", "url": "/calculator/word-count/", "icon": "type" },
-      { "label": "时区转换", "url": "/calculator/timezone/", "icon": "globe" },
-      { "label": "衣服尺码", "url": "/calculator/size/", "icon": "shirt" },
-      { "label": "装修预算", "url": "/calculator/decoration/", "icon": "edit-3" },
-      { "label": "预产期", "url": "/calculator/due-date/", "icon": "gift" },
-      { "label": "儿童身高预测", "url": "/calculator/height-predict/", "icon": "trending-up" },
-      { "label": "宠物年龄", "url": "/calculator/pet-age/", "icon": "paw" },
-      { "label": "油耗计算", "url": "/calculator/fuel-cost/", "icon": "droplet" },
-      { "label": "IP地址查询", "url": "/calculator/ip-query/", "icon": "map-pin" },
-      { "label": "宝宝取名", "url": "/calculator/baby-name/", "icon": "star" },
-      { "label": "密语", "url": "/calculator/secret-message/", "icon": "lock" }
+      { "label": "个税计算器", "url": "/calculator/tax.html", "icon": "file-text" },
+      { "label": "单位换算", "url": "/calculator/unit.html", "icon": "repeat" },
+      { "label": "房贷提前还款", "url": "/calculator/prepay.html", "icon": "home" },
+      { "label": "养老金计算器", "url": "/calculator/pension.html", "icon": "dollar-sign" },
+      { "label": "五险一金", "url": "/calculator/social-insurance.html", "icon": "shield" },
+      { "label": "折扣计算", "url": "/calculator/discount.html", "icon": "tag" },
+      { "label": "百分比", "url": "/calculator/percentage.html", "icon": "percent" },
+      { "label": "加班费", "url": "/calculator/overtime.html", "icon": "clock" },
+      { "label": "基础代谢体脂", "url": "/calculator/body-fat.html", "icon": "heart" },
+      { "label": "跑步配速", "url": "/calculator/pace.html", "icon": "activity" },
+      { "label": "日期计算", "url": "/calculator/date-calc.html", "icon": "calendar" },
+      { "label": "字数统计", "url": "/calculator/word-count.html", "icon": "type" },
+      { "label": "时区转换", "url": "/calculator/timezone.html", "icon": "globe" },
+      { "label": "衣服尺码", "url": "/calculator/size.html", "icon": "shirt" },
+      { "label": "装修预算", "url": "/calculator/decoration.html", "icon": "edit-3" },
+      { "label": "预产期", "url": "/calculator/due-date.html", "icon": "gift" },
+      { "label": "儿童身高预测", "url": "/calculator/height-predict.html", "icon": "trending-up" },
+      { "label": "宠物年龄", "url": "/calculator/pet-age.html", "icon": "paw" },
+      { "label": "油耗计算", "url": "/calculator/fuel-cost.html", "icon": "droplet" },
+      { "label": "IP地址查询", "url": "/calculator/ip-query.html", "icon": "map-pin" },
+      { "label": "宝宝取名", "url": "/calculator/baby-name.html", "icon": "star" },
+      { "label": "密语", "url": "/calculator/secret-message.html", "icon": "lock" }
     ]},
     { "label": "日历工具", "items": [
-      { "label": "万年历·老黄历", "url": "/calendar/", "icon": "calendar" },
-      { "label": "今日指南", "url": "/calendar/daily-guide/", "icon": "sun" },
-      { "label": "倒计时·纪念日", "url": "/calendar/countdown/", "icon": "clock" }
+      { "label": "万年历·老黄历", "url": "/calendar.html", "icon": "calendar" },
+      { "label": "今日指南", "url": "/calendar/daily-guide.html", "icon": "sun" },
+      { "label": "倒计时·纪念日", "url": "/calendar/countdown.html", "icon": "clock" }
     ]},
     { "label": "场景组合", "items": [
-      { "label": "买房全攻略", "url": "/combo/buy-house/", "icon": "home" },
-      { "label": "买车全攻略", "url": "/combo/buy-car/", "icon": "car" },
-      { "label": "健康体检站", "url": "/combo/health-check/", "icon": "heart" },
-      { "label": "趣味测试", "url": "/combo/fun-test/", "icon": "smile" },
-      { "label": "理财百宝箱", "url": "/combo/finance-toolkit/", "icon": "bar-chart-2" },
-      { "label": "人生规划", "url": "/combo/life-plan/", "icon": "compass" },
-      { "label": "色彩研究所", "url": "/combo/color-lab/", "icon": "droplet" }
+      { "label": "买房全攻略", "url": "/combo/buy-house.html", "icon": "home" },
+      { "label": "买车全攻略", "url": "/combo/buy-car.html", "icon": "car" },
+      { "label": "健康体检站", "url": "/combo/health-check.html", "icon": "heart" },
+      { "label": "趣味测试", "url": "/combo/fun-test.html", "icon": "smile" },
+      { "label": "理财百宝箱", "url": "/combo/finance-toolkit.html", "icon": "bar-chart-2" },
+      { "label": "人生规划", "url": "/combo/life-plan.html", "icon": "compass" },
+      { "label": "色彩研究所", "url": "/combo/color-lab.html", "icon": "droplet" }
     ]},
     { "label": "其他工具", "items": [
-      { "label": "概率计算器", "url": "/probability/", "icon": "target" },
-      { "label": "随机数生成", "url": "/random/", "icon": "shuffle" },
-      { "label": "视力测试", "url": "/vision/", "icon": "eye" },
-      { "label": "双色球", "url": "/lotto/", "icon": "star" },
-      { "label": "实用工具箱", "url": "/tools/", "icon": "grid" }
+      { "label": "概率计算器", "url": "/probability.html", "icon": "target" },
+      { "label": "随机数生成", "url": "/random.html", "icon": "shuffle" },
+      { "label": "视力测试", "url": "/vision.html", "icon": "eye" },
+      { "label": "双色球", "url": "/lotto.html", "icon": "star" },
+      { "label": "实用工具箱", "url": "/tools.html", "icon": "grid" }
     ]}
   ],
   "footer": {
     "sections": [
       { "title": "热门工具", "links": [
-        { "label": "个税计算器", "url": "/calculator/tax/" },
-        { "label": "万年历", "url": "/calendar/" },
-        { "label": "房贷计算", "url": "/calculator/prepay/" },
-        { "label": "单位换算", "url": "/calculator/unit/" }
+        { "label": "个税计算器", "url": "/calculator/tax.html" },
+        { "label": "万年历", "url": "/calendar.html" },
+        { "label": "房贷计算", "url": "/calculator/prepay.html" },
+        { "label": "单位换算", "url": "/calculator/unit.html" }
       ]},
       { "title": "生活工具", "links": [
-        { "label": "今日指南", "url": "/calendar/daily-guide/" },
-        { "label": "买房攻略", "url": "/combo/buy-house/" },
-        { "label": "健康体检", "url": "/combo/health-check/" },
-        { "label": "宝宝取名", "url": "/calculator/baby-name/" }
+        { "label": "今日指南", "url": "/calendar/daily-guide.html" },
+        { "label": "买房攻略", "url": "/combo/buy-house.html" },
+        { "label": "健康体检", "url": "/combo/health-check.html" },
+        { "label": "宝宝取名", "url": "/calculator/baby-name.html" }
       ]},
       { "title": "关于", "links": [
-        { "label": "关于我们", "url": "/about/" },
-        { "label": "隐私政策", "url": "/privacy/" }
+        { "label": "关于我们", "url": "/about.html" },
+        { "label": "隐私政策", "url": "/privacy.html" }
       ]}
     ],
     "sister_sites": [

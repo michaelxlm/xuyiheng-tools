@@ -9,6 +9,7 @@
      - JSON-LD（站点级 / 工具级 WebApplication / 面包屑）
      - 公共脚本按序：tracker → ad-slots → coupon-slot（页面脚本由各页模板自带）
    页面正文来自 templates/pages/<slug>.html；缺省用占位提示（迁移前占位）。
+   URL 口径：首页 /，其余为显式 .html（如 /calculator/tax.html），与磁盘产物一一对应。
 
    由 build.js 调用：renderRoute(site, route, ctx) → HTML 字符串
    ctx = { manifest, nowIso }
@@ -34,11 +35,11 @@ function slugOf(route) {
   return o.replace(/\//g, '-');
 }
 
-/** 路由 → 站点绝对路径（URL path，带首尾斜杠） */
+/** 路由 → 站点绝对路径（显式 .html，首页为 /） */
 function urlPathOf(route) {
   const p = String(route.path || '');
   if (!p || p === 'index') return '/';
-  return '/' + p.replace(/^\/+|\/+$/g, '') + '/';
+  return '/' + p.replace(/^\/+|\/+$/g, '') + '.html';
 }
 
 /** 资源引用：绝对路径 + fingerprint 版本 token（若有） */
@@ -154,7 +155,7 @@ function routesIndex() {
 }
 
 const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>';
-const FEATURED = ['/calculator/tax/', '/calendar/', '/calculator/prepay/', '/combo/health-check/', '/combo/buy-house/', '/combo/color-lab/'];
+const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.html', '/combo/health-check.html', '/combo/buy-house.html', '/combo/color-lab.html'];
 
 function toolCardHtml(item, catLabel, idx, wide) {
   const r = idx[item.url] || {};
@@ -183,7 +184,7 @@ function buildHomeContent(site) {
     '          <span class="hero-badge">✦ ' + total + ' 个免费在线工具 · 纯本地运行</span>',
     '          <h1>' + P.escapeHtml(site.site_name) + '</h1>',
     '          <p class="hero-sub">' + P.escapeHtml(site.description) + '</p>',
-    '          <form class="hero-search" action="/search/" method="get" role="search">',
+    '          <form class="hero-search" action="/search.html" method="get" role="search">',
     '            ' + SEARCH_ICON,
     '            <input type="search" name="q" placeholder="搜索：个税、房贷、万年历、BMI…" aria-label="搜索工具" autocomplete="off">',
     '            <button class="btn btn-primary" type="submit">搜索</button>',
@@ -237,6 +238,9 @@ function renderRoute(site, route, ctx) {
   }
 
   const scriptTags = [
+    // 本站复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
+    // 否则会取错分片。本地兜底用绝对路径（深层路由 /calculator/xxx/ 下相对路径会 404）。
+    '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};</script>',
     '    <script src="' + assetUrl('assets/js/tracker.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/ad-slots.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/coupon-slot.min.js', manifest) + '" defer></script>',

@@ -25,6 +25,9 @@ const REQUIRED = [
   'assets/js/http-api.min.js',
 ];
 
+// 本站复用 main-tool 分片 key；漏声明会让 ad-slots.js 回落到默认 aiweb 分片（广告内容/埋点全错）
+const AD_SLOTS_CONF = 'window.AdSlotsConfig={site:"main-tool"';
+
 function walk(dir, out) {
   let entries;
   try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
@@ -45,6 +48,7 @@ function run() {
   files.forEach((file) => {
     const html = fs.readFileSync(file, 'utf8');
     const missing = REQUIRED.filter((dep) => html.indexOf(dep) === -1);
+    if (html.indexOf(AD_SLOTS_CONF) === -1) missing.push('AdSlotsConfig(site:main-tool)');
     if (missing.length) {
       bad++;
       console.log('  ✗ ' + path.relative(ROOT, file).replace(/\\/g, '/') + '  缺：' + missing.join(', '));

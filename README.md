@@ -20,7 +20,7 @@ templates/pages/ 各页正文模板（构建期注入外壳）
 assets/          css / js / img 源资源（构建期压缩 + fingerprint）
 scripts/         构建与门禁脚本（见下）
 .github/workflows/  deploy.yml 部署流水线
-<路由目录>/        构建产物 index.html（提交进仓库，非 pages/ 子目录）
+<路由目录>/<页面>.html  构建产物，URL 与磁盘文件一一对应（如 calculator/tax.html → /calculator/tax.html；首页为根 index.html）
 robots.txt / llms.txt / sitemap.xml / site.webmanifest / og-cover.png  根级公共产物
 ```
 
@@ -52,6 +52,22 @@ npm run check:encoding # UTF-8 编码门禁（禁 GBK/双重乱码/BOM）
 `.github/workflows/deploy.yml`（`push` 到 `main` 或手动触发）在**仓库级 self-hosted runner**（标签 `self-hosted,linux,x64,static-deploy`）上执行：编码门禁 → 构建 → 死链门禁 → `tar` 同步产物到 `39.107.225.222:/www/wwwroot/uni-web/`。
 
 > 新克隆本仓库需先在生产机注册对应仓库的 runner，否则 run 会永久 `queued`。
+
+### URL 形态与旧链接兼容
+
+全站为**显式 `.html` 多页静态站**：首页 `/`，其余页面 `/calculator/tax.html`、`/calendar/countdown.html` 等，URL 与磁盘产物一一对应（不再生成 `<路由>/index.html`）。`sitemap.xml`、canonical、OG、JSON-LD 与站点导航均由 `scripts/prerender.js` 的 `urlPathOf` 统一派生。
+
+旧版目录式 URL（`/calculator/tax/`）需在 nginx 侧 301 到新地址，避免已收录链接落 404：
+
+```nginx
+# 旧目录式 URL → 对应 .html（/calculator/tax/ → /calculator/tax.html）
+rewrite ^/(.+)/$ /$1.html permanent;
+# 404 回首页（与 store-web 旧路径口径一致；如需保留真 404 状态码则删除此行）
+error_page 404 =301 /;
+```
+
+> `tar` 同步不做删除，首次切换后请手动清理服务器上残留的旧目录产物：
+> `cd /www/wwwroot/uni-web && rm -rf calculator/*/ calendar/*/ combo/*/`
 
 ## 共用基础设施
 
