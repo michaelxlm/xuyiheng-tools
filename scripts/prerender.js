@@ -254,11 +254,24 @@ function renderRoute(site, route, ctx) {
   const robots = indexable ? 'index, follow' : 'noindex, nofollow';
   const ldJson = buildJsonLd(site, route);
 
+  // E-E-A-T 作者实体（Michaelxlm）：与全站 about 页统一，sameAs 归一化到已落地的三站作者实体
+  const authorLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': origin + '/about.html#author',
+    name: 'Michaelxlm',
+    url: origin + '/about.html',
+    jobTitle: '独立开发者',
+    description: 'Michaelxlm，独立开发者，主理明先生日常、cs调色盘、访客小站、小满券仓、小满美图、实测手记、年表拾遗、一珩成长笔记等多个站点，倡导隐私优先、开放标准与免费可达的 Web 体验。',
+    sameAs: [ 'https://2002cs.com/about.html#author', 'https://xuliming.com/#author', 'https://antucao.com' ],
+  });
+
   const head = [
     '  <meta charset="utf-8">',
     '  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
     '  <title>' + P.escapeHtml(route.title) + '</title>',
     '  <meta name="description" content="' + P.escapeHtml(route.description || '') + '">',
+    '  <meta name="author" content="Michaelxlm">',
     route.keywords ? '  <meta name="keywords" content="' + P.escapeHtml(route.keywords) + '">' : '',
     '  <link rel="canonical" href="' + P.escapeHtml(canonical) + '">',
     '  <meta name="robots" content="' + robots + '">',
@@ -284,6 +297,7 @@ function renderRoute(site, route, ctx) {
     '  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>',
     cssLinks.join('\n'),
     '  <script type="application/ld+json">' + ldJson + '</script>',
+    '  <script type="application/ld+json">' + authorLd + '</script>',
   ].filter(Boolean).join('\n');
 
   // body 内容
