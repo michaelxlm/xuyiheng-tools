@@ -108,6 +108,19 @@ function buildJsonLd(site, route) {
     itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.item })),
   });
 
+  // FAQPage：与正文模板里的可见「常见问题」同源（route.faq 由 data/pages.json 提供）
+  if (route.indexable !== false && Array.isArray(route.faq) && route.faq.length) {
+    graph.push({
+      '@type': 'FAQPage',
+      inLanguage: 'zh-CN',
+      mainEntity: route.faq
+        .filter(function (f) { return f && f.q && f.a; })
+        .map(function (f) {
+          return { '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } };
+        }),
+    });
+  }
+
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
 }
 

@@ -1,46 +1,1081 @@
 {
   "routes": [
-    { "path": "index", "title": "一珩成长笔记 - 实用工具平台", "description": "一珩成长笔记是纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。", "keywords": "一珩成长笔记,实用工具,万年历,房贷计算器,星座运势,老黄历,BMI计算器,在线工具,计算器", "type": "content", "category": "core", "indexable": true, "output": "index.html" },
-    { "path": "discover", "title": "发现 - 一珩成长笔记", "description": "探索一珩成长笔记的精彩发现页面，发现更多有趣内容、实用计算器、日历工具、趣味测试和生活服务。", "keywords": "发现,一珩成长笔记,实用工具,计算器,日历工具,趣味测试,生活服务", "type": "content", "category": "core", "indexable": true, "output": "discover.html" },
-    { "path": "search", "title": "搜索工具 - 一珩成长笔记", "description": "搜索一珩成长笔记全站实用工具，快速找到你想要的在线计算与查询工具。", "keywords": "搜索,一珩成长笔记,实用工具,在线计算,工具搜索", "type": "content", "category": "core", "indexable": true, "output": "search.html" },
-    { "path": "about", "title": "关于一珩成长笔记", "description": "了解一珩成长笔记——纯实用工具站，提供万年历、各类计算器、星座运势、老黄历等20+在线工具，打开即用，无需下载。", "keywords": "关于我们,一珩成长笔记,平台介绍,实用工具,联系我们", "type": "content", "category": "info", "indexable": true, "output": "about.html" },
-    { "path": "privacy", "title": "隐私政策 - 一珩成长笔记", "description": "一珩成长笔记隐私政策：无登录态设计，不收集账号与身份信息，仅采集匿名浏览数据，说明数据收集、使用、存储与第三方服务情况。", "keywords": "隐私政策,隐私保护,用户协议,一珩成长笔记", "type": "content", "category": "info", "indexable": true, "output": "privacy.html" },
-    { "path": "calculator/tax", "title": "个人所得税计算器 - 工资税后收入计算", "description": "在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。", "keywords": "个税计算器,个人所得税,税后工资,工资计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/tax.html" },
-    { "path": "calculator/unit", "title": "单位换算 - 长度重量面积温度速度存储在线换算", "description": "在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。", "keywords": "单位换算,长度换算,重量换算,温度换算,面积换算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/unit.html" },
-    { "path": "calculator/pension", "title": "养老金计算器 - 退休养老金估算", "description": "在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。", "keywords": "养老金计算器,退休养老金,社保计算,养老保险,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/pension.html" },
-    { "path": "calculator/word-count", "title": "字数统计器 - 在线字数统计工具", "description": "在线字数统计工具，实时统计文字数量、字符数、段落数，写作必备工具。", "keywords": "字数统计,字符计数,文字统计,写作工具,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/word-count.html" },
-    { "path": "calculator/timezone", "title": "时区转换器 - 世界时间转换工具", "description": "在线时区转换器，支持全球主要时区之间的时间转换，出国旅行必备。", "keywords": "时区转换,世界时间,国际时间,时差计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/timezone.html" },
-    { "path": "calculator/decoration", "title": "装修计算器 - 装修费用预算估算", "description": "在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。", "keywords": "装修计算器,装修费用,装修预算,装修报价,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/decoration.html" },
-    { "path": "calculator/baby-name", "title": "宝宝取名 - 新生儿起名字大全", "description": "宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。", "keywords": "宝宝取名,起名字,新生儿名字,取名大全,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/baby-name.html" },
-    { "path": "calculator/ip-query", "title": "IP地址查询 - 查询IP归属地", "description": "在线IP地址查询工具，快速查询IP地址的归属地、运营商等信息。", "keywords": "IP查询,IP地址,IP归属地,网络工具,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/ip-query.html" },
-    { "path": "calculator/secret-message", "title": "密语 - 写下心里话分享给TA", "description": "密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。", "keywords": "密语,悄悄话,秘密消息,分享密语,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/secret-message.html" },
-    { "path": "calculator/size", "title": "衣服尺码对照表 - 在线尺码换算", "description": "国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。", "keywords": "衣服尺码,尺码对照表,尺码换算,国际尺码,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/size.html" },
-    { "path": "calculator/body-fat", "title": "基础代谢与体脂率计算器 - BMR TDEE 在线计算", "description": "在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。", "keywords": "基础代谢,BMR,体脂率,TDEE,每日消耗计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/body-fat.html" },
-    { "path": "calculator/discount", "title": "折扣到手价计算 - 折上折满减叠加省钱计算", "description": "在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。", "keywords": "折扣计算,到手价,折上折,满减叠加,省钱计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/discount.html" },
-    { "path": "calculator/date-calc", "title": "日期计算器 - 日期间隔天数/日期加减/星期查询", "description": "在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。", "keywords": "日期计算器,日期间隔,日期推算,星期查询,天数计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/date-calc.html" },
-    { "path": "calculator/prepay", "title": "房贷提前还款计算器 - 提前还清能省多少利息", "description": "在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。", "keywords": "提前还贷,房贷提前还款,提前还款计算,节省利息,等额本息,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/prepay.html" },
-    { "path": "calculator/social-insurance", "title": "五险一金计算器 - 社保公积金缴费明细计算", "description": "在线五险一金计算器，输入缴费基数与公积金比例，一键算出个人与单位月缴费明细。", "keywords": "五险一金,社保计算,公积金计算,缴费基数,社保明细,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/social-insurance.html" },
-    { "path": "calculator/due-date", "title": "预产期计算器 - 孕周天数查询与预产期推算", "description": "在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。", "keywords": "预产期计算,孕周查询,怀孕计算,预产期推算,孕期,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/due-date.html" },
-    { "path": "calculator/pace", "title": "跑步配速计算器 - 配速/完赛时间/时速互算", "description": "在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。", "keywords": "配速计算,跑步配速,完赛时间,马拉松配速,跑步工具,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/pace.html" },
-    { "path": "calculator/pet-age", "title": "宠物年龄换算 - 猫狗年龄对照人类年龄", "description": "在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。", "keywords": "宠物年龄,猫年龄换算,狗年龄换算,宠物计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/pet-age.html" },
-    { "path": "calculator/percentage", "title": "百分比计算器 - 占比/增长率/百分比值在线计算", "description": "在线百分比计算器，支持占比计算、增长率计算、百分比值计算与按变化幅度还原原值。", "keywords": "百分比计算,占比计算,增长率,百分比换算,数学工具,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/percentage.html" },
-    { "path": "calculator/overtime", "title": "加班费计算器 - 工作日/周末/节假日加班工资计算", "description": "在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。", "keywords": "加班费计算,加班工资,倍工资,1.5倍,劳动法加班,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/overtime.html" },
-    { "path": "calculator/height-predict", "title": "儿童身高预测 - 遗传靶身高计算器", "description": "在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。", "keywords": "身高预测,遗传身高,儿童身高,靶身高,身高计算,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/height-predict.html" },
-    { "path": "calculator/fuel-cost", "title": "油耗计算器 - 百公里油耗与油费在线计算", "description": "在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。", "keywords": "油耗计算,百公里油耗,油费计算,汽车油耗,一珩成长笔记", "type": "tool", "category": "calculator", "indexable": true, "output": "calculator/fuel-cost.html" },
-    { "path": "calendar", "title": "万年历老黄历查询 - 一珩成长笔记", "description": "在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。", "keywords": "万年历,老黄历,日历查询,农历,宜忌,吉日查询,节气节日,一珩成长笔记", "type": "tool", "category": "calendar", "indexable": true, "output": "calendar.html" },
-    { "path": "calendar/daily-guide", "title": "今日指南 - 老黄历+运势+午餐一站查", "description": "每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。", "keywords": "今日指南,每日运势,老黄历,午餐推荐,一珩成长笔记", "type": "tool", "category": "calendar", "indexable": true, "output": "calendar/daily-guide.html" },
-    { "path": "calendar/countdown", "title": "重要日子 - 倒计时、纪念日、年龄、工作日计算", "description": "在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。", "keywords": "倒计时,纪念日,生日计算,旅行倒计时,考试倒计时,年龄计算,工作日计算,一珩成长笔记", "type": "tool", "category": "calendar", "indexable": true, "output": "calendar/countdown.html" },
-    { "path": "combo/buy-house", "title": "买房全攻略 - 房贷月供税费一站算清", "description": "买房全攻略工具，整合房贷计算、税费估算、装修预算，买房决策一站搞定。", "keywords": "买房攻略,房贷计算,买房税费,购房指南,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/buy-house.html" },
-    { "path": "combo/buy-car", "title": "买车全攻略 - 车贷油费保险综合对比", "description": "买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。", "keywords": "买车攻略,车贷计算,购车指南,汽车对比,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/buy-car.html" },
-    { "path": "combo/health-check", "title": "健康体检站 - BMI与BMR快速评估", "description": "在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础代谢率 BMR 与每日消耗，快速自我健康评估。", "keywords": "健康体检,BMI测试,BMR,基础代谢,健康评估,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/health-check.html" },
-    { "path": "combo/fun-test", "title": "趣味测试合集 - 缘分星座生日趣味测试", "description": "趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。", "keywords": "趣味测试,缘分测试,星座测试,生日密码,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/fun-test.html" },
-    { "path": "combo/finance-toolkit", "title": "理财百宝箱 - 复利/存款/通胀/汇率/贷款对比", "description": "理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。", "keywords": "理财工具,复利计算,存款利息,通胀计算,汇率换算,贷款对比,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/finance-toolkit.html" },
-    { "path": "combo/life-plan", "title": "人生规划计算器 - 财务全景报告", "description": "人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。", "keywords": "人生规划,财务规划,理财规划,人生目标,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/life-plan.html" },
-    { "path": "combo/color-lab", "title": "色彩研究所 - 配色/传统色彩/性格测试", "description": "色彩研究所整合颜色搭配方案、中国传统色彩、颜色性格测试，探索色彩的魅力。", "keywords": "配色方案,中国传统色彩,颜色性格测试,色彩搭配,一珩成长笔记", "type": "tool", "category": "combo", "indexable": true, "output": "combo/color-lab.html" },
-    { "path": "probability", "title": "概率计算器 - 数学概率在线计算", "description": "在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。", "keywords": "概率计算,数学概率,概率统计,数学工具,一珩成长笔记", "type": "tool", "category": "tools", "indexable": true, "output": "probability.html" },
-    { "path": "random", "title": "随机数生成器 - 在线生成随机数字", "description": "在线随机数生成器，快速生成指定范围的随机数字，实用小工具。", "keywords": "随机数,随机数生成,在线随机,数字生成,一珩成长笔记", "type": "tool", "category": "tools", "indexable": true, "output": "random.html" },
-    { "path": "vision", "title": "在线视力测试 - 一珩成长笔记", "description": "免费在线视力测试，快速检测视力水平，支持动态视力检测。", "keywords": "视力测试,在线测视力,眼睛健康,一珩成长笔记", "type": "tool", "category": "tools", "indexable": true, "output": "vision.html" },
-    { "path": "lotto", "title": "双色球随机选号 - 彩票模拟选号工具", "description": "双色球随机模拟选号工具，一键生成随机号码，仅供娱乐参考。", "keywords": "双色球,随机选号,彩票选号,福利彩票,一珩成长笔记", "type": "tool", "category": "tools", "indexable": true, "output": "lotto.html" },
-    { "path": "tools", "title": "实用工具箱 - 生活必备在线工具", "description": "精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。", "keywords": "实用工具,在线工具,工具箱,生活工具,一珩成长笔记", "type": "content", "category": "tools", "indexable": true, "output": "tools.html" }
+    {
+      "path": "index",
+      "title": "一珩成长笔记 - 实用工具平台",
+      "description": "一珩成长笔记是纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。",
+      "keywords": "一珩成长笔记,实用工具,万年历,房贷计算器,星座运势,老黄历,BMI计算器,在线工具,计算器",
+      "type": "content",
+      "category": "core",
+      "indexable": true,
+      "output": "index.html"
+    },
+    {
+      "path": "discover",
+      "title": "发现 - 一珩成长笔记",
+      "description": "探索一珩成长笔记的精彩发现页面，发现更多有趣内容、实用计算器、日历工具、趣味测试和生活服务。",
+      "keywords": "发现,一珩成长笔记,实用工具,计算器,日历工具,趣味测试,生活服务",
+      "type": "content",
+      "category": "core",
+      "indexable": true,
+      "output": "discover.html"
+    },
+    {
+      "path": "search",
+      "title": "搜索工具 - 一珩成长笔记",
+      "description": "搜索一珩成长笔记全站实用工具，快速找到你想要的在线计算与查询工具。",
+      "keywords": "搜索,一珩成长笔记,实用工具,在线计算,工具搜索",
+      "type": "content",
+      "category": "core",
+      "indexable": true,
+      "output": "search.html"
+    },
+    {
+      "path": "about",
+      "title": "关于一珩成长笔记",
+      "description": "了解一珩成长笔记——纯实用工具站，提供万年历、各类计算器、星座运势、老黄历等20+在线工具，打开即用，无需下载。",
+      "keywords": "关于我们,一珩成长笔记,平台介绍,实用工具,联系我们",
+      "type": "content",
+      "category": "info",
+      "indexable": true,
+      "output": "about.html"
+    },
+    {
+      "path": "privacy",
+      "title": "隐私政策 - 一珩成长笔记",
+      "description": "一珩成长笔记隐私政策：无登录态设计，不收集账号与身份信息，仅采集匿名浏览数据，说明数据收集、使用、存储与第三方服务情况。",
+      "keywords": "隐私政策,隐私保护,用户协议,一珩成长笔记",
+      "type": "content",
+      "category": "info",
+      "indexable": true,
+      "output": "privacy.html"
+    },
+    {
+      "path": "calculator/tax",
+      "title": "个人所得税计算器 - 工资税后收入计算",
+      "description": "在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。",
+      "keywords": "个税计算器,个人所得税,税后工资,工资计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/tax.html",
+      "faq": [
+        {
+          "q": "计算方式是什么？",
+          "a": "按应税收入减除基本减除费用、社保公积金与专项附加扣除后，套用税率估算税额。"
+        },
+        {
+          "q": "专项附加扣除要自己填吗？",
+          "a": "是的，请据实填写子女教育、房贷、赡养老人等扣除项，它们会直接影响结果。"
+        },
+        {
+          "q": "结果准确吗？",
+          "a": "为基于预扣模型的估算，年度汇算清缴后以税务机关核定为准。"
+        },
+        {
+          "q": "含年终奖单独计税吗？",
+          "a": "视页面选项而定，如未涵盖请以实际政策与申报为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/unit",
+      "title": "单位换算 - 长度重量面积温度速度存储在线换算",
+      "description": "在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。",
+      "keywords": "单位换算,长度换算,重量换算,温度换算,面积换算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/unit.html",
+      "faq": [
+        {
+          "q": "换算系数精确吗？",
+          "a": "采用国际通用换算系数，温度按标准公式换算，结果按显示位数四舍五入。"
+        },
+        {
+          "q": "存储单位按 1000 还是 1024？",
+          "a": "页面区分十进制（如 1 KB=1000 B）与二进制（1 KiB=1024 B），请按需要选择。"
+        },
+        {
+          "q": "支持一次换算多个单位吗？",
+          "a": "一般输入一个值并选择源单位与目标单位即可对照。"
+        },
+        {
+          "q": "能用于工程精确计算吗？",
+          "a": "日常换算足够，高精度或法定计量场景请核对权威系数。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/pension",
+      "title": "养老金计算器 - 退休养老金估算",
+      "description": "在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。",
+      "keywords": "养老金计算器,退休养老金,社保计算,养老保险,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/pension.html",
+      "faq": [
+        {
+          "q": "是怎么估算的？",
+          "a": "以你输入的缴费年限、缴费基数等按简化公式估算，不代表实际计发公式。"
+        },
+        {
+          "q": "为什么和真实发放差很多？",
+          "a": "实际养老金涉及当地社平工资、计发月数、账户积累与政策，模型只能近似。"
+        },
+        {
+          "q": "需要输入什么？",
+          "a": "常见为缴费年限、缴费基数或指数与退休相关参数。"
+        },
+        {
+          "q": "能作退休财务依据吗？",
+          "a": "仅供大致参考，准确测算请以社保经办机构与规划师为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/word-count",
+      "title": "字数统计器 - 在线字数统计工具",
+      "description": "在线字数统计工具，实时统计文字数量、字符数、段落数，写作必备工具。",
+      "keywords": "字数统计,字符计数,文字统计,写作工具,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/word-count.html",
+      "faq": [
+        {
+          "q": "字数和字符数有何区别？",
+          "a": "字符数包含标点及可能的空格，字数一般按词或汉字计数，页面会分别展示。"
+        },
+        {
+          "q": "中文是按字还是按词？",
+          "a": "中文通常按字统计，英文按词统计，具体以工具口径为准。"
+        },
+        {
+          "q": "空格会被计入吗？",
+          "a": "取决于页面是否勾选包含空格，注意对应选项。"
+        },
+        {
+          "q": "统计口径能用于投稿要求吗？",
+          "a": "请以目标平台的官方统计为准，工具仅作近似。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/timezone",
+      "title": "时区转换器 - 世界时间转换工具",
+      "description": "在线时区转换器，支持全球主要时区之间的时间转换，出国旅行必备。",
+      "keywords": "时区转换,世界时间,国际时间,时差计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/timezone.html",
+      "faq": [
+        {
+          "q": "会考虑夏令时吗？",
+          "a": "工具按地区规则处理，夏令时切换期间的结果请以官方时区数据为准。"
+        },
+        {
+          "q": "支持哪些时区？",
+          "a": "覆盖常见世界主要城市与时区，冷门地区可能不含。"
+        },
+        {
+          "q": "日期会跨天吗？",
+          "a": "跨时区可能使日期加减一天，注意结果中的日期。"
+        },
+        {
+          "q": "可作航班或合同时间依据吗？",
+          "a": "重要时间请以官方时刻表与当地时区规定为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/decoration",
+      "title": "装修计算器 - 装修费用预算估算",
+      "description": "在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。",
+      "keywords": "装修计算器,装修费用,装修预算,装修报价,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/decoration.html",
+      "faq": [
+        {
+          "q": "估算是怎么算的？",
+          "a": "依据面积乘以所选单价档位，分项估算材料与人工，得到预算区间。"
+        },
+        {
+          "q": "为什么和实际报价差很多？",
+          "a": "装修受户型、工艺、材料品牌与地区差价影响大，工具为粗略区间，并非精确报价。"
+        },
+        {
+          "q": "需要输入哪些项？",
+          "a": "一般填写面积并选择单价或档次等参数。"
+        },
+        {
+          "q": "结果能当合同金额吗？",
+          "a": "不能，请以真实量房报价与合同为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/baby-name",
+      "title": "宝宝取名 - 新生儿起名字大全",
+      "description": "宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。",
+      "keywords": "宝宝取名,起名字,新生儿名字,取名大全,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/baby-name.html",
+      "faq": [
+        {
+          "q": "这些名字有讲究或保证好吗？",
+          "a": "名字候选与寓意仅供灵感参考，不构成对命运或吉凶的承诺；取名文化因人而异。"
+        },
+        {
+          "q": "可以自定义哪些条件？",
+          "a": "一般可设定姓氏、字数与偏好的风格或寓意方向，工具据此给出候选。"
+        },
+        {
+          "q": "结果能直接用来上户口吗？",
+          "a": "请自行核对用字是否规范、是否过于生僻，并以当地户籍登记要求为准。"
+        },
+        {
+          "q": "会不会泄露我填写的信息？",
+          "a": "候选在页面本地生成，不上传你输入的内容。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/ip-query",
+      "title": "IP地址查询 - 查询IP归属地",
+      "description": "在线IP地址查询工具，快速查询IP地址的归属地、运营商等信息。",
+      "keywords": "IP查询,IP地址,IP归属地,网络工具,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/ip-query.html",
+      "faq": [
+        {
+          "q": "定位准吗？",
+          "a": "IP 地理定位由数据库映射，通常到城市级，且随网络调整会变化，不作精确依据。"
+        },
+        {
+          "q": "用的是谁的 IP 数据？",
+          "a": "结果来自公开的 IP 地理库，具体归属以数据提供方为准。"
+        },
+        {
+          "q": "为什么查到的是外省或外市？",
+          "a": "使用代理、专线或 IPv6 出口时，显示的是出口节点位置而非设备真实位置。"
+        },
+        {
+          "q": "输入会被记录吗？",
+          "a": "查询为展示用途，一般不存储你查询的地址。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/secret-message",
+      "title": "密语 - 写下心里话分享给TA",
+      "description": "密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。",
+      "keywords": "密语,悄悄话,秘密消息,分享密语,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/secret-message.html",
+      "faq": [
+        {
+          "q": "别人怎么看到我的内容？",
+          "a": "工具生成一个专属链接，把链接分享给对方即可打开查看。"
+        },
+        {
+          "q": "内容会长期保存吗？",
+          "a": "保存与有效期取决于站点实现，敏感信息不建议长期公开留存。"
+        },
+        {
+          "q": "任何人都能打开吗？",
+          "a": "知道链接者即可访问，请勿把链接传播给不相关的人。"
+        },
+        {
+          "q": "适合放隐私信息吗？",
+          "a": "不建议放置密码、证件等高敏感信息，请自行把握内容尺度。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/size",
+      "title": "衣服尺码对照表 - 在线尺码换算",
+      "description": "国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。",
+      "keywords": "衣服尺码,尺码对照表,尺码换算,国际尺码,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/size.html",
+      "faq": [
+        {
+          "q": "这些换算可靠吗？",
+          "a": "仅提供通用对照参考，品牌与版型差异显著，请以具体商品的尺寸表为准。"
+        },
+        {
+          "q": "按什么测量选码？",
+          "a": "建议测量胸围、腰围、臀围等，再对照商品实测数据，而非仅看字母码。"
+        },
+        {
+          "q": "覆盖哪些尺码体系？",
+          "a": "常见中国、美国、欧洲、日本、韩国等服装尺码。"
+        },
+        {
+          "q": "童装、鞋码也适用吗？",
+          "a": "本页以服装为主，鞋码与童装另有体系，需另行核对。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/body-fat",
+      "title": "基础代谢与体脂率计算器 - BMR TDEE 在线计算",
+      "description": "在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。",
+      "keywords": "基础代谢,BMR,体脂率,TDEE,每日消耗计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/body-fat.html",
+      "faq": [
+        {
+          "q": "用的是哪些公式？",
+          "a": "BMR/TDEE 采用 Mifflin-St Jeor 公式，体脂率采用美国海军法（围度法）。"
+        },
+        {
+          "q": "估算准吗？",
+          "a": "公式给出的是群体层面的估算，个体差异与测量误差都会影响结果，仅作趋势参考。"
+        },
+        {
+          "q": "体脂率为什么和体检查的不一样？",
+          "a": "不同方法（皮褶、生物电阻抗、DEXA 等）口径不同，海军法按围度估算，数值存在差异属正常。"
+        },
+        {
+          "q": "能作为饮食或减脂处方吗？",
+          "a": "不能，TDEE 只提供热量参考，减脂或增肌方案请结合自身情况并咨询专业人士。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/discount",
+      "title": "折扣到手价计算 - 折上折满减叠加省钱计算",
+      "description": "在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。",
+      "keywords": "折扣计算,到手价,折上折,满减叠加,省钱计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/discount.html",
+      "faq": [
+        {
+          "q": "“折上折”和“满减叠加”有什么区别？",
+          "a": "折上折是按成交价连续打折，满减是在满足门槛后减固定金额，工具按对应规则分别计算。"
+        },
+        {
+          "q": "“相当于几折”是怎么来的？",
+          "a": "用到手价除以原价得到综合折扣，供跨活动比较。"
+        },
+        {
+          "q": "需要输入哪些信息？",
+          "a": "原价以及折扣或满减档位等，具体以页面对应模式的输入项为准。"
+        },
+        {
+          "q": "能反映平台真实价吗？",
+          "a": "最终以电商结算价为准，工具只按你输入的规则预估。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/date-calc",
+      "title": "日期计算器 - 日期间隔天数/日期加减/星期查询",
+      "description": "在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。",
+      "keywords": "日期计算器,日期间隔,日期推算,星期查询,天数计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/date-calc.html",
+      "faq": [
+        {
+          "q": "计算按什么历法？",
+          "a": "按公历规则计算，含闰年判断；如需农历请以权威农历为准。"
+        },
+        {
+          "q": "“间隔天数”含首尾吗？",
+          "a": "页面会区分“相差天数”与“含首尾天数”，请按需选择对应结果。"
+        },
+        {
+          "q": "支持多大的年份范围？",
+          "a": "支持常见年份范围，极端或超远日期可能受浏览器日期实现限制。"
+        },
+        {
+          "q": "结果可作法律或合同期限依据吗？",
+          "a": "日期计算仅供参考，合同与法务期限请以正式约定及专业核算为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/prepay",
+      "title": "房贷提前还款计算器 - 提前还清能省多少利息",
+      "description": "在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。",
+      "keywords": "提前还贷,房贷提前还款,提前还款计算,节省利息,等额本息,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/prepay.html",
+      "faq": [
+        {
+          "q": "支持哪两种还款方式？",
+          "a": "等额本息与等额本金，两者的剩余本金与利息结构不同。"
+        },
+        {
+          "q": "能省多少利息怎么来的？",
+          "a": "用你输入的利率与剩余期限，对比是否提前偿还所产生的利息差值。"
+        },
+        {
+          "q": "计算准吗？",
+          "a": "以你输入的利率、期数为假设，实际受合同利率、违约金与银行规则影响。"
+        },
+        {
+          "q": "要不要提前还？",
+          "a": "需结合资金机会成本、利率与个人情况综合判断，工具只提供数字参考。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/social-insurance",
+      "title": "五险一金计算器 - 社保公积金缴费明细计算",
+      "description": "在线五险一金计算器，输入缴费基数与公积金比例，一键算出个人与单位月缴费明细。",
+      "keywords": "五险一金,社保计算,公积金计算,缴费基数,社保明细,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/social-insurance.html",
+      "faq": [
+        {
+          "q": "是怎么算的？",
+          "a": "以缴费基数乘以各险种与公积金的比例，分别得到个人与单位缴纳额。"
+        },
+        {
+          "q": "比例用哪里的？",
+          "a": "各地比例与基数上下限不同，工具采用可输入或默认档位，请核对当地标准。"
+        },
+        {
+          "q": "为什么和工资条不一样？",
+          "a": "实际受当地基数上下限、比例调整与申报口径影响，可能与估算存在差异。"
+        },
+        {
+          "q": "能当报销或落户依据吗？",
+          "a": "不能，涉及待遇与资格请以社保、公积金经办机构核定为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/due-date",
+      "title": "预产期计算器 - 孕周天数查询与预产期推算",
+      "description": "在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。",
+      "keywords": "预产期计算,孕周查询,怀孕计算,预产期推算,孕期,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/due-date.html",
+      "faq": [
+        {
+          "q": "用的是什么算法？",
+          "a": "按内格勒法则推算：以末次月经首日约加 280 天（10 个妊娠月），并按你的周期长度调整。"
+        },
+        {
+          "q": "周期不是 28 天怎么办？",
+          "a": "工具支持输入个人月经周期长度进行修正，周期偏长或偏短都会相应平移预产期。"
+        },
+        {
+          "q": "预产期一定会在那天生吗？",
+          "a": "不一定，多数宝宝在预产期前后两周内出生都属正常。"
+        },
+        {
+          "q": "能替代产检吗？",
+          "a": "不能，具体孕周与预产期请以医生超声核对为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/pace",
+      "title": "跑步配速计算器 - 配速/完赛时间/时速互算",
+      "description": "在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。",
+      "keywords": "配速计算,跑步配速,完赛时间,马拉松配速,跑步工具,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/pace.html",
+      "faq": [
+        {
+          "q": "三种模式分别算什么？",
+          "a": "距离÷用时得配速；距离加配速预算完赛时间；用时加配速反推距离。"
+        },
+        {
+          "q": "配速单位是什么？",
+          "a": "常用每公里用时（分:秒/公里），也可换算为时速。"
+        },
+        {
+          "q": "结果考虑坡度吗？",
+          "a": "不考虑地形、天气与体力衰减，为平路理想值参考。"
+        },
+        {
+          "q": "能作为比赛配速保证吗？",
+          "a": "不能，实际配速受状态影响，工具用于目标测算。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/pet-age",
+      "title": "宠物年龄换算 - 猫狗年龄对照人类年龄",
+      "description": "在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。",
+      "keywords": "宠物年龄,猫年龄换算,狗年龄换算,宠物计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/pet-age.html",
+      "faq": [
+        {
+          "q": "换算有科学依据吗？",
+          "a": "“人年对照”是通俗近似，猫犬衰老速度并非每年等比，仅便于理解生命阶段。"
+        },
+        {
+          "q": "猫和狗换算一样吗？",
+          "a": "不同，犬还受体型与品种影响，工具按所选种类采用对应通用口径。"
+        },
+        {
+          "q": "需要输入什么？",
+          "a": "宠物种类（猫或犬）与实际年龄，部分口径还考虑体型。"
+        },
+        {
+          "q": "能指导喂养或就医吗？",
+          "a": "只作参考，健康与喂养请以兽医意见为准。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/percentage",
+      "title": "百分比计算器 - 占比/增长率/百分比值在线计算",
+      "description": "在线百分比计算器，支持占比计算、增长率计算、百分比值计算与按变化幅度还原原值。",
+      "keywords": "百分比计算,占比计算,增长率,百分比换算,数学工具,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/percentage.html",
+      "faq": [
+        {
+          "q": "增长率怎么算？",
+          "a": "增长率=（现值−原值）÷原值×100%，为负即表示下降。"
+        },
+        {
+          "q": "“占比”和“百分比值”有何不同？",
+          "a": "占比是部分除以整体，百分比值是某数乘以给定百分率。"
+        },
+        {
+          "q": "需要注意除零吗？",
+          "a": "作为除数的原值或整体不能为 0，否则无法计算。"
+        },
+        {
+          "q": "结果精确吗？",
+          "a": "算术计算精确，输入小数可能按页面规则做四舍五入显示。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/overtime",
+      "title": "加班费计算器 - 工作日/周末/节假日加班工资计算",
+      "description": "在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。",
+      "keywords": "加班费计算,加班工资,倍工资,1.5倍,劳动法加班,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/overtime.html",
+      "faq": [
+        {
+          "q": "倍率是怎么来的？",
+          "a": "采用劳动法对工作日、休息日与法定节假日加班常见的 1.5、2、3 倍计酬口径。"
+        },
+        {
+          "q": "时薪怎么折算？",
+          "a": "一般以月计薪天数折算日薪与时薪，再乘以倍率与加班时长。"
+        },
+        {
+          "q": "计算结果能直接要工资吗？",
+          "a": "仅供参考，具体应以公司薪酬制度与当地规定核定。"
+        },
+        {
+          "q": "需要输入什么？",
+          "a": "月工资与各类加班时长，页面会分别汇总估算。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/height-predict",
+      "title": "儿童身高预测 - 遗传靶身高计算器",
+      "description": "在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。",
+      "keywords": "身高预测,遗传身高,儿童身高,靶身高,身高计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/height-predict.html",
+      "faq": [
+        {
+          "q": "用的是哪个公式？",
+          "a": "常用遗传靶身高法：男孩（父+母+13）÷2、女孩（父+母−13）÷2，并给出上下浮动区间。"
+        },
+        {
+          "q": "预测准吗？",
+          "a": "只反映遗传潜力区间，实际身高受营养、睡眠、运动与健康影响，存在较大偏差。"
+        },
+        {
+          "q": "需要输入什么？",
+          "a": "父亲身高、母亲身高与孩子性别（单位需统一）。"
+        },
+        {
+          "q": "能当医学结论吗？",
+          "a": "不能，如关注生长发育请咨询儿科或内分泌科。"
+        }
+      ]
+    },
+    {
+      "path": "calculator/fuel-cost",
+      "title": "油耗计算器 - 百公里油耗与油费在线计算",
+      "description": "在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。",
+      "keywords": "油耗计算,百公里油耗,油费计算,汽车油耗,一珩成长笔记",
+      "type": "tool",
+      "category": "calculator",
+      "indexable": true,
+      "output": "calculator/fuel-cost.html",
+      "faq": [
+        {
+          "q": "百公里油耗怎么算？",
+          "a": "用加油量除以行驶里程再乘以 100，得到每百公里耗油升数。"
+        },
+        {
+          "q": "需要哪些输入？",
+          "a": "行驶里程、加油升数，以及可选的油价用于计算每公里油费。"
+        },
+        {
+          "q": "为什么和仪表盘不一样？",
+          "a": "仪表多按瞬时或区间工况计算，工具基于加油—里程记录，方法与时间窗口不同会有偏差。"
+        },
+        {
+          "q": "数据会被上传吗？",
+          "a": "计算在浏览器本地完成，不上传你输入的内容。"
+        }
+      ]
+    },
+    {
+      "path": "calendar",
+      "title": "万年历老黄历查询 - 一珩成长笔记",
+      "description": "在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。",
+      "keywords": "万年历,老黄历,日历查询,农历,宜忌,吉日查询,节气节日,一珩成长笔记",
+      "type": "tool",
+      "category": "calendar",
+      "indexable": true,
+      "output": "calendar.html",
+      "faq": [
+        {
+          "q": "万年历和老黄历有什么区别？",
+          "a": "万年历侧重长周期的公历 / 农历日期对照与查询；老黄历在传统历法基础上附加每日宜忌、吉神凶煞、冲煞、节气等内容，多用于择吉参考。本页面同时提供两类信息。"
+        },
+        {
+          "q": "农历、干支、生肖是准确的吗？",
+          "a": "这些由本地天文算法推算，覆盖常见年份，一般与通行农历一致；涉及跨世纪或含闰月的极端日期时，建议以权威农历发布为准。"
+        },
+        {
+          "q": "为什么有时看不到宜忌和节气？",
+          "a": "宜忌、节气、节日、冲煞属民俗与天文数据，需要联网从接口获取；离线或接口暂无数据时，页面只显示本地可算的农历 / 干支 / 生肖部分。"
+        },
+        {
+          "q": "老黄历的“宜 / 忌”能作为决策依据吗？",
+          "a": "它属于传统民俗文化参考，没有科学依据，仅供了解与娱乐；涉及健康、财务、出行等重要决策，请以现实条件与专业意见为准。"
+        }
+      ]
+    },
+    {
+      "path": "calendar/daily-guide",
+      "title": "今日指南 - 老黄历+运势+午餐一站查",
+      "description": "每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。",
+      "keywords": "今日指南,每日运势,老黄历,午餐推荐,一珩成长笔记",
+      "type": "tool",
+      "category": "calendar",
+      "indexable": true,
+      "output": "calendar/daily-guide.html",
+      "faq": [
+        {
+          "q": "宜忌和运势可信吗？",
+          "a": "属传统民俗与娱乐参考，没有科学依据，请勿据此做重要决策。"
+        },
+        {
+          "q": "需要联网吗？",
+          "a": "部分数据（如宜忌、运势）可能需要联网获取，离线时显示可能不完整。"
+        },
+        {
+          "q": "午餐推荐算什么？",
+          "a": "为轻松建议，不构成营养或医疗处方，饮食请结合自身情况。"
+        },
+        {
+          "q": "内容每天会变吗？",
+          "a": "内容按日期更新，作为日常趣味参考。"
+        }
+      ]
+    },
+    {
+      "path": "calendar/countdown",
+      "title": "重要日子 - 倒计时、纪念日、年龄、工作日计算",
+      "description": "在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。",
+      "keywords": "倒计时,纪念日,生日计算,旅行倒计时,考试倒计时,年龄计算,工作日计算,一珩成长笔记",
+      "type": "tool",
+      "category": "calendar",
+      "indexable": true,
+      "output": "calendar/countdown.html",
+      "faq": [
+        {
+          "q": "支持哪些类型？",
+          "a": "常见有倒计时、纪念日、年龄计算与工作日计算等。"
+        },
+        {
+          "q": "“工作日”怎么定义？",
+          "a": "一般按周一至周五计，是否排除法定节假日以页面说明为准。"
+        },
+        {
+          "q": "跨越闰年算得准吗？",
+          "a": "采用公历规则并含闰年判断，在常见年份范围内可靠。"
+        },
+        {
+          "q": "年龄计算按什么口径？",
+          "a": "按出生日期与所选日期之差计算周岁或天数，注意生日当天的口径。"
+        }
+      ]
+    },
+    {
+      "path": "combo/buy-house",
+      "title": "买房全攻略 - 房贷月供税费一站算清",
+      "description": "买房全攻略工具，整合房贷计算、税费估算、装修预算，买房决策一站搞定。",
+      "keywords": "买房攻略,房贷计算,买房税费,购房指南,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/buy-house.html",
+      "faq": [
+        {
+          "q": "包含哪些测算？",
+          "a": "通常有房贷月供、相关税费与装修预算估算。"
+        },
+        {
+          "q": "税费算得准吗？",
+          "a": "契税、增值税等受面积、套数与城市政策影响大，工具为估算，实际以当地规定为准。"
+        },
+        {
+          "q": "需要输入哪些？",
+          "a": "房价、面积、贷款参数与税费相关选项等。"
+        },
+        {
+          "q": "可作购房决策唯一依据吗？",
+          "a": "不能，请结合资金、政策与专业人士意见综合判断。"
+        }
+      ]
+    },
+    {
+      "path": "combo/buy-car",
+      "title": "买车全攻略 - 车贷油费保险综合对比",
+      "description": "买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。",
+      "keywords": "买车攻略,车贷计算,购车指南,汽车对比,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/buy-car.html",
+      "faq": [
+        {
+          "q": "包含哪些计算？",
+          "a": "一般整合车贷月供、油费估算与保险费用对比等模块。"
+        },
+        {
+          "q": "结果是最终价格吗？",
+          "a": "不是，落地价还受购置税、保险方案、地区与议价影响，工具给出区间参考。"
+        },
+        {
+          "q": "数据会被上传吗？",
+          "a": "输入多用于页面本地计算，具体以站点隐私说明为准。"
+        },
+        {
+          "q": "能直接决定买哪辆吗？",
+          "a": "工具提供数字对比，最终选择需结合需求、口碑与实地看车。"
+        }
+      ]
+    },
+    {
+      "path": "combo/health-check",
+      "title": "健康体检站 - BMI与BMR快速评估",
+      "description": "在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础代谢率 BMR 与每日消耗，快速自我健康评估。",
+      "keywords": "健康体检,BMI测试,BMR,基础代谢,健康评估,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/health-check.html",
+      "faq": [
+        {
+          "q": "BMI 怎么算、准吗？",
+          "a": "BMI=体重÷身高²，是群体层面的粗略指标，未区分肌肉与脂肪，需结合体脂等综合看。"
+        },
+        {
+          "q": "用的是哪些公式？",
+          "a": "BMR、TDEE 常采用 Mifflin-St Jeor 等公式，属估算。"
+        },
+        {
+          "q": "结果能当诊断吗？",
+          "a": "不能，仅供自我评估，健康问题请咨询医生。"
+        },
+        {
+          "q": "需要输入什么？",
+          "a": "一般包括身高、体重、年龄、性别与活动量。"
+        }
+      ]
+    },
+    {
+      "path": "combo/fun-test",
+      "title": "趣味测试合集 - 缘分星座生日趣味测试",
+      "description": "趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。",
+      "keywords": "趣味测试,缘分测试,星座测试,生日密码,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/fun-test.html",
+      "faq": [
+        {
+          "q": "这些测试准吗？",
+          "a": "属娱乐性质，没有科学与命理依据，请勿据此做重要决定。"
+        },
+        {
+          "q": "会保存我的答案吗？",
+          "a": "结果多由所选选项即时生成，具体以站点隐私说明为准。"
+        },
+        {
+          "q": "星座运势能指导生活吗？",
+          "a": "仅供娱乐参考。"
+        },
+        {
+          "q": "适合未成年人吗？",
+          "a": "内容轻松娱乐，但请理性看待、不要沉迷。"
+        }
+      ]
+    },
+    {
+      "path": "combo/finance-toolkit",
+      "title": "理财百宝箱 - 复利/存款/通胀/汇率/贷款对比",
+      "description": "理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。",
+      "keywords": "理财工具,复利计算,存款利息,通胀计算,汇率换算,贷款对比,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/finance-toolkit.html",
+      "faq": [
+        {
+          "q": "包含哪些工具？",
+          "a": "复利、定期存款、通胀、汇率与贷款对比等模块。"
+        },
+        {
+          "q": "收益预测准吗？",
+          "a": "均以你输入的收益率与期限为假设，实际收益存在不确定性。"
+        },
+        {
+          "q": "汇率用哪里的价？",
+          "a": "参考汇率以数据源与市场实时价为准，工具为近似换算。"
+        },
+        {
+          "q": "可作投资决策依据吗？",
+          "a": "不能，投资有风险，重大决策请咨询持牌专业机构。"
+        }
+      ]
+    },
+    {
+      "path": "combo/life-plan",
+      "title": "人生规划计算器 - 财务全景报告",
+      "description": "人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。",
+      "keywords": "人生规划,财务规划,理财规划,人生目标,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/life-plan.html",
+      "faq": [
+        {
+          "q": "综合了哪些方面？",
+          "a": "通常涵盖房贷、车贷、养老储备与投资等模块的汇总。"
+        },
+        {
+          "q": "数字准吗？",
+          "a": "全部基于你输入的假设，未来收入、利率与支出变化会显著影响结果。"
+        },
+        {
+          "q": "能替代理财规划师吗？",
+          "a": "不能，仅提供概览，重大规划请咨询专业人士。"
+        },
+        {
+          "q": "需要输入很多数据吗？",
+          "a": "是的，输入越贴近实际，概览越有参考价值。"
+        }
+      ]
+    },
+    {
+      "path": "combo/color-lab",
+      "title": "色彩研究所 - 配色/传统色彩/性格测试",
+      "description": "色彩研究所整合颜色搭配方案、中国传统色彩、颜色性格测试，探索色彩的魅力。",
+      "keywords": "配色方案,中国传统色彩,颜色性格测试,色彩搭配,一珩成长笔记",
+      "type": "tool",
+      "category": "combo",
+      "indexable": true,
+      "output": "combo/color-lab.html",
+      "faq": [
+        {
+          "q": "有哪些功能？",
+          "a": "一般提供配色方案、传统色名与颜色性格测试等模块。"
+        },
+        {
+          "q": "颜色性格测试准吗？",
+          "a": "属趣味娱乐，不具有心理学诊断意义。"
+        },
+        {
+          "q": "配色能直接用在设计里吗？",
+          "a": "可作灵感起点，正式设计请结合品牌规范与可读性、对比度要求。"
+        },
+        {
+          "q": "传统色释义可靠吗？",
+          "a": "提供文化科普参考，不同来源的叫法与色值或有差异。"
+        }
+      ]
+    },
+    {
+      "path": "probability",
+      "title": "概率计算器 - 数学概率在线计算",
+      "description": "在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。",
+      "keywords": "概率计算,数学概率,概率统计,数学工具,一珩成长笔记",
+      "type": "tool",
+      "category": "tools",
+      "indexable": true,
+      "output": "probability.html",
+      "faq": [
+        {
+          "q": "概率是怎么定义的？",
+          "a": "概率 = 有利结果数 ÷ 全部等可能结果数，取值在 0 到 1 之间，常乘以 100 表示为百分比。"
+        },
+        {
+          "q": "需要哪些输入？",
+          "a": "通常填写“有利结果数”和“总结果数”（均为非负整数，且总数不小于有利数），工具据此计算概率与补集概率。"
+        },
+        {
+          "q": "计算结果准确吗？",
+          "a": "对基于正确输入的算术计算是精确的；但真实事件的概率取决于模型假设是否成立，需你自行判断输入是否符合实际情况。"
+        },
+        {
+          "q": "概率为 1% 意味着买 100 次就一定中一次吗？",
+          "a": "不是。每次是独立事件，1% 表示单次发生的可能性；多次尝试“至少一次”的概率需按 1-(1-p)^n 计算，并非必然。"
+        }
+      ]
+    },
+    {
+      "path": "random",
+      "title": "随机数生成器 - 在线生成随机数字",
+      "description": "在线随机数生成器，快速生成指定范围的随机数字，实用小工具。",
+      "keywords": "随机数,随机数生成,在线随机,数字生成,一珩成长笔记",
+      "type": "tool",
+      "category": "tools",
+      "indexable": true,
+      "output": "random.html",
+      "faq": [
+        {
+          "q": "生成的是真随机数吗？",
+          "a": "不是。浏览器用的是伪随机算法（周期极长），足以应付抽签、测试等日常场景；用于密码、密钥等高安全用途请使用专业的密码学随机源。"
+        },
+        {
+          "q": "可以设定哪些参数？",
+          "a": "一般可设定最小值、最大值与生成个数，工具在闭区间内随机取值（是否允许重复以页面选项为准）。"
+        },
+        {
+          "q": "输入的数据会被上传吗？",
+          "a": "不会。范围与结果都在本地计算，不上传、不记录。"
+        },
+        {
+          "q": "生成的数字会重复吗？",
+          "a": "取决于设置：允许重复时可出现相同值；要求不重复时数量不能超过区间可选值个数。"
+        }
+      ]
+    },
+    {
+      "path": "vision",
+      "title": "在线视力测试 - 一珩成长笔记",
+      "description": "免费在线视力测试，快速检测视力水平，支持动态视力检测。",
+      "keywords": "视力测试,在线测视力,眼睛健康,一珩成长笔记",
+      "type": "tool",
+      "category": "tools",
+      "indexable": true,
+      "output": "vision.html",
+      "faq": [
+        {
+          "q": "这个视力测试准确吗？",
+          "a": "仅供参考。在线测试受屏幕像素密度、尺寸、亮度与观看距离影响，无法等同于标准视力表；如需准确度数请到正规机构验光。"
+        },
+        {
+          "q": "应该保持多远距离？",
+          "a": "建议在屏幕前约一臂到两臂的固定距离，并在正常光线下进行；距离与光线变化都会影响结果。"
+        },
+        {
+          "q": "多久该检查一次视力？",
+          "a": "一般成人可每年自测并定期专业检查；长时间用眼者、青少年与 40 岁以上人群建议更频繁，出现视力骤降、眼痛等应立即就医。"
+        },
+        {
+          "q": "儿童可以做吗？",
+          "a": "可做粗略参考，但儿童配合度与表达能力有限，建议以专业眼科检查为准。"
+        }
+      ]
+    },
+    {
+      "path": "lotto",
+      "title": "双色球随机选号 - 彩票模拟选号工具",
+      "description": "双色球随机模拟选号工具，一键生成随机号码，仅供娱乐参考。",
+      "keywords": "双色球,随机选号,彩票选号,福利彩票,一珩成长笔记",
+      "type": "tool",
+      "category": "tools",
+      "indexable": true,
+      "output": "lotto.html",
+      "faq": [
+        {
+          "q": "这个工具能预测中奖号码吗？",
+          "a": "不能。彩票开奖是独立随机事件，任何工具都无法预测；本页面仅按规则随机生成号码，仅供娱乐参考。"
+        },
+        {
+          "q": "双色球的选号规则是什么？",
+          "a": "红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个，组成一注。工具按此规则随机生成。"
+        },
+        {
+          "q": "生成的号码会被记录或上传吗？",
+          "a": "不会。选号在浏览器本地完成，不上传、不保存、不涉及账号。"
+        },
+        {
+          "q": "理性购彩有哪些提醒？",
+          "a": "彩票是公益与娱乐属性，中奖概率极低，请量力而行、不沉迷，未成年人不得购彩。"
+        }
+      ]
+    },
+    {
+      "path": "tools",
+      "title": "实用工具箱 - 生活必备在线工具",
+      "description": "精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。",
+      "keywords": "实用工具,在线工具,工具箱,生活工具,一珩成长笔记",
+      "type": "content",
+      "category": "tools",
+      "indexable": true,
+      "output": "tools.html"
+    },
+    {
+      "path": "404",
+      "title": "页面不存在 - 一珩成长笔记",
+      "description": "你访问的页面不存在或已迁移，可从返回首页、浏览全部工具或搜索入口继续。",
+      "type": "content",
+      "category": "core",
+      "indexable": false,
+      "output": "404.html"
+    }
   ]
 }

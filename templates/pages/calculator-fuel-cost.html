@@ -51,3 +51,25 @@
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
         </script>
+
+<section class="tool-info">
+          <h2>关于本工具</h2>
+          <p>油耗计算器输入行驶里程与加油量，算出百公里油耗与每公里油费，帮助估算用车成本；结果是基于记录的估算。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>百公里油耗怎么算？</summary>
+            <p>用加油量除以行驶里程再乘以 100，得到每百公里耗油升数。</p>
+          </details>
+          <details>
+            <summary>需要哪些输入？</summary>
+            <p>行驶里程、加油升数，以及可选的油价用于计算每公里油费。</p>
+          </details>
+          <details>
+            <summary>为什么和仪表盘不一样？</summary>
+            <p>仪表多按瞬时或区间工况计算，工具基于加油—里程记录，方法与时间窗口不同会有偏差。</p>
+          </details>
+          <details>
+            <summary>数据会被上传吗？</summary>
+            <p>计算在浏览器本地完成，不上传你输入的内容。</p>
+          </details>
+        </section>

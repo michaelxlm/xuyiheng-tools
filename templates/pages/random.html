@@ -72,3 +72,25 @@
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
         </script>
+
+<section class="tool-info">
+          <h2>关于随机数生成器</h2>
+          <p>随机数生成器在浏览器本地按你设定的范围与个数生成随机数，可用于抽签、点名、抽奖、生成测试数据等场景，不上传任何数据。适用于日常随机需求；高安全场景（密码、密钥）请使用专业密码学随机源。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>生成的是真随机数吗？</summary>
+            <p>不是。浏览器用的是伪随机算法（周期极长），足以应付抽签、测试等日常场景；用于密码、密钥等高安全用途请使用专业的密码学随机源。</p>
+          </details>
+          <details>
+            <summary>可以设定哪些参数？</summary>
+            <p>一般可设定最小值、最大值与生成个数，工具在闭区间内随机取值（是否允许重复以页面选项为准）。</p>
+          </details>
+          <details>
+            <summary>输入的数据会被上传吗？</summary>
+            <p>不会。范围与结果都在本地计算，不上传、不记录。</p>
+          </details>
+          <details>
+            <summary>生成的数字会重复吗？</summary>
+            <p>取决于设置：允许重复时可出现相同值；要求不重复时数量不能超过区间可选值个数。</p>
+          </details>
+        </section>

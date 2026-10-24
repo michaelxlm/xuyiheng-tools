@@ -99,3 +99,25 @@
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
         </script>
+
+<section class="tool-info">
+          <h2>关于概率计算</h2>
+          <p>概率计算器用于计算常见事件的发生概率，支持等可能事件、对立事件等基本情形，帮助理解概率概念、辅助学习与决策分析。概率取值介于 0 与 1 之间（0 表示不可能，1 表示必然），常乘以 100 表示为百分比。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>概率是怎么定义的？</summary>
+            <p>概率 = 有利结果数 ÷ 全部等可能结果数，取值在 0 到 1 之间，常乘以 100 表示为百分比。</p>
+          </details>
+          <details>
+            <summary>需要哪些输入？</summary>
+            <p>通常填写“有利结果数”和“总结果数”（均为非负整数，且总数不小于有利数），工具据此计算概率与补集概率。</p>
+          </details>
+          <details>
+            <summary>计算结果准确吗？</summary>
+            <p>对基于正确输入的算术计算是精确的；但真实事件的概率取决于模型假设是否成立，需你自行判断输入是否符合实际情况。</p>
+          </details>
+          <details>
+            <summary>概率为 1% 意味着买 100 次就一定中一次吗？</summary>
+            <p>不是。每次是独立事件，1% 表示单次发生的可能性；多次尝试“至少一次”的概率需按 1-(1-p)^n 计算，并非必然。</p>
+          </details>
+        </section>
