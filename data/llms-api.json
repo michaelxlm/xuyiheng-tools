@@ -3,7 +3,7 @@
   "base": "https://api.xuyiheng.com",
   "auth": "x-api-key 请求头",
   "access": "本期免费接入（面向 LLM / Agent 只读调用）；档位单价与付费结算暂未对客开放，计费能力已对接",
-  "portal": "/developer.html",
+  "portal": "/public/developer.html",
   "mcp": {
     "endpoint": "/api/v1/mcp",
     "protocol": "JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额",
