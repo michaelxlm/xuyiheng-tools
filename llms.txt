@@ -19,11 +19,9 @@
 - [个人所得税计算器](https://xuyiheng.com/calculator/tax.html): 在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。
 - [单位换算](https://xuyiheng.com/calculator/unit.html): 在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。
 - [养老金计算器](https://xuyiheng.com/calculator/pension.html): 在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。
-- [字数统计器](https://xuyiheng.com/calculator/word-count.html): 在线字数统计工具，实时统计文字数量、字符数、段落数，写作必备工具。
 - [时区转换器](https://xuyiheng.com/calculator/timezone.html): 在线时区转换器，支持全球主要时区之间的时间转换，出国旅行必备。
 - [装修计算器](https://xuyiheng.com/calculator/decoration.html): 在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。
 - [宝宝取名](https://xuyiheng.com/calculator/baby-name.html): 宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。
-- [IP地址查询](https://xuyiheng.com/calculator/ip-query.html): 在线IP地址查询工具，快速查询IP地址的归属地、运营商等信息。
 - [密语](https://xuyiheng.com/calculator/secret-message.html): 密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。
 - [衣服尺码对照表](https://xuyiheng.com/calculator/size.html): 国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。
 - [基础代谢与体脂率计算器](https://xuyiheng.com/calculator/body-fat.html): 在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。
@@ -51,7 +49,7 @@
 - [趣味测试合集](https://xuyiheng.com/combo/fun-test.html): 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。
 - [理财百宝箱](https://xuyiheng.com/combo/finance-toolkit.html): 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。
 - [人生规划计算器](https://xuyiheng.com/combo/life-plan.html): 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。
-- [色彩研究所](https://xuyiheng.com/combo/color-lab.html): 色彩研究所整合颜色搭配方案、中国传统色彩、颜色性格测试，探索色彩的魅力。
+- [颜色性格测试](https://xuyiheng.com/combo/color-lab.html): 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。
 
 ## 其他工具
 - [概率计算器](https://xuyiheng.com/probability.html): 在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。

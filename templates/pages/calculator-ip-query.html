@@ -1,93 +1,19 @@
         <section class="page-heading">
-          <h1>IP 地址查询</h1>
-          <p>输入 IPv4 / IPv6 地址查询归属地、运营商与网络类型；留空则自动检测你的公网 IP。内置常见 IP 段离线识别，联网时对接中台返回精确归属。</p>
+          <h1>IP 地址查询（已迁移）</h1>
+          <p>为遵循全站工具去重原则，IP 归属地查询已统一归并至兄弟站「访客小站」，功能更完整并持续维护。本页将自动为你跳转。</p>
         </section>
 
-        <form class="card" id="ipForm">
-          <div class="form-group">
-            <label class="form-label" for="ip-input">IP 地址（留空查询本机公网 IP）</label>
-            <input class="form-input" id="ip-input" type="text" placeholder="如 8.8.8.8 或 2400:3200::1" autocomplete="off">
-          </div>
+        <div class="card">
+          <p style="margin:0 0 var(--space-3)">正在跳转至访客小站的 IP 查询工具……若没有自动跳转，请点击下方按钮前往。</p>
           <div class="btn-row">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"ip-query"}'>查询</button>
-            <button class="btn btn-secondary" type="button" id="ip-mine">查询我的 IP</button>
+            <a class="btn btn-primary" href="https://fangkelianmeng.com/ip.html" rel="noopener">前往访客小站 · IP 地址查询</a>
           </div>
-          <div class="chips" id="ip-quick"></div>
-        </form>
-
-        <div class="result-box" id="ip-result" hidden>
-          <div class="result-row"><div><div class="result-label">归属地</div><div class="result-value" id="ip-loc" style="font-size:var(--text-lg)">--</div></div></div>
-          <dl class="result-detail" id="ip-detail"></dl>
         </div>
-
-        <div class="info-box mt-4" id="ip-note"><span>ℹ️</span><div>离线识别库覆盖常见公共 DNS 与国内运营商号段；精确归属依赖中台接口，若网络不可达会回退到离线结果。</div></div>
 
         <script>
         (function () {
-          function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            var V4 = /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
-            var V6 = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))$/;
-            function detect(ip) { return V4.test(ip) ? 'IPv4' : V6.test(ip) ? 'IPv6' : ''; }
-            var DB = [
-              ['8.8.8', '美国', 'Google DNS'], ['8.8.4', '美国', 'Google DNS'], ['1.1.1', '美国', 'Cloudflare'],
-              ['114.114', '中国', '114DNS'], ['223.5', '中国 浙江 杭州', '阿里巴巴'], ['180.76', '中国 北京', '百度'],
-              ['119.29', '中国 广东 深圳', '腾讯'], ['120.196', '中国 广东 广州', '中国移动'], ['183.2', '中国 广东 深圳', '中国电信'],
-              ['61.135', '中国 北京', '中国联通'], ['192.168', '局域网', '私有地址'], ['10.', '局域网', '私有地址'], ['127.0', '本机', 'Loopback'],
-            ];
-            function offline(ip) { for (var i = 0; i < DB.length; i++) if (ip.indexOf(DB[i][0]) === 0) return { loc: DB[i][1], isp: DB[i][2], type: detect(ip) || 'IPv4' }; return null; }
-            var QUICK = [['Google DNS', '8.8.8.8'], ['阿里 DNS', '223.5.5.5'], ['114 DNS', '114.114.114.114'], ['腾讯 DNS', '119.29.29.29'], ['Cloudflare', '1.1.1.1'], ['百度 DNS', '180.76.76.76']];
-            $('ip-quick').innerHTML = QUICK.map(function (q) { return '<button type="button" class="chip" data-ip="' + q[1] + '">' + q[0] + '</button>'; }).join('');
-            $('ip-quick').addEventListener('click', function (e) { var b = e.target.closest('[data-ip]'); if (b) { $('ip-input').value = b.getAttribute('data-ip'); query(); } });
-
-            function render(ip, loc, isp, type, extra) {
-              $('ip-loc').textContent = loc || '--';
-              var d = row('IP 地址', ip || '--') + row('运营商 / ISP', isp || '--') + row('网络协议', type || '--');
-              if (extra) d += extra;
-              d += row('查询时间', new Date().toLocaleString('zh-CN'));
-              $('ip-detail').innerHTML = d; $('ip-result').hidden = false;
-            }
-            function query() {
-              var ip = String($('ip-input').value).trim();
-              if (ip && !detect(ip)) { alert('IP 地址格式不正确（IPv4 每段需在 0-255）'); return; }
-              var off = ip ? offline(ip) : null;
-              if (off) render(ip, off.loc, off.isp, off.type);
-              var API = window.API;
-              if (!API) return;
-              API.get(API.endpoints.ip, { ip: ip }).then(function (res) {
-                var d = (res && res.data) || res || {};
-                var realIp = d.ip || ip;
-                render(realIp, d.location || d.address || (off && off.loc), d.isp || (off && off.isp), detect(realIp) || (off && off.type),
-                  (d.country ? row('国家/地区', d.country) : '') + (d.region ? row('省份/州', d.region) : '') + (d.city ? row('城市', d.city) : '') + (d.timezone ? row('时区', d.timezone) : ''));
-              }).catch(function () { if (!off) render(ip || '（本机）', '离线不可识别', '需联网查询', detect(ip) || '—'); });
-            }
-            $('ipForm').addEventListener('submit', function (e) { e.preventDefault(); query(); });
-            $('ip-mine').addEventListener('click', function () { $('ip-input').value = ''; query(); });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+          var TARGET = 'https://fangkelianmeng.com/ip.html';
+          var timer = setTimeout(function () { try { location.replace(TARGET); } catch (e) {} }, 1500);
+          document.addEventListener('click', function () { clearTimeout(timer); });
         })();
         </script>
-
-<section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>IP 查询工具展示指定 IP 的归属地、运营商等信息，数据来自公开的 IP 地理库，定位通常精确到城市级，仅供参考。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details>
-            <summary>定位准吗？</summary>
-            <p>IP 地理定位由数据库映射，通常到城市级，且随网络调整会变化，不作精确依据。</p>
-          </details>
-          <details>
-            <summary>用的是谁的 IP 数据？</summary>
-            <p>结果来自公开的 IP 地理库，具体归属以数据提供方为准。</p>
-          </details>
-          <details>
-            <summary>为什么查到的是外省或外市？</summary>
-            <p>使用代理、专线或 IPv6 出口时，显示的是出口节点位置而非设备真实位置。</p>
-          </details>
-          <details>
-            <summary>输入会被记录吗？</summary>
-            <p>查询为展示用途，一般不存储你查询的地址。</p>
-          </details>
-        </section>

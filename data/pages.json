@@ -136,12 +136,12 @@
     },
     {
       "path": "calculator/word-count",
-      "title": "字数统计器 - 在线字数统计工具",
-      "description": "在线字数统计工具，实时统计文字数量、字符数、段落数，写作必备工具。",
-      "keywords": "字数统计,字符计数,文字统计,写作工具,一珩成长笔记",
-      "type": "tool",
+      "title": "字数统计（已迁移至访客小站） - 一珩成长笔记",
+      "description": "字数统计已归并至兄弟站「访客小站 · 文本处理」，实时统计字符/汉字/单词/段落，本页自动跳转。",
+      "keywords": "字数统计,字符计数,访客小站,文本处理,一珩成长笔记",
+      "type": "content",
       "category": "calculator",
-      "indexable": true,
+      "indexable": false,
       "output": "calculator/word-count.html",
       "faq": [
         {
@@ -248,12 +248,12 @@
     },
     {
       "path": "calculator/ip-query",
-      "title": "IP地址查询 - 查询IP归属地",
-      "description": "在线IP地址查询工具，快速查询IP地址的归属地、运营商等信息。",
-      "keywords": "IP查询,IP地址,IP归属地,网络工具,一珩成长笔记",
-      "type": "tool",
+      "title": "IP地址查询（已迁移至访客小站） - 一珩成长笔记",
+      "description": "IP 归属地查询已归并至兄弟站「访客小站 · IP 查询」，查询归属地/运营商，本页自动跳转。",
+      "keywords": "IP查询,IP地址,IP归属地,访客小站,一珩成长笔记",
+      "type": "content",
       "category": "calculator",
-      "indexable": true,
+      "indexable": false,
       "output": "calculator/ip-query.html",
       "faq": [
         {
@@ -920,29 +920,25 @@
     },
     {
       "path": "combo/color-lab",
-      "title": "色彩研究所 - 配色/传统色彩/性格测试",
-      "description": "色彩研究所整合颜色搭配方案、中国传统色彩、颜色性格测试，探索色彩的魅力。",
-      "keywords": "配色方案,中国传统色彩,颜色性格测试,色彩搭配,一珩成长笔记",
+      "title": "颜色性格测试 - 色彩研究所",
+      "description": "凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。",
+      "keywords": "颜色性格测试,色彩心理,趣味测试,一珩成长笔记",
       "type": "tool",
       "category": "combo",
       "indexable": true,
       "output": "combo/color-lab.html",
       "faq": [
         {
-          "q": "有哪些功能？",
-          "a": "一般提供配色方案、传统色名与颜色性格测试等模块。"
-        },
-        {
           "q": "颜色性格测试准吗？",
           "a": "属趣味娱乐，不具有心理学诊断意义。"
         },
         {
-          "q": "配色能直接用在设计里吗？",
-          "a": "可作灵感起点，正式设计请结合品牌规范与可读性、对比度要求。"
+          "q": "怎么生成配色方案？",
+          "a": "配色能力已归并至兄弟站「cs 调色盘」，本页面提供直达入口。"
         },
         {
-          "q": "传统色释义可靠吗？",
-          "a": "提供文化科普参考，不同来源的叫法与色值或有差异。"
+          "q": "中国传统色在哪里看？",
+          "a": "传统色名与色值由「cs 调色盘」统一维护，点页内按钮即可前往。"
         }
       ]
     },

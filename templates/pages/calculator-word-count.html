@@ -1,81 +1,19 @@
         <section class="page-heading">
-          <h1>字数统计器</h1>
-          <p>实时统计文本的字符数、汉字数、英文单词数、数字与段落数，写作、公文、发帖前的字数核对工具，输入即更新。</p>
+          <h1>字数统计（已迁移）</h1>
+          <p>为遵循全站工具去重原则，字数/文本统计已统一归并至兄弟站「访客小站 · 文本处理」，功能更完整并持续维护。本页将自动为你跳转。</p>
         </section>
 
         <div class="card">
-          <div class="form-group">
-            <label class="form-label" for="wc-text">请输入或粘贴文本</label>
-            <textarea class="form-input" id="wc-text" rows="10" placeholder="在此输入文本，下方实时显示统计结果……" style="resize:vertical"></textarea>
-          </div>
+          <p style="margin:0 0 var(--space-3)">正在跳转至访客小站的文本处理工具……若没有自动跳转，请点击下方按钮前往。</p>
           <div class="btn-row">
-            <button class="btn btn-secondary" type="button" id="wc-clear">清空</button>
+            <a class="btn btn-primary" href="https://fangkelianmeng.com/text.html" rel="noopener">前往访客小站 · 字数统计</a>
           </div>
-        </div>
-
-        <div class="result-box">
-          <div class="result-row">
-            <div><div class="result-label">字符数（含空格）</div><div class="result-value" id="wc-chars">0</div></div>
-            <div><div class="result-label">字符数（不含空格）</div><div class="result-value" id="wc-chars-ns">0</div></div>
-            <div><div class="result-label">汉字数</div><div class="result-value" id="wc-cn">0</div></div>
-            <div><div class="result-label">英文单词</div><div class="result-value" id="wc-en">0</div></div>
-          </div>
-          <dl class="result-detail">
-            <div class="result-detail-row"><dt>数字字符</dt><dd id="wc-num">0</dd></div>
-            <div class="result-detail-row"><dt>段落数</dt><dd id="wc-para">0</dd></div>
-            <div class="result-detail-row"><dt>行数</dt><dd id="wc-lines">0</dd></div>
-          </dl>
         </div>
 
         <script>
         (function () {
-          function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function count() {
-              var t = $('wc-text').value || '';
-              var chars = t.length;
-              var charsNs = t.replace(/\s/g, '').length;
-              var cn = (t.match(/[\u4e00-\u9fa5]/g) || []).length;
-              var en = (t.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || []).length;
-              var num = (t.match(/[0-9]/g) || []).length;
-              var lines = t === '' ? 0 : t.split(/\n/).length;
-              var para = t === '' ? 0 : t.split(/\n\s*\n/).filter(function (s) { return s.trim(); }).length || (t.trim() ? 1 : 0);
-              $('wc-chars').textContent = chars;
-              $('wc-chars-ns').textContent = charsNs;
-              $('wc-cn').textContent = cn;
-              $('wc-en').textContent = en;
-              $('wc-num').textContent = num;
-              $('wc-lines').textContent = lines;
-              $('wc-para').textContent = para;
-            }
-            var debounced = U.debounce(function () { U.track('calc_result', { tool: 'word-count' }); }, 800);
-            $('wc-text').addEventListener('input', function () { count(); debounced(); });
-            $('wc-clear').addEventListener('click', function () { $('wc-text').value = ''; count(); });
-            count();
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+          var TARGET = 'https://fangkelianmeng.com/text.html';
+          var timer = setTimeout(function () { try { location.replace(TARGET); } catch (e) {} }, 1500);
+          document.addEventListener('click', function () { clearTimeout(timer); });
         })();
         </script>
-
-<section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>字数统计器实时统计文本的字数、字符数与段落数，帮助写作与投稿核对篇幅；统计口径（是否计空格、标点）以页面说明为准。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details>
-            <summary>字数和字符数有何区别？</summary>
-            <p>字符数包含标点及可能的空格，字数一般按词或汉字计数，页面会分别展示。</p>
-          </details>
-          <details>
-            <summary>中文是按字还是按词？</summary>
-            <p>中文通常按字统计，英文按词统计，具体以工具口径为准。</p>
-          </details>
-          <details>
-            <summary>空格会被计入吗？</summary>
-            <p>取决于页面是否勾选包含空格，注意对应选项。</p>
-          </details>
-          <details>
-            <summary>统计口径能用于投稿要求吗？</summary>
-            <p>请以目标平台的官方统计为准，工具仅作近似。</p>
-          </details>
-        </section>
