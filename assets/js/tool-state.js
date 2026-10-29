@@ -80,6 +80,7 @@
     var obj;
     try { obj = JSON.parse(decodeURIComponent(h.slice(3))); } catch (e) { return; }
     if (!obj || typeof obj !== 'object') return;
+    var touched = [];
     var forms = {};
     Object.keys(obj).forEach(function (id) {
       var el = doc.getElementById(id);
@@ -87,19 +88,30 @@
       var type = (el.type || '').toLowerCase();
       if (type === 'checkbox' || type === 'radio') { el.checked = obj[id] === '1'; }
       else { el.value = obj[id]; }
-      try {
-        el.dispatchEvent(new global.Event('input', { bubbles: true }));
-        el.dispatchEvent(new global.Event('change', { bubbles: true }));
-      } catch (e) {}
+      touched.push(el);
       var f = el.form;
       if (f) forms[Object.keys(forms).length] = f;
     });
-    Object.keys(forms).forEach(function (k) {
-      var f = forms[k];
-      var sub = f.querySelector('[type=submit]');
-      if (!sub) return;
-      try { if (f.requestSubmit) f.requestSubmit(sub); else sub.click(); } catch (e) {}
-    });
+    // WO-133：本脚本以 defer 加载，init() 在 readyState==='interactive' 即执行，早于各工具页内联的
+    // DOMContentLoaded→boot()（页面在 boot 里才给表单绑定 submit→preventDefault+计算、或 input→重算 处理器）。
+    // 若此刻同步派发 input/change 或 requestSubmit：处理器尚未就位 → 结果不重算；更蹩的是 requestSubmit
+    // 会触发**原生 GET 提交**（尚无处理器 preventDefault）→ URL 被追加 `?`、打断加载、boot() 永不执行。
+    // 故把“事件回放 + 提交模拟”整体推迟到 DOMContentLoaded 之后的宏任务（setTimeout 0），确保页面处理器已就位。
+    function replay() {
+      touched.forEach(function (el) {
+        try {
+          el.dispatchEvent(new global.Event('input', { bubbles: true }));
+          el.dispatchEvent(new global.Event('change', { bubbles: true }));
+        } catch (e) {}
+      });
+      Object.keys(forms).forEach(function (k) {
+        var f = forms[k];
+        var sub = f.querySelector('[type=submit]');
+        if (!sub) return;
+        try { if (f.requestSubmit) f.requestSubmit(sub); else sub.click(); } catch (e) {}
+      });
+    }
+    setTimeout(replay, 0);
   }
 
   /* ---------------- 复制链接按钮（注入结果区之后） ---------------- */
