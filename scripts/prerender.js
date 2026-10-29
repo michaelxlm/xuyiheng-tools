@@ -263,6 +263,9 @@ function renderRoute(site, route, ctx) {
   if (hasPageAsset('js', slug, 'js')) {
     scriptTags.push('    <script src="' + assetUrl('assets/js/pages/' + slug + '.min.js', manifest) + '" defer></script>');
   }
+  // WO-133 工具站留存钩子：分享链接（输入→#s=）+ 首页最近使用；置于页面脚本之后，
+  // 使 restoreState 派发的事件能被已绑定的页面监听器接住（敏感页内部自行豁免）。
+  scriptTags.push('    <script src="' + assetUrl('assets/js/tool-state.min.js', manifest) + '" defer></script>');
 
   const robots = indexable ? 'index, follow' : 'noindex, nofollow';
   const ldJson = buildJsonLd(site, route);
