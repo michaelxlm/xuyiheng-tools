@@ -4,8 +4,9 @@
   "/assets/js/ad-slots.min.js": "51546622c8",
   "/assets/js/coupon-slot.min.js": "38fe1583b1",
   "/assets/js/http-api.min.js": "5a6b36d2be",
-  "/assets/js/tracker.min.js": "69a6321d14",
-  "/assets/js/utils.min.js": "08436666a1",
+  "/assets/js/tool-state.min.js": "870f5af098",
+  "/assets/js/tracker.min.js": "3e2f252eee",
+  "/assets/js/utils.min.js": "32de2d2bf0",
   "/assets/js/pages/calculator-discount.min.js": "a6ec41dfe2",
   "/assets/js/pages/calculator-tax.min.js": "fea99f15f5",
   "/assets/js/pages/calculator-unit.min.js": "83642a11fe"

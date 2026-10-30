@@ -23,6 +23,7 @@ const minify = require('./minify');
 const fingerprint = require('./fingerprint');
 const buildSitemap = require('./build-sitemap');
 const buildLlms = require('./build-llms');
+const collectSsq = require('./collect-ssq');
 
 function readJson(rel) {
   return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -56,7 +57,7 @@ function cleanLegacyOutputs(routes) {
   });
 }
 
-function main() {
+async function main() {
   const t0 = Date.now();
   const skipCheck = process.argv.indexOf('--no-check') !== -1;
   console.log('== xuyiheng-tools build ==');
@@ -64,6 +65,13 @@ function main() {
   const site = readJson('data/site.json');
   const data = readJson('data/pages.json');
   const routes = data.routes || [];
+
+  // 构建期采集双色球开奖 → data/ssq-draws.json（fail-soft，源不可达沿用 seed，绝不中断构建）
+  try {
+    await collectSsq.run();
+  } catch (e) {
+    console.warn('  collect-ssq 跳过：' + (e && e.message ? e.message : e));
+  }
 
   minify.run();
   const manifest = fingerprint.run();
@@ -89,9 +97,7 @@ function main() {
   console.log('== 完成，用时 ' + ((Date.now() - t0) / 1000).toFixed(2) + 's ==');
 }
 
-try {
-  main();
-} catch (e) {
+main().catch(e => {
   console.error('构建失败：', e && e.stack ? e.stack : e);
   process.exit(1);
-}
+});

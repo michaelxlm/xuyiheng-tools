@@ -55,7 +55,7 @@
 - [概率计算器](https://xuyiheng.com/probability.html): 在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。
 - [随机数生成器](https://xuyiheng.com/random.html): 在线随机数生成器，快速生成指定范围的随机数字，实用小工具。
 - [在线视力测试](https://xuyiheng.com/vision.html): 免费在线视力测试，快速检测视力水平，支持动态视力检测。
-- [双色球随机选号](https://xuyiheng.com/lotto.html): 双色球随机模拟选号工具，一键生成随机号码，仅供娱乐参考。
+- [双色球走势分析与智能选号（娱乐）](https://xuyiheng.com/lotto.html): 双色球号码工具：随机机选、近十年号码热度与遗漏走势分析、加权随机智能选号（娱乐）。历史统计仅供娱乐参考，不能提高选中机会。
 - [实用工具箱](https://xuyiheng.com/tools.html): 精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。
 
 ## Datasets

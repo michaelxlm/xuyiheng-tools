@@ -1,76 +1,432 @@
         <section class="page-heading">
-          <h1>双色球随机选号</h1>
-          <p>一键生成双色球随机号码：红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个。可批量生成多注，仅供娱乐参考，理性购彩。</p>
+          <h1>双色球走势分析与智能选号</h1>
+          <p>双色球号码工具：一键随机机选、基于近十年开奖历史的号码热度与遗漏统计、以及加权随机的智能选号（娱乐）。红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个。所有计算均在浏览器本地完成，仅供娱乐参考，理性购彩。</p>
         </section>
 
-        <form class="card" id="ltForm">
-          <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="lt-count">生成注数</label><div class="input-with-unit"><input class="form-input" id="lt-count" type="number" inputmode="numeric" min="1" max="20" value="5"><span class="unit-tag">注</span></div></div>
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"lotto"}'>机选号码</button>
-          </div>
-        </form>
-
-        <div class="ticket-wrap" id="lt-result" hidden>
-          <div id="lt-tickets"></div>
+        <div class="lt-tabs" role="tablist" aria-label="双色球工具">
+          <button class="lt-tab" role="tab" id="tab-pick" aria-controls="panel-pick" aria-selected="true" type="button">随机机选</button>
+          <button class="lt-tab" role="tab" id="tab-ana" aria-controls="panel-ana" aria-selected="false" type="button" hidden>走势分析</button>
+          <button class="lt-tab" role="tab" id="tab-ai" aria-controls="panel-ai" aria-selected="false" type="button" hidden>智能选号</button>
         </div>
 
-        <div class="info-box mt-4"><span>🎱</span><div>本工具为模拟随机选号，与开奖结果毫无关联，不构成任何中奖预测。彩票是公益与娱乐，请量力而行。中奖规则以官方公告为准。</div></div>
+        <!-- ===== Tab 1：随机机选（现状保留） ===== -->
+        <div class="lt-panel" role="tabpanel" id="panel-pick" aria-labelledby="tab-pick" tabindex="0">
+          <form class="card" id="ltForm">
+            <div class="field-grid">
+              <div class="form-group"><label class="form-label" for="lt-count">生成注数</label><div class="input-with-unit"><input class="form-input" id="lt-count" type="number" inputmode="numeric" min="1" max="20" value="5"><span class="unit-tag">注</span></div></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"lotto"}'>机选号码</button>
+            </div>
+          </form>
+          <div class="ticket-wrap" id="lt-result" hidden>
+            <div id="lt-tickets"></div>
+          </div>
+          <div class="info-box mt-4"><span>🎱</span><div>本工具为模拟随机选号，与开奖结果毫无关联。彩票是公益与娱乐，请量力而行。开奖信息以官方公告为准。</div></div>
+        </div>
+
+        <!-- ===== Tab 2：走势与统计分析 ===== -->
+        <div class="lt-panel" role="tabpanel" id="panel-ana" aria-labelledby="tab-ana" tabindex="0" hidden>
+          <div class="card">
+            <div class="lt-toolbar">
+              <span class="lt-toolbar-label">统计范围</span>
+              <div class="lt-seg" role="group" aria-label="统计范围">
+                <button class="lt-seg-btn is-on" type="button" data-win="100">近 100 期</button>
+                <button class="lt-seg-btn" type="button" data-win="1000">近 1000 期</button>
+                <button class="lt-seg-btn" type="button" data-win="0">全部（近十年）</button>
+              </div>
+              <span class="lt-src" id="lt-ana-src"></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">红球出现频率</h2>
+            <p class="lt-note">统计所选范围内每个红球（01–33）开出的次数与占比，仅描述历史发生频次，不代表后续趋势。</p>
+            <div class="lt-bars" id="lt-red-freq" role="img" aria-label="红球出现频率条形图"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">蓝球出现频率</h2>
+            <p class="lt-note">统计所选范围内每个蓝球（01–16）开出的次数与占比。</p>
+            <div class="lt-bars" id="lt-blue-freq" role="img" aria-label="蓝球出现频率条形图"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">当前遗漏期数</h2>
+            <p class="lt-note">「遗漏」指某号码距上一次开出已间隔的期数，括号内为该号码历史单次最大遗漏，用于对比当前间隔处于什么水平。</p>
+            <div class="lt-grid-chip" id="lt-red-omit"></div>
+            <div class="lt-grid-chip" id="lt-blue-omit"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">号码特征分布</h2>
+            <p class="lt-note">对所选范围每期号码的结构性特征做客观统计：和值区间、奇偶比、大小比、三区比、连号与重号出现率。均为历史频次描述。</p>
+            <div class="lt-stat-grid" id="lt-features"></div>
+          </div>
+        </div>
+
+        <!-- ===== Tab 3：智能选号（娱乐） ===== -->
+        <div class="lt-panel" role="tabpanel" id="panel-ai" aria-labelledby="tab-ai" tabindex="0" hidden>
+          <div class="lt-warn">⚠️ 智能选号基于历史频率与遗漏的加权随机采样，属于统计娱乐玩法。开奖为独立随机事件，<strong>任何算法都无法提高选中机会，也不能保证任何结果</strong>，生成号码仅供娱乐。</div>
+          <form class="card" id="ltAiForm">
+            <div class="field-grid">
+              <div class="form-group">
+                <label class="form-label" for="lt-ai-strategy">选号策略</label>
+                <select class="form-input" id="lt-ai-strategy">
+                  <option value="hot">热号偏好（近期高频号码权重更大）</option>
+                  <option value="cold">冷号偏好（长期未出号码权重更大）</option>
+                  <option value="balanced" selected>均衡（频率与遗漏加权平衡）</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lt-ai-window">参考范围</label>
+                <select class="form-input" id="lt-ai-window">
+                  <option value="30">近 30 期</option>
+                  <option value="100" selected>近 100 期</option>
+                  <option value="500">近 500 期</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lt-ai-alpha">权重平滑 <span id="lt-ai-alpha-val">0.5</span></label>
+                <input class="form-range" id="lt-ai-alpha" type="range" min="0" max="100" value="50" aria-describedby="lt-ai-alpha-help">
+                <small id="lt-ai-alpha-help" class="lt-note">数值越大越趋近均匀，越小越偏向所选策略的极端权重。</small>
+              </div>
+              <div class="form-group"><label class="form-label" for="lt-ai-count">生成注数</label><div class="input-with-unit"><input class="form-input" id="lt-ai-count" type="number" inputmode="numeric" min="1" max="20" value="5"><span class="unit-tag">注</span></div></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"lotto-ai"}'>智能选号</button>
+            </div>
+          </form>
+          <div class="ticket-wrap" id="lt-ai-result" hidden>
+            <div id="lt-ai-tickets"></div>
+          </div>
+        </div>
+
+        <div class="info-box mt-4" id="lt-ana-unavailable" hidden><span>📉</span><div>历史开奖数据暂时不可用，走势分析与智能选号已隐藏，随机机选不受影响。</div></div>
 
         <style>
+        .lt-tabs { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); border-bottom: 1px solid var(--color-border); }
+        .lt-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: var(--space-2) var(--space-3); font: inherit; font-weight: 600; color: var(--color-muted); cursor: pointer; }
+        .lt-tab[aria-selected="true"] { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+        .lt-tab:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+        .lt-panel { margin-bottom: var(--space-4); }
         .ticket { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; padding: var(--space-3) var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); margin-bottom: var(--space-3); box-shadow: var(--shadow-sm); }
         .ticket-idx { font-weight: 700; color: var(--color-muted); min-width: 42px; }
+        .ticket-reasons { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: var(--space-1); }
         .ball { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); color: #fff; }
         .ball-red { background: #e23b3b; }
         .ball-blue { background: #2563eb; margin-left: auto; }
+        .reason { font-size: var(--text-xs, 12px); color: var(--color-muted); background: var(--color-surface-2, rgba(0,0,0,.04)); border: 1px solid var(--color-border); border-radius: 999px; padding: 2px 8px; }
+        .lt-h2 { font-size: var(--text-lg, 1.1rem); margin: 0 0 var(--space-2); }
+        .lt-note { color: var(--color-muted); font-size: var(--text-sm); margin: 0 0 var(--space-3); line-height: 1.5; }
+        .lt-toolbar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+        .lt-toolbar-label { font-weight: 600; }
+        .lt-seg { display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+        .lt-seg-btn { appearance: none; border: 0; background: var(--color-surface); color: var(--color-muted); padding: 6px 12px; font: inherit; font-size: var(--text-sm); cursor: pointer; }
+        .lt-seg-btn + .lt-seg-btn { border-left: 1px solid var(--color-border); }
+        .lt-seg-btn.is-on { background: var(--color-primary); color: var(--on-primary, #fff); }
+        .lt-src { color: var(--color-muted); font-size: var(--text-sm); margin-left: auto; }
+        .lt-bars { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); }
+        .lt-bar-item { display: flex; align-items: center; gap: 6px; min-width: 120px; flex: 1 1 120px; }
+        .lt-bar-num { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); color: #fff; flex: none; }
+        .lt-bar-num.red { background: #e23b3b; } .lt-bar-num.blue { background: #2563eb; }
+        .lt-bar-track { position: relative; flex: 1; height: 14px; background: var(--color-surface-2, rgba(0,0,0,.06)); border-radius: 999px; overflow: hidden; }
+        .lt-bar-fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+        .lt-bar-fill.red { background: #e23b3b; } .lt-bar-fill.blue { background: #2563eb; }
+        .lt-bar-val { font-size: var(--text-sm); color: var(--color-muted); min-width: 74px; text-align: right; }
+        .lt-grid-chip { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); margin-bottom: var(--space-3); }
+        .lt-chip { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); }
+        .lt-chip-num { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); color: #fff; flex: none; }
+        .lt-chip-num.red { background: #e23b3b; } .lt-chip-num.blue { background: #2563eb; }
+        .lt-chip-body { display: flex; flex-direction: column; line-height: 1.25; }
+        .lt-chip-cur { font-weight: 700; font-size: var(--text-sm); } .lt-chip-max { color: var(--color-muted); font-size: var(--text-xs, 12px); }
+        .lt-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-3); }
+        .lt-stat { border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-3); background: var(--color-surface); }
+        .lt-stat h3 { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-muted); font-weight: 600; }
+        .lt-hist { display: flex; align-items: flex-end; gap: 2px; height: 72px; }
+        .lt-hist-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; min-width: 0; }
+        .lt-hist-bar { width: 100%; background: var(--color-primary); border-radius: 2px 2px 0 0; min-height: 2px; }
+        .lt-hist-lbl { font-size: 10px; color: var(--color-muted); white-space: nowrap; }
+        .lt-rank-row { display: flex; justify-content: space-between; gap: var(--space-2); font-size: var(--text-sm); padding: 2px 0; }
+        .lt-warn { background: #fff7df; border: 1px solid #e6c86a; color: #6b5416; border-radius: var(--radius); padding: var(--space-3); margin-bottom: var(--space-3); font-size: var(--text-sm); line-height: 1.5; }
+        [data-theme="dark"] .lt-warn { background: #3a3013; border-color: #7a6420; color: #f0dca0; }
+        .form-range { width: 100%; }
+        @media (max-width: 420px) { .lt-bar-item { flex-basis: 100%; } }
         </style>
 
         <script>
         (function () {
+          'use strict';
+          var DATA_URL = '/data/ssq-draws.json';
+          var STATE = { draws: null, ready: false, win: 100 };
+
+          function pad(x) { x = Number(x); return (x < 10 ? '0' : '') + x; }
+          function $(id) { return document.getElementById(id); }
+          function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+          /* ---------- 数据加载（同源 JSON，3s 超时；失败隐藏分析/智能） ---------- */
+          function loadData() {
+            var ctrl = ('AbortController' in window) ? new AbortController() : null;
+            var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 3000) : null;
+            return fetch(DATA_URL, ctrl ? { signal: ctrl.signal, cache: 'no-cache' } : { cache: 'no-cache' })
+              .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+              .then(function (j) { if (timer) clearTimeout(timer); return j; })
+              .catch(function (e) { if (timer) clearTimeout(timer); throw e; });
+          }
+
+          /* ---------- 统计算子 ---------- */
+          function windowDraws() { var w = STATE.win; return (w > 0 && STATE.draws.length > w) ? STATE.draws.slice(0, w) : STATE.draws; }
+          function freqOf(list) {
+            var r = [], b = [], i, j; for (i = 0; i <= 33; i++) r[i] = 0; for (i = 0; i <= 16; i++) b[i] = 0;
+            for (i = 0; i < list.length; i++) { var d = list[i]; for (j = 0; j < d.reds.length; j++) r[+d.reds[j]]++; b[+d.blue]++; }
+            return { r: r, b: b };
+          }
+          // 遗漏：list 按 code 降序（最新在前）；cur=距上次开出的间隔期数，max=历史单次最大间隔
+          function omissionOf(getBalls, maxN) {
+            var all = STATE.draws, cur = [], mx = [], seen = {}, i, j;
+            for (i = 0; i <= maxN; i++) { cur[i] = all.length; mx[i] = 0; }
+            for (i = 0; i < all.length; i++) {
+              var balls = getBalls(all[i]);
+              for (j = 0; j < balls.length; j++) {
+                var n = balls[j];
+                if (seen[n] !== undefined) { var gap = i - seen[n] - 1; if (gap > mx[n]) mx[n] = gap; }
+                else { cur[n] = i; }
+                seen[n] = i;
+              }
+            }
+            for (i = 1; i <= maxN; i++) { if (cur[i] > mx[i]) mx[i] = cur[i]; }
+            return { cur: cur, max: mx };
+          }
+          var getReds = function (d) { return d.reds.map(Number); };
+          var getBlue = function (d) { return [ Number(d.blue) ]; };
+
+          /* ---------- 渲染：频率条形图 ---------- */
+          function renderBars(el, counts, maxN, color, total) {
+            var maxV = 0, i; for (i = 1; i <= maxN; i++) if (counts[i] > maxV) maxV = counts[i];
+            var html = '';
+            for (i = 1; i <= maxN; i++) {
+              var pct = maxV ? (counts[i] / maxV * 100) : 0;
+              var share = total ? (counts[i] / total * 100).toFixed(1) : '0.0';
+              html += '<div class="lt-bar-item"><span class="lt-bar-num ' + color + '">' + pad(i) + '</span>' +
+                '<span class="lt-bar-track" aria-hidden="true"><span class="lt-bar-fill ' + color + '" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+                '<span class="lt-bar-val">' + counts[i] + ' 次 · ' + share + '%</span></div>';
+            }
+            el.innerHTML = html;
+          }
+
+          /* ---------- 渲染：遗漏 chip ---------- */
+          function renderOmit(el, om, maxN, color) {
+            var html = '';
+            for (var i = 1; i <= maxN; i++) {
+              html += '<div class="lt-chip"><span class="lt-chip-num ' + color + '">' + pad(i) + '</span>' +
+                '<span class="lt-chip-body"><span class="lt-chip-cur">遗漏 ' + om.cur[i] + ' 期</span>' +
+                '<span class="lt-chip-max">历史最大 ' + om.max[i] + '</span></span></div>';
+            }
+            el.innerHTML = html;
+          }
+
+          /* ---------- 渲染：特征分布 ---------- */
+          function histHTML(buckets) { // [{label,count}]
+            var maxV = buckets.reduce(function (a, x) { return Math.max(a, x.count); }, 0) || 1;
+            return '<div class="lt-hist">' + buckets.map(function (bk) {
+              var h = Math.round(bk.count / maxV * 60) + 2;
+              return '<div class="lt-hist-col" title="' + esc(bk.label) + '：' + bk.count + ' 期"><div class="lt-hist-bar" style="height:' + h + 'px"></div><span class="lt-hist-lbl">' + esc(bk.label) + '</span></div>';
+            }).join('') + '</div>';
+          }
+          function renderFeatures(el) {
+            var list = windowDraws(), n = list.length || 1;
+            // 和值直方图（分桶 21-183）
+            var binW = 20, bins = {}; list.forEach(function (d) { var s = d.reds.reduce(function (a, x) { return a + (+x); }, 0); var key = Math.floor((s - 21) / binW); bins[key] = (bins[key] || 0) + 1; });
+            var bk = Object.keys(bins).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return { label: (21 + k * binW) + '+', count: bins[k] }; });
+            // 奇偶 / 大小 / 三区 众数比
+            var oddCnt = {}, bigCnt = {}, zoneCnt = {}, consec = 0, repeat = 0, prevSet = null;
+            list.forEach(function (d) {
+              var nums = d.reds.map(Number), odd = nums.filter(function (x) { return x % 2; }).length;
+              oddCnt[odd] = (oddCnt[odd] || 0) + 1;
+              var big = nums.filter(function (x) { return x >= 17; }).length; bigCnt[big] = (bigCnt[big] || 0) + 1;
+              var z = [ 0, 0, 0 ]; nums.forEach(function (x) { z[x <= 11 ? 0 : (x <= 22 ? 1 : 2)]++; });
+              var zk = z.join(':'); zoneCnt[zk] = (zoneCnt[zk] || 0) + 1;
+              var sorted = nums.slice().sort(function (a, b) { return a - b; });
+              for (var i = 1; i < sorted.length; i++) { if (sorted[i] - sorted[i - 1] === 1) { consec++; break; } }
+              var set = {}; nums.forEach(function (x) { set[x] = 1; });
+              if (prevSet) { var hit = nums.some(function (x) { return prevSet[x]; }); if (hit) repeat++; }
+              prevSet = set;
+            });
+            function topK(map, k) { return Object.keys(map).map(function (x) { return { label: x, count: map[x] }; }).sort(function (a, b) { return b.count - a.count; }).slice(0, k); }
+            function pct(x) { return (x / n * 100).toFixed(1) + '%'; }
+            var topOdd = topK(oddCnt, 1)[0], topBig = topK(bigCnt, 1)[0], topZone = topK(zoneCnt, 3);
+            var html = '';
+            html += '<div class="lt-stat"><h3>红球和值分布</h3>' + histHTML(bk) + '<div class="lt-rank-row"><span>样本期数</span><span>' + n + '</span></div></div>';
+            html += '<div class="lt-stat"><h3>奇数个数（众数）</h3><div class="lt-rank-row"><span>最常见：' + topOdd.label + ' 个奇数</span><span>' + pct(topOdd.count) + '</span></div>' + histHTML(topK(oddCnt, 7).sort(function (a, b) { return a.label - b.label; })) + '</div>';
+            html += '<div class="lt-stat"><h3>大号(≥17)个数（众数）</h3><div class="lt-rank-row"><span>最常见：' + topBig.label + ' 个大号</span><span>' + pct(topBig.count) + '</span></div>' + histHTML(topK(bigCnt, 7).sort(function (a, b) { return a.label - b.label; })) + '</div>';
+            html += '<div class="lt-stat"><h3>三区比 Top3</h3>' + topZone.map(function (t) { return '<div class="lt-rank-row"><span>' + esc(t.label) + '</span><span>' + pct(t.count) + '</span></div>'; }).join('') + '</div>';
+            html += '<div class="lt-stat"><h3>连号 / 重号出现率</h3><div class="lt-rank-row"><span>含连号</span><span>' + pct(consec) + '</span></div><div class="lt-rank-row"><span>与上期重号</span><span>' + pct(repeat) + '</span></div></div>';
+            el.innerHTML = html;
+          }
+
+          function renderAnalysis() {
+            if (!STATE.ready) return;
+            var list = windowDraws(), total = list.length;
+            var fr = freqOf(list);
+            var redTotal = total * 6, blueTotal = total;
+            renderBars($('lt-red-freq'), fr.r, 33, 'red', redTotal);
+            renderBars($('lt-blue-freq'), fr.b, 16, 'blue', blueTotal);
+            renderOmit($('lt-red-omit'), omissionOf(getReds, 33), 33, 'red');
+            renderOmit($('lt-blue-omit'), omissionOf(getBlue, 16), 16, 'blue');
+            renderFeatures($('lt-features'));
+            $('lt-ana-src').textContent = '样本 ' + total + ' 期（最新 ' + (STATE.draws[0] ? STATE.draws[0].code : '') + '）';
+          }
+
+          /* ---------- 智能选号：频率/遗漏加权无放回采样 ---------- */
+          function normalize(arr, maxN) { var mx = 0; for (var i = 1; i <= maxN; i++) if (arr[i] > mx) mx = arr[i]; var out = []; for (i = 1; i <= maxN; i++) out[i] = mx ? arr[i] / mx : 0; return out; }
+          function weightsFor(maxN, freqArr, omissArr, strategy, alpha) {
+            var fN = normalize(freqArr, maxN), oN = normalize(omissArr, maxN), w = [];
+            for (var i = 1; i <= maxN; i++) {
+              var raw;
+              if (strategy === 'hot') raw = (1 - alpha) * fN[i] + alpha * 0.5;
+              else if (strategy === 'cold') raw = (1 - alpha) * oN[i] + alpha * 0.5;
+              else raw = (1 - alpha) * ((fN[i] + oN[i]) / 2) + alpha * 0.5;
+              w[i] = 0.15 + raw; // 下限，保证每个号码都有机会被采中
+            }
+            return { w: w, fN: fN, oN: oN };
+          }
+          function weightedPick(w, maxN, k) {
+            var pool = []; for (var i = 1; i <= maxN; i++) pool.push({ n: i, w: w[i] }); var out = [];
+            for (var t = 0; t < k; t++) {
+              var total = pool.reduce(function (a, c) { return a + c.w; }, 0), x = Math.random() * total, acc = 0, idx = pool.length - 1;
+              for (var j = 0; j < pool.length; j++) { acc += pool[j].w; if (x <= acc) { idx = j; break; } }
+              out.push(pool[idx]); pool.splice(idx, 1);
+            }
+            return out;
+          }
+          function reasonLabel(n, fN, oN, curOmit, win) {
+            if (fN[n] >= 0.85) return pad(n) + '=近' + win + '期高频';
+            if (oN[n] >= 0.85) return pad(n) + '=遗漏' + curOmit + '期偏长';
+            if (fN[n] <= 0.2 && oN[n] <= 0.2) return pad(n) + '=均衡权重';
+            return pad(n) + '=频率/遗漏加权';
+          }
+
+          function aiGenerate(U) {
+            var strategy = $('lt-ai-strategy').value;
+            var win = parseInt($('lt-ai-window').value, 10);
+            var alpha = (parseInt($('lt-ai-alpha').value, 10) || 0) / 100;
+            var count = Math.floor(U.numInput($('lt-ai-count')) || 1); if (count < 1) count = 1; if (count > 20) count = 20;
+            var list = (STATE.draws.length > win) ? STATE.draws.slice(0, win) : STATE.draws;
+            var fr = freqOf(list);
+            var omR = omissionOf(getReds, 33), omB = omissionOf(getBlue, 16);
+            var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha);
+            var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha);
+            var html = '';
+            for (var t = 0; t < count; t++) {
+              var pickedR = weightedPick(wr.w, 33, 6).map(function (o) { return o.n; }).sort(function (a, b) { return a - b; });
+              var pickedB = weightedPick(wb.w, 16, 1)[0].n;
+              var balls = pickedR.map(function (n) { return '<span class="ball ball-red">' + pad(n) + '</span>'; }).join('');
+              balls += '<span class="ball ball-blue">' + pad(pickedB) + '</span>';
+              var reasons = pickedR.map(function (n) { return '<span class="reason">' + esc(reasonLabel(n, wr.fN, wr.oN, omR.cur[n], win)) + '</span>'; }).join('');
+              reasons += '<span class="reason">' + esc(reasonLabel(pickedB, wb.fN, wb.oN, omB.cur[pickedB], win)) + ' (蓝)</span>';
+              html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' + balls + '<div class="ticket-reasons">' + reasons + '</div></div>';
+            }
+            $('lt-ai-tickets').innerHTML = html;
+            $('lt-ai-result').hidden = false;
+            if (U) U.track('calc_result', { tool: 'lotto-ai', strategy: strategy, count: count });
+          }
+
+          /* ---------- Tab 切换 ---------- */
+          function selectTab(btn) {
+            var tabs = Array.prototype.slice.call(document.querySelectorAll('.lt-tab'));
+            tabs.forEach(function (t) { if (t.hidden) return; var on = (t === btn); t.setAttribute('aria-selected', on ? 'true' : 'false'); var p = $(t.getAttribute('aria-controls')); if (p) p.hidden = !on; });
+            if (btn.id === 'tab-ana' && !STATE.anaDone) { renderAnalysis(); STATE.anaDone = true; }
+          }
+          function bindTabs() {
+            var tabs = Array.prototype.slice.call(document.querySelectorAll('.lt-tab'));
+            tabs.forEach(function (t, i) {
+              t.addEventListener('click', function () { selectTab(t); });
+              t.addEventListener('keydown', function (e) {
+                var vis = tabs.filter(function (x) { return !x.hidden; });
+                var pos = vis.indexOf(t);
+                if (e.key === 'ArrowRight') { e.preventDefault(); vis[(pos + 1) % vis.length].focus(); vis[(pos + 1) % vis.length].click(); }
+                else if (e.key === 'ArrowLeft') { e.preventDefault(); var q = (pos - 1 + vis.length) % vis.length; vis[q].focus(); vis[q].click(); }
+              });
+            });
+          }
+
+          function markDataReady() {
+            STATE.ready = true;
+            $('tab-ana').hidden = false; $('tab-ai').hidden = false;
+          }
+
           function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function pick(n, k) { var pool = []; for (var i = 1; i <= n; i++) pool.push(i); var out = []; for (var j = 0; j < k; j++) { var idx = Math.floor(Math.random() * pool.length); out.push(pool[idx]); pool.splice(idx, 1); } return out.sort(function (a, b) { return a - b; }); }
-            function pad(x) { return (x < 10 ? '0' : '') + x; }
+            var U = window.U;
+            bindTabs();
+            // 机选（现状）
             $('ltForm').addEventListener('submit', function (e) {
               e.preventDefault();
-              var count = Math.floor(U.numInput($('lt-count')) || 1);
+              var count = Math.floor((U && U.numInput($('lt-count'))) || 1);
               if (count < 1) count = 1; if (count > 20) count = 20;
               var html = '';
               for (var t = 0; t < count; t++) {
-                var reds = pick(33, 6), blue = 1 + Math.floor(Math.random() * 16);
+                var pool = []; for (var i = 1; i <= 33; i++) pool.push(i); var reds = [];
+                for (var j = 0; j < 6; j++) { var k = Math.floor(Math.random() * pool.length); reds.push(pool[k]); pool.splice(k, 1); }
+                reds.sort(function (a, b) { return a - b; });
+                var blue = 1 + Math.floor(Math.random() * 16);
                 html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' +
                   reds.map(function (r) { return '<span class="ball ball-red">' + pad(r) + '</span>'; }).join('') +
                   '<span class="ball ball-blue">' + pad(blue) + '</span></div>';
               }
-              $('lt-tickets').innerHTML = html;
-              $('lt-result').hidden = false;
-              U.track('calc_result', { tool: 'lotto', count: count });
+              $('lt-tickets').innerHTML = html; $('lt-result').hidden = false;
+              if (U) U.track('calc_result', { tool: 'lotto', count: count });
             });
+            // 智能选号
+            $('lt-ai-alpha').addEventListener('input', function () { $('lt-ai-alpha-val').textContent = (this.value / 100).toFixed(2); });
+            $('ltAiForm').addEventListener('submit', function (e) { e.preventDefault(); if (STATE.ready) aiGenerate(U); });
+            // 范围切换
+            Array.prototype.forEach.call(document.querySelectorAll('.lt-seg-btn'), function (b) {
+              b.addEventListener('click', function () {
+                Array.prototype.forEach.call(document.querySelectorAll('.lt-seg-btn'), function (x) { x.classList.remove('is-on'); });
+                b.classList.add('is-on'); STATE.win = parseInt(b.getAttribute('data-win'), 10); renderAnalysis();
+              });
+            });
+            // 数据加载
+            loadData().then(function (j) {
+              if (!j || !Array.isArray(j.draws) || !j.draws.length) throw new Error('empty');
+              STATE.draws = j.draws.slice().sort(function (a, b) { return String(b.code).localeCompare(String(a.code)); });
+              markDataReady();
+            }).catch(function () { /* 无数据：分析/智能保持隐藏 */ $('lt-ana-unavailable').hidden = false; });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
         </script>
 
-<section class="tool-info">
-          <h2>关于双色球随机选号</h2>
-          <p>本工具用于模拟彩票选号，按双色球规则（红球从 01–33 选 6 个不重复、蓝球从 01–16 选 1 个）随机生成注数，在浏览器本地完成，不上传任何数据。它仅供娱乐与参考，不能预测中奖号码，也不代表任何更高的中奖概率。</p>
+        <section class="tool-info">
+          <h2>关于双色球走势分析与智能选号</h2>
+          <p>本工具提供三部分能力：按规则随机机选；基于近十年开奖历史的号码频率、遗漏与特征分布统计；以及以历史频率与遗漏为权重的智能选号（娱乐）。历史数据与计算均在浏览器本地完成，不上传任何数据。需要明确：开奖是每一期相互独立的随机事件，历史统计不改变任何一个号码在下期的真实机会，任何算法都不能提高选中机会或保证结果，本页面全部内容仅供娱乐参考。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>这个工具能预测中奖号码吗？</summary>
-            <p>不能。彩票开奖是独立随机事件，任何工具都无法预测；本页面仅按规则随机生成号码，仅供娱乐参考。</p>
+            <summary>这个工具能提前知道开奖号码吗？</summary>
+            <p>不能。开奖是独立随机事件，任何人都无法提前知道结果；本页面仅展示历史统计与随机选号，不构成任何依据，仅供娱乐。</p>
+          </details>
+          <details>
+            <summary>智能选号的算法是什么？</summary>
+            <p>智能选号依据历史开奖的出现频率与遗漏期数进行加权随机采样，属于统计娱乐玩法；它不会改变每一期各号码真实的随机机会，生成结果仅供娱乐。</p>
+          </details>
+          <details>
+            <summary>「遗漏」「热度」是什么意思？</summary>
+            <p>「热度」指所选范围内号码出现的频次占比；「遗漏」指某号码距上一次开出已间隔的期数。两者都是对已经发生的历史数据的客观描述，不代表未来走势。</p>
+          </details>
+          <details>
+            <summary>数据来源与更新频率？</summary>
+            <p>历史开奖数据来自公开渠道，随静态站构建定期更新，可能存在约一周延迟，仅供分析展示，准确开奖信息以官方公告为准。</p>
           </details>
           <details>
             <summary>双色球的选号规则是什么？</summary>
-            <p>红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个，组成一注。工具按此规则随机生成。</p>
+            <p>红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个，组成一注。工具按此规则生成。</p>
           </details>
           <details>
             <summary>生成的号码会被记录或上传吗？</summary>
-            <p>不会。选号在浏览器本地完成，不上传、不保存、不涉及账号。</p>
+            <p>不会。选号与统计均在浏览器本地完成，不上传、不保存、不涉及账号。</p>
           </details>
           <details>
             <summary>理性购彩有哪些提醒？</summary>
-            <p>彩票是公益与娱乐属性，中奖概率极低，请量力而行、不沉迷，未成年人不得购彩。</p>
+            <p>彩票是公益与娱乐属性，单注选中机会极低，请量力而行、不沉迷，未成年人不得购彩。</p>
           </details>
         </section>
