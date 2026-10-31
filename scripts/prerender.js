@@ -168,15 +168,19 @@ function routesIndex() {
 }
 
 const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>';
-const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.html', '/combo/health-check.html', '/combo/buy-house.html', '/combo/color-lab.html'];
+// 「场景组合」为主入口（见 buildHomeContent），FEATURED 退居「热门工具」次级区，放单点高频工具
+const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.html', '/calculator/pension.html', '/calculator/baby-name.html', '/vision.html'];
+// 娱乐向场景（与工具站专业调性区隔，卡片加「娱乐」徽标）
+const ENTERTAINMENT = ['/combo/fun-test.html', '/combo/color-lab.html'];
 
 function toolCardHtml(item, catLabel, idx, wide) {
   const r = idx[item.url] || {};
   const iconMarkup = I.iconRef(item.icon);
   const key = P.catKey(catLabel);
+  const ent = ENTERTAINMENT.indexOf(item.url) >= 0 ? '<span class="ent-badge" title="娱乐向内容，结果仅供娱乐参考">娱乐</span>' : '';
   return '          <a class="tool-card' + (wide ? ' is-wide' : '') + '"' + (key ? ' data-cat="' + key + '"' : '') + ' href="' + P.escapeHtml(item.url) + '">' +
     '<span class="tool-card-icon">' + iconMarkup + '</span>' +
-    '<span class="tool-card-title">' + P.escapeHtml(item.label) + '</span>' +
+    '<span class="tool-card-title">' + P.escapeHtml(item.label) + ent + '</span>' +
     '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
 }
 
@@ -206,6 +210,31 @@ function buildHomeContent(site) {
     '        </section>',
   ].join('\n');
 
+  // 主入口：场景组合（决策流）——把离散单点工具聚合成买房/买车/健康/理财/人生规划等决策入口，首屏优先展示
+  const comboCat = cats.find((c) => c.label === '场景组合');
+  const comboKey = comboCat ? P.catKey(comboCat.label) : '';
+  let scenario = '';
+  if (comboCat && (comboCat.items || []).length) {
+    const scCards = comboCat.items.map((item) => {
+      const r = idx[item.url] || {};
+      const iconMarkup = I.iconRef(item.icon);
+      const ent = ENTERTAINMENT.indexOf(item.url) >= 0 ? '<span class="ent-badge" title="娱乐向内容，结果仅供娱乐参考">娱乐</span>' : '';
+      return '          <a class="tool-card is-wide"' + (comboKey ? ' data-cat="' + comboKey + '"' : '') + ' href="' + P.escapeHtml(item.url) + '">' +
+        '<span class="tool-card-icon">' + iconMarkup + '</span>' +
+        '<span class="tool-card-title">' + P.escapeHtml(item.label) + ent + '</span>' +
+        '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
+    }).join('\n');
+    scenario = [
+      '        <section class="home-section home-scenario" id="cat-' + P.escapeHtml(comboKey) + '"' + (comboKey ? ' data-cat="' + comboKey + '"' : '') + '>',
+      '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>按场景进入 · 一站算清<span class="count">' + comboCat.items.length + '</span></h2>',
+      '          <p class="section-sub">把分散的单点工具聚合成决策流：买房、买车、健康体检、理财宝箱、人生规划，进一个场景算清一整笔账。</p>',
+      '          <div class="tool-grid">',
+      scCards,
+      '          </div>',
+      '        </section>',
+    ].join('\n');
+  }
+
   const featCards = FEATURED.filter((u) => flat[u]).map((u, i) =>
     toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0)
   ).join('\n');
@@ -218,7 +247,7 @@ function buildHomeContent(site) {
     '        </section>',
   ].join('\n');
 
-  const sections = cats.map((cat) => {
+  const sections = cats.filter((cat) => cat !== comboCat).map((cat) => {
     const key = P.catKey(cat.label);
     const cards = (cat.items || []).map((item) => toolCardHtml(item, cat.label, idx, false)).join('\n');
     return '        <section class="home-section" id="cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '"' : '') + '>\n' +
@@ -227,7 +256,7 @@ function buildHomeContent(site) {
       '        </section>';
   }).join('\n');
 
-  return hero + '\n' + featured + '\n' + sections;
+  return hero + '\n' + scenario + '\n' + featured + '\n' + sections;
 }
 
 /* ---------------------------- 主渲染 ---------------------------- */
