@@ -716,6 +716,12 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
   .header-actions { margin-left: var(--space-1); }
 }
 
+/* ---------- 响应式：宽屏自适应（逐级放宽内容宽度，大屏不再居中过窄） ---------- */
+@media (min-width: 1280px) { :root { --maxw: 1280px; } }
+@media (min-width: 1440px) { :root { --maxw: 1420px; --sidebar-w: 264px; } }
+@media (min-width: 1720px) { :root { --maxw: 1600px; } }
+@media (min-width: 2000px) { :root { --maxw: 1760px; } }
+
 /* ---------- 响应式：1024px+ PC 双栏 ---------- */
 @media (min-width: 1024px) {
   .site-body { max-width: var(--maxw); margin: 0 auto; width: 100%; padding: 0 var(--space-5); }
