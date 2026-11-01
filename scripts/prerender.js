@@ -288,6 +288,7 @@ function renderRoute(site, route, ctx) {
     '    <script src="' + assetUrl('assets/js/coupon-slot.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/utils.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/http-api.min.js', manifest) + '" defer></script>',
+    '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',
   ];
   if (hasPageAsset('js', slug, 'js')) {
     scriptTags.push('    <script src="' + assetUrl('assets/js/pages/' + slug + '.min.js', manifest) + '" defer></script>');
