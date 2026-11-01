@@ -173,14 +173,15 @@ const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.
 // 娱乐向场景（与工具站专业调性区隔，卡片加「娱乐」徽标）
 const ENTERTAINMENT = ['/combo/fun-test.html', '/combo/color-lab.html'];
 
-function toolCardHtml(item, catLabel, idx, wide) {
+function toolCardHtml(item, catLabel, idx, wide, badge) {
   const r = idx[item.url] || {};
   const iconMarkup = I.iconRef(item.icon);
   const key = P.catKey(catLabel);
   const ent = ENTERTAINMENT.indexOf(item.url) >= 0 ? '<span class="ent-badge" title="娱乐向内容，结果仅供娱乐参考">娱乐</span>' : '';
+  const badgeHtml = badge ? '<span class="tool-badge">' + P.escapeHtml(badge) + '</span>' : '';
   return '          <a class="tool-card' + (wide ? ' is-wide' : '') + '"' + (key ? ' data-cat="' + key + '"' : '') + ' href="' + P.escapeHtml(item.url) + '">' +
     '<span class="tool-card-icon">' + iconMarkup + '</span>' +
-    '<span class="tool-card-title">' + P.escapeHtml(item.label) + ent + '</span>' +
+    '<span class="tool-card-title">' + P.escapeHtml(item.label) + ent + badgeHtml + '</span>' +
     '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
 }
 
@@ -191,10 +192,10 @@ function buildHomeContent(site) {
   cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label, icon: it.icon }; }));
   const total = Object.keys(flat).length;
 
-  const chips = cats.map((cat) => {
+  const chips = ['<a href="#cat-all" data-filter="all" class="active"><span class="dot" aria-hidden="true"></span>全部</a>'].concat(cats.map((cat) => {
     const key = P.catKey(cat.label);
-    return '<a href="#cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '"' : '') + '><span class="dot" aria-hidden="true"></span>' + P.escapeHtml(cat.label) + '</a>';
-  }).join('');
+    return '<a href="#cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '" data-filter="' + key + '"' : '') + '><span class="dot" aria-hidden="true"></span>' + P.escapeHtml(cat.label) + '</a>';
+  })).join('');
 
   const hero = [
     '        <section class="hero">',
@@ -236,7 +237,7 @@ function buildHomeContent(site) {
   }
 
   const featCards = FEATURED.filter((u) => flat[u]).map((u, i) =>
-    toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0)
+    toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0, i === 0 ? '热门' : '')
   ).join('\n');
   const featured = [
     '        <section class="home-section" id="featured">',
@@ -244,6 +245,14 @@ function buildHomeContent(site) {
     '          <div class="tool-grid">',
     featCards,
     '          </div>',
+    '        </section>',
+  ].join('\n');
+
+  // 最近使用（动态区，layout.js 依据 localStorage['xt_recent'] 填充；无记录时整段隐藏）
+  const recent = [
+    '        <section class="home-section" id="recent" hidden>',
+    '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>最近使用<a class="recent-clear" href="#" title="清除使用记录">清除</a></h2>',
+    '          <div class="tool-grid" id="recent-grid"></div>',
     '        </section>',
   ].join('\n');
 
@@ -256,7 +265,26 @@ function buildHomeContent(site) {
       '        </section>';
   }).join('\n');
 
-  return hero + '\n' + scenario + '\n' + featured + '\n' + sections;
+  return hero + '\n' + recent + '\n' + scenario + '\n' + featured + '\n' + sections;
+}
+
+/* ---------------------------- 工具注册表（供前端动态拼卡片） ----------------------------
+   输出 window.__TOOLS__（全量工具 {url,label,icon,cat,key,desc}）与 window.__ENT__（娱乐向 URL 列表），
+   供 layout.js 渲染「最近使用 / 相关工具」、并支持无后端即时拼卡。 */
+function buildToolsRegistryScript(site) {
+  const idx = routesIndex();
+  const items = [];
+  (site.sidebar_categories || []).forEach(function (cat) {
+    const key = P.catKey(cat.label);
+    (cat.items || []).forEach(function (it) {
+      const r = idx[it.url] || {};
+      items.push({
+        url: it.url, label: it.label, icon: it.icon,
+        cat: cat.label, key: key, desc: (r.description || '').slice(0, 60)
+      });
+    });
+  });
+  return '<script>window.__TOOLS__=' + JSON.stringify(items) + ';window.__ENT__=' + JSON.stringify(ENTERTAINMENT) + ';</script>';
 }
 
 /* ---------------------------- 主渲染 ---------------------------- */
@@ -344,6 +372,7 @@ function renderRoute(site, route, ctx) {
     '  <link rel="apple-touch-icon" href="' + BRAND_ICON_URI + '">',
     '  <link rel="manifest" href="/site.webmanifest">',
     '  <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>',
+    buildToolsRegistryScript(site),
     cssLinks.join('\n'),
     '  <script type="application/ld+json">' + ldJson + '</script>',
     '  <script type="application/ld+json">' + authorLd + '</script>',
