@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /* ==========================================================================
    check-wcag.js · 反色字对比度门禁（审计 T4，零依赖 Node 18+）
-   xuyiheng-tools 变体（品牌主色直校，无 --accent-solid 深阶）。校验两件事：
-     1. 令牌层：每个主题作用域里，品牌主色 --color-primary 与其反色字
-        --on-primary 的对比度必须 ≥4.5:1（亮色白字 / 暗色深字，均由令牌定义）；
+   store-web 变体（品牌主色直校：--primary / --primary-strong，单亮色主题）。
+   校验两件事：
+     1. 令牌层：:root 里承载白字的品牌色令牌（--primary、--primary-strong）
+        对 #ffffff 的对比度必须 ≥4.5:1；
      2. 载体层：反色字载体的 background 不得使用未验证的辅助色
-        --color-accent（该色不保证反色字达标），必须走已校对的 --color-primary。
+        --accent（#007AFF 白字约 4.0:1，不达标），必须走已校对的品牌主色。
    用法：node scripts/check-wcag.js          （独立跑，违例 exit 1）
         require('./check-wcag')()            （被 check 链集成，返回违例数组）
    ========================================================================== */
@@ -20,15 +21,23 @@ const ROOT = path.resolve(__dirname, '..');
 /* ---------------------------- 本站配置 ---------------------------- */
 const CONFIG = {
   cssDir: 'assets/css',
-  // 令牌层：作用域内 bg 令牌 × 反色字令牌（fg 为 -- 开头时到同作用域查找，回退 :root）
+  // 令牌层：作用域内 bg 令牌 × 反色字（fg 为 -- 开头时到同作用域查找，回退 :root）
   pairs: [
-    { scope: ':root', bg: '--color-primary', fg: '--on-primary' },
-    { scope: ':root[data-theme="dark"]', bg: '--color-primary', fg: '--on-primary' },
+    { scope: ':root', bg: '--primary', fg: '#ffffff' },
+    { scope: ':root', bg: '--primary-strong', fg: '#ffffff' },
   ],
   // 反色字载体选择器（子串匹配）
-  carriers: ['.btn-primary'],
+  carriers: [
+    '.skip-link',
+    '.header-search button',
+    '.header-cta',
+    '.btn-primary',
+    '.tab.is-active',
+    '.merchant-pick-check',
+    '.merchant-plan-flag',
+  ],
   // 不保证反色字达标的辅助色：反色字载体背景出现即违例
-  badBgTokens: ['--color-accent'],
+  badBgTokens: ['--accent'],
   minContrast: 4.5,
 };
 
@@ -105,7 +114,7 @@ function run() {
     rules = rules.concat(cssRules(stripComments(fs.readFileSync(path.join(ROOT, f), 'utf8'))));
   }
 
-  // 1. 令牌层：品牌主色 × 反色字的对比度
+  // 1. 令牌层：白字背景令牌的对比度
   for (const { scope, bg, fg } of CONFIG.pairs) {
     const bgHex = tokenValue(rules, scope, bg);
     if (!bgHex) { problems.push(`${scope} 缺少 ${bg}（品牌主色令牌，审计 T4）`); continue; }
@@ -130,7 +139,7 @@ function run() {
     if (!bg) continue;
     for (const t of CONFIG.badBgTokens) {
       if (bg.includes('var(' + t + ')')) {
-        problems.push(`载体 ${r.selector} 反色字背景用了未验证的 var(${t})，应改 var(--color-primary)（审计 T4）`);
+        problems.push(`载体 ${r.selector} 反色字背景用了未验证的 var(${t})，应改 var(--primary)（审计 T4）`);
       }
     }
   }
@@ -143,7 +152,7 @@ module.exports = run;
 if (require.main === module) {
   const problems = run();
   if (!problems.length) {
-    console.log('[check-wcag] ✓ 品牌主色反色字门禁通过（亮/暗令牌达标 + 载体无未验证色）');
+    console.log('[check-wcag] ✓ 品牌主色白字门禁通过（--primary/--primary-strong 达标 + 载体无未验证色）');
   } else {
     for (const p of problems) console.error('[check-wcag] ✗ ' + p);
     console.error(`[check-wcag] ${problems.length} 处违例`);

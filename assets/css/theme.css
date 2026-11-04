@@ -726,7 +726,8 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
   .site-nav { display: flex; }
   .bottom-nav { display: none; }
   .site-main { padding-bottom: var(--space-8); }
-  .back-to-top { bottom: 28px; }
+  /* 桌面态无底部导航：有 AI 气泡时（--corner-stack:84px）抬到其上方，无则保持 28px */
+  .back-to-top { bottom: var(--corner-stack, 28px); }
   .footer-inner { grid-template-columns: repeat(2, 1fr); }
   .footer-brand { grid-column: 1 / -1; }
 }

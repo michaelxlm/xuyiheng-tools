@@ -310,7 +310,9 @@ function renderRoute(site, route, ctx) {
   const scriptTags = [
     // 本站复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
     // 否则会取错分片。本地兜底用绝对路径（深层路由 /calculator/xxx/ 下相对路径会 404）。
-    '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};</script>',
+    // TrackerConfig.project 必须显式覆盖：tracker.js 默认 project:'unknown'，若不声明则埋点
+    // 落到 unknown 分母，v4-ledger/trackChain 按 project 聚合会与旧 main-tool 台账分裂。
+    '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};window.TrackerConfig={project:\'main-tool\'};</script>',
     '    <script src="' + assetUrl('assets/js/tracker.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/ad-slots.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/coupon-slot.min.js', manifest) + '" defer></script>',

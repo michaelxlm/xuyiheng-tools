@@ -7,6 +7,7 @@
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
   "ad_site_key": "main-tool",
   "tracker_project": "main-tool",
+  "build": { "sitemapMode": "indexable", "fingerprintMode": "manifest" },
   "logo": "/assets/img/logo.svg",
   "favicon": "/assets/img/favicon.svg",
   "author": "一珩成长笔记",
