@@ -1,3 +1,12 @@
+---
+title: xuyiheng-tools · 一珩成长笔记
+owner: Michaelxlm
+updated: 2026-11-04
+scope: xuyiheng-tools
+status: 有效
+tags: [xuyiheng-tools, 静态站]
+---
+
 # xuyiheng-tools · 一珩成长笔记
 
 纯静态、**零运行时依赖**的在线实用工具站（域名 `xuyiheng.com`）。由 WO-127 + WO-128 从 uni-app 工程 `main-tool` 的 H5 Web 承载平移拆分而来，独立仓库、独立部署，接入八站共用基础设施。
