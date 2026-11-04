@@ -4,7 +4,8 @@
    --------------------------------------------------------------------------
    扫描构建产物 HTML，确认每页都按序引用：
    tokens.min.css → theme.min.css → tracker → ad-slots → coupon-slot →
-   img-slot → wx-h5 → utils → http-api。缺失即 exit 1，防止手写整页漏引。
+   utils → http-api。缺失即 exit 1，防止手写整页漏引。
+   （本站组件为 mp-slot，非 wx-h5；img-slot 暂未全站挂载，均不列入必选）
    ========================================================================== */
 
 const fs = require('fs');
@@ -19,8 +20,6 @@ const REQUIRED = [
   'assets/js/tracker.min.js',
   'assets/js/ad-slots.min.js',
   'assets/js/coupon-slot.min.js',
-  'assets/js/img-slot.min.js',
-  'assets/js/wx-h5.min.js',
   'assets/js/utils.min.js',
   'assets/js/http-api.min.js',
 ];
