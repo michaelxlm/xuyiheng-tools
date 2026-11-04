@@ -27,6 +27,10 @@
   --on-primary: #ffffff;
   --color-focus: #6366f1;
 
+  /* 品牌主色令牌（WCAG 门禁直标，审计 T4；与 --color-primary 同源） */
+  --primary: #4f46e5;
+  --primary-strong: #4338ca;
+
   /* 点缀：青绿 */
   --color-accent: #0d9488;
   --color-accent-soft: #ecfdf5;
