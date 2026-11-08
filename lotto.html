@@ -135,6 +135,11 @@
           <button class="lt-tab" role="tab" id="tab-bt" aria-controls="panel-bt" aria-selected="false" type="button" hidden>回测验证</button>
         </div>
 
+        <div class="card lt-latest" id="lt-latest" hidden>
+          <div class="lt-latest-head">最新一期开奖</div>
+          <div class="lt-latest-body" id="lt-latest-body"></div>
+        </div>
+
         <!-- ===== Tab 1：随机机选（现状保留） ===== -->
         <div class="lt-panel" role="tabpanel" id="panel-pick" aria-labelledby="tab-pick" tabindex="0">
           <form class="card" id="ltForm">
@@ -297,6 +302,10 @@
         .lt-chip-num.red { background: #e23b3b; } .lt-chip-num.blue { background: #2563eb; }
         .lt-chip-body { display: flex; flex-direction: column; line-height: 1.25; }
         .lt-chip-cur { font-weight: 700; font-size: var(--text-sm); } .lt-chip-max { color: var(--color-muted); font-size: var(--text-xs, 12px); }
+  .lt-latest { margin-bottom: var(--space-4); }
+  .lt-latest-head { font-weight: 700; margin-bottom: var(--space-2); }
+  .lt-latest-balls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .lt-latest-meta { margin-top: var(--space-2); color: var(--color-muted); font-size: var(--text-sm); }
         .lt-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-3); }
         .lt-stat { border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-3); background: var(--color-surface); }
         .lt-stat h3 { margin: 0 0 var(--space-2); font-size: var(--text-sm); color: var(--color-muted); font-weight: 600; }
@@ -642,6 +651,16 @@
             $('tab-ana').hidden = false; $('tab-ai').hidden = false; $('tab-bt').hidden = false;
           }
 
+          function renderLatest() {
+            var d = STATE.draws && STATE.draws[0]; if (!d) return;
+            var body = $('lt-latest-body'); if (!body) return;
+            var balls = (d.reds || []).map(function (n) { return '<span class="ball ball-red">' + pad(n) + '</span>'; }).join('');
+            balls += '<span class="ball ball-blue">' + pad(d.blue) + '</span>';
+            body.innerHTML = '<div class="lt-latest-balls">' + balls + '</div>' +
+              '<div class="lt-latest-meta">第 ' + esc(d.code) + ' 期' + (d.date ? ' · ' + esc(d.date) : '') + '</div>';
+            var box = $('lt-latest'); if (box) box.hidden = false;
+          }
+
           function boot() {
             var U = window.U;
             bindTabs();
@@ -689,6 +708,9 @@
               if (!j || !Array.isArray(j.draws) || !j.draws.length) throw new Error('empty');
               STATE.draws = j.draws.slice().sort(function (a, b) { return String(b.code).localeCompare(String(a.code)); });
               markDataReady();
+              renderAnalysis(); STATE.anaDone = true;   // 预渲染走势，避免首屏空白
+              renderLatest();                            // 顶部「最新一期」横幅
+              selectTab($('tab-ana'));                   // 数据就绪后默认展示走势分析（最近一期+走势摘要）
             }).catch(function () { /* 无数据：分析/智能保持隐藏 */ $('lt-ana-unavailable').hidden = false; });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
