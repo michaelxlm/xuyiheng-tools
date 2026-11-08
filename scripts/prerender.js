@@ -326,6 +326,8 @@ function renderRoute(site, route, ctx) {
   // WO-133 工具站留存钩子：分享链接（输入→#s=）+ 首页最近使用；置于页面脚本之后，
   // 使 restoreState 派发的事件能被已绑定的页面监听器接住（敏感页内部自行豁免）。
   scriptTags.push('    <script src="' + assetUrl('assets/js/tool-state.min.js', manifest) + '" defer></script>');
+  // 场景联盟位：localStorage 本地热度排序，替代六站共用 ad-slots.js 的 next 位
+  scriptTags.push('    <script src="' + assetUrl('assets/js/combo-popularity.js', manifest) + '" defer></script>');
   // WO-146 工具站 AI 兜底问答（右下角气泡 + 面板）：共享 widget 由 main-api 侧 /public/ai-widget.js 提供，
   // 分站灰度开关与 prompt 分派全在中台，前端只靠 data-site 识别站点。中台默认关。
   scriptTags.push('    <script src="https://api.xuyiheng.com/public/ai-widget.js" data-site="xuyihengTools" defer></script>');

@@ -1,0 +1,115 @@
+// combo-popularity.js · 场景联盟位（localStorage 本地热度排序，避开六站共用 ad-slots.js）
+// 职责：① 拦截 calc_click 事件记录本地热度；② 在 combo 页的 .ad-slot[data-ad-slot="next"] 渲染相关工具推荐
+(function () {
+  'use strict';
+  var KEY = 'xt_combo_clicks';
+
+  // ---------- 热度记录 ----------
+  function record(tool) {
+    try {
+      var d = JSON.parse(localStorage.getItem(KEY) || '{}');
+      d[tool] = (d[tool] || 0) + 1;
+      localStorage.setItem(KEY, JSON.stringify(d));
+    } catch (e) { /* 隐私模式静默 */ }
+  }
+
+  function getAll() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
+    catch (e) { return {}; }
+  }
+
+  // ---------- 拦截 U.track 捕获 calc_click ----------
+  function hookTracker() {
+    var U = window.U;
+    if (!U || !U.track) return;
+    var orig = U.track;
+    U.track = function () {
+      if (arguments[0] === 'calc_click') {
+        var p = arguments[1] || {};
+        if (p.tool) record(p.tool);
+      }
+      return orig.apply(this, arguments);
+    };
+  }
+
+  // ---------- 安全 DOM 工具 ----------
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  // ---------- 场景联盟位渲染 ----------
+  function renderRelated() {
+    var slot = document.querySelector('.ad-slot[data-ad-slot="next"]');
+    if (!slot) return;
+    var tools = window.__TOOLS__ || [];
+    var comboTools = tools.filter(function (t) { return t.key === 'combo'; });
+    if (!comboTools.length) return;
+
+    var curPath = location.pathname.replace(/\/+$/, '') + '/';
+    var clicks = getAll();
+
+    // 按本地热度降序，排除当前页
+    var sorted = comboTools
+      .filter(function (t) { return t.url !== curPath && t.url !== location.pathname; })
+      .sort(function (a, b) {
+        var ca = 0, cb = 0;
+        for (var k in clicks) {
+          if (a.url.indexOf(k) >= 0) ca += clicks[k];
+          if (b.url.indexOf(k) >= 0) cb += clicks[k];
+        }
+        return cb - ca;
+      })
+      .slice(0, 6);
+
+    if (!sorted.length) return;
+
+    // 注入配套样式（幂等）
+    if (!document.getElementById('combo-related-style')) {
+      var s = document.createElement('style');
+      s.id = 'combo-related-style';
+      s.textContent = '.combo-related{margin:2rem 0;padding:1.5rem;border:1px solid var(--border,#e5e7eb);border-radius:12px;background:var(--surface-alt,#f9fafb)}'
+        + '.combo-related h3{margin:0 0 1rem;font-size:1.1rem}'
+        + '.combo-related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}'
+        + '.combo-related-card{display:flex;flex-direction:column;gap:4px;padding:.75rem 1rem;border-radius:8px;border:1px solid var(--border,#e5e7eb);text-decoration:none;color:inherit;background:var(--surface,#fff);transition:border-color .15s}'
+        + '.combo-related-card:hover{border-color:var(--accent,#2563eb)}'
+        + '.crc-label{font-weight:600;font-size:.95rem}'
+        + '.crc-desc{font-size:.8rem;opacity:.65;line-height:1.3}';
+      document.head.appendChild(s);
+    }
+
+    // 用安全 DOM API 构建，避免 innerHTML XSS
+    var section = document.createElement('section');
+    section.className = 'combo-related';
+    var h3 = document.createElement('h3');
+    h3.textContent = '相关场景工具';
+    section.appendChild(h3);
+    var grid = document.createElement('div');
+    grid.className = 'combo-related-grid';
+    sorted.forEach(function (t) {
+      var a = document.createElement('a');
+      a.className = 'combo-related-card';
+      a.href = t.url;
+      var lbl = document.createElement('span');
+      lbl.className = 'crc-label';
+      lbl.textContent = t.label;
+      var desc = document.createElement('span');
+      desc.className = 'crc-desc';
+      desc.textContent = (t.desc || '').slice(0, 36);
+      a.appendChild(lbl);
+      a.appendChild(desc);
+      grid.appendChild(a);
+    });
+    section.appendChild(grid);
+    slot.parentNode.replaceChild(section, slot);
+  }
+
+  // ---------- 启动 ----------
+  hookTracker();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderRelated);
+  } else {
+    renderRelated();
+  }
+})();
