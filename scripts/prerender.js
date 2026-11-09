@@ -330,7 +330,7 @@ function renderRoute(site, route, ctx) {
   scriptTags.push('    <script src="' + assetUrl('assets/js/combo-popularity.js', manifest) + '" defer></script>');
   // WO-146 工具站 AI 兜底问答（右下角气泡 + 面板）：共享 widget 由 main-api 侧 /public/ai-widget.js 提供，
   // 分站灰度开关与 prompt 分派全在中台，前端只靠 data-site 识别站点。中台默认关。
-  scriptTags.push('    <script src="https://api.xuyiheng.com/public/ai-widget.js" data-site="xuyihengTools" defer></script>');
+  scriptTags.push('    <script src="https://api.xuyiheng.com/public/ai-widget.js" data-site="xuyihengTools" defer onerror="this.remove()"></script>');
 
   const robots = indexable ? 'index, follow' : 'noindex, nofollow';
   const ldJson = buildJsonLd(site, route);
