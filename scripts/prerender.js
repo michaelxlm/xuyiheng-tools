@@ -372,6 +372,8 @@ function renderRoute(site, route, ctx) {
     '  <meta name="twitter:image" content="' + P.escapeHtml(ogImage) + '">',
     '  <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">',
     '  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">',
+    '  <link rel="dns-prefetch" href="//api.xuyiheng.com">',
+    '  <link rel="preconnect" href="https://api.xuyiheng.com" crossorigin>',
     '  <link rel="icon" href="' + (site.favicon || '/assets/img/favicon.svg') + '">',
     '  <link rel="apple-touch-icon" href="' + BRAND_ICON_URI + '">',
     '  <link rel="manifest" href="/site.webmanifest">',
