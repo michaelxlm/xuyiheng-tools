@@ -240,4 +240,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+<!-- SITE-SHELL:SITEMAP:START -->
+<url><loc>https://xuyiheng.com/sites.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<!-- SITE-SHELL:SITEMAP:END -->
 </urlset>

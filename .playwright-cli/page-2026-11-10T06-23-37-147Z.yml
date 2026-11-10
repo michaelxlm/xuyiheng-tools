@@ -1,0 +1,354 @@
+- generic [active] [ref=f2e1]:
+  - link "跳至内容" [ref=f2e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - link "一珩工具" [ref=f2e5] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=f2e6]: "Y"
+        - text: 一珩工具
+      - navigation "主导航" [ref=f2e7]:
+        - link "首页" [ref=f2e8] [cursor=pointer]:
+          - /url: /
+        - link "发现" [ref=f2e9] [cursor=pointer]:
+          - /url: /discover.html
+        - link "搜索" [ref=f2e10] [cursor=pointer]:
+          - /url: /search.html
+        - link "关于" [ref=f2e11] [cursor=pointer]:
+          - /url: /about.html
+      - search [ref=f2e12]:
+        - searchbox "搜索工具" [ref=f2e16]
+      - generic [ref=f2e17]:
+        - button "命令面板" [ref=f2e18] [cursor=pointer]:
+          - generic [ref=f2e19]: Ctrl
+          - generic [ref=f2e20]: K
+        - button "切换主题" [ref=f2e21] [cursor=pointer]
+  - generic [ref=f2e25]:
+    - complementary "工具分类" [ref=f2e26]:
+      - generic [ref=f2e27]:
+        - generic [ref=f2e28]: 计算器
+        - navigation [ref=f2e30]:
+          - link "个税计算器" [ref=f2e31] [cursor=pointer]:
+            - /url: /calculator/tax.html
+          - link "单位换算" [ref=f2e32] [cursor=pointer]:
+            - /url: /calculator/unit.html
+          - link "房贷提前还款" [ref=f2e33] [cursor=pointer]:
+            - /url: /calculator/prepay.html
+          - link "养老金计算器" [ref=f2e34] [cursor=pointer]:
+            - /url: /calculator/pension.html
+          - link "五险一金" [ref=f2e35] [cursor=pointer]:
+            - /url: /calculator/social-insurance.html
+          - link "折扣计算" [ref=f2e36] [cursor=pointer]:
+            - /url: /calculator/discount.html
+          - link "百分比" [ref=f2e37] [cursor=pointer]:
+            - /url: /calculator/percentage.html
+          - link "加班费" [ref=f2e38] [cursor=pointer]:
+            - /url: /calculator/overtime.html
+          - link "基础代谢体脂" [ref=f2e39] [cursor=pointer]:
+            - /url: /calculator/body-fat.html
+          - link "跑步配速" [ref=f2e40] [cursor=pointer]:
+            - /url: /calculator/pace.html
+          - link "日期计算" [ref=f2e41] [cursor=pointer]:
+            - /url: /calculator/date-calc.html
+          - link "字数统计" [ref=f2e42] [cursor=pointer]:
+            - /url: /calculator/word-count.html
+          - link "时区转换" [ref=f2e43] [cursor=pointer]:
+            - /url: /calculator/timezone.html
+          - link "衣服尺码" [ref=f2e44] [cursor=pointer]:
+            - /url: /calculator/size.html
+          - link "装修预算" [ref=f2e45] [cursor=pointer]:
+            - /url: /calculator/decoration.html
+          - link "预产期" [ref=f2e46] [cursor=pointer]:
+            - /url: /calculator/due-date.html
+          - link "儿童身高预测" [ref=f2e47] [cursor=pointer]:
+            - /url: /calculator/height-predict.html
+          - link "宠物年龄" [ref=f2e48] [cursor=pointer]:
+            - /url: /calculator/pet-age.html
+          - link "油耗计算" [ref=f2e49] [cursor=pointer]:
+            - /url: /calculator/fuel-cost.html
+          - link "IP地址查询" [ref=f2e50] [cursor=pointer]:
+            - /url: /calculator/ip-query.html
+          - link "宝宝取名" [ref=f2e51] [cursor=pointer]:
+            - /url: /calculator/baby-name.html
+          - link "密语" [ref=f2e52] [cursor=pointer]:
+            - /url: /calculator/secret-message.html
+      - generic [ref=f2e53]:
+        - generic [ref=f2e54]: 日历工具
+        - navigation [ref=f2e56]:
+          - link "万年历·老黄历" [ref=f2e57] [cursor=pointer]:
+            - /url: /calendar.html
+          - link "今日指南" [ref=f2e58] [cursor=pointer]:
+            - /url: /calendar/daily-guide.html
+          - link "倒计时·纪念日" [ref=f2e59] [cursor=pointer]:
+            - /url: /calendar/countdown.html
+      - generic [ref=f2e60]:
+        - generic [ref=f2e61]: 场景组合
+        - navigation [ref=f2e63]:
+          - link "买房全攻略" [ref=f2e64] [cursor=pointer]:
+            - /url: /combo/buy-house.html
+          - link "买车全攻略" [ref=f2e65] [cursor=pointer]:
+            - /url: /combo/buy-car.html
+          - link "健康体检站" [ref=f2e66] [cursor=pointer]:
+            - /url: /combo/health-check.html
+          - link "趣味测试" [ref=f2e67] [cursor=pointer]:
+            - /url: /combo/fun-test.html
+          - link "理财百宝箱" [ref=f2e68] [cursor=pointer]:
+            - /url: /combo/finance-toolkit.html
+          - link "人生规划" [ref=f2e69] [cursor=pointer]:
+            - /url: /combo/life-plan.html
+          - link "色彩研究所" [ref=f2e70] [cursor=pointer]:
+            - /url: /combo/color-lab.html
+      - generic [ref=f2e71]:
+        - generic [ref=f2e72]: 其他工具
+        - navigation [ref=f2e74]:
+          - link "概率计算器" [ref=f2e75] [cursor=pointer]:
+            - /url: /probability.html
+          - link "随机数生成" [ref=f2e76] [cursor=pointer]:
+            - /url: /random.html
+          - link "视力测试" [ref=f2e77] [cursor=pointer]:
+            - /url: /vision.html
+          - link "双色球" [ref=f2e78] [cursor=pointer]:
+            - /url: /lotto.html
+          - link "实用工具箱" [ref=f2e79] [cursor=pointer]:
+            - /url: /tools.html
+    - main [ref=f2e80]:
+      - generic [ref=f2e81]:
+        - navigation "面包屑" [ref=f2e82]:
+          - link "首页" [ref=f2e83] [cursor=pointer]:
+            - /url: /
+          - generic [aria-hidden] [ref=f2e84]: /
+          - generic [ref=f2e85]: 万年历老黄历查询
+        - generic [ref=f2e86]:
+          - heading "万年历 · 老黄历" [level=1] [ref=f2e87]
+          - paragraph [ref=f2e88]: 公历农历对照月历，点选任意日期查看农历、干支、生肖与生肖年；联网时补齐当日宜忌、节气、节日与冲煞方位。农历月日由本地算法（1900–2050）计算，离线也能看。
+        - generic [ref=f2e89]:
+          - generic [ref=f2e90]:
+            - button "上一月" [ref=f2e91] [cursor=pointer]: ‹
+            - generic [ref=f2e92]: 2026年11月
+            - button "下一月" [ref=f2e93] [cursor=pointer]: ›
+            - button "今天" [ref=f2e94] [cursor=pointer]
+            - textbox "跳转到日期" [ref=f2e95]: 2026-11-10
+          - generic [ref=f2e96]:
+            - generic [ref=f2e97]: 日
+            - generic [ref=f2e98]: 一
+            - generic [ref=f2e99]: 二
+            - generic [ref=f2e100]: 三
+            - generic [ref=f2e101]: 四
+            - generic [ref=f2e102]: 五
+            - generic [ref=f2e103]: 六
+          - generic [ref=f2e104]:
+            - generic [ref=f2e105] [cursor=pointer]:
+              - generic [ref=f2e106]: "1"
+              - generic [ref=f2e107]: 九月一
+            - generic [ref=f2e108] [cursor=pointer]:
+              - generic [ref=f2e109]: "2"
+              - generic [ref=f2e110]: 廿四
+            - generic [ref=f2e111] [cursor=pointer]:
+              - generic [ref=f2e112]: "3"
+              - generic [ref=f2e113]: 廿五
+            - generic [ref=f2e114] [cursor=pointer]:
+              - generic [ref=f2e115]: "4"
+              - generic [ref=f2e116]: 廿六
+            - generic [ref=f2e117] [cursor=pointer]:
+              - generic [ref=f2e118]: "5"
+              - generic [ref=f2e119]: 廿七
+            - generic [ref=f2e120] [cursor=pointer]:
+              - generic [ref=f2e121]: "6"
+              - generic [ref=f2e122]: 廿八
+            - generic [ref=f2e123] [cursor=pointer]:
+              - generic [ref=f2e124]: "7"
+              - generic [ref=f2e125]: 廿九
+            - generic [ref=f2e126] [cursor=pointer]:
+              - generic [ref=f2e127]: "8"
+              - generic [ref=f2e128]: 三十
+            - generic [ref=f2e129] [cursor=pointer]:
+              - generic [ref=f2e130]: "9"
+              - generic [ref=f2e131]: 初一
+            - generic [ref=f2e132] [cursor=pointer]:
+              - generic [ref=f2e133]: "10"
+              - generic [ref=f2e134]: 初二
+            - generic [ref=f2e135] [cursor=pointer]:
+              - generic [ref=f2e136]: "11"
+              - generic [ref=f2e137]: 初三
+            - generic [ref=f2e138] [cursor=pointer]:
+              - generic [ref=f2e139]: "12"
+              - generic [ref=f2e140]: 初四
+            - generic [ref=f2e141] [cursor=pointer]:
+              - generic [ref=f2e142]: "13"
+              - generic [ref=f2e143]: 初五
+            - generic [ref=f2e144] [cursor=pointer]:
+              - generic [ref=f2e145]: "14"
+              - generic [ref=f2e146]: 初六
+            - generic [ref=f2e147] [cursor=pointer]:
+              - generic [ref=f2e148]: "15"
+              - generic [ref=f2e149]: 初七
+            - generic [ref=f2e150] [cursor=pointer]:
+              - generic [ref=f2e151]: "16"
+              - generic [ref=f2e152]: 初八
+            - generic [ref=f2e153] [cursor=pointer]:
+              - generic [ref=f2e154]: "17"
+              - generic [ref=f2e155]: 初九
+            - generic [ref=f2e156] [cursor=pointer]:
+              - generic [ref=f2e157]: "18"
+              - generic [ref=f2e158]: 初十
+            - generic [ref=f2e159] [cursor=pointer]:
+              - generic [ref=f2e160]: "19"
+              - generic [ref=f2e161]: 十一
+            - generic [ref=f2e162] [cursor=pointer]:
+              - generic [ref=f2e163]: "20"
+              - generic [ref=f2e164]: 十二
+            - generic [ref=f2e165] [cursor=pointer]:
+              - generic [ref=f2e166]: "21"
+              - generic [ref=f2e167]: 十三
+            - generic [ref=f2e168] [cursor=pointer]:
+              - generic [ref=f2e169]: "22"
+              - generic [ref=f2e170]: 十四
+            - generic [ref=f2e171] [cursor=pointer]:
+              - generic [ref=f2e172]: "23"
+              - generic [ref=f2e173]: 十五
+            - generic [ref=f2e174] [cursor=pointer]:
+              - generic [ref=f2e175]: "24"
+              - generic [ref=f2e176]: 十六
+            - generic [ref=f2e177] [cursor=pointer]:
+              - generic [ref=f2e178]: "25"
+              - generic [ref=f2e179]: 十七
+            - generic [ref=f2e180] [cursor=pointer]:
+              - generic [ref=f2e181]: "26"
+              - generic [ref=f2e182]: 十八
+            - generic [ref=f2e183] [cursor=pointer]:
+              - generic [ref=f2e184]: "27"
+              - generic [ref=f2e185]: 十九
+            - generic [ref=f2e186] [cursor=pointer]:
+              - generic [ref=f2e187]: "28"
+              - generic [ref=f2e188]: 二十
+            - generic [ref=f2e189] [cursor=pointer]:
+              - generic [ref=f2e190]: "29"
+              - generic [ref=f2e191]: 廿一
+            - generic [ref=f2e192] [cursor=pointer]:
+              - generic [ref=f2e193]: "30"
+              - generic [ref=f2e194]: 廿二
+        - generic [ref=f2e195]:
+          - generic [ref=f2e196]:
+            - generic [ref=f2e197]:
+              - generic [ref=f2e198]: 2026年11月10日
+              - generic [ref=f2e199]: 周二
+            - generic [ref=f2e200]:
+              - generic [ref=f2e201]: 农历 十月初二
+              - generic [ref=f2e202]: 丙午年 · 马年
+          - generic [ref=f2e203]:
+            - generic [ref=f2e204]:
+              - generic [ref=f2e205]: 宜
+              - generic [ref=f2e206]: "--"
+            - generic [ref=f2e207]:
+              - generic [ref=f2e208]: 忌
+              - generic [ref=f2e209]: "--"
+          - generic [ref=f2e210]:
+            - generic [ref=f2e211]:
+              - term [ref=f2e212]: 干支年
+              - definition [ref=f2e213]: 丙午年
+            - generic [ref=f2e214]:
+              - term [ref=f2e215]: 生肖
+              - definition [ref=f2e216]: 马年
+          - generic [ref=f2e217]: 正在获取宜忌、节气、冲煞…
+        - generic [ref=f2e218]:
+          - generic [ref=f2e219]: ℹ️
+          - generic [ref=f2e220]: 本地算法覆盖 1900–2050 年的农历年月日、闰月、年干支与生肖；宜忌等黄历细节来自在线黄历库，弱网或接口不可用时相应字段留空，不作推测。
+        - region [ref=f2e221]:
+          - heading "关于万年历与老黄历" [level=2] [ref=f2e222]
+          - paragraph [ref=f2e223]: 万年历是跨越较长时间范围、可查询公历与农历对照的日历工具。本工具支持按月翻查每个公历日期对应的农历日期、干支与生肖，并可查看每日宜忌、节气与节日。其中公历日期由系统直接给出，农历、干支、生肖由本地天文算法推算；宜忌、节气、节日、冲煞等民俗内容在联网时由数据接口补全，离线时仅显示本地可算部分。
+          - heading "常见问题" [level=2] [ref=f2e224]
+          - group [ref=f2e225]:
+            - generic "万年历和老黄历有什么区别？" [ref=f2e226] [cursor=pointer]
+          - group [ref=f2e227]:
+            - generic "农历、干支、生肖是准确的吗？" [ref=f2e228] [cursor=pointer]
+          - group [ref=f2e229]:
+            - generic "为什么有时看不到宜忌和节气？" [ref=f2e230] [cursor=pointer]
+          - group [ref=f2e231]:
+            - generic "老黄历的“宜 / 忌”能作为决策依据吗？" [ref=f2e232] [cursor=pointer]
+        - generic [ref=f2e233]:
+          - heading "相关工具" [level=2] [ref=f2e234]
+          - generic [ref=f2e236]:
+            - link "→ 今日指南 每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。" [ref=f2e237] [cursor=pointer]:
+              - /url: /calendar/daily-guide.html
+              - text: →
+              - generic [ref=f2e241]: 今日指南
+              - generic [ref=f2e242]: 每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。
+            - link "→ 倒计时·纪念日 在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。" [ref=f2e243] [cursor=pointer]:
+              - /url: /calendar/countdown.html
+              - text: →
+              - generic [ref=f2e247]: 倒计时·纪念日
+              - generic [ref=f2e248]: 在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。
+        - button "🔗 复制结果链接" [ref=f2e250] [cursor=pointer]
+        - link "明先生日常 · xuliming.com" [ref=f2e252] [cursor=pointer]:
+          - /url: https://xuliming.com/
+          - generic [ref=f2e253]: 广告
+          - generic [ref=f2e255]: 21 个场景 99 步，跟着做就能把站搭起来：服务器、域名、部署、SEO 一次讲清。
+          - generic [ref=f2e256]: 打开建站向导 →
+        - generic [ref=f2e259]:
+          - generic [ref=f2e260]:
+            - generic [aria-hidden] [ref=f2e261]: 🎫
+            - generic [ref=f2e262]: 全网优惠券 · 限时领取
+          - link "更多 →" [ref=f2e263] [cursor=pointer]:
+            - /url: https://coupon.zangeng.com/
+  - contentinfo [ref=f2e265]:
+    - generic [ref=f2e266]:
+      - generic [ref=f2e267]:
+        - link "一珩工具" [ref=f2e268] [cursor=pointer]:
+          - /url: /
+          - generic [aria-hidden] [ref=f2e269]: "Y"
+          - text: 一珩工具
+        - paragraph [ref=f2e270]: 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。
+      - generic [ref=f2e271]:
+        - heading "热门工具" [level=3] [ref=f2e272]
+        - link "个税计算器" [ref=f2e273] [cursor=pointer]:
+          - /url: /calculator/tax.html
+        - link "万年历" [ref=f2e274] [cursor=pointer]:
+          - /url: /calendar.html
+        - link "房贷计算" [ref=f2e275] [cursor=pointer]:
+          - /url: /calculator/prepay.html
+        - link "单位换算" [ref=f2e276] [cursor=pointer]:
+          - /url: /calculator/unit.html
+      - generic [ref=f2e277]:
+        - heading "生活工具" [level=3] [ref=f2e278]
+        - link "今日指南" [ref=f2e279] [cursor=pointer]:
+          - /url: /calendar/daily-guide.html
+        - link "买房攻略" [ref=f2e280] [cursor=pointer]:
+          - /url: /combo/buy-house.html
+        - link "健康体检" [ref=f2e281] [cursor=pointer]:
+          - /url: /combo/health-check.html
+        - link "宝宝取名" [ref=f2e282] [cursor=pointer]:
+          - /url: /calculator/baby-name.html
+      - generic [ref=f2e283]:
+        - heading "关于" [level=3] [ref=f2e284]
+        - link "关于我们" [ref=f2e285] [cursor=pointer]:
+          - /url: /about.html
+        - link "隐私政策" [ref=f2e286] [cursor=pointer]:
+          - /url: /privacy.html
+      - generic [ref=f2e287]:
+        - heading "更多站点" [level=3] [ref=f2e288]
+        - link "明先生日常 · xuliming.com" [ref=f2e289] [cursor=pointer]:
+          - /url: https://xuliming.com/?src=hub
+        - link "cs调色盘 · 2002cs.com" [ref=f2e290] [cursor=pointer]:
+          - /url: https://2002cs.com/?src=hub
+        - link "访客小站 · fangkelianmeng.com" [ref=f2e291] [cursor=pointer]:
+          - /url: https://fangkelianmeng.com/?src=hub
+        - link "小满美图 · img.fangkelianmeng.com" [ref=f2e292] [cursor=pointer]:
+          - /url: https://img.fangkelianmeng.com/?src=hub
+        - link "小满手记 · zangeng.com" [ref=f2e293] [cursor=pointer]:
+          - /url: https://zangeng.com/?src=hub
+        - link "实测手记 · 585.ink" [ref=f2e294] [cursor=pointer]:
+          - /url: https://585.ink/?src=hub
+        - link "年表拾遗 · 20101115.com" [ref=f2e295] [cursor=pointer]:
+          - /url: https://20101115.com/?src=hub
+        - link "小满券仓 · coupon.zangeng.com" [ref=f2e296] [cursor=pointer]:
+          - /url: https://coupon.zangeng.com/?src=hub
+        - link "东北电动车汇 · store.fangkelianmeng.com" [ref=f2e297] [cursor=pointer]:
+          - /url: https://store.fangkelianmeng.com/?src=hub
+    - generic [ref=f2e298]:
+      - generic [ref=f2e299]: © 一珩成长笔记
+      - generic [ref=f2e300]:
+        - link "京ICP备18062653号-13" [ref=f2e301] [cursor=pointer]:
+          - /url: https://beian.miit.gov.cn/
+        - link "回到顶部 ↑" [ref=f2e302] [cursor=pointer]:
+          - /url: "#top"
+  - button "AI 助手" [ref=f2e303] [cursor=pointer]: AI

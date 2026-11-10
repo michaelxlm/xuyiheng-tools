@@ -66,6 +66,9 @@
   --sidebar-w: 248px;
   --bottom-nav-h: 60px;
 
+  /* 右下角浮层台阶：让「回到顶部」抬升到 AI 气泡（20+52=72px）上方，避免二者重叠 */
+  --corner-stack: 84px;
+
   /* 广告区 */
   --ad-bg-from: #fffbeb;
   --ad-bg-to: #fef3c7;
@@ -466,6 +469,26 @@ input.form-input[type="search"]::-webkit-search-decoration { -webkit-appearance:
 .tool-card.is-wide .tool-card-icon .ico { width: 27px; height: 27px; }
 .tool-card.is-wide .tool-card-title { font-size: var(--text-lg); }
 
+/* 目录卡（tool.html 等仅含标题的紧凑型卡片）：与全站卡片统一视觉语言，
+   用分类色点 + 居中对齐，避免单标题在大卡内左侧空荡 */
+.tool-card--slim {
+  flex-direction: row; align-items: center; justify-content: center;
+  min-height: 56px; padding: var(--space-3) var(--space-4);
+  text-align: center; font-weight: 600;
+}
+.tool-card--slim .tool-card-title { font-size: var(--text-sm); }
+.tool-card--slim .tool-card-title::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 9px; vertical-align: middle; background: var(--color-faint);
+}
+[data-cat="calc"]  .tool-card--slim .tool-card-title::before { background: var(--cat-calc-ink); }
+[data-cat="cal"]   .tool-card--slim .tool-card-title::before { background: var(--cat-cal-ink); }
+[data-cat="combo"] .tool-card--slim .tool-card-title::before { background: var(--cat-combo-ink); }
+[data-cat="other"] .tool-card--slim .tool-card-title::before { background: var(--cat-other-ink); }
+/* 悬停箭头改为右中，配合居中标题 */
+.tool-card--slim::before { top: 50%; right: 14px; transform: translateY(-50%) translateX(-6px); }
+.tool-card--slim:hover::before { transform: translateY(-50%) translateX(0); }
+
 /* 分类着色（图标块）：分类软底 + 同色微渐变，暗色下由令牌自适应 */
 [data-cat="calc"]  .tool-card-icon { background-color: var(--cat-calc-bg);  background-image: linear-gradient(135deg, color-mix(in srgb, var(--cat-calc-ink) 18%, transparent), transparent 72%); color: var(--cat-calc-ink); }
 [data-cat="cal"]   .tool-card-icon { background-color: var(--cat-cal-bg);   background-image: linear-gradient(135deg, color-mix(in srgb, var(--cat-cal-ink) 18%, transparent), transparent 72%); color: var(--cat-cal-ink); }
@@ -724,6 +747,21 @@ html.reveal-on .reveal.is-visible { opacity: 1; transform: none; }
 html.reveal-on .reveal.d1 { transition-delay: 60ms; }
 html.reveal-on .reveal.d2 { transition-delay: 120ms; }
 html.reveal-on .reveal.d3 { transition-delay: 180ms; }
+
+/* ---------- 响应式：≤767px 移动态 ---------- */
+@media (max-width: 767.98px) {
+  /* 触屏无键盘快捷键：隐藏命令面板触发键，节省页头空间 */
+  .xt-cmdk-trigger { display: none !important; }
+
+  /* AI 气泡抬到底部导航上方，避免遮挡「搜索」；面板随之上移 */
+  .aiw-b { right: 16px !important; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 14px) !important; }
+  .aiw-p { right: 12px !important; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 72px) !important; max-width: calc(100vw - 24px) !important; }
+
+  /* 回到顶部移至左下，避免与右下 AI 气泡重叠 */
+  .back-to-top { right: auto !important; left: 16px !important; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 14px) !important; }
+  /* 目录卡在窄屏两列即可，避免标题过挤 */
+  .tool-grid--slim { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
 
 /* ---------- 响应式：768px+ ---------- */
 @media (min-width: 768px) {

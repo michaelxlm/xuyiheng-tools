@@ -1,0 +1,405 @@
+- generic [active] [ref=f5e1]:
+  - link "跳至内容" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f5e3]:
+    - generic [ref=f5e4]:
+      - link "一珩工具" [ref=f5e5] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=f5e6]: "Y"
+        - text: 一珩工具
+      - navigation "主导航" [ref=f5e7]:
+        - link "首页" [ref=f5e8] [cursor=pointer]:
+          - /url: /
+        - link "发现" [ref=f5e9] [cursor=pointer]:
+          - /url: /discover.html
+        - link "搜索" [ref=f5e10] [cursor=pointer]:
+          - /url: /search.html
+        - link "关于" [ref=f5e11] [cursor=pointer]:
+          - /url: /about.html
+      - search [ref=f5e12]:
+        - searchbox "搜索工具" [ref=f5e16]
+      - generic [ref=f5e17]:
+        - button "命令面板" [ref=f5e18] [cursor=pointer]:
+          - generic [ref=f5e19]: Ctrl
+          - generic [ref=f5e20]: K
+        - button "切换主题" [ref=f5e21] [cursor=pointer]
+  - generic [ref=f5e25]:
+    - complementary "工具分类" [ref=f5e26]:
+      - generic [ref=f5e27]:
+        - generic [ref=f5e28]: 计算器
+        - navigation [ref=f5e30]:
+          - link "个税计算器" [ref=f5e31] [cursor=pointer]:
+            - /url: /calculator/tax.html
+          - link "单位换算" [ref=f5e32] [cursor=pointer]:
+            - /url: /calculator/unit.html
+          - link "房贷提前还款" [ref=f5e33] [cursor=pointer]:
+            - /url: /calculator/prepay.html
+          - link "养老金计算器" [ref=f5e34] [cursor=pointer]:
+            - /url: /calculator/pension.html
+          - link "五险一金" [ref=f5e35] [cursor=pointer]:
+            - /url: /calculator/social-insurance.html
+          - link "折扣计算" [ref=f5e36] [cursor=pointer]:
+            - /url: /calculator/discount.html
+          - link "百分比" [ref=f5e37] [cursor=pointer]:
+            - /url: /calculator/percentage.html
+          - link "加班费" [ref=f5e38] [cursor=pointer]:
+            - /url: /calculator/overtime.html
+          - link "基础代谢体脂" [ref=f5e39] [cursor=pointer]:
+            - /url: /calculator/body-fat.html
+          - link "跑步配速" [ref=f5e40] [cursor=pointer]:
+            - /url: /calculator/pace.html
+          - link "日期计算" [ref=f5e41] [cursor=pointer]:
+            - /url: /calculator/date-calc.html
+          - link "字数统计" [ref=f5e42] [cursor=pointer]:
+            - /url: /calculator/word-count.html
+          - link "时区转换" [ref=f5e43] [cursor=pointer]:
+            - /url: /calculator/timezone.html
+          - link "衣服尺码" [ref=f5e44] [cursor=pointer]:
+            - /url: /calculator/size.html
+          - link "装修预算" [ref=f5e45] [cursor=pointer]:
+            - /url: /calculator/decoration.html
+          - link "预产期" [ref=f5e46] [cursor=pointer]:
+            - /url: /calculator/due-date.html
+          - link "儿童身高预测" [ref=f5e47] [cursor=pointer]:
+            - /url: /calculator/height-predict.html
+          - link "宠物年龄" [ref=f5e48] [cursor=pointer]:
+            - /url: /calculator/pet-age.html
+          - link "油耗计算" [ref=f5e49] [cursor=pointer]:
+            - /url: /calculator/fuel-cost.html
+          - link "IP地址查询" [ref=f5e50] [cursor=pointer]:
+            - /url: /calculator/ip-query.html
+          - link "宝宝取名" [ref=f5e51] [cursor=pointer]:
+            - /url: /calculator/baby-name.html
+          - link "密语" [ref=f5e52] [cursor=pointer]:
+            - /url: /calculator/secret-message.html
+      - generic [ref=f5e53]:
+        - generic [ref=f5e54]: 日历工具
+        - navigation [ref=f5e56]:
+          - link "万年历·老黄历" [ref=f5e57] [cursor=pointer]:
+            - /url: /calendar.html
+          - link "今日指南" [ref=f5e58] [cursor=pointer]:
+            - /url: /calendar/daily-guide.html
+          - link "倒计时·纪念日" [ref=f5e59] [cursor=pointer]:
+            - /url: /calendar/countdown.html
+      - generic [ref=f5e60]:
+        - generic [ref=f5e61]: 场景组合
+        - navigation [ref=f5e63]:
+          - link "买房全攻略" [ref=f5e64] [cursor=pointer]:
+            - /url: /combo/buy-house.html
+          - link "买车全攻略" [ref=f5e65] [cursor=pointer]:
+            - /url: /combo/buy-car.html
+          - link "健康体检站" [ref=f5e66] [cursor=pointer]:
+            - /url: /combo/health-check.html
+          - link "趣味测试" [ref=f5e67] [cursor=pointer]:
+            - /url: /combo/fun-test.html
+          - link "理财百宝箱" [ref=f5e68] [cursor=pointer]:
+            - /url: /combo/finance-toolkit.html
+          - link "人生规划" [ref=f5e69] [cursor=pointer]:
+            - /url: /combo/life-plan.html
+          - link "色彩研究所" [ref=f5e70] [cursor=pointer]:
+            - /url: /combo/color-lab.html
+      - generic [ref=f5e71]:
+        - generic [ref=f5e72]: 其他工具
+        - navigation [ref=f5e74]:
+          - link "概率计算器" [ref=f5e75] [cursor=pointer]:
+            - /url: /probability.html
+          - link "随机数生成" [ref=f5e76] [cursor=pointer]:
+            - /url: /random.html
+          - link "视力测试" [ref=f5e77] [cursor=pointer]:
+            - /url: /vision.html
+          - link "双色球" [ref=f5e78] [cursor=pointer]:
+            - /url: /lotto.html
+          - link "实用工具箱" [ref=f5e79] [cursor=pointer]:
+            - /url: /tools.html
+    - main [ref=f5e80]:
+      - generic [ref=f5e81]:
+        - navigation "面包屑" [ref=f5e82]:
+          - link "首页" [ref=f5e83] [cursor=pointer]:
+            - /url: /
+          - generic [aria-hidden] [ref=f5e84]: /
+          - generic [ref=f5e85]: 搜索工具
+        - generic [ref=f5e86]:
+          - heading "搜索工具" [level=1] [ref=f5e87]
+          - paragraph [ref=f5e88]: 输入关键词，快速找到全站在线工具。支持按名称、用途搜索，无需回车即可实时筛选。
+        - generic [ref=f5e89]:
+          - generic [ref=f5e90]:
+            - searchbox "搜索工具" [ref=f5e93]
+            - button "清除" [ref=f5e94] [cursor=pointer]
+          - generic [ref=f5e95]:
+            - button "个税" [ref=f5e96] [cursor=pointer]
+            - button "房贷" [ref=f5e97] [cursor=pointer]
+            - button "万年历" [ref=f5e98] [cursor=pointer]
+            - button "BMI" [ref=f5e99] [cursor=pointer]
+            - button "汇率" [ref=f5e100] [cursor=pointer]
+            - button "字数" [ref=f5e101] [cursor=pointer]
+            - button "配速" [ref=f5e102] [cursor=pointer]
+            - button "倒计时" [ref=f5e103] [cursor=pointer]
+        - generic [ref=f5e104]: 共收录 38 个工具
+        - generic [ref=f5e105]:
+          - link "→ 个税计算器 工资税后收入与应缴税额" [ref=f5e106] [cursor=pointer]:
+            - /url: /calculator/tax.html
+            - text: →
+            - generic [ref=f5e110]: 个税计算器
+            - generic [ref=f5e111]: 工资税后收入与应缴税额
+          - link "→ 单位换算 长度重量面积温度速度存储互转" [ref=f5e112] [cursor=pointer]:
+            - /url: /calculator/unit.html
+            - text: →
+            - generic [ref=f5e116]: 单位换算
+            - generic [ref=f5e117]: 长度重量面积温度速度存储互转
+          - link "→ 房贷提前还款 提前还清能省多少利息" [ref=f5e118] [cursor=pointer]:
+            - /url: /calculator/prepay.html
+            - text: →
+            - generic [ref=f5e122]: 房贷提前还款
+            - generic [ref=f5e123]: 提前还清能省多少利息
+          - link "→ 养老金计算器 退休养老金估算" [ref=f5e124] [cursor=pointer]:
+            - /url: /calculator/pension.html
+            - text: →
+            - generic [ref=f5e128]: 养老金计算器
+            - generic [ref=f5e129]: 退休养老金估算
+          - link "→ 五险一金 社保公积金缴费明细" [ref=f5e130] [cursor=pointer]:
+            - /url: /calculator/social-insurance.html
+            - text: →
+            - generic [ref=f5e134]: 五险一金
+            - generic [ref=f5e135]: 社保公积金缴费明细
+          - link "→ 折扣计算 折上折满减到手价" [ref=f5e136] [cursor=pointer]:
+            - /url: /calculator/discount.html
+            - text: →
+            - generic [ref=f5e140]: 折扣计算
+            - generic [ref=f5e141]: 折上折满减到手价
+          - link "→ 百分比 占比增长率百分比" [ref=f5e142] [cursor=pointer]:
+            - /url: /calculator/percentage.html
+            - text: →
+            - generic [ref=f5e146]: 百分比
+            - generic [ref=f5e147]: 占比增长率百分比
+          - link "→ 加班费 工作日周末节假日加班工资" [ref=f5e148] [cursor=pointer]:
+            - /url: /calculator/overtime.html
+            - text: →
+            - generic [ref=f5e152]: 加班费
+            - generic [ref=f5e153]: 工作日周末节假日加班工资
+          - link "→ 基础代谢体脂 BMR TDEE 体脂率" [ref=f5e154] [cursor=pointer]:
+            - /url: /calculator/body-fat.html
+            - text: →
+            - generic [ref=f5e158]: 基础代谢体脂
+            - generic [ref=f5e159]: BMR TDEE 体脂率
+          - link "→ 跑步配速 配速完赛时间时速互算" [ref=f5e160] [cursor=pointer]:
+            - /url: /calculator/pace.html
+            - text: →
+            - generic [ref=f5e164]: 跑步配速
+            - generic [ref=f5e165]: 配速完赛时间时速互算
+          - link "→ 日期计算 日期间隔天数与推算" [ref=f5e166] [cursor=pointer]:
+            - /url: /calculator/date-calc.html
+            - text: →
+            - generic [ref=f5e170]: 日期计算
+            - generic [ref=f5e171]: 日期间隔天数与推算
+          - link "→ 字数统计 在线字数字符统计" [ref=f5e172] [cursor=pointer]:
+            - /url: /calculator/word-count.html
+            - text: →
+            - generic [ref=f5e176]: 字数统计
+            - generic [ref=f5e177]: 在线字数字符统计
+          - link "→ 时区转换 世界时间时差换算" [ref=f5e178] [cursor=pointer]:
+            - /url: /calculator/timezone.html
+            - text: →
+            - generic [ref=f5e182]: 时区转换
+            - generic [ref=f5e183]: 世界时间时差换算
+          - link "→ 衣服尺码 国际尺码对照换算" [ref=f5e184] [cursor=pointer]:
+            - /url: /calculator/size.html
+            - text: →
+            - generic [ref=f5e188]: 衣服尺码
+            - generic [ref=f5e189]: 国际尺码对照换算
+          - link "→ 装修预算 瓷砖地板油漆用量" [ref=f5e190] [cursor=pointer]:
+            - /url: /calculator/decoration.html
+            - text: →
+            - generic [ref=f5e194]: 装修预算
+            - generic [ref=f5e195]: 瓷砖地板油漆用量
+          - link "→ 预产期 孕周与预产期推算" [ref=f5e196] [cursor=pointer]:
+            - /url: /calculator/due-date.html
+            - text: →
+            - generic [ref=f5e200]: 预产期
+            - generic [ref=f5e201]: 孕周与预产期推算
+          - link "→ 儿童身高预测 遗传靶身高" [ref=f5e202] [cursor=pointer]:
+            - /url: /calculator/height-predict.html
+            - text: →
+            - generic [ref=f5e206]: 儿童身高预测
+            - generic [ref=f5e207]: 遗传靶身高
+          - link "→ 宠物年龄 猫狗年龄换算人类年龄" [ref=f5e208] [cursor=pointer]:
+            - /url: /calculator/pet-age.html
+            - text: →
+            - generic [ref=f5e212]: 宠物年龄
+            - generic [ref=f5e213]: 猫狗年龄换算人类年龄
+          - link "→ 油耗计算 百公里油耗与油费" [ref=f5e214] [cursor=pointer]:
+            - /url: /calculator/fuel-cost.html
+            - text: →
+            - generic [ref=f5e218]: 油耗计算
+            - generic [ref=f5e219]: 百公里油耗与油费
+          - link "→ IP地址查询 IP 归属地查询" [ref=f5e220] [cursor=pointer]:
+            - /url: /calculator/ip-query.html
+            - text: →
+            - generic [ref=f5e224]: IP地址查询
+            - generic [ref=f5e225]: IP 归属地查询
+          - link "→ 宝宝取名 寓意美好的名字推荐" [ref=f5e226] [cursor=pointer]:
+            - /url: /calculator/baby-name.html
+            - text: →
+            - generic [ref=f5e230]: 宝宝取名
+            - generic [ref=f5e231]: 寓意美好的名字推荐
+          - link "→ 密语 生成加密链接分享悄悄话" [ref=f5e232] [cursor=pointer]:
+            - /url: /calculator/secret-message.html
+            - text: →
+            - generic [ref=f5e236]: 密语
+            - generic [ref=f5e237]: 生成加密链接分享悄悄话
+          - link "→ 万年历·老黄历 公历农历对照宜忌节气" [ref=f5e238] [cursor=pointer]:
+            - /url: /calendar.html
+            - text: →
+            - generic [ref=f5e242]: 万年历·老黄历
+            - generic [ref=f5e243]: 公历农历对照宜忌节气
+          - link "→ 今日指南 黄历运势午餐一站查" [ref=f5e244] [cursor=pointer]:
+            - /url: /calendar/daily-guide.html
+            - text: →
+            - generic [ref=f5e248]: 今日指南
+            - generic [ref=f5e249]: 黄历运势午餐一站查
+          - link "→ 倒计时·纪念日 重要日子天数倒数" [ref=f5e250] [cursor=pointer]:
+            - /url: /calendar/countdown.html
+            - text: →
+            - generic [ref=f5e254]: 倒计时·纪念日
+            - generic [ref=f5e255]: 重要日子天数倒数
+          - link "→ 买房全攻略 房贷月供税费一站算" [ref=f5e256] [cursor=pointer]:
+            - /url: /combo/buy-house.html
+            - text: →
+            - generic [ref=f5e260]: 买房全攻略
+            - generic [ref=f5e261]: 房贷月供税费一站算
+          - link "→ 买车全攻略 车贷购置税保险落地价" [ref=f5e262] [cursor=pointer]:
+            - /url: /combo/buy-car.html
+            - text: →
+            - generic [ref=f5e266]: 买车全攻略
+            - generic [ref=f5e267]: 车贷购置税保险落地价
+          - link "→ 健康体检站 BMI 理想体重 BMR" [ref=f5e268] [cursor=pointer]:
+            - /url: /combo/health-check.html
+            - text: →
+            - generic [ref=f5e272]: 健康体检站
+            - generic [ref=f5e273]: BMI 理想体重 BMR
+          - link "→ 趣味测试 星座速配生命灵数" [ref=f5e274] [cursor=pointer]:
+            - /url: /combo/fun-test.html
+            - text: →
+            - generic [ref=f5e278]: 趣味测试
+            - generic [ref=f5e279]: 星座速配生命灵数
+          - link "→ 理财百宝箱 复利存款通胀汇率" [ref=f5e280] [cursor=pointer]:
+            - /url: /combo/finance-toolkit.html
+            - text: →
+            - generic [ref=f5e284]: 理财百宝箱
+            - generic [ref=f5e285]: 复利存款通胀汇率
+          - link "→ 人生规划 储蓄率财务自由全景" [ref=f5e286] [cursor=pointer]:
+            - /url: /combo/life-plan.html
+            - text: →
+            - generic [ref=f5e290]: 人生规划
+            - generic [ref=f5e291]: 储蓄率财务自由全景
+          - link "→ 色彩研究所 配色传统色颜色性格" [ref=f5e292] [cursor=pointer]:
+            - /url: /combo/color-lab.html
+            - text: →
+            - generic [ref=f5e296]: 色彩研究所
+            - generic [ref=f5e297]: 配色传统色颜色性格
+          - link "→ 概率计算器 单次联合至少一次组合数" [ref=f5e298] [cursor=pointer]:
+            - /url: /probability.html
+            - text: →
+            - generic [ref=f5e302]: 概率计算器
+            - generic [ref=f5e303]: 单次联合至少一次组合数
+          - link "→ 随机数生成 范围随机整数小数" [ref=f5e304] [cursor=pointer]:
+            - /url: /random.html
+            - text: →
+            - generic [ref=f5e308]: 随机数生成
+            - generic [ref=f5e309]: 范围随机整数小数
+          - link "→ 视力测试 E 字视力自测" [ref=f5e310] [cursor=pointer]:
+            - /url: /vision.html
+            - text: →
+            - generic [ref=f5e314]: 视力测试
+            - generic [ref=f5e315]: E 字视力自测
+          - link "→ 双色球 随机选号 + 走势分析" [ref=f5e316] [cursor=pointer]:
+            - /url: /lotto.html
+            - text: →
+            - generic [ref=f5e320]: 双色球
+            - generic [ref=f5e321]: 随机选号 + 走势分析
+          - link "→ 关于我们 了解一珩成长笔记" [ref=f5e322] [cursor=pointer]:
+            - /url: /about.html
+            - text: →
+            - generic [ref=f5e326]: 关于我们
+            - generic [ref=f5e327]: 了解一珩成长笔记
+          - link "→ 隐私政策 数据收集与使用说明" [ref=f5e328] [cursor=pointer]:
+            - /url: /privacy.html
+            - text: →
+            - generic [ref=f5e332]: 隐私政策
+            - generic [ref=f5e333]: 数据收集与使用说明
+        - generic [ref=f5e334]:
+          - generic [aria-hidden] [ref=f5e335]: 💡
+          - generic [ref=f5e336]: 搜索在本页浏览器内即时匹配，不经过服务器，保护隐私。
+        - button "🔗 复制结果链接" [ref=f5e338] [cursor=pointer]
+        - link "🤖 国产 AI IDE 免费领 3500 积分！写代码、改 Bug、跑任务全搞定" [ref=f5e340] [cursor=pointer]:
+          - /url: https://www.trae.cn/events/code-fission/GMNA4GWL3SFR?utm_source=copy_link&utm_medium=code_fission
+          - generic [ref=f5e341]: 广告
+          - generic [ref=f5e343]: 一个人做项目，雇不起初级工程师？Trae 就是你的 AI 结对编程搭档 💻 需求拆解 → 文件改动 → 终端执行一条龙，免费层日常开发完全够用。现在通过邀请链接注册，直接送你 500 通用积分，累计可拿 3500 积分（邀满 7 人），写业务代码、改 Bug、跑脚本全靠它。独立开发者 / 外包接单 / 一人公司必备，不花一分钱多一个"AI 员工"。
+          - generic [ref=f5e344]: 去看看 →
+  - contentinfo [ref=f5e345]:
+    - generic [ref=f5e347]:
+      - generic [ref=f5e348]:
+        - generic [ref=f5e349]: 微信小程序
+        - generic [ref=f5e350]: 贴图话题·承接页
+        - generic [ref=f5e351]: 微信贴图话题活动码（scene=topic-mt-discover，落地 src=wx-topic）
+      - img "贴图话题·承接页（微信扫码打开小程序）" [ref=f5e353]
+    - generic [ref=f5e354]:
+      - generic [ref=f5e355]:
+        - link "一珩工具" [ref=f5e356] [cursor=pointer]:
+          - /url: /
+          - generic [aria-hidden] [ref=f5e357]: "Y"
+          - text: 一珩工具
+        - paragraph [ref=f5e358]: 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。
+      - generic [ref=f5e359]:
+        - heading "热门工具" [level=3] [ref=f5e360]
+        - link "个税计算器" [ref=f5e361] [cursor=pointer]:
+          - /url: /calculator/tax.html
+        - link "万年历" [ref=f5e362] [cursor=pointer]:
+          - /url: /calendar.html
+        - link "房贷计算" [ref=f5e363] [cursor=pointer]:
+          - /url: /calculator/prepay.html
+        - link "单位换算" [ref=f5e364] [cursor=pointer]:
+          - /url: /calculator/unit.html
+      - generic [ref=f5e365]:
+        - heading "生活工具" [level=3] [ref=f5e366]
+        - link "今日指南" [ref=f5e367] [cursor=pointer]:
+          - /url: /calendar/daily-guide.html
+        - link "买房攻略" [ref=f5e368] [cursor=pointer]:
+          - /url: /combo/buy-house.html
+        - link "健康体检" [ref=f5e369] [cursor=pointer]:
+          - /url: /combo/health-check.html
+        - link "宝宝取名" [ref=f5e370] [cursor=pointer]:
+          - /url: /calculator/baby-name.html
+      - generic [ref=f5e371]:
+        - heading "关于" [level=3] [ref=f5e372]
+        - link "关于我们" [ref=f5e373] [cursor=pointer]:
+          - /url: /about.html
+        - link "隐私政策" [ref=f5e374] [cursor=pointer]:
+          - /url: /privacy.html
+      - generic [ref=f5e375]:
+        - heading "更多站点" [level=3] [ref=f5e376]
+        - link "明先生日常 · xuliming.com" [ref=f5e377] [cursor=pointer]:
+          - /url: https://xuliming.com/?src=hub
+        - link "cs调色盘 · 2002cs.com" [ref=f5e378] [cursor=pointer]:
+          - /url: https://2002cs.com/?src=hub
+        - link "访客小站 · fangkelianmeng.com" [ref=f5e379] [cursor=pointer]:
+          - /url: https://fangkelianmeng.com/?src=hub
+        - link "小满美图 · img.fangkelianmeng.com" [ref=f5e380] [cursor=pointer]:
+          - /url: https://img.fangkelianmeng.com/?src=hub
+        - link "小满手记 · zangeng.com" [ref=f5e381] [cursor=pointer]:
+          - /url: https://zangeng.com/?src=hub
+        - link "实测手记 · 585.ink" [ref=f5e382] [cursor=pointer]:
+          - /url: https://585.ink/?src=hub
+        - link "年表拾遗 · 20101115.com" [ref=f5e383] [cursor=pointer]:
+          - /url: https://20101115.com/?src=hub
+        - link "小满券仓 · coupon.zangeng.com" [ref=f5e384] [cursor=pointer]:
+          - /url: https://coupon.zangeng.com/?src=hub
+        - link "东北电动车汇 · store.fangkelianmeng.com" [ref=f5e385] [cursor=pointer]:
+          - /url: https://store.fangkelianmeng.com/?src=hub
+    - generic [ref=f5e386]:
+      - generic [ref=f5e387]: © 一珩成长笔记
+      - generic [ref=f5e388]:
+        - link "京ICP备18062653号-13" [ref=f5e389] [cursor=pointer]:
+          - /url: https://beian.miit.gov.cn/
+        - link "回到顶部 ↑" [ref=f5e390] [cursor=pointer]:
+          - /url: "#top"
+  - button "AI 助手" [ref=f5e391] [cursor=pointer]: AI

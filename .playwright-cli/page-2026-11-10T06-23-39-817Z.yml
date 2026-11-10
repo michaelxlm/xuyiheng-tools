@@ -1,0 +1,310 @@
+- generic [active] [ref=f3e1]:
+  - link "跳至内容" [ref=f3e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f3e3]:
+    - generic [ref=f3e4]:
+      - link "一珩工具" [ref=f3e5] [cursor=pointer]:
+        - /url: /
+        - generic [aria-hidden] [ref=f3e6]: "Y"
+        - text: 一珩工具
+      - navigation "主导航" [ref=f3e7]:
+        - link "首页" [ref=f3e8] [cursor=pointer]:
+          - /url: /
+        - link "发现" [ref=f3e9] [cursor=pointer]:
+          - /url: /discover.html
+        - link "搜索" [ref=f3e10] [cursor=pointer]:
+          - /url: /search.html
+        - link "关于" [ref=f3e11] [cursor=pointer]:
+          - /url: /about.html
+      - search [ref=f3e12]:
+        - searchbox "搜索工具" [ref=f3e16]
+      - generic [ref=f3e17]:
+        - button "命令面板" [ref=f3e18] [cursor=pointer]:
+          - generic [ref=f3e19]: Ctrl
+          - generic [ref=f3e20]: K
+        - button "切换主题" [ref=f3e21] [cursor=pointer]
+  - generic [ref=f3e25]:
+    - complementary "工具分类" [ref=f3e26]:
+      - generic [ref=f3e27]:
+        - generic [ref=f3e28]: 计算器
+        - navigation [ref=f3e30]:
+          - link "个税计算器" [ref=f3e31] [cursor=pointer]:
+            - /url: /calculator/tax.html
+          - link "单位换算" [ref=f3e32] [cursor=pointer]:
+            - /url: /calculator/unit.html
+          - link "房贷提前还款" [ref=f3e33] [cursor=pointer]:
+            - /url: /calculator/prepay.html
+          - link "养老金计算器" [ref=f3e34] [cursor=pointer]:
+            - /url: /calculator/pension.html
+          - link "五险一金" [ref=f3e35] [cursor=pointer]:
+            - /url: /calculator/social-insurance.html
+          - link "折扣计算" [ref=f3e36] [cursor=pointer]:
+            - /url: /calculator/discount.html
+          - link "百分比" [ref=f3e37] [cursor=pointer]:
+            - /url: /calculator/percentage.html
+          - link "加班费" [ref=f3e38] [cursor=pointer]:
+            - /url: /calculator/overtime.html
+          - link "基础代谢体脂" [ref=f3e39] [cursor=pointer]:
+            - /url: /calculator/body-fat.html
+          - link "跑步配速" [ref=f3e40] [cursor=pointer]:
+            - /url: /calculator/pace.html
+          - link "日期计算" [ref=f3e41] [cursor=pointer]:
+            - /url: /calculator/date-calc.html
+          - link "字数统计" [ref=f3e42] [cursor=pointer]:
+            - /url: /calculator/word-count.html
+          - link "时区转换" [ref=f3e43] [cursor=pointer]:
+            - /url: /calculator/timezone.html
+          - link "衣服尺码" [ref=f3e44] [cursor=pointer]:
+            - /url: /calculator/size.html
+          - link "装修预算" [ref=f3e45] [cursor=pointer]:
+            - /url: /calculator/decoration.html
+          - link "预产期" [ref=f3e46] [cursor=pointer]:
+            - /url: /calculator/due-date.html
+          - link "儿童身高预测" [ref=f3e47] [cursor=pointer]:
+            - /url: /calculator/height-predict.html
+          - link "宠物年龄" [ref=f3e48] [cursor=pointer]:
+            - /url: /calculator/pet-age.html
+          - link "油耗计算" [ref=f3e49] [cursor=pointer]:
+            - /url: /calculator/fuel-cost.html
+          - link "IP地址查询" [ref=f3e50] [cursor=pointer]:
+            - /url: /calculator/ip-query.html
+          - link "宝宝取名" [ref=f3e51] [cursor=pointer]:
+            - /url: /calculator/baby-name.html
+          - link "密语" [ref=f3e52] [cursor=pointer]:
+            - /url: /calculator/secret-message.html
+      - generic [ref=f3e53]:
+        - generic [ref=f3e54]: 日历工具
+        - navigation [ref=f3e56]:
+          - link "万年历·老黄历" [ref=f3e57] [cursor=pointer]:
+            - /url: /calendar.html
+          - link "今日指南" [ref=f3e58] [cursor=pointer]:
+            - /url: /calendar/daily-guide.html
+          - link "倒计时·纪念日" [ref=f3e59] [cursor=pointer]:
+            - /url: /calendar/countdown.html
+      - generic [ref=f3e60]:
+        - generic [ref=f3e61]: 场景组合
+        - navigation [ref=f3e63]:
+          - link "买房全攻略" [ref=f3e64] [cursor=pointer]:
+            - /url: /combo/buy-house.html
+          - link "买车全攻略" [ref=f3e65] [cursor=pointer]:
+            - /url: /combo/buy-car.html
+          - link "健康体检站" [ref=f3e66] [cursor=pointer]:
+            - /url: /combo/health-check.html
+          - link "趣味测试" [ref=f3e67] [cursor=pointer]:
+            - /url: /combo/fun-test.html
+          - link "理财百宝箱" [ref=f3e68] [cursor=pointer]:
+            - /url: /combo/finance-toolkit.html
+          - link "人生规划" [ref=f3e69] [cursor=pointer]:
+            - /url: /combo/life-plan.html
+          - link "色彩研究所" [ref=f3e70] [cursor=pointer]:
+            - /url: /combo/color-lab.html
+      - generic [ref=f3e71]:
+        - generic [ref=f3e72]: 其他工具
+        - navigation [ref=f3e74]:
+          - link "概率计算器" [ref=f3e75] [cursor=pointer]:
+            - /url: /probability.html
+          - link "随机数生成" [ref=f3e76] [cursor=pointer]:
+            - /url: /random.html
+          - link "视力测试" [ref=f3e77] [cursor=pointer]:
+            - /url: /vision.html
+          - link "双色球" [ref=f3e78] [cursor=pointer]:
+            - /url: /lotto.html
+          - link "实用工具箱" [ref=f3e79] [cursor=pointer]:
+            - /url: /tools.html
+    - main [ref=f3e80]:
+      - generic [ref=f3e81]:
+        - navigation "面包屑" [ref=f3e82]:
+          - link "首页" [ref=f3e83] [cursor=pointer]:
+            - /url: /
+          - generic [aria-hidden] [ref=f3e84]: /
+          - generic [ref=f3e85]: 买房全攻略
+        - generic [ref=f3e86]:
+          - heading "买房全攻略" [level=1] [ref=f3e87]
+          - paragraph [ref=f3e88]: 一站算清买房核心账目：首付与贷款额度、等额本息月供与总利息、契税与主要交易税费，帮你在签约前对总预算心里有数。
+        - generic [ref=f3e89]:
+          - generic [ref=f3e90]:
+            - generic [ref=f3e91]: 房屋总价
+            - generic [ref=f3e92]:
+              - spinbutton "房屋总价" [ref=f3e93]
+              - generic [ref=f3e94]: 元
+          - generic [ref=f3e95]:
+            - generic [ref=f3e96]:
+              - generic [ref=f3e97]: 首付比例
+              - generic [ref=f3e98]:
+                - spinbutton "首付比例" [ref=f3e99]: "30"
+                - generic [ref=f3e100]: "%"
+            - generic [ref=f3e101]:
+              - generic [ref=f3e102]: 贷款年利率
+              - generic [ref=f3e103]:
+                - spinbutton "贷款年利率" [ref=f3e104]: "3.85"
+                - generic [ref=f3e105]: "%"
+            - generic [ref=f3e106]:
+              - generic [ref=f3e107]: 贷款年限
+              - generic [ref=f3e108]:
+                - spinbutton "贷款年限" [ref=f3e109]: "30"
+                - generic [ref=f3e110]: 年
+          - generic [ref=f3e111]:
+            - generic [ref=f3e112]:
+              - generic [ref=f3e113]: 建筑面积
+              - generic [ref=f3e114]:
+                - spinbutton "建筑面积" [ref=f3e115]
+                - generic [ref=f3e116]: ㎡
+            - generic [ref=f3e117]:
+              - generic [ref=f3e118]: 购房套数
+              - combobox "购房套数" [ref=f3e119]:
+                - option "首套" [selected]
+                - option "二套"
+          - button "开始测算" [ref=f3e121] [cursor=pointer]
+        - generic [ref=f3e122]:
+          - generic [ref=f3e123]: ℹ️
+          - generic [ref=f3e124]: 契税按常见政策估算：首套 ≤90㎡ 1%、>90㎡ 1.5%；二套 3%（各地不同）。月供按等额本息公式计算。实际税费、中介费与贷款利率以当地政策及银行合同为准。
+        - generic [ref=f3e125]:
+          - heading "相关工具" [level=2] [ref=f3e126]
+          - generic [ref=f3e128]:
+            - link "→ 买车全攻略 买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。" [ref=f3e129] [cursor=pointer]:
+              - /url: /combo/buy-car.html
+              - text: →
+              - generic [ref=f3e133]: 买车全攻略
+              - generic [ref=f3e134]: 买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。
+            - link "→ 健康体检站 在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础代谢率 BMR 与每日消耗，快速自我健康评估。" [ref=f3e135] [cursor=pointer]:
+              - /url: /combo/health-check.html
+              - text: →
+              - generic [ref=f3e139]: 健康体检站
+              - generic [ref=f3e140]: 在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础代谢率 BMR 与每日消耗，快速自我健康评估。
+            - link "→ 趣味测试 娱乐 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。" [ref=f3e141] [cursor=pointer]:
+              - /url: /combo/fun-test.html
+              - text: →
+              - generic [ref=f3e145]:
+                - text: 趣味测试
+                - generic [ref=f3e146]: 娱乐
+              - generic [ref=f3e147]: 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。
+            - link "→ 理财百宝箱 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。" [ref=f3e148] [cursor=pointer]:
+              - /url: /combo/finance-toolkit.html
+              - text: →
+              - generic [ref=f3e152]: 理财百宝箱
+              - generic [ref=f3e153]: 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。
+            - link "→ 人生规划 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。" [ref=f3e154] [cursor=pointer]:
+              - /url: /combo/life-plan.html
+              - text: →
+              - generic [ref=f3e158]: 人生规划
+              - generic [ref=f3e159]: 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。
+            - link "→ 色彩研究所 娱乐 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。" [ref=f3e160] [cursor=pointer]:
+              - /url: /combo/color-lab.html
+              - text: →
+              - generic [ref=f3e164]:
+                - text: 色彩研究所
+                - generic [ref=f3e165]: 娱乐
+              - generic [ref=f3e166]: 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。
+        - button "🔗 复制结果链接" [ref=f3e168] [cursor=pointer]
+        - generic [ref=f3e169]:
+          - heading "相关场景工具" [level=3] [ref=f3e170]
+          - generic [ref=f3e171]:
+            - link "买车全攻略 买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。" [ref=f3e172] [cursor=pointer]:
+              - /url: /combo/buy-car.html
+              - generic [ref=f3e173]: 买车全攻略
+              - generic [ref=f3e174]: 买车全攻略工具，整合车贷计算、油费估算、保险对比，帮你做出最佳购车决策。
+            - link "健康体检站 在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础" [ref=f3e175] [cursor=pointer]:
+              - /url: /combo/health-check.html
+              - generic [ref=f3e176]: 健康体检站
+              - generic [ref=f3e177]: 在线健康体检工具，输入身高体重一键计算 BMI 体质指数、理想体重、基础
+            - link "趣味测试 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。" [ref=f3e178] [cursor=pointer]:
+              - /url: /combo/fun-test.html
+              - generic [ref=f3e179]: 趣味测试
+              - generic [ref=f3e180]: 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。
+            - link "理财百宝箱 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。" [ref=f3e181] [cursor=pointer]:
+              - /url: /combo/finance-toolkit.html
+              - generic [ref=f3e182]: 理财百宝箱
+              - generic [ref=f3e183]: 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。
+            - link "人生规划 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全" [ref=f3e184] [cursor=pointer]:
+              - /url: /combo/life-plan.html
+              - generic [ref=f3e185]: 人生规划
+              - generic [ref=f3e186]: 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全
+            - link "色彩研究所 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与" [ref=f3e187] [cursor=pointer]:
+              - /url: /combo/color-lab.html
+              - generic [ref=f3e188]: 色彩研究所
+              - generic [ref=f3e189]: 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与
+        - generic [ref=f3e190]:
+          - heading "关于本工具" [level=2] [ref=f3e191]
+          - paragraph [ref=f3e192]: 买房全攻略整合房贷月供、税费估算与装修预算，帮助买房决策一站测算；各项以输入参数与当地政策为准，结果仅供参考。
+          - heading "常见问题" [level=2] [ref=f3e193]
+          - group [ref=f3e194]:
+            - generic "包含哪些测算？" [ref=f3e195] [cursor=pointer]
+          - group [ref=f3e196]:
+            - generic "税费算得准吗？" [ref=f3e197] [cursor=pointer]
+          - group [ref=f3e198]:
+            - generic "需要输入哪些？" [ref=f3e199] [cursor=pointer]
+          - group [ref=f3e200]:
+            - generic "可作购房决策唯一依据吗？" [ref=f3e201] [cursor=pointer]
+        - link "天聚数行TianAPI - 应用开发者API数据调用平台" [ref=f3e203] [cursor=pointer]:
+          - /url: https://www.tianapi.com/source/0c74a63663
+          - generic [ref=f3e204]: 广告
+          - generic [ref=f3e206]: 天聚数行TianAPI应用开发者数据调用平台天行数据，在这里您可以免费且轻松的调用各种API数据接口用于系统软件、应用App、网站、小程序开发等
+          - generic [ref=f3e207]: 前往注册 →
+  - contentinfo [ref=f3e208]:
+    - generic [ref=f3e210]:
+      - generic [ref=f3e211]:
+        - generic [ref=f3e212]: 微信小程序
+        - generic [ref=f3e213]: 贴图话题·承接页
+        - generic [ref=f3e214]: 微信贴图话题活动码（scene=topic-mt-discover，落地 src=wx-topic）
+      - img "贴图话题·承接页（微信扫码打开小程序）" [ref=f3e216]
+    - generic [ref=f3e217]:
+      - generic [ref=f3e218]:
+        - link "一珩工具" [ref=f3e219] [cursor=pointer]:
+          - /url: /
+          - generic [aria-hidden] [ref=f3e220]: "Y"
+          - text: 一珩工具
+        - paragraph [ref=f3e221]: 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。
+      - generic [ref=f3e222]:
+        - heading "热门工具" [level=3] [ref=f3e223]
+        - link "个税计算器" [ref=f3e224] [cursor=pointer]:
+          - /url: /calculator/tax.html
+        - link "万年历" [ref=f3e225] [cursor=pointer]:
+          - /url: /calendar.html
+        - link "房贷计算" [ref=f3e226] [cursor=pointer]:
+          - /url: /calculator/prepay.html
+        - link "单位换算" [ref=f3e227] [cursor=pointer]:
+          - /url: /calculator/unit.html
+      - generic [ref=f3e228]:
+        - heading "生活工具" [level=3] [ref=f3e229]
+        - link "今日指南" [ref=f3e230] [cursor=pointer]:
+          - /url: /calendar/daily-guide.html
+        - link "买房攻略" [ref=f3e231] [cursor=pointer]:
+          - /url: /combo/buy-house.html
+        - link "健康体检" [ref=f3e232] [cursor=pointer]:
+          - /url: /combo/health-check.html
+        - link "宝宝取名" [ref=f3e233] [cursor=pointer]:
+          - /url: /calculator/baby-name.html
+      - generic [ref=f3e234]:
+        - heading "关于" [level=3] [ref=f3e235]
+        - link "关于我们" [ref=f3e236] [cursor=pointer]:
+          - /url: /about.html
+        - link "隐私政策" [ref=f3e237] [cursor=pointer]:
+          - /url: /privacy.html
+      - generic [ref=f3e238]:
+        - heading "更多站点" [level=3] [ref=f3e239]
+        - link "明先生日常 · xuliming.com" [ref=f3e240] [cursor=pointer]:
+          - /url: https://xuliming.com/?src=hub
+        - link "cs调色盘 · 2002cs.com" [ref=f3e241] [cursor=pointer]:
+          - /url: https://2002cs.com/?src=hub
+        - link "访客小站 · fangkelianmeng.com" [ref=f3e242] [cursor=pointer]:
+          - /url: https://fangkelianmeng.com/?src=hub
+        - link "小满美图 · img.fangkelianmeng.com" [ref=f3e243] [cursor=pointer]:
+          - /url: https://img.fangkelianmeng.com/?src=hub
+        - link "小满手记 · zangeng.com" [ref=f3e244] [cursor=pointer]:
+          - /url: https://zangeng.com/?src=hub
+        - link "实测手记 · 585.ink" [ref=f3e245] [cursor=pointer]:
+          - /url: https://585.ink/?src=hub
+        - link "年表拾遗 · 20101115.com" [ref=f3e246] [cursor=pointer]:
+          - /url: https://20101115.com/?src=hub
+        - link "小满券仓 · coupon.zangeng.com" [ref=f3e247] [cursor=pointer]:
+          - /url: https://coupon.zangeng.com/?src=hub
+        - link "东北电动车汇 · store.fangkelianmeng.com" [ref=f3e248] [cursor=pointer]:
+          - /url: https://store.fangkelianmeng.com/?src=hub
+    - generic [ref=f3e249]:
+      - generic [ref=f3e250]: © 一珩成长笔记
+      - generic [ref=f3e251]:
+        - link "京ICP备18062653号-13" [ref=f3e252] [cursor=pointer]:
+          - /url: https://beian.miit.gov.cn/
+        - link "回到顶部 ↑" [ref=f3e253] [cursor=pointer]:
+          - /url: "#top"
+  - button "AI 助手" [ref=f3e254] [cursor=pointer]: AI
