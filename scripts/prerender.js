@@ -357,8 +357,8 @@ function renderRoute(site, route, ctx) {
     // 落到 unknown 分母，v4-ledger/trackChain 按 project 聚合会与旧 main-tool 台账分裂。
     '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};window.TrackerConfig={project:\'main-tool\'};</script>',
     '    <script src="' + assetUrl('assets/js/tracker.min.js', manifest) + '" defer></script>',
-    '    <script src="' + assetUrl('assets/js/ad-slots.min.js', manifest) + '" defer></script>',
-    '    <script src="' + assetUrl('assets/js/coupon-slot.min.js', manifest) + '" defer></script>',
+    // WO-210：ad-slots / coupon-slot 合并进 slot-loader.js（本站无 img-slot）；经 assetUrl 带 ?v=<token>。
+    '    <script src="' + assetUrl('assets/js/slot-loader.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/utils.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/http-api.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',

@@ -83,8 +83,8 @@ error_page 404 =301 /;
 | 能力 | 接入方式 |
 | --- | --- |
 | 埋点 | `assets/js/tracker.min.js`，`tracker_project = main-tool` |
-| 广告 | `assets/js/ad-slots.min.js` + `data-ad-slot` 标记，`ad_site_key = main-tool` |
-| 优惠券位 | `assets/js/coupon-slot.min.js` + `data-coupon-slot` 标记 |
+| 广告位 | `assets/js/slot-loader.js`（由 site-sdk 单源把 `ad-slots` / `coupon-slot` 拼接而成，本站无 img-slot；经 `?v=` 版本化）+ `data-ad-slot` 标记，`ad_site_key = main-tool` |
+| 优惠券位 | 同上 `slot-loader.js` + `data-coupon-slot` 标记 |
 | 后端 API | `assets/js/http-api.js` → `https://api.xuyiheng.com`，带 `X-Source-Guard` 头 |
 | 开放数据集（DaaS） | `llms.txt` 的 `## Datasets` 区块由 `scripts/build-llms.js` 读 `data/llms-api.json` 生成（事实源 = main-api `config.apiGateway.match` + `config.mcp.datasets`，本期免费接入、不含单价 · WO-124）；Key 申请走 `https://api.xuyiheng.com/public/developer.html` |
 | 结构化数据 | 构建期写入 JSON-LD（WebSite/Organization/WebApplication/BreadcrumbList） |
