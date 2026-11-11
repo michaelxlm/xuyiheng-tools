@@ -1,0 +1,32 @@
+{
+  "_note": "决策页 next 位「站内自营相关库存」（WO-191）：scene 与 combo 页文件名 /combo/<scene>.html 一致；每条 url 仅指向本仓真实存在的页面，不含任何外部返利/佣金链接。该位最终展示条数受 site-shell-registry.js 的 next 配额约束（本站 next=1），运行时按本地点击热度择优。字段：scene / label / desc / url。",
+  "items": [
+    { "scene": "buy-house", "label": "房贷提前还款", "desc": "算清剩余本金、利息与提前还款能省多少", "url": "/calculator/prepay.html" },
+    { "scene": "buy-house", "label": "装修预算", "desc": "按面积估算主材与人工用量", "url": "/calculator/decoration.html" },
+    { "scene": "buy-house", "label": "个税计算器", "desc": "购房前后算清税后收入", "url": "/calculator/tax.html" },
+
+    { "scene": "buy-car", "label": "油耗计算", "desc": "按里程与油价估算每月用车成本", "url": "/calculator/fuel-cost.html" },
+    { "scene": "buy-car", "label": "折扣计算", "desc": "落地价里的裸车优惠、满减叠加算清楚", "url": "/calculator/discount.html" },
+    { "scene": "buy-car", "label": "百分比", "desc": "首付比例、利率与费率快速换算", "url": "/calculator/percentage.html" },
+
+    { "scene": "health-check", "label": "基础代谢体脂", "desc": "BMI、BMR 与体脂率一站式评估", "url": "/calculator/body-fat.html" },
+    { "scene": "health-check", "label": "跑步配速", "desc": "按距离与时间算配速，制定运动计划", "url": "/calculator/pace.html" },
+    { "scene": "health-check", "label": "儿童身高预测", "desc": "结合父母身高估算孩子成年身高", "url": "/calculator/height-predict.html" },
+
+    { "scene": "finance-toolkit", "label": "个税计算器", "desc": "税后收入是理财的起点", "url": "/calculator/tax.html" },
+    { "scene": "finance-toolkit", "label": "养老金计算器", "desc": "估算退休后每月可领养老金", "url": "/calculator/pension.html" },
+    { "scene": "finance-toolkit", "label": "五险一金", "desc": "算清每月个人与单位缴费明细", "url": "/calculator/social-insurance.html" },
+
+    { "scene": "life-plan", "label": "养老金计算器", "desc": "把养老目标纳入人生财务全景", "url": "/calculator/pension.html" },
+    { "scene": "life-plan", "label": "房贷提前还款", "desc": "规划提前还款对长期现金流的影响", "url": "/calculator/prepay.html" },
+    { "scene": "life-plan", "label": "倒计时·纪念日", "desc": "为人生关键节点设定日期与提醒", "url": "/calendar/countdown.html" },
+
+    { "scene": "fun-test", "label": "色彩研究所", "desc": "凭直觉选颜色，看看性格倾向（趣味）", "url": "/combo/color-lab.html" },
+    { "scene": "fun-test", "label": "随机数生成", "desc": "抽签、分组、小游戏都用得上", "url": "/random.html" },
+    { "scene": "fun-test", "label": "概率计算器", "desc": "趣味结果背后的概率直观算一算", "url": "/probability.html" },
+
+    { "scene": "color-lab", "label": "趣味测试合集", "desc": "星座速配与生命灵数，换个玩法继续逛", "url": "/combo/fun-test.html" },
+    { "scene": "color-lab", "label": "随机数生成", "desc": "随机抽一个颜色或号码", "url": "/random.html" },
+    { "scene": "color-lab", "label": "视力测试", "desc": "换个轻松的自测小工具", "url": "/vision.html" }
+  ]
+}

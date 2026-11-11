@@ -1,0 +1,5 @@
+{
+  "updated": null,
+  "_note": "构建期可选热度覆盖（WO-191）。当前尚无服务端/全站聚合数据，tools 为空数组，首页「热门工具」保持 scripts/prerender.js 中 FEATURED 的硬编码顺序（诚实降级，不编造 PV）。由 scripts/aggregate-popularity.js 从可选导出文件生成；无导出时不写假数据。字段：tools[].url 为站内绝对路径，tools[].clicks 为非负整数点击数；updated 为数据日期（YYYY-MM-DD），无数据时为 null。",
+  "tools": []
+}

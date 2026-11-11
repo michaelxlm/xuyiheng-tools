@@ -1,14 +1,20 @@
 {
-  "/assets/css/theme.min.css": "96b769c807",
+  "/assets/css/site-shell.min.css": "58e65489a3",
+  "/assets/css/theme.min.css": "4c5fe8a7e6",
   "/assets/css/tokens.min.css": "a0d18f5150",
   "/assets/js/ad-slots.min.js": "51546622c8",
+  "/assets/js/combo-popularity.min.js": "94037e6c9c",
   "/assets/js/coupon-slot.min.js": "38fe1583b1",
   "/assets/js/http-api.min.js": "5a6b36d2be",
+  "/assets/js/img-slot.min.js": "910a4ab18c",
   "/assets/js/layout.min.js": "c000442d9e",
+  "/assets/js/mp-slot.min.js": "b4b2140b48",
+  "/assets/js/site-shell.min.js": "1b2ac09d64",
   "/assets/js/tool-state.min.js": "870f5af098",
-  "/assets/js/tracker.min.js": "3e2f252eee",
+  "/assets/js/tracker.min.js": "8c0bef3151",
   "/assets/js/utils.min.js": "32de2d2bf0",
   "/assets/js/pages/calculator-discount.min.js": "a6ec41dfe2",
   "/assets/js/pages/calculator-tax.min.js": "fea99f15f5",
-  "/assets/js/pages/calculator-unit.min.js": "83642a11fe"
+  "/assets/js/pages/calculator-unit.min.js": "83642a11fe",
+  "/assets/js/pages/home.min.js": "e3028512cc"
 }

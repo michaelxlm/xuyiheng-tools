@@ -173,6 +173,39 @@ const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.
 // 娱乐向场景（与工具站专业调性区隔，卡片加「娱乐」徽标）
 const ENTERTAINMENT = ['/combo/fun-test.html', '/combo/color-lab.html'];
 
+/* WO-191 构建期可选热度覆盖：data/tool-popularity.json 有数据时按 clicks 降序
+   重排 FEATURED；文件缺失 / tools 为空 / 无正点击数时返回 null，保持原硬编码
+   顺序（诚实降级，不编造 PV）。数据由 scripts/aggregate-popularity.js 生成。 */
+function featuredPopularity() {
+  const f = path.join(ROOT, 'data', 'tool-popularity.json');
+  if (!fs.existsSync(f)) return null;
+  try {
+    const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+    if (!d || !Array.isArray(d.tools) || !d.tools.length) return null;
+    const clicks = {};
+    d.tools.forEach((t) => {
+      if (t && typeof t.url === 'string' && Number(t.clicks) > 0) {
+        clicks[t.url] = (clicks[t.url] || 0) + Number(t.clicks);
+      }
+    });
+    return Object.keys(clicks).length ? clicks : null;
+  } catch (e) { return null; }
+}
+
+/* WO-191 决策页 next 位：读站内自营库存，并取 site-shell-registry.js 的 next 硬配额 */
+function affiliateInventory() {
+  const f = path.join(ROOT, 'data', 'affiliate-inventory.json');
+  if (!fs.existsSync(f)) return [];
+  try {
+    const d = JSON.parse(fs.readFileSync(f, 'utf8'));
+    return Array.isArray(d) ? d : (d && Array.isArray(d.items) ? d.items : []);
+  } catch (e) { return []; }
+}
+function nextQuota() {
+  try { return require('./site-shell-registry').quotaFor('xuyiheng-tools').next; }
+  catch (e) { return 1; }
+}
+
 function toolCardHtml(item, catLabel, idx, wide, badge) {
   const r = idx[item.url] || {};
   const iconMarkup = I.iconRef(item.icon);
@@ -236,7 +269,13 @@ function buildHomeContent(site) {
     ].join('\n');
   }
 
-  const featCards = FEATURED.filter((u) => flat[u]).map((u, i) =>
+  // WO-191：有构建期热度覆盖时按 clicks 降序重排，无数据时保持硬编码顺序
+  const featList = FEATURED.filter((u) => flat[u]).slice();
+  const popularity = featuredPopularity();
+  if (popularity) {
+    featList.sort((a, b) => (popularity[b] || 0) - (popularity[a] || 0));
+  }
+  const featCards = featList.map((u, i) =>
     toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0, i === 0 ? '热门' : '')
   ).join('\n');
   const featured = [
@@ -284,7 +323,11 @@ function buildToolsRegistryScript(site) {
       });
     });
   });
-  return '<script>window.__TOOLS__=' + JSON.stringify(items) + ';window.__ENT__=' + JSON.stringify(ENTERTAINMENT) + ';</script>';
+  // WO-191：注入决策页 next 位的站内自营库存与硬配额（供 combo-popularity.js 择优、限量渲染）
+  const invJson = JSON.stringify(affiliateInventory()).replace(/</g, '\\u003c');
+  return '<script>window.__TOOLS__=' + JSON.stringify(items) + ';window.__ENT__=' + JSON.stringify(ENTERTAINMENT)
+    + ';window.__AFFILIATE_INVENTORY__=' + invJson
+    + ';window.__NEXT_QUOTA__=' + JSON.stringify(nextQuota()) + ';</script>';
 }
 
 /* ---------------------------- 主渲染 ---------------------------- */
