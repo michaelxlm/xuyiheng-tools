@@ -286,7 +286,7 @@
           <div class="card" id="lt-bt-result" hidden>
             <h2 class="lt-h2">红球/蓝球命中对比</h2>
             <div id="lt-bt-table"></div>
-            <p class="lt-note">理论期望：单注命中红球 = 6 × 6 ÷ 33 ≈ 1.09 个；蓝球命中率 = 1 ÷ 16 ≈ 6.25%。此为准绳，非目标。</p>
+            <p class="lt-note">「理论期望」列由组合数精确推导，与「奖级加权对照示例」「奖级中奖概率」表同源：单注命中红球 = 6 × 6 ÷ 33 ≈ 1.09 个、蓝球命中率 = 1 ÷ 16 ≈ 6.25%、任一奖级 ≈ 6.71%。这些值恒定不变，是准绳而非目标。</p>
             <h2 class="lt-h2" style="margin-top:1em">红球命中个数分布</h2>
             <p class="lt-note">按单注命中的红球个数（0–6）统计占比，对比加权策略、纯随机与理论超几何分布。</p>
             <div id="lt-bt-dist"></div>
@@ -359,6 +359,7 @@
         .lt-dantuo .lt-bar-num { margin: 0 4px 4px 0; }
         .lt-bt-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: var(--space-2); padding: 6px 0; border-bottom: 1px solid var(--color-border); font-size: var(--text-sm); }
         .lt-bt-row4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .lt-bt-row4w { grid-template-columns: 1.9fr 1fr 1fr 1fr; }
         .lt-bt-row.lt-bt-head { font-weight: 700; color: var(--color-muted); }
         .lt-bt-row span { text-align: right; } .lt-bt-row span:first-child { text-align: left; }
         .lt-cmp { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
@@ -800,6 +801,19 @@
           /* ---------- Block C：walk-forward 回测（无数据泄漏）---------- */
           function comb(n, k) { if (k < 0 || k > n) return 0; var res = 1; for (var i = 1; i <= k; i++) res = res * (n - i + 1) / i; return res; }
           function hyperRed(j) { return comb(6, j) * comb(27, 6 - j) / comb(33, 6); }
+          // 理论参照（组合数精确，与历史范围、策略、参数均无关）：
+          // 「奖级加权对照示例」与正式回测结果共用这一份，确保两处准绳完全一致。
+          function theoreticalRefs() {
+            var pr = [], j; for (j = 0; j <= 6; j++) pr[j] = hyperRed(j);
+            return {
+              dist: pr,                                   // 单注命中 j 个红球的概率分布
+              avg: 36 / 33,                               // 单注命中红球期望
+              hit: pr[3] + pr[4] + pr[5] + pr[6],         // 命中 3+ 红
+              hit5: pr[5] + pr[6],                        // 命中 5+ 红
+              any: (pr[4] + pr[5] + pr[6]) + (pr[0] + pr[1] + pr[2] + pr[3]) / 16, // 任一奖级
+              blue: 1 / 16
+            };
+          }
 
           // 回测复用线上同一组算子（freqOf / omissionOf / weightsFor / computeShapeGate /
           // shapeOk / weightedPick），训练窗与权重平滑也一致，因此被检验的就是当前实际算法，
@@ -813,7 +827,8 @@
               rndA: makeRng(seed), rndR: makeRng(seed ^ 0x9e3779b9), // 两组独立流：可复现且互不干扰
               n: 0, aiSum: 0, rdSum: 0, aiSq: 0, rdSq: 0,
               aiDist: [ 0, 0, 0, 0, 0, 0, 0 ], rdDist: [ 0, 0, 0, 0, 0, 0, 0 ],
-              aiBlue: 0, rdBlue: 0, done: false, periods: 0
+              aiBlue: 0, rdBlue: 0, aiHit: 0, rdHit: 0, aiHit5: 0, rdHit5: 0, aiAny: 0, rdAny: 0,
+              done: false, periods: 0
             };
           }
 
@@ -841,11 +856,15 @@
                 var ab = weightedPick(wB.w, 16, 1, acc.rndA)[0].n;
                 var ah = ar.filter(function (n) { return tSet[n]; }).length;
                 acc.aiSum += ah; acc.aiSq += ah * ah; acc.aiDist[ah]++; if (ab === tB) acc.aiBlue++;
+                if (ah >= 3) acc.aiHit++; if (ah >= 5) acc.aiHit5++;
+                if (prizeTier(ah, ab === tB) > 0) acc.aiAny++;
                 // 对照组：纯随机机选
                 var rr = uniformPick(33, 6, acc.rndR);
                 var rb = 1 + Math.floor(acc.rndR() * 16);
                 var rh = rr.filter(function (n) { return tSet[n]; }).length;
                 acc.rdSum += rh; acc.rdSq += rh * rh; acc.rdDist[rh]++; if (rb === tB) acc.rdBlue++;
+                if (rh >= 3) acc.rdHit++; if (rh >= 5) acc.rdHit5++;
+                if (prizeTier(rh, rb === tB) > 0) acc.rdAny++;
                 acc.n++;
               }
               acc.periods = acc.i + 1;
@@ -860,12 +879,14 @@
             var vR = Math.max(0, acc.rdSq / N - rdAvg * rdAvg);
             var se = Math.sqrt((vA + vR) / N) || 0; // 两组独立样本均值差的标准误
             var diff = aiAvg - rdAvg, lo = diff - 1.96 * se, hi = diff + 1.96 * se;
-            var theoDist = []; for (var q = 0; q <= 6; q++) theoDist.push(hyperRed(q));
+            var theo = theoreticalRefs();
             return { T: acc.periods, W: acc.W, n: N, seed: acc.seed, alpha: acc.alpha,
-              aiAvg: aiAvg, rdAvg: rdAvg, theoAvg: 36 / 33, diff: diff, se: se, ciLo: lo, ciHi: hi,
+              aiAvg: aiAvg, rdAvg: rdAvg, theoAvg: theo.avg, diff: diff, se: se, ciLo: lo, ciHi: hi,
               distinguishable: lo > 0 || hi < 0,
-              aiDist: acc.aiDist, rdDist: acc.rdDist, theoDist: theoDist,
-              aiBlue: acc.aiBlue / N, rdBlue: acc.rdBlue / N, theoBlue: 1 / 16 };
+              aiDist: acc.aiDist, rdDist: acc.rdDist, theoDist: theo.dist,
+              aiBlue: acc.aiBlue / N, rdBlue: acc.rdBlue / N, theoBlue: theo.blue,
+              aiHit: acc.aiHit / N, rdHit: acc.rdHit / N, aiHit5: acc.aiHit5 / N, rdHit5: acc.rdHit5 / N,
+              aiAny: acc.aiAny / N, rdAny: acc.rdAny / N };
           }
 
           // 奖级判定：返回 1~6 等奖编号，未中奖返回 0（规则同「奖级中奖概率」表）
@@ -933,9 +954,7 @@
               var rnd = makeRng(seed ^ (s.k.length * 2654435761));
               return { name: s.name, r: backtestOneStrategy(train, test, s.k, p.alpha, reps, rnd) };
             });
-            var pr = [], j; for (j = 0; j <= 6; j++) pr[j] = hyperRed(j);
-            var theo = { avg: 36 / 33, hit: pr[3] + pr[4] + pr[5] + pr[6], hit5: pr[5] + pr[6],
-              any: (pr[4] + pr[5] + pr[6]) + (pr[0] + pr[1] + pr[2] + pr[3]) / 16 };
+            var theo = theoreticalRefs();
             var html = '<p class="lt-note">基于全部 <strong>' + all.length + '</strong> 期开奖：训练窗 <strong>' + train.length + '</strong> 期（较旧）、测试窗 <strong>' + test.length + '</strong> 期（较新），每期 ' + reps + ' 注、每策略共 <strong>' + (test.length * reps) + '</strong> 注；权重平滑 ' + p.alpha.toFixed(2) + '，随机种子固定可复现。参数取自本页表单，<strong>不受「统计范围」分段影响</strong>。</p>';
             html += '<div style="overflow-x:auto"><table class="lt-cmp"><thead><tr><th>策略</th><th>平均命中红球</th><th>3+ 红命中率</th><th>5+ 红命中率</th><th>任一奖级中奖率</th><th>注数</th></tr></thead><tbody>';
             rows.forEach(function (rw) {
@@ -978,14 +997,21 @@
               $('lt-bt-conc').innerHTML = '样本不足，无法回测（请缩小训练窗期数）。';
               $('lt-bt-result').hidden = false; return;
             }
+            var theo = theoreticalRefs();
+            function pct3(x) { return (x * 100).toFixed(2) + '%'; }
+            function brow(label, a, b, t) {
+              return '<div class="lt-bt-row lt-bt-row4w"><span>' + label + '</span><span>' + a + '</span><span>' + b + '</span><span>' + t + '</span></div>';
+            }
             $('lt-bt-table').innerHTML =
-              '<div class="lt-bt-row lt-bt-head"><span>指标</span><span>加权策略</span><span>纯随机</span></div>' +
-              '<div class="lt-bt-row"><span>红球平均命中（个）</span><span>' + bt.aiAvg.toFixed(3) + '</span><span>' + bt.rdAvg.toFixed(3) + '</span></div>' +
-              '<div class="lt-bt-row"><span>蓝球命中率</span><span>' + (bt.aiBlue * 100).toFixed(2) + '%</span><span>' + (bt.rdBlue * 100).toFixed(2) + '%</span></div>' +
-              '<div class="lt-bt-row"><span>理论期望（红 / 蓝）</span><span>' + bt.theoAvg.toFixed(3) + ' / ' + (bt.theoBlue * 100).toFixed(2) + '%</span><span>同左</span></div>';
+              '<div class="lt-bt-row lt-bt-row4w lt-bt-head"><span>指标</span><span>加权策略</span><span>纯随机</span><span>理论期望</span></div>' +
+              brow('红球平均命中（个）', bt.aiAvg.toFixed(3), bt.rdAvg.toFixed(3), theo.avg.toFixed(3)) +
+              brow('3+ 红命中率', pct3(bt.aiHit), pct3(bt.rdHit), pct3(theo.hit)) +
+              brow('5+ 红命中率', pct3(bt.aiHit5), pct3(bt.rdHit5), pct3(theo.hit5)) +
+              brow('任一奖级中奖率', pct3(bt.aiAny), pct3(bt.rdAny), pct3(theo.any)) +
+              brow('蓝球命中率', pct3(bt.aiBlue), pct3(bt.rdBlue), pct3(theo.blue));
             var distHtml = '<div class="lt-bt-row lt-bt-row4 lt-bt-head"><span>命中红球数</span><span>加权</span><span>随机</span><span>理论</span></div>';
             for (var i = 0; i <= 6; i++) {
-              var pa = bt.aiDist[i] / bt.n * 100, pr = bt.rdDist[i] / bt.n * 100, pt = bt.theoDist[i] * 100;
+              var pa = bt.aiDist[i] / bt.n * 100, pr = bt.rdDist[i] / bt.n * 100, pt = theo.dist[i] * 100;
               distHtml += '<div class="lt-bt-row lt-bt-row4"><span>' + i + ' 个</span><span>' + pa.toFixed(1) + '%</span><span>' + pr.toFixed(1) + '%</span><span>' + pt.toFixed(1) + '%</span></div>';
             }
             $('lt-bt-dist').innerHTML = distHtml;
@@ -993,8 +1019,8 @@
             var judge = bt.distinguishable
               ? '本次样本中两组均值出现统计上的差异（95% 置信区间不含 0），但这只是单一历史样本内的波动，不构成可外推的预测能力；可调整参数或扩大回溯期数复验。'
               : '两组均值差的 95% 置信区间覆盖 0，本次样本下无法把加权策略与机选区分开。';
-            $('lt-bt-conc').innerHTML = '回溯 ' + bt.T + ' 期、每期 8 注（共 ' + bt.n + ' 注，权重平滑 ' + bt.alpha.toFixed(2) + '，复现种子 ' + bt.seed + '）：加权平均命中 <strong>' + bt.aiAvg.toFixed(3) + '</strong> 个红球，纯随机 <strong>' + bt.rdAvg.toFixed(3) + '</strong> 个，理论期望 <strong>' + bt.theoAvg.toFixed(3) + '</strong> 个；均值差 <strong>' + bt.diff.toFixed(3) + '</strong>，95% 置信区间 [' + bt.ciLo.toFixed(3) + ', ' + bt.ciHi.toFixed(3) + ']。' + judge +
-              '<strong>开奖是独立随机事件，历史统计不改变下期任何一个号码的真实机会，任何算法都无法提高选中机会。</strong>';
+            $('lt-bt-conc').innerHTML = '回溯 ' + bt.T + ' 期、每期 8 注（共 ' + bt.n + ' 注，权重平滑 ' + bt.alpha.toFixed(2) + '，复现种子 ' + bt.seed + '）：加权平均命中 <strong>' + bt.aiAvg.toFixed(3) + '</strong> 个红球，纯随机 <strong>' + bt.rdAvg.toFixed(3) + '</strong> 个，理论期望 <strong>' + theo.avg.toFixed(3) + '</strong> 个；任一奖级中奖率 加权 <strong>' + pct3(bt.aiAny) + '</strong>、随机 <strong>' + pct3(bt.rdAny) + '</strong>、理论 <strong>' + pct3(theo.any) + '</strong>；均值差 <strong>' + bt.diff.toFixed(3) + '</strong>，95% 置信区间 [' + bt.ciLo.toFixed(3) + ', ' + bt.ciHi.toFixed(3) + ']。' + judge +
+              '「理论期望」列由组合数精确推导，与上方「奖级加权对照示例」及「奖级中奖概率」表同源，恒定不变、是准绳而非目标。<strong>开奖是独立随机事件，历史统计不改变下期任何一个号码的真实机会，任何算法都无法提高选中机会。</strong>';
             $('lt-bt-result').hidden = false;
           }
 
