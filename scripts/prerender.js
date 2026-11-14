@@ -245,11 +245,6 @@ function buildHomeContent(site) {
   cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label, icon: it.icon }; }));
   const total = Object.keys(flat).length;
 
-  const catBar = cats.map((cat) => {
-    const key = P.catKey(cat.label);
-    return '<a href="#cat-' + P.escapeHtml(key) + '" data-cat="' + P.escapeHtml(key) + '">' + P.escapeHtml(cat.label) + '</a>';
-  }).join('');
-
   const hero = [
     '        <section class="home-hero">',
     '          <span class="hero-badge">✦ ' + total + ' 个免费在线工具 · 纯本地运行</span>',
@@ -261,7 +256,7 @@ function buildHomeContent(site) {
     '            <button class="btn btn-primary" type="submit">搜索</button>',
     '          </form>',
     '        </section>',
-    '        <nav class="cat-bar" aria-label="分类导航">' + catBar + '<a href="/tools.html" class="cat-bar-all">全部工具</a></nav>',
+    '        ' + P.renderCatBar(site),
   ].join('\n');
 
   // 主入口：场景组合（决策流）——把离散单点工具聚合成买房/买车/健康/理财/人生规划等决策入口，首屏优先展示
@@ -460,6 +455,8 @@ function renderRoute(site, route, ctx) {
     '        <div class="coupon-slot" data-coupon-slot="strip"></div>',
   ].join('\n');
 
+  const catBarNav = route.path === 'index' ? '' : P.renderCatBar(site, { absolute: true });
+
   const body = [
     '<body data-page="' + P.escapeHtml(slug) + '" data-page-id="' + P.escapeHtml(slug) + '">',
     I.fullSprite(),
@@ -468,7 +465,7 @@ function renderRoute(site, route, ctx) {
     '<div class="site-body">',
     '  <main class="site-main' + (route.path === 'index' ? '' : ' site-main--flat') + '" id="main">',
     '    <div class="main-inner">',
-    content + (related ? '\n' + related : '') + '\n' + slots,
+    (catBarNav ? catBarNav + '\n' : '') + content + (related ? '\n' + related : '') + '\n' + slots,
     '    </div>',
     '  </main>',
     '</div>',

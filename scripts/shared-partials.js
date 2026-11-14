@@ -195,6 +195,21 @@ function renderCouponSlot(placement) {
   return `  <div class="coupon-slot" data-coupon-slot="${escapeHtml(placement || 'strip')}"></div>`;
 }
 
+/**
+ * 渲染 sticky 分类导航条（分类锚点 + 全部工具入口）。
+ * opts.absolute=true 时链接为 "/#cat-xxx"（跨页跳回首页对应分类区），
+ * 否则为相对 "#cat-xxx"（首页内锚点，配合滚动高亮）。
+ */
+function renderCatBar(site, opts) {
+  opts = opts || {};
+  const prefix = opts.absolute ? '/#' : '#';
+  const links = (site.sidebar_categories || []).map((cat) => {
+    const key = catKey(cat.label);
+    return '<a href="' + prefix + 'cat-' + escapeHtml(key) + '" data-cat="' + escapeHtml(key) + '">' + escapeHtml(cat.label) + '</a>';
+  }).join('');
+  return '<nav class="cat-bar" aria-label="分类导航">' + links + '<a href="/tools.html" class="cat-bar-all">全部工具</a></nav>';
+}
+
 module.exports = {
   escapeHtml,
   catKey,
@@ -202,6 +217,7 @@ module.exports = {
   renderSidebar,
   renderBottomNav,
   renderFooter,
+  renderCatBar,
   renderAdSlot,
   renderCouponSlot,
 };

@@ -61,6 +61,21 @@
     onScrollHeader();
   }
 
+  /* ---------- 1b. 分类弹窗：点击外部区域 / Esc 关闭 ---------- */
+  var catMega = doc.querySelector('.cat-mega');
+  if (catMega) {
+    doc.addEventListener('click', function (e) {
+      if (!catMega.hasAttribute('open')) return;
+      // 点击弹窗外部，或点击弹窗内链接（含导航）时关闭
+      if (!catMega.contains(e.target) || (e.target.closest && e.target.closest('a'))) {
+        catMega.removeAttribute('open');
+      }
+    });
+    doc.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && catMega.hasAttribute('open')) catMega.removeAttribute('open');
+    });
+  }
+
   /* ---------- 2. 浮动「回到顶部」 ---------- */
   var btt = doc.createElement('button');
   btt.type = 'button';
