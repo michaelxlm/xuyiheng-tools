@@ -47,30 +47,50 @@
 
           <div class="card">
             <h2 class="lt-h2">红球出现频率</h2>
-            <p class="lt-note">统计所选范围内每个红球（01–33）开出的次数与占比。竖线为「理论期望出现次数」，仅描述历史发生频次，不代表后续趋势。</p>
+            <p class="lt-note">统计所选范围内每个红球（01–33）开出的次数与占比。竖线为「理论期望出现次数」，仅描述历史发生频次，不代表后续趋势。点击任一号码可在下方走势图中高亮对应列。</p>
             <div class="lt-bars" id="lt-red-freq" role="img" aria-label="红球出现频率条形图"></div>
             <p class="lt-note" id="lt-red-zsum"></p>
           </div>
 
           <div class="card">
             <h2 class="lt-h2">蓝球出现频率</h2>
-            <p class="lt-note">统计所选范围内每个蓝球（01–16）开出的次数与占比。竖线为「理论期望出现次数」。</p>
+            <p class="lt-note">统计所选范围内每个蓝球（01–16）开出的次数与占比。竖线为「理论期望出现次数」。点击任一号码可在下方走势图中高亮对应列。</p>
             <div class="lt-bars" id="lt-blue-freq" role="img" aria-label="蓝球出现频率条形图"></div>
             <p class="lt-note" id="lt-blue-zsum"></p>
           </div>
 
           <div class="card">
             <h2 class="lt-h2">当前遗漏期数</h2>
-            <p class="lt-note">「遗漏」指某号码距上一次开出已间隔的期数，括号内为该范围内单次最长遗漏。频率、遗漏与特征分布均基于上方所选的同一统计范围计算。</p>
+            <p class="lt-note">「遗漏」指某号码距上一次开出已间隔的期数，下方为该范围内单次最长间隔，细条表示当前遗漏占该最长间隔的比例。频率、遗漏与特征分布均基于上方所选的同一统计范围计算。点击任一号码可在下方走势图中高亮对应列。<strong>这些只是对已发生历史的客观描述，不代表号码「即将开出」或未来更可能出现。</strong></p>
             <div class="lt-grid-chip" id="lt-red-omit"></div>
             <div class="lt-grid-chip" id="lt-blue-omit"></div>
           </div>
 
           <div class="card">
             <h2 class="lt-h2">号码特征分布</h2>
-            <p class="lt-note">对所选范围每期号码的结构性特征做客观统计：和值区间、奇偶比、大小比、三区比、连号与重号出现率。均为历史频次描述。</p>
+            <p class="lt-note">对所选范围每期号码的结构性特征做客观统计：和值区间、奇偶比、大小比、三区比、连号与重号出现率，以及专业分析常用的 012 路、质合比、红球跨度与 AC 值（算术复杂度）。均为历史频次描述，不代表未来走势。</p>
             <div class="lt-stat-grid" id="lt-features"></div>
           </div>
+
+          <div class="card">
+            <h2 class="lt-h2">红球走势图</h2>
+            <p class="lt-note">逐期展示每个红球（01–33）是否开出：红底格为该期实际开出的号码；右侧附和值、奇数个数、跨度。最多展示最近 500 期，与上方「统计范围」联动。每行就是一期开奖，仅为历史记录展示，不构成任何走势预测。</p>
+            <div class="lt-modes" role="group" aria-label="走势图着色模式"><span>着色模式：</span><button type="button" class="lt-mode-btn active" data-mode="zone" aria-pressed="true">三区</button><button type="button" class="lt-mode-btn" data-mode="odd" aria-pressed="false">奇偶</button><button type="button" class="lt-mode-btn" data-mode="012" aria-pressed="false">012路</button><button type="button" class="lt-mode-btn" data-mode="none" aria-pressed="false">无</button></div>
+            <div class="lt-trend-wrap"><table class="lt-trend" id="lt-red-trend" data-mode="zone"></table></div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">蓝球走势图</h2>
+            <p class="lt-note">逐期展示蓝球（01–16）是否开出：蓝底格为该期实际开出的蓝球。最多展示最近 500 期，与上方「统计范围」联动。</p>
+            <div class="lt-trend-wrap"><table class="lt-trend lt-trend-blue" id="lt-blue-trend" data-mode="zone"></table></div>
+          </div>
+
+          <div class="card">
+            <h2 class="lt-h2">奖级中奖概率（组合数学精确值）</h2>
+            <p class="lt-note">下表为单注（6 红 + 1 蓝）双色球各奖级的<strong>理论中奖概率</strong>，由组合数精确推导（与历史统计范围无关）：红球恰好命中 j 个的概率为 C(6,j)·C(27,6−j) / C(33,6)，蓝球命中概率 1/16。开奖是独立随机事件，该概率对每一期、每一注恒定不变，历史走势不会改变它；本表仅用于理解「中奖为何是小概率」。</p>
+            <div id="lt-prize"></div>
+          </div>
+
         </div>
 
         <!-- ===== Tab 3：智能选号（娱乐） ===== -->
@@ -84,6 +104,7 @@
                   <option value="hot">热号偏好（近期高频号码权重更大）</option>
                   <option value="cold">冷号偏好（长期未出号码权重更大）</option>
                   <option value="balanced" selected>均衡（频率与遗漏加权平衡）</option>
+                  <option value="prize">奖级概率加权（按历史三区密度倾斜）</option>
                 </select>
               </div>
               <div class="form-group">
@@ -120,14 +141,21 @@
           <div class="lt-warn">⚠️ 回测以「用过去若干期训练、逐期推算下一期」的方式，把智能选号与纯随机机选放在同一条件下比较，并给出均值差与 95% 置信区间。结论以本次实测数据为准，不预设结果；<strong>开奖为独立随机事件，算法不能提高选中机会</strong>，此模块仅用于理解统计原理。</div>
           <form class="card" id="ltBtForm">
             <div class="field-grid">
-              <div class="form-group"><label class="form-label" for="lt-bt-strategy">被检验策略</label><select class="form-input" id="lt-bt-strategy"><option value="balanced" selected>均衡</option><option value="hot">热号偏好</option><option value="cold">冷号偏好</option></select></div>
+              <div class="form-group"><label class="form-label" for="lt-bt-strategy">被检验策略</label><select class="form-input" id="lt-bt-strategy"><option value="balanced" selected>均衡</option><option value="hot">热号偏好</option><option value="cold">冷号偏好</option><option value="prize">奖级概率加权</option></select></div>
               <div class="form-group"><label class="form-label" for="lt-bt-window">训练窗期数</label><div class="input-with-unit"><input class="form-input" id="lt-bt-window" type="number" inputmode="numeric" min="30" max="1000" value="100"><span class="unit-tag">期</span></div></div>
               <div class="form-group"><label class="form-label" for="lt-bt-test">回溯测试期数</label><div class="input-with-unit"><input class="form-input" id="lt-bt-test" type="number" inputmode="numeric" min="50" max="1000" value="200"><span class="unit-tag">期</span></div></div>
               <div class="form-group"><label class="form-label" for="lt-bt-alpha">权重平滑 <span id="lt-bt-alpha-val">0.50</span></label><input class="form-range" id="lt-bt-alpha" type="range" min="0" max="100" value="50" aria-describedby="lt-bt-alpha-help"><small id="lt-bt-alpha-help" class="lt-note">与「智能选号」的权重平滑一致，确保回测检验的是当前实际使用的参数。</small></div>
             </div>
-            <div class="btn-row"><button class="btn btn-primary" type="submit" id="lt-bt-run" data-track="calc_click" data-track-props='{"tool":"lotto-bt"}'>运行回测</button></div>
+            <div class="btn-row">
+              <button class="btn btn-primary" type="submit" id="lt-bt-run" data-track="calc_click" data-track-props='{"tool":"lotto-bt"}'>运行回测</button>
+              <button class="btn btn-ghost" type="button" id="lt-bt-compare" title="在同一训练/测试切分下，对纯随机、均衡、奖级概率加权三种策略各生成若干注做对照">奖级加权对照示例</button>
+            </div>
           </form>
           <p class="lt-note" id="lt-bt-progress" role="status" aria-live="polite" hidden></p>
+          <div class="card" id="lt-bt-compare-box" hidden>
+            <h2 class="lt-h2">奖级加权对照示例</h2>
+            <div id="lt-bt-compare"></div>
+          </div>
           <div class="card" id="lt-bt-result" hidden>
             <h2 class="lt-h2">红球/蓝球命中对比</h2>
             <div id="lt-bt-table"></div>
@@ -177,8 +205,11 @@
         .lt-chip { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); }
         .lt-chip-num { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); color: #fff; flex: none; }
         .lt-chip-num.red { background: #e23b3b; } .lt-chip-num.blue { background: #2563eb; }
-        .lt-chip-body { display: flex; flex-direction: column; line-height: 1.25; }
+        .lt-chip-body { display: flex; flex-direction: column; line-height: 1.25; flex: 1; min-width: 0; }
         .lt-chip-cur { font-weight: 700; font-size: var(--text-sm); } .lt-chip-max { color: var(--color-muted); font-size: var(--text-xs, 12px); }
+        .lt-chip-bar { display: block; width: 100%; height: 3px; margin-top: 3px; background: var(--color-surface-2, rgba(0,0,0,.08)); border-radius: 999px; overflow: hidden; }
+        .lt-chip-bar i { display: block; height: 100%; border-radius: 999px; }
+        .lt-chip-bar i.red { background: #e23b3b; } .lt-chip-bar i.blue { background: #2563eb; }
   .lt-latest { margin-bottom: var(--space-4); }
   .lt-latest-head { font-weight: 700; margin-bottom: var(--space-2); }
   .lt-latest-balls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -203,7 +234,40 @@
         .lt-bt-row4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
         .lt-bt-row.lt-bt-head { font-weight: 700; color: var(--color-muted); }
         .lt-bt-row span { text-align: right; } .lt-bt-row span:first-child { text-align: left; }
+        .lt-cmp { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+        .lt-cmp th, .lt-cmp td { padding: 7px 10px; border-bottom: 1px solid var(--color-border); text-align: right; white-space: nowrap; }
+        .lt-cmp th { color: var(--color-muted); font-weight: 600; }
+        .lt-cmp th:first-child, .lt-cmp td:first-child { text-align: left; }
+        .lt-cmp .lt-cmp-theo td { color: var(--color-muted); font-style: italic; }
         @media (max-width: 420px) { .lt-bar-item { flex-basis: 100%; } }
+        /* 走势图（逐期矩阵） */
+        .lt-trend-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 calc(var(--space-4) * -1); padding: 0 var(--space-4); }
+        .lt-trend { border-collapse: collapse; width: 100%; font-size: 11px; line-height: 1; }
+        .lt-trend th, .lt-trend td { border: 1px solid var(--color-border); padding: 3px 4px; text-align: center; white-space: nowrap; }
+        .lt-trend thead th { background: var(--color-surface); font-weight: 600; color: var(--color-muted); }
+        .lt-th-fixed, .lt-td-fixed { position: sticky; left: 0; background: var(--color-surface); text-align: left; z-index: 2; }
+        .lt-trend thead .lt-th-fixed { z-index: 3; }
+        .lt-cell { min-width: 24px; height: 24px; }
+        .lt-cell.on { border-radius: 3px; font-weight: 700; color: #fff; }
+        .lt-trend td.lt-cell.on.red { background: #e23b3b; }
+        .lt-trend td.lt-cell.on.blue { background: #2563eb; }
+        /* 走势图着色模式（默认三区；可切换为奇偶 / 012路 / 无） */
+        .lt-trend[data-mode="zone"] td.z1, .lt-trend[data-mode="zone"] th.z1 { background: #fde8e8; }
+        .lt-trend[data-mode="zone"] td.z2, .lt-trend[data-mode="zone"] th.z2 { background: #fdf3e3; }
+        .lt-trend[data-mode="zone"] td.z3, .lt-trend[data-mode="zone"] th.z3 { background: #e7f3ea; }
+        .lt-trend[data-mode="odd"] td.o, .lt-trend[data-mode="odd"] th.o { background: #eef2ff; }
+        .lt-trend[data-mode="odd"] td.e, .lt-trend[data-mode="odd"] th.e { background: #fef2f2; }
+        .lt-trend[data-mode="012"] td.r0, .lt-trend[data-mode="012"] th.r0 { background: #e7f3ea; }
+        .lt-trend[data-mode="012"] td.r1, .lt-trend[data-mode="012"] th.r1 { background: #fdf3e3; }
+        .lt-trend[data-mode="012"] td.r2, .lt-trend[data-mode="012"] th.r2 { background: #fde8e8; }
+        .lt-td-ratio { color: var(--color-muted); font-weight: 600; }
+        .lt-modes { display: flex; gap: 8px; align-items: center; margin: 4px 0 10px; font-size: 13px; color: var(--color-muted); flex-wrap: wrap; }
+        .lt-mode-btn { border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); padding: 3px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; }
+        .lt-mode-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+        /* 频率/遗漏点击联动高亮走势图对应列 */
+        .lt-pick { cursor: pointer; }
+        .lt-pick.is-hl { outline: 2px solid #2563eb; outline-offset: 1px; border-radius: 4px; }
+        .lt-trend td.hl, .lt-trend th.hl { box-shadow: inset 0 0 0 2px #f59e0b; }
         </style>
 
         <script>
@@ -305,7 +369,7 @@
             for (i = 1; i <= maxN; i++) {
               var pct = maxV ? (counts[i] / maxV * 100) : 0;
               var share = total ? (counts[i] / total * 100).toFixed(1) : '0.0';
-              html += '<div class="lt-bar-item"><span class="lt-bar-num ' + color + '">' + pad(i) + '</span>' +
+              html += '<div class="lt-bar-item"><span class="lt-bar-num ' + color + ' lt-pick" data-num="' + i + '" title="点击在走势图高亮该号码">' + pad(i) + '</span>' +
                 '<span class="lt-bar-track" aria-hidden="true"><span class="lt-bar-fill ' + color + '" style="width:' + pct.toFixed(1) + '%"></span>' + expMark + '</span>' +
                 '<span class="lt-bar-val">' + counts[i] + ' 次 · ' + share + '%</span></div>';
             }
@@ -323,9 +387,11 @@
           function renderOmit(el, om, maxN, color) {
             var html = '';
             for (var i = 1; i <= maxN; i++) {
-              html += '<div class="lt-chip"><span class="lt-chip-num ' + color + '">' + pad(i) + '</span>' +
+              var pct = Math.min(100, om.cur[i] / Math.max(1, om.max[i]) * 100); // 当前遗漏占该范围历史最长间隔的比例
+              html += '<div class="lt-chip"><span class="lt-chip-num ' + color + ' lt-pick" data-num="' + i + '" title="点击在走势图高亮该号码">' + pad(i) + '</span>' +
                 '<span class="lt-chip-body"><span class="lt-chip-cur">遗漏 ' + om.cur[i] + ' 期</span>' +
-                '<span class="lt-chip-max">历史最大 ' + om.max[i] + '</span></span></div>';
+                '<span class="lt-chip-max">历史最大 ' + om.max[i] + '</span>' +
+                '<span class="lt-chip-bar" aria-hidden="true"><i class="' + color + '" style="width:' + pct.toFixed(1) + '%"></i></span></span></div>';
             }
             el.innerHTML = html;
           }
@@ -343,14 +409,26 @@
             // 和值直方图（分桶 21-183）
             var binW = 20, bins = {}; list.forEach(function (d) { var s = d.reds.reduce(function (a, x) { return a + (+x); }, 0); var key = Math.floor((s - 21) / binW); bins[key] = (bins[key] || 0) + 1; });
             var bk = Object.keys(bins).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return { label: (21 + k * binW) + '+', count: bins[k] }; });
-            // 奇偶 / 大小 / 三区 众数比
+            // 奇偶 / 大小 / 三区 / 012 路 / 质合 / 跨度 / AC 众数比
             var oddCnt = {}, bigCnt = {}, zoneCnt = {}, consec = 0, repeat = 0, prevSet = null;
+            var roadCnt = [ 0, 0, 0 ], primeN = 0, spanBins = {}, spanSum = 0, acBins = {}, acSum = 0;
+            var PRIMES = { 2:1, 3:1, 5:1, 7:1, 11:1, 13:1, 17:1, 19:1, 23:1, 29:1, 31:1 }; // 红球质数共 11 个（1 既非质也非合）
             list.forEach(function (d) {
               var nums = d.reds.map(Number), odd = nums.filter(function (x) { return x % 2; }).length;
               oddCnt[odd] = (oddCnt[odd] || 0) + 1;
               var big = nums.filter(function (x) { return x >= 17; }).length; bigCnt[big] = (bigCnt[big] || 0) + 1;
               var z = [ 0, 0, 0 ]; nums.forEach(function (x) { z[x <= 11 ? 0 : (x <= 22 ? 1 : 2)]++; });
               var zk = z.join(':'); zoneCnt[zk] = (zoneCnt[zk] || 0) + 1;
+              // 012 路（按 3 取余）：0 路=3 的倍数，1 路=余 1，2 路=余 2；红球 01-33 每路恰好 11 个
+              nums.forEach(function (x) { roadCnt[x % 3]++; });
+              // 质数个数
+              primeN += nums.filter(function (x) { return PRIMES[x]; }).length;
+              // 跨度 = 最大号 - 最小号
+              var span = nums[nums.length - 1] - nums[0]; spanSum += span; spanBins[span] = (spanBins[span] || 0) + 1;
+              // AC 值（算术复杂度）= 两两差值去重个数 - (n-1)，衡量号码离散程度，专业分析常用指标
+              var diffs = {}, dd, ee, dc = 0;
+              for (dd = 0; dd < nums.length; dd++) for (ee = dd + 1; ee < nums.length; ee++) { var dv = nums[ee] - nums[dd]; if (!diffs[dv]) { diffs[dv] = 1; dc++; } }
+              var ac = dc - 5; acSum += ac; acBins[ac] = (acBins[ac] || 0) + 1;
               var sorted = nums.slice().sort(function (a, b) { return a - b; });
               for (var i = 1; i < sorted.length; i++) { if (sorted[i] - sorted[i - 1] === 1) { consec++; break; } }
               var set = {}; nums.forEach(function (x) { set[x] = 1; });
@@ -359,13 +437,31 @@
             });
             function topK(map, k) { return Object.keys(map).map(function (x) { return { label: x, count: map[x] }; }).sort(function (a, b) { return b.count - a.count; }).slice(0, k); }
             function pct(x) { return (x / n * 100).toFixed(1) + '%'; }
+            function pctOf(total, x) { return (x / total * 100).toFixed(1) + '%'; }
+            function spanDist(b) { var ks = Object.keys(b).map(Number).sort(function (a, c) { return a - c; }); return ks.map(function (k) { return { label: String(k), count: b[k] }; }); }
             var topOdd = topK(oddCnt, 1)[0], topBig = topK(bigCnt, 1)[0], topZone = topK(zoneCnt, 3);
+            var totalBalls = n * 6, spanAvg = n ? spanSum / n : 0, acAvg = n ? acSum / n : 0;
             var html = '';
             html += '<div class="lt-stat"><h3>红球和值分布</h3>' + histHTML(bk) + '<div class="lt-rank-row"><span>样本期数</span><span>' + n + '</span></div></div>';
             html += '<div class="lt-stat"><h3>奇数个数（众数）</h3><div class="lt-rank-row"><span>最常见：' + topOdd.label + ' 个奇数</span><span>' + pct(topOdd.count) + '</span></div>' + histHTML(topK(oddCnt, 7).sort(function (a, b) { return a.label - b.label; })) + '</div>';
             html += '<div class="lt-stat"><h3>大号(≥17)个数（众数）</h3><div class="lt-rank-row"><span>最常见：' + topBig.label + ' 个大号</span><span>' + pct(topBig.count) + '</span></div>' + histHTML(topK(bigCnt, 7).sort(function (a, b) { return a.label - b.label; })) + '</div>';
             html += '<div class="lt-stat"><h3>三区比 Top3</h3>' + topZone.map(function (t) { return '<div class="lt-rank-row"><span>' + esc(t.label) + '</span><span>' + pct(t.count) + '</span></div>'; }).join('') + '</div>';
             html += '<div class="lt-stat"><h3>连号 / 重号出现率</h3><div class="lt-rank-row"><span>含连号</span><span>' + pct(consec) + '</span></div><div class="lt-rank-row"><span>与上期重号</span><span>' + pct(repeat) + '</span></div></div>';
+            // 专业进阶特征
+            html += '<div class="lt-stat"><h3>012 路占比</h3>' +
+              '<div class="lt-rank-row"><span>0 路（3 的倍数）</span><span>' + pctOf(totalBalls, roadCnt[0]) + '</span></div>' +
+              '<div class="lt-rank-row"><span>1 路（余 1）</span><span>' + pctOf(totalBalls, roadCnt[1]) + '</span></div>' +
+              '<div class="lt-rank-row"><span>2 路（余 2）</span><span>' + pctOf(totalBalls, roadCnt[2]) + '</span></div>' +
+              '<div class="lt-rank-row"><span>理论（每路各 11 个）</span><span>33.3%</span></div></div>';
+            html += '<div class="lt-stat"><h3>质数占比</h3>' +
+              '<div class="lt-rank-row"><span>红球质数个数合计</span><span>' + primeN + ' / ' + totalBalls + '</span></div>' +
+              '<div class="lt-rank-row"><span>实际占比</span><span>' + pctOf(totalBalls, primeN) + '</span></div>' +
+              '<div class="lt-rank-row"><span>理论（质数 11 个）</span><span>33.3%</span></div></div>';
+            html += '<div class="lt-stat"><h3>红球跨度分布</h3>' + histHTML(spanDist(spanBins)) +
+              '<div class="lt-rank-row"><span>平均跨度</span><span>' + spanAvg.toFixed(1) + '</span></div></div>';
+            html += '<div class="lt-stat"><h3>AC 值（算术复杂度）</h3>' + histHTML(spanDist(acBins)) +
+              '<div class="lt-rank-row"><span>平均 AC</span><span>' + acAvg.toFixed(2) + '</span></div>' +
+              '<div class="lt-rank-row"><span>专业参考区间</span><span>约 5–11</span></div></div>';
             el.innerHTML = html;
           }
 
@@ -382,17 +478,90 @@
             renderOmit($('lt-red-omit'), omissionOf(getReds, 33, list), 33, 'red');
             renderOmit($('lt-blue-omit'), omissionOf(getBlue, 16, list), 16, 'blue');
             renderFeatures($('lt-features'));
+            renderTrends();
             $('lt-ana-src').textContent = '样本 ' + total + ' 期（最新 ' + (STATE.draws[0] ? STATE.draws[0].code : '') + '）';
+          }
+
+          /* ---------- 走势图（逐期矩阵，与统计范围联动）---------- */
+          function renderTrends() {
+            if (!STATE.ready) return;
+            var list = windowDraws();
+            var rows = list.slice(0, Math.min(list.length, 500)); // 性能上限：最多最近 500 期
+            function clsOf(n) { return (n % 2 ? 'o' : 'e') + ' r' + (n % 3); } // 奇偶 + 012 路，供着色模式切换
+            // 红球走势（列按三区着色：01–11 / 12–22 / 23–33，并附每行区比小标）
+            var rh = '<thead><tr><th class="lt-th-fixed">期号</th><th class="lt-th-fixed">日期</th>';
+            for (var c = 1; c <= 33; c++) rh += '<th class="z' + (c <= 11 ? 1 : (c <= 22 ? 2 : 3)) + ' ' + clsOf(c) + '" data-num="' + c + '">' + pad(c) + '</th>';
+            rh += '<th>和值</th><th>奇</th><th>跨</th><th>区比</th></tr></thead><tbody>';
+            rows.forEach(function (d) {
+              var nums = d.reds.map(Number), set = {}; nums.forEach(function (x) { set[x] = 1; });
+              var sum = nums.reduce(function (a, x) { return a + x; }, 0);
+              var odd = nums.filter(function (x) { return x % 2; }).length;
+              var span = nums[nums.length - 1] - nums[0];
+              var z = [0, 0, 0]; nums.forEach(function (x) { z[x <= 11 ? 0 : (x <= 22 ? 1 : 2)]++; });
+              rh += '<tr><td class="lt-td-fixed">' + esc(d.code) + '</td><td class="lt-td-fixed">' + esc(d.date || '') + '</td>';
+              for (var i = 1; i <= 33; i++) {
+                var zc = i <= 11 ? 1 : (i <= 22 ? 2 : 3), cl = clsOf(i);
+                rh += set[i] ? '<td class="lt-cell on red z' + zc + ' ' + cl + '" data-num="' + i + '">' + pad(i) + '</td>' : '<td class="lt-cell z' + zc + ' ' + cl + '" data-num="' + i + '"></td>';
+              }
+              rh += '<td>' + sum + '</td><td>' + odd + '</td><td>' + span + '</td><td class="lt-td-ratio">' + z.join(':') + '</td></tr>';
+            });
+            rh += '</tbody>';
+            var rt = $('lt-red-trend'); if (rt) rt.innerHTML = rh;
+            // 蓝球走势
+            var bh = '<thead><tr><th class="lt-th-fixed">期号</th><th class="lt-th-fixed">日期</th>';
+            for (var b = 1; b <= 16; b++) bh += '<th class="' + clsOf(b) + '" data-num="' + b + '">' + pad(b) + '</th>';
+            bh += '</tr></thead><tbody>';
+            rows.forEach(function (d) {
+              bh += '<tr><td class="lt-td-fixed">' + esc(d.code) + '</td><td class="lt-td-fixed">' + esc(d.date || '') + '</td>';
+              for (var j = 1; j <= 16; j++) { var bc = clsOf(j); bh += (j === d.blue) ? '<td class="lt-cell on blue ' + bc + '" data-num="' + j + '">' + pad(j) + '</td>' : '<td class="lt-cell ' + bc + '" data-num="' + j + '"></td>'; }
+              bh += '</tr>';
+            });
+            bh += '</tbody>';
+            var bt = $('lt-blue-trend'); if (bt) bt.innerHTML = bh;
+          }
+
+          /* ---------- 奖级中奖概率（组合数精确，与历史范围无关）---------- */
+          function renderPrizeOdds(el) {
+            if (!el) return;
+            var p = []; for (var j = 0; j <= 6; j++) p[j] = hyperRed(j); // 单注红球恰好命中 j 个的概率
+            var bHit = 1 / 16, bMiss = 15 / 16;
+            var tiers = [
+              { name: '一等奖', cond: '6 红 + 1 蓝', prob: p[6] * bHit },
+              { name: '二等奖', cond: '6 红 + 0 蓝', prob: p[6] * bMiss },
+              { name: '三等奖', cond: '5 红 + 1 蓝', prob: p[5] * bHit },
+              { name: '四等奖', cond: '5 红 + 0 蓝 或 4 红 + 1 蓝', prob: p[5] * bMiss + p[4] * bHit },
+              { name: '五等奖', cond: '4 红 + 0 蓝 或 3 红 + 1 蓝', prob: p[4] * bMiss + p[3] * bHit },
+              { name: '六等奖', cond: '2/1/0 红 + 1 蓝', prob: (p[2] + p[1] + p[0]) * bHit }
+            ];
+            var anyProb = tiers.reduce(function (a, t) { return a + t.prob; }, 0);
+            function odds(pr) { return pr > 0 ? '1 / ' + Math.round(1 / pr).toLocaleString('en-US') : '—'; }
+            var html = '<div class="lt-bt-row lt-bt-row4 lt-bt-head"><span>奖级</span><span>中奖条件</span><span>单注概率</span><span>约 1 注</span></div>';
+            tiers.forEach(function (t) {
+              html += '<div class="lt-bt-row lt-bt-row4"><span>' + t.name + '</span><span>' + esc(t.cond) + '</span><span>' + (t.prob * 100).toFixed(4) + '%</span><span>' + odds(t.prob) + '</span></div>';
+            });
+            html += '<div class="lt-bt-row lt-bt-row4"><span>任一奖级</span><span>上述合计</span><span>' + (anyProb * 100).toFixed(3) + '%</span><span>' + odds(anyProb) + '</span></div>';
+            el.innerHTML = html;
           }
 
           /* ---------- 智能选号：频率/遗漏加权无放回采样 ---------- */
           function normalize(arr, maxN) { var mx = 0; for (var i = 1; i <= maxN; i++) if (arr[i] > mx) mx = arr[i]; var out = []; for (i = 1; i <= maxN; i++) out[i] = mx ? arr[i] / mx : 0; return out; }
-          function weightsFor(maxN, freqArr, omissArr, strategy, alpha) {
+          // 奖级概率加权的「三区密度倾斜」系数：历史红球越密集的三区，赋权越高（更易命中红球的区间）。
+          // 以各三区实际占比相对均衡值 1/3 的偏离按比例放大，系数以 1 为中心；蓝球（maxN=16）无分区，返回全 1。
+          function prizeAffinity(list, maxN) {
+            if (maxN === 16) { var a = []; for (var q = 1; q <= 16; q++) a[q] = 1; return a; }
+            var zc = [0, 0, 0], tot = 0;
+            list.forEach(function (d) { d.reds.forEach(function (x) { var n = +x; zc[n <= 11 ? 0 : (n <= 22 ? 1 : 2)]++; tot++; }); });
+            var out = [], i;
+            for (i = 1; i <= maxN; i++) { var z = i <= 11 ? 0 : (i <= 22 ? 1 : 2); out[i] = 1 + (zc[z] / (tot / 3) - 1) * 1.5; }
+            return out;
+          }
+          function weightsFor(maxN, freqArr, omissArr, strategy, alpha, aff) {
             var fN = normalize(freqArr, maxN), oN = normalize(omissArr, maxN), w = [];
             for (var i = 1; i <= maxN; i++) {
               var raw;
               if (strategy === 'hot') raw = (1 - alpha) * fN[i] + alpha * 0.5;
               else if (strategy === 'cold') raw = (1 - alpha) * oN[i] + alpha * 0.5;
+              else if (strategy === 'prize' && aff) raw = (1 - alpha) * ((fN[i] + oN[i]) / 2) * aff[i] + alpha * 0.5;
               else raw = (1 - alpha) * ((fN[i] + oN[i]) / 2) + alpha * 0.5;
               w[i] = 0.15 + raw; // 下限，保证每个号码都有机会被采中
             }
@@ -419,7 +588,8 @@
             for (var t = 0; t < k; t++) { var c = Math.min(pool.length - 1, Math.floor(rnd() * pool.length)); out.push(pool[c]); pool.splice(c, 1); }
             return out;
           }
-          function reasonLabel(n, fN, oN, curOmit, win) {
+          function reasonLabel(n, fN, oN, curOmit, win, strategy, aff) {
+            if (strategy === 'prize' && aff && aff[n] > 1.02) return pad(n) + '=奖级概率加权·高密度三区';
             if (fN[n] >= 0.85) return pad(n) + '=近' + win + '期高频';
             if (oN[n] >= 0.85) return pad(n) + '=遗漏' + curOmit + '期偏长';
             if (fN[n] <= 0.2 && oN[n] <= 0.2) return pad(n) + '=均衡权重';
@@ -434,8 +604,9 @@
             var list = (STATE.draws.length > win) ? STATE.draws.slice(0, win) : STATE.draws;
             var fr = freqOf(list);
             var omR = omissionOf(getReds, 33, list), omB = omissionOf(getBlue, 16, list);
-            var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha);
-            var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha);
+            var affR = (strategy === 'prize') ? prizeAffinity(list, 33) : null;
+            var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
+            var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha, (strategy === 'prize') ? prizeAffinity(list, 16) : null);
             var gate = computeShapeGate(list);
             var html = '', used = {};
             for (var t = 0; t < count; t++) {
@@ -451,8 +622,8 @@
               used[key] = 1;
               var balls = pickedR.map(function (n) { return '<span class="ball ball-red">' + pad(n) + '</span>'; }).join('');
               balls += '<span class="ball ball-blue">' + pad(pickedB) + '</span>';
-              var reasons = pickedR.map(function (n) { return '<span class="reason">' + esc(reasonLabel(n, wr.fN, wr.oN, omR.cur[n], win)) + '</span>'; }).join('');
-              reasons += '<span class="reason">' + esc(reasonLabel(pickedB, wb.fN, wb.oN, omB.cur[pickedB], win)) + ' (蓝)</span>';
+              var reasons = pickedR.map(function (n) { return '<span class="reason">' + esc(reasonLabel(n, wr.fN, wr.oN, omR.cur[n], win, strategy, affR)) + '</span>'; }).join('');
+              reasons += '<span class="reason">' + esc(reasonLabel(pickedB, wb.fN, wb.oN, omB.cur[pickedB], win, strategy, null)) + ' (蓝)</span>';
               reasons += '<span class="reason">' + (shapeFit && fresh ? '形态贴合历史分布' : '形态/去重放宽（多次重采未果）') + '</span>';
               html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' + balls + '<div class="ticket-reasons">' + reasons + '</div></div>';
             }
@@ -527,8 +698,9 @@
               var target = STATE.draws[acc.i];
               var fr = freqOf(train);
               var omR = omissionOf(getReds, 33, train), omB = omissionOf(getBlue, 16, train);
-              var wR = weightsFor(33, fr.r, omR.cur, acc.strategy, acc.alpha);
-              var wB = weightsFor(16, fr.b, omB.cur, acc.strategy, acc.alpha);
+              var affR = (acc.strategy === 'prize') ? prizeAffinity(train, 33) : null;
+              var wR = weightsFor(33, fr.r, omR.cur, acc.strategy, acc.alpha, affR);
+              var wB = weightsFor(16, fr.b, omB.cur, acc.strategy, acc.alpha, null);
               var gate = computeShapeGate(train);
               var tSet = {}; target.reds.forEach(function (x) { tSet[+x] = 1; });
               var tB = +target.blue, k;
@@ -569,7 +741,91 @@
               aiBlue: acc.aiBlue / N, rdBlue: acc.rdBlue / N, theoBlue: 1 / 16 };
           }
 
+          // 奖级判定：返回 1~6 等奖编号，未中奖返回 0（规则同「奖级中奖概率」表）
+          function prizeTier(r, b) {
+            if (r === 6) return b ? 1 : 2;
+            if (r === 5) return b ? 3 : 4;
+            if (r === 4) return b ? 4 : 5;
+            if (r === 3 && b) return 5;
+            if (b) return 6;
+            return 0;
+          }
+          // 回测表单参数：对照示例与正式回测共用，确保两者口径一致
+          function btParams() {
+            return {
+              strategy: $('lt-bt-strategy').value,
+              win: Math.min(1000, Math.max(30, parseInt($('lt-bt-window').value, 10) || 100)),
+              test: Math.min(1000, Math.max(50, parseInt($('lt-bt-test').value, 10) || 200)),
+              alpha: (parseInt($('lt-bt-alpha').value, 10) || 0) / 100
+            };
+          }
+
+          // 对照示例：同一「较旧训练 → 较新测试」切分下，对三种策略各生成若干注做横向对比。
+          // 与正式回测共用 freqOf / omissionOf / weightsFor / computeShapeGate / shapeOk / weightedPick 等算子；
+          // 区别仅为：此处是固定单次切分的快速示例，正式回测是逐期滑动训练窗 + 95% 置信区间。
+          function backtestOneStrategy(train, test, strategy, alpha, reps, rnd) {
+            var fr = freqOf(train);
+            var omR = omissionOf(getReds, 33, train), omB = omissionOf(getBlue, 16, train);
+            var affR = (strategy === 'prize') ? prizeAffinity(train, 33) : null;
+            var wR = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
+            var wB = weightsFor(16, fr.b, omB.cur, strategy, alpha, null);
+            var gate = computeShapeGate(train);
+            var sum = 0, hit = 0, hit5 = 0, any = 0, n = 0, i, k;
+            for (i = 0; i < test.length; i++) {
+              var target = test[i];
+              var tSet = {}; target.reds.forEach(function (x) { tSet[+x] = 1; });
+              var tB = +target.blue;
+              for (k = 0; k < reps; k++) {
+                var ar, ab;
+                if (strategy === 'random') { ar = uniformPick(33, 6, rnd); ab = 1 + Math.floor(rnd() * 16); }
+                else { var tries = 0; do { ar = weightedPick(wR.w, 33, 6, rnd).map(function (o) { return o.n; }); tries++; } while (!shapeOk(ar, gate) && tries < 12); ab = weightedPick(wB.w, 16, 1, rnd)[0].n; }
+                var ah = ar.filter(function (x) { return tSet[x]; }).length;
+                sum += ah; if (ah >= 3) hit++; if (ah >= 5) hit5++;
+                if (prizeTier(ah, ab === tB) > 0) any++;
+                n++;
+              }
+            }
+            if (!n) return null;
+            return { avg: sum / n, hit: hit / n, hit5: hit5 / n, any: any / n, n: n };
+          }
+          function backtestCompare() {
+            var box = $('lt-bt-compare-box'), el = $('lt-bt-compare');
+            if (!box || !el) return;
+            var all = STATE.draws;
+            if (!all || all.length < 60) { el.innerHTML = '<p class="lt-note">历史数据不足，无法生成对照示例。</p>'; box.hidden = false; return; }
+            var p = btParams();
+            // all 按 code 降序（最新在前）：test 取最新 test 期，train 取紧邻其前、更旧的 win 期，避免用未来数据训练
+            var testN = Math.max(10, Math.min(p.test, all.length - p.win - 1));
+            var test = all.slice(0, testN);
+            var train = all.slice(testN, testN + p.win);
+            if (train.length < 20) { el.innerHTML = '<p class="lt-note">训练窗数据不足，请减小「回溯测试期数」。</p>'; box.hidden = false; return; }
+            var reps = 8; // 与正式回测每期注数一致
+            var seed = hashSeed('compare|' + all.length + '|' + train.length + '|' + test.length + '|' + p.alpha);
+            var defs = [{ k: 'random', name: '纯随机' }, { k: 'balanced', name: '均衡（频率+遗漏）' }, { k: 'prize', name: '奖级概率加权' }];
+            var rows = defs.map(function (s) {
+              var rnd = makeRng(seed ^ (s.k.length * 2654435761));
+              return { name: s.name, r: backtestOneStrategy(train, test, s.k, p.alpha, reps, rnd) };
+            });
+            var pr = [], j; for (j = 0; j <= 6; j++) pr[j] = hyperRed(j);
+            var theo = { avg: 36 / 33, hit: pr[3] + pr[4] + pr[5] + pr[6], hit5: pr[5] + pr[6],
+              any: (pr[4] + pr[5] + pr[6]) + (pr[0] + pr[1] + pr[2] + pr[3]) / 16 };
+            var html = '<p class="lt-note">基于全部 <strong>' + all.length + '</strong> 期开奖：训练窗 <strong>' + train.length + '</strong> 期（较旧）、测试窗 <strong>' + test.length + '</strong> 期（较新），每期 ' + reps + ' 注、每策略共 <strong>' + (test.length * reps) + '</strong> 注；权重平滑 ' + p.alpha.toFixed(2) + '，随机种子固定可复现。参数取自本页表单，<strong>不受「统计范围」分段影响</strong>。</p>';
+            html += '<div style="overflow-x:auto"><table class="lt-cmp"><thead><tr><th>策略</th><th>平均命中红球</th><th>3+ 红命中率</th><th>5+ 红命中率</th><th>任一奖级中奖率</th><th>注数</th></tr></thead><tbody>';
+            rows.forEach(function (rw) {
+              if (!rw.r) return;
+              html += '<tr><td>' + esc(rw.name) + '</td><td>' + rw.r.avg.toFixed(3) + '</td><td>' + (rw.r.hit * 100).toFixed(2) + '%</td><td>' + (rw.r.hit5 * 100).toFixed(2) + '%</td><td>' + (rw.r.any * 100).toFixed(2) + '%</td><td>' + rw.r.n + '</td></tr>';
+            });
+            html += '<tr class="lt-cmp-theo"><td>理论期望（组合数精确）</td><td>' + theo.avg.toFixed(3) + '</td><td>' + (theo.hit * 100).toFixed(2) + '%</td><td>' + (theo.hit5 * 100).toFixed(2) + '%</td><td>' + (theo.any * 100).toFixed(2) + '%</td><td>—</td></tr>';
+            html += '</tbody></table></div>';
+            var avgs = rows.filter(function (x) { return x.r; }).map(function (x) { return x.r.avg; });
+            var spread = avgs.length ? (Math.max.apply(null, avgs) - Math.min.apply(null, avgs)) : 0;
+            html += '<p class="lt-note">本次实测三策略「平均命中红球」最大相差 <strong>' + spread.toFixed(3) + '</strong> 个，均在理论期望 ' + theo.avg.toFixed(3) + ' 附近；任一奖级中奖率也接近理论 ' + (theo.any * 100).toFixed(2) + '%。' + (spread < 0.15 ? '本样本下三者无法区分。' : '该差异属有限样本的随机波动，可调整参数或扩大期数复验。') + '结论以本次实测数据为准，不预设结果。</p>';
+            html += '<div class="lt-warn" style="margin-top:1em">⚠️ 本示例是<strong>单次固定切分</strong>的快速对照；「运行回测」采用逐期滑动训练窗并给出均值差与 95% 置信区间，完整结论以后者为准。<strong>开奖为独立随机事件，任何选号策略都不能提高真实中奖机会</strong>，历史统计只描述过去。</div>';
+            el.innerHTML = html; box.hidden = false;
+          }
+
           var BT_RUNNING = null;
+          var BT_AUTO_SHOWN = false; // 首次进入回测标签页时自动跑一次奖级加权对照示例
           function runBacktestAsync(p, onDone) {
             if (BT_RUNNING) return; // 防止重复点击并发跑两份
             var acc = createBacktest(p);
@@ -620,6 +876,7 @@
             var tabs = Array.prototype.slice.call(document.querySelectorAll('.lt-tab'));
             tabs.forEach(function (t) { if (t.hidden) return; var on = (t === btn); t.setAttribute('aria-selected', on ? 'true' : 'false'); var p = $(t.getAttribute('aria-controls')); if (p) p.hidden = !on; });
             if (btn.id === 'tab-ana' && !STATE.anaDone) { renderAnalysis(); STATE.anaDone = true; }
+            if (btn.id === 'tab-bt' && !BT_AUTO_SHOWN && STATE.ready) { BT_AUTO_SHOWN = true; backtestCompare(); }
           }
           function bindTabs() {
             var tabs = Array.prototype.slice.call(document.querySelectorAll('.lt-tab'));
@@ -649,9 +906,33 @@
             var box = $('lt-latest'); if (box) box.hidden = false;
           }
 
+          function toggleNumHighlight(num, color, src) {
+            var tbl = color === 'blue' ? $('lt-blue-trend') : $('lt-red-trend');
+            var on = src.classList.toggle('is-hl');
+            document.querySelectorAll('.lt-pick[data-num="' + num + '"]').forEach(function (p) { if (p !== src) p.classList.toggle('is-hl', on); });
+            if (tbl) tbl.querySelectorAll('td[data-num="' + num + '"], th[data-num="' + num + '"]').forEach(function (c) { c.classList.toggle('hl', on); });
+          }
+          function bindPickLink() {
+            document.addEventListener('click', function (e) {
+              var el = e.target.closest('.lt-pick');
+              if (!el || !el.getAttribute('data-num')) return;
+              var color = el.classList.contains('blue') ? 'blue' : 'red';
+              toggleNumHighlight(el.getAttribute('data-num'), color, el);
+            });
+          }
+          function bindTrendModes() {
+            document.addEventListener('click', function (e) {
+              var b = e.target.closest('.lt-mode-btn'); if (!b) return;
+              var mode = b.getAttribute('data-mode');
+              ['lt-red-trend', 'lt-blue-trend'].forEach(function (id) { var t = $(id); if (t) t.setAttribute('data-mode', mode); });
+              document.querySelectorAll('.lt-mode-btn').forEach(function (x) { var on = (x === b); x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+            });
+          }
           function boot() {
             var U = window.U;
             bindTabs();
+            bindPickLink();
+            bindTrendModes();
             // 机选（现状）
             $('ltForm').addEventListener('submit', function (e) {
               e.preventDefault();
@@ -677,18 +958,14 @@
             $('lt-bt-alpha').addEventListener('input', function () { $('lt-bt-alpha-val').textContent = (this.value / 100).toFixed(2); });
             $('ltBtForm').addEventListener('submit', function (e) {
               e.preventDefault(); if (!STATE.ready || BT_RUNNING) return;
-              var p = {
-                strategy: $('lt-bt-strategy').value,
-                win: Math.min(1000, Math.max(30, parseInt($('lt-bt-window').value, 10) || 100)),
-                test: Math.min(1000, Math.max(50, parseInt($('lt-bt-test').value, 10) || 200)),
-                alpha: (parseInt($('lt-bt-alpha').value, 10) || 0) / 100
-              };
+              var p = btParams();
               $('lt-bt-result').hidden = true;
               runBacktestAsync(p, function (bt) {
                 renderBacktest(bt);
                 if (U) U.track('calc_result', { tool: 'lotto-bt', test: bt ? bt.T : 0 });
               });
             });
+            $('lt-bt-compare').addEventListener('click', function () { backtestCompare(); });
             // 范围切换
             Array.prototype.forEach.call(document.querySelectorAll('.lt-seg-btn'), function (b) {
               b.addEventListener('click', function () {
@@ -703,6 +980,7 @@
               if (!STATE.draws.length) throw new Error('all invalid');
               markDataReady();
               renderAnalysis(); STATE.anaDone = true;   // 预渲染走势，避免首屏空白
+              renderPrizeOdds($('lt-prize'));             // 奖级概率（组合数精确，与范围无关）
               renderLatest();                            // 顶部「最新一期」横幅
               selectTab($('tab-ana'));                   // 数据就绪后默认展示走势分析（最近一期+走势摘要）
             }).catch(function () { /* 无数据：分析/智能保持隐藏 */ $('lt-ana-unavailable').hidden = false; });
@@ -721,11 +999,11 @@
           </details>
           <details>
             <summary>智能选号的算法是什么？</summary>
-            <p>智能选号依据所选范围内历史开奖的出现频率与遗漏期数做加权随机采样（两者使用同一统计范围、同一权重参数），并对生成注去重，属于统计娱乐玩法；它不会改变每一期各号码真实的随机机会，生成结果仅供娱乐。</p>
+            <p>智能选号依据所选范围内历史开奖的出现频率与遗漏期数做加权随机采样（两者使用同一统计范围、同一权重参数），并对生成注去重，属于统计娱乐玩法；它不会改变每一期各号码真实的随机机会，生成结果仅供娱乐。可选策略包括热号偏好、冷号偏好、均衡，以及「奖级概率加权」（按历史红球更密集的三区倾斜赋权）；回测验证模块可对包括该策略在内的各策略做同一条件下的对照检验。</p>
           </details>
           <details>
             <summary>「回测验证」是做什么的？</summary>
-            <p>回测用“以过去若干期训练、逐期推算下一期”的方式，把智能选号与纯随机机选放在同一条件下比较，给出平均命中个数的差值与 95% 置信区间。结论由本次实测数据决定、不预设结果；开奖是独立随机事件，任何算法都不能提高选中机会，本模块仅用于理解统计原理。</p>
+            <p>回测用“以过去若干期训练、逐期推算下一期”的方式，把智能选号与纯随机机选放在同一条件下比较，给出平均命中个数的差值与 95% 置信区间。首次进入「回测验证」会自动展示一份「奖级加权对照示例」：在较旧数据训练、较新数据测试的固定切分下，横向对比纯随机、均衡与奖级概率加权三种策略，并列出组合数精确的理论期望作参照；点击「运行回测」才是逐期滑动训练窗的完整检验。结论由本次实测数据决定、不预设结果；开奖是独立随机事件，任何算法都不能提高选中机会，本模块仅用于理解统计原理。</p>
           </details>
           <details>
             <summary>「遗漏」「热度」是什么意思？</summary>
@@ -742,6 +1020,10 @@
           <details>
             <summary>生成的号码会被记录或上传吗？</summary>
             <p>不会。选号与统计均在浏览器本地完成，不上传、不保存、不涉及账号。</p>
+          </details>
+          <details>
+            <summary>双色球各奖级的中奖概率是多少？</summary>
+            <p>各奖级的<strong>单注理论中奖概率</strong>由组合数精确推导，详见本页「奖级中奖概率」表：一等奖约 1/1772 万、二等奖约 1/118 万、三等奖约 1/10.9 万、四等奖约 1/2300、五等奖约 1/129、六等奖约 1/17；任一奖级合计约 1/15。开奖为独立随机事件，这些概率对每一期恒定不变，历史走势不会改变它。</p>
           </details>
           <details>
             <summary>理性购彩有哪些提醒？</summary>
