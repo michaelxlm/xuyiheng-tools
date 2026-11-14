@@ -429,16 +429,16 @@ input.form-input[type="search"]::-webkit-search-decoration { -webkit-appearance:
 
 /* ---------- 工具网格 / Bento ---------- */
 .tool-grid {
-  display: grid; gap: var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: grid; gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, minmax(208px, 1fr));
 }
 
 .tool-card {
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; min-height: 134px;
   background: var(--color-surface); border: 1px solid var(--color-border);
-  border-radius: var(--radius); padding: var(--space-5);
+  border-radius: calc(var(--radius) + 4px); padding: var(--space-5);
   text-decoration: none; color: inherit;
-  display: flex; flex-direction: column; gap: 11px;
+  display: flex; flex-direction: column; gap: 12px;
   transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease), background var(--dur-base) var(--ease);
 }
 .tool-card::after {
@@ -447,21 +447,24 @@ input.form-input[type="search"]::-webkit-search-decoration { -webkit-appearance:
 }
 .tool-card:hover {
   text-decoration: none; border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
-  box-shadow: var(--shadow-hover); transform: translateY(-3px); background: var(--color-surface);
+  box-shadow: var(--shadow-hover); transform: translateY(-4px); background: var(--color-surface);
 }
 .tool-card:hover::after { opacity: 1; }
 .tool-card:active { transform: translateY(-1px); }
 .tool-card:hover .tool-card-icon { transform: scale(1.06) rotate(-2deg); }
 .tool-card-icon {
-  width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0;
+  width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
   background: var(--color-surface-2); color: var(--color-text);
   display: grid; place-items: center; position: relative; z-index: 1;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 14%, transparent);
   transition: transform var(--dur-base) var(--ease);
 }
-.tool-card-icon .ico { width: 22px; height: 22px; }
-.tool-card-title { font-weight: 650; font-size: var(--text-base); letter-spacing: -0.01em; position: relative; z-index: 1; }
-.tool-card-desc { font-size: var(--text-sm); color: var(--color-muted); line-height: 1.5; position: relative; z-index: 1; }
+.tool-card-icon .ico { width: 24px; height: 24px; }
+.tool-card-title { font-weight: 700; font-size: var(--text-base); letter-spacing: -0.01em; position: relative; z-index: 1; }
+.tool-card-desc {
+  font-size: var(--text-sm); color: var(--color-muted); line-height: 1.5; position: relative; z-index: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 
 /* Bento 宽卡（热门首卡跨列） */
 @media (min-width: 560px) { .tool-card.is-wide { grid-column: span 2; } }
@@ -848,12 +851,15 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
 .header-inner { gap: var(--space-4); }
 .brand { font-size: 1.04rem; }
 
-/* 搜索框：桌面常驻、居中、醒目 */
+/* 搜索框：内页常驻、居中、醒目；首页由 hero 大搜索承担，避免重复 */
 .header-search {
-  display: none; flex: 1 1 auto; max-width: 540px; margin: 0 auto;
-  height: 42px;
+  display: none; flex: 0 1 560px; margin: 0 auto;
+  height: 42px; padding: 0 16px; max-width: 560px;
+  background: var(--color-surface-2); border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
 }
 @media (min-width: 768px) { .header-search { display: flex; } }
+body[data-page="home"] .header-search { display: none; }
 .header-search input { font-size: var(--text-base); }
 
 /* 分类 mega-menu（details 原生开合，无需 JS） */
@@ -911,21 +917,44 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
 /* 顶部分类导航条（sticky，锚点跳转 + 滚动高亮） */
 .cat-bar {
   position: sticky; top: var(--header-h); z-index: 40;
-  display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center;
-  padding: 10px 0; margin: var(--space-2) 0 var(--space-6);
-  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; gap: var(--space-2); justify-content: center; flex-wrap: wrap;
+  padding: 12px 0; margin: 0 0 var(--space-6);
+  background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 8px 24px -20px rgba(20, 23, 38, 0.45);
 }
 .cat-bar a {
-  padding: 6px 15px; border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px; border-radius: var(--radius-pill);
   font-size: var(--text-sm); font-weight: 600; color: var(--color-muted);
   border: 1px solid var(--color-border); background: var(--color-surface);
-  text-decoration: none; transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+  text-decoration: none; white-space: nowrap;
+  transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
 }
-.cat-bar a:hover { color: var(--color-text); background: var(--color-surface-2); text-decoration: none; }
-.cat-bar a.active { color: var(--color-primary-ink); background: var(--color-primary-soft); border-color: color-mix(in srgb, var(--color-primary) 35%, transparent); }
-.cat-bar a.cat-bar-all { color: var(--color-primary-ink); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); }
+.cat-bar a::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: var(--color-primary);
+}
+.cat-bar a[data-cat="calc"]::before { background: var(--cat-calc-ink); }
+.cat-bar a[data-cat="cal"]::before { background: var(--cat-cal-ink); }
+.cat-bar a[data-cat="combo"]::before { background: var(--cat-combo-ink); }
+.cat-bar a[data-cat="other"]::before { background: var(--cat-other-ink); }
+.cat-bar a:hover { color: var(--color-text); background: var(--color-surface-2); transform: translateY(-1px); text-decoration: none; }
+.cat-bar a.active {
+  color: #fff; background: var(--color-primary); border-color: var(--color-primary);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--color-primary) 70%, transparent);
+}
+.cat-bar a.active::before { background: rgba(255, 255, 255, 0.92); }
+.cat-bar a.cat-bar-all {
+  color: var(--color-primary-ink); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); font-weight: 700;
+}
+.cat-bar a.cat-bar-all::before { content: none; }
+@media (max-width: 560px) {
+  .cat-bar { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding: 10px 12px; gap: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .cat-bar::-webkit-scrollbar { display: none; }
+  .cat-bar a { flex: 0 0 auto; }
+}
 
 /* ---------- 工具页：居中收束，工具为主角 ---------- */
 .site-main--flat .main-inner { max-width: 1080px; }
