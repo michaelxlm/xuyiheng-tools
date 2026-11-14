@@ -46,18 +46,21 @@ function renderHeader(site, page) {
       <span class="brand-icon" aria-hidden="true">Y</span>
       ${escapeHtml(site.short_name || site.site_name)}
     </a>
-    <form class="header-search" action="/search.html" method="get" role="search">
-      ${ICON_SEARCH}
-      <input type="search" name="q" placeholder="搜索工具：个税、房贷、万年历、BMI…" aria-label="搜索工具" autocomplete="off">
-    </form>
-    <details class="cat-mega">
-      <summary>分类</summary>
-      <div class="cat-mega-panel" role="menu">
+    <div class="header-right">
+      <form class="header-search" action="/search.html" method="get" role="search">
+        ${ICON_SEARCH}
+        <input type="search" name="q" placeholder="搜索工具…" aria-label="搜索工具" autocomplete="off">
+      </form>
+      <details class="cat-mega">
+        <summary>分类</summary>
+        <div class="cat-mega-panel" role="menu">
 ${cats}
+          <a class="cat-mega-all" href="/tools.html">查看全部工具 →</a>
+        </div>
+      </details>
+      <div class="header-actions">
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">${ICON_SUN}${ICON_MOON}</button>
       </div>
-    </details>
-    <div class="header-actions">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">${ICON_SUN}${ICON_MOON}</button>
     </div>
   </div>
 </header>`;

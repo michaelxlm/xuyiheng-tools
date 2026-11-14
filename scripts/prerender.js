@@ -125,29 +125,7 @@ function buildJsonLd(site, route) {
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
 }
 
-/* ---------------------------- 面包屑 HTML ---------------------------- */
-function categoryOf(route, site) {
-  if (!route.path || route.path === 'index') return null;
-  const cur = '/' + route.path + '.html';
-  const cats = site.sidebar_categories || [];
-  for (const cat of cats) {
-    if ((cat.items || []).some((it) => it.url === cur)) return cat.label;
-  }
-  return null;
-}
 
-function renderBreadcrumb(route, site) {
-  if (route.path === 'index') return '';
-  const cat = categoryOf(route, site);
-  const parts = ['<a href="/">首页</a>'];
-  if (cat) {
-    parts.push('<span class="breadcrumb-sep" aria-hidden="true">/</span>');
-    parts.push('<a href="/tools.html">' + P.escapeHtml(cat) + '</a>');
-  }
-  parts.push('<span class="breadcrumb-sep" aria-hidden="true">/</span>');
-  parts.push('<span>' + P.escapeHtml(route.title.split(' - ')[0]) + '</span>');
-  return '        <nav class="breadcrumb" aria-label="面包屑">' + parts.join('') + '</nav>\n';
-}
 
 /* 工具页「相关工具」静态区块：构建期生成，无 JS 也完整，利于 SEO 与健壮性 */
 function relatedToolsSection(route, site) {
@@ -474,7 +452,6 @@ function renderRoute(site, route, ctx) {
   const header = P.renderHeader(site, route);
   const bottomNav = P.renderBottomNav(site, route);
   const footer = P.renderFooter(site);
-  const breadcrumb = renderBreadcrumb(route, site);
   const related = relatedToolsSection(route, site);
 
   // 全站统一的广告位 / 券位（运行期由 ad-slots.js / coupon-slot.js 扫描填充）
@@ -491,7 +468,7 @@ function renderRoute(site, route, ctx) {
     '<div class="site-body">',
     '  <main class="site-main' + (route.path === 'index' ? '' : ' site-main--flat') + '" id="main">',
     '    <div class="main-inner">',
-    breadcrumb + content + (related ? '\n' + related : '') + '\n' + slots,
+    content + (related ? '\n' + related : '') + '\n' + slots,
     '    </div>',
     '  </main>',
     '</div>',
