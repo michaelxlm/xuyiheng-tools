@@ -30,12 +30,15 @@ const ICON_MOON = '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke
  * @param {Object} page - 当前页信息 { path, title }
  */
 function renderHeader(site, page) {
-  const navLinks = (site.nav || []).map(n => {
-    const isActive = page.path === '' && n.url === '/' ||
-      (page.path && n.url === '/' + page.path + '.html');
-    const cls = isActive ? ' class="active" aria-current="page"' : '';
-    return `<a href="${escapeHtml(n.url)}"${cls}>${escapeHtml(n.label)}</a>`;
-  }).join('\n        ');
+  const cats = (site.sidebar_categories || []).map(cat => {
+    const items = (cat.items || []).map(it =>
+      '            <a href="' + escapeHtml(it.url) + '">' + escapeHtml(it.label) + '</a>'
+    ).join('\n');
+    return '        <div class="cat-mega-group"' + (catKey(cat.label) ? ' data-cat="' + catKey(cat.label) + '"' : '') + '>\n' +
+      '          <div class="cat-mega-title"><span class="dot" aria-hidden="true"></span>' + escapeHtml(cat.label) + '</div>\n' +
+      '          <div class="cat-mega-list">\n' + items + '\n          </div>\n' +
+      '        </div>';
+  }).join('\n');
 
   return `<header class="site-header" id="top">
   <div class="header-inner">
@@ -43,15 +46,17 @@ function renderHeader(site, page) {
       <span class="brand-icon" aria-hidden="true">Y</span>
       ${escapeHtml(site.short_name || site.site_name)}
     </a>
-    <nav class="site-nav" aria-label="主导航">
-        ${navLinks}
-    </nav>
     <form class="header-search" action="/search.html" method="get" role="search">
       ${ICON_SEARCH}
-      <input type="search" name="q" placeholder="搜索工具…" aria-label="搜索工具" autocomplete="off">
+      <input type="search" name="q" placeholder="搜索工具：个税、房贷、万年历、BMI…" aria-label="搜索工具" autocomplete="off">
     </form>
+    <details class="cat-mega">
+      <summary>分类</summary>
+      <div class="cat-mega-panel" role="menu">
+${cats}
+      </div>
+    </details>
     <div class="header-actions">
-      <a href="/search.html" class="search-toggle" aria-label="搜索工具">${ICON_SEARCH}</a>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换主题">${ICON_SUN}${ICON_MOON}</button>
     </div>
   </div>
@@ -78,7 +83,10 @@ ${items}
   </div>`;
   }).join('\n  ');
 
+  const allActive = page.path === 'tools' ? ' class="active"' : '';
+  const allLink = '    <a class="sidebar-summary"' + allActive + ' href="/tools.html">全部工具</a>';
   return `<aside class="site-sidebar" aria-label="工具分类">
+  ${allLink}
   ${categories}
 </aside>`;
 }

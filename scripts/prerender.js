@@ -126,12 +126,53 @@ function buildJsonLd(site, route) {
 }
 
 /* ---------------------------- 面包屑 HTML ---------------------------- */
-function renderBreadcrumb(route) {
+function categoryOf(route, site) {
+  if (!route.path || route.path === 'index') return null;
+  const cur = '/' + route.path + '.html';
+  const cats = site.sidebar_categories || [];
+  for (const cat of cats) {
+    if ((cat.items || []).some((it) => it.url === cur)) return cat.label;
+  }
+  return null;
+}
+
+function renderBreadcrumb(route, site) {
   if (route.path === 'index') return '';
+  const cat = categoryOf(route, site);
   const parts = ['<a href="/">首页</a>'];
+  if (cat) {
+    parts.push('<span class="breadcrumb-sep" aria-hidden="true">/</span>');
+    parts.push('<a href="/tools.html">' + P.escapeHtml(cat) + '</a>');
+  }
   parts.push('<span class="breadcrumb-sep" aria-hidden="true">/</span>');
   parts.push('<span>' + P.escapeHtml(route.title.split(' - ')[0]) + '</span>');
   return '        <nav class="breadcrumb" aria-label="面包屑">' + parts.join('') + '</nav>\n';
+}
+
+/* 工具页「相关工具」静态区块：构建期生成，无 JS 也完整，利于 SEO 与健壮性 */
+function relatedToolsSection(route, site) {
+  if (!route.path || route.path === 'index') return '';
+  const cur = '/' + route.path + '.html';
+  const cats = site.sidebar_categories || [];
+  let cat = null;
+  let others = [];
+  for (const c of cats) {
+    const items = c.items || [];
+    if (items.some((it) => it.url === cur)) {
+      cat = c;
+      others = items.filter((it) => it.url !== cur);
+      break;
+    }
+  }
+  if (!cat || !others.length) return '';
+  const idx = routesIndex();
+  const cards = others.slice(0, 6).map((it) =>
+    toolCardHtml({ url: it.url, label: it.label, icon: it.icon }, cat.label, idx, false)
+  ).join('\n          ');
+  return '        <section class="home-section" id="related" aria-label="相关工具">\n' +
+    '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>相关工具</h2>\n' +
+    '          <div class="tool-grid">\n          ' + cards + '\n          </div>\n' +
+    '        </section>';
 }
 
 /* ---------------------------- 页级资源检测 ---------------------------- */
@@ -226,13 +267,13 @@ function buildHomeContent(site) {
   cats.forEach((cat) => (cat.items || []).forEach((it) => { flat[it.url] = { label: it.label, cat: cat.label, icon: it.icon }; }));
   const total = Object.keys(flat).length;
 
-  const chips = ['<a href="#cat-all" data-filter="all" class="active"><span class="dot" aria-hidden="true"></span>全部</a>'].concat(cats.map((cat) => {
+  const catBar = cats.map((cat) => {
     const key = P.catKey(cat.label);
-    return '<a href="#cat-' + P.escapeHtml(key) + '"' + (key ? ' data-cat="' + key + '" data-filter="' + key + '"' : '') + '><span class="dot" aria-hidden="true"></span>' + P.escapeHtml(cat.label) + '</a>';
-  })).join('');
+    return '<a href="#cat-' + P.escapeHtml(key) + '" data-cat="' + P.escapeHtml(key) + '">' + P.escapeHtml(cat.label) + '</a>';
+  }).join('');
 
   const hero = [
-    '        <section class="hero">',
+    '        <section class="home-hero">',
     '          <span class="hero-badge">✦ ' + total + ' 个免费在线工具 · 纯本地运行</span>',
     '          <h1>' + P.escapeHtml(site.site_name) + '</h1>',
     '          <p class="hero-sub">' + P.escapeHtml(site.description) + '</p>',
@@ -241,8 +282,8 @@ function buildHomeContent(site) {
     '            <input type="search" name="q" placeholder="搜索：个税、房贷、万年历、BMI…" aria-label="搜索工具" autocomplete="off">',
     '            <button class="btn btn-primary" type="submit">搜索</button>',
     '          </form>',
-    '          <div class="hero-chips">' + chips + '</div>',
     '        </section>',
+    '        <nav class="cat-bar" aria-label="分类导航">' + catBar + '<a href="/tools.html" class="cat-bar-all">全部工具</a></nav>',
   ].join('\n');
 
   // 主入口：场景组合（决策流）——把离散单点工具聚合成买房/买车/健康/理财/人生规划等决策入口，首屏优先展示
@@ -431,10 +472,10 @@ function renderRoute(site, route, ctx) {
   // body 内容
   const content = loadContent(route, site);
   const header = P.renderHeader(site, route);
-  const sidebar = P.renderSidebar(site, route);
   const bottomNav = P.renderBottomNav(site, route);
   const footer = P.renderFooter(site);
-  const breadcrumb = renderBreadcrumb(route);
+  const breadcrumb = renderBreadcrumb(route, site);
+  const related = relatedToolsSection(route, site);
 
   // 全站统一的广告位 / 券位（运行期由 ad-slots.js / coupon-slot.js 扫描填充）
   const slots = [
@@ -448,10 +489,9 @@ function renderRoute(site, route, ctx) {
     '<a class="skip-link" href="#main">跳至内容</a>',
     header,
     '<div class="site-body">',
-    sidebar,
-    '  <main class="site-main" id="main">',
+    '  <main class="site-main' + (route.path === 'index' ? '' : ' site-main--flat') + '" id="main">',
     '    <div class="main-inner">',
-    breadcrumb + content + '\n' + slots,
+    breadcrumb + content + (related ? '\n' + related : '') + '\n' + slots,
     '    </div>',
     '  </main>',
     '</div>',

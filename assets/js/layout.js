@@ -109,26 +109,22 @@
         c.classList.toggle('active', c.getAttribute('data-filter') === f);
       });
     }
+    // 分类 chip：桌面端作为「跳转 + 高亮」锚点，不再隐藏其它分区（避免误以为工具消失）
     function applyFilter(f) {
-      currentFilter = f;
-      sections.forEach(function (s) {
-        if (s.id === 'recent') return; // 最近使用常驻
-        if (f === 'all' || s.id === 'cat-' + f) { s.classList.remove('is-filtered-out'); ensureVisible(s); }
-        else { s.classList.add('is-filtered-out'); }
-      });
+      currentFilter = 'all';
+      setActiveChip(f);
+      if (f === 'all') { win.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); return; }
+      var target = doc.getElementById('cat-' + f);
+      if (target) target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     }
     Array.prototype.forEach.call(homeChips, function (a) {
       var f = a.getAttribute('data-filter');
       if (!f) return;
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        if (a.classList.contains('active') && f !== 'all') f = 'all'; // 再次点击当前分类 → 复位
-        setActiveChip(f);
-        applyFilter(f);
-        if (f !== 'all') {
-          var target = doc.getElementById('cat-' + f);
-          if (target) target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-        }
+        var f2 = f;
+        if (a.classList.contains('active') && f !== 'all') f2 = 'all'; // 再次点击当前分类 → 复位到全部
+        applyFilter(f2);
       });
     });
     // 滚动联动：仅在「全部」态下更新高亮（避免与筛选选择互相打架）
@@ -146,6 +142,29 @@
         });
       }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
       spySections.forEach(function (s) { spy.observe(s); });
+    }
+  }
+
+  /* ---------- 4b. 顶部分类条滚动高亮（首页） ---------- */
+  var catBar = doc.querySelector('.cat-bar');
+  if (catBar && hasIO) {
+    var barLinks = Array.prototype.slice.call(catBar.querySelectorAll('a[href^="#cat-"]'));
+    var barMap = {};
+    barLinks.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var sec = doc.getElementById(id);
+      if (sec) barMap[id] = a;
+    });
+    if (Object.keys(barMap).length) {
+      var spy2 = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            barLinks.forEach(function (l) { l.classList.remove('active'); });
+            if (barMap[e.target.id]) barMap[e.target.id].classList.add('active');
+          }
+        });
+      }, { rootMargin: '-48% 0px -48% 0px', threshold: 0 });
+      Object.keys(barMap).forEach(function (id) { spy2.observe(doc.getElementById(id)); });
     }
   }
 
