@@ -30,15 +30,25 @@ const ICON_MOON = '<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke
  * @param {Object} page - 当前页信息 { path, title }
  */
 function renderHeader(site, page) {
-  const cats = (site.sidebar_categories || []).map(cat => {
-    const items = (cat.items || []).map(it =>
-      '            <a href="' + escapeHtml(it.url) + '">' + escapeHtml(it.label) + '</a>'
-    ).join('\n');
-    return '        <div class="cat-mega-group"' + (catKey(cat.label) ? ' data-cat="' + catKey(cat.label) + '"' : '') + '>\n' +
-      '          <div class="cat-mega-title"><span class="dot" aria-hidden="true"></span>' + escapeHtml(cat.label) + '</div>\n' +
-      '          <div class="cat-mega-list">\n' + items + '\n          </div>\n' +
-      '        </div>';
-  }).join('\n');
+  const CAT_ICONS = {
+    calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><circle cx="8" cy="10" r="1.2"></circle><circle cx="12" cy="10" r="1.2"></circle><circle cx="16" cy="10" r="1.2"></circle><circle cx="8" cy="14" r="1.2"></circle><circle cx="12" cy="14" r="1.2"></circle><circle cx="16" cy="14" r="1.2"></circle><circle cx="8" cy="18" r="1.2"></circle><circle cx="12" cy="18" r="1.2"></circle><circle cx="16" cy="18" r="1.2"></circle></svg>',
+    cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>',
+    combo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
+    other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>'
+  };
+  const cats = (function () {
+    const tiles = (site.sidebar_categories || []).map(function (cat) {
+      const key = catKey(cat.label);
+      const count = (cat.items || []).length;
+      const ico = (key && CAT_ICONS[key]) ? CAT_ICONS[key] : CAT_ICONS.other;
+      return '          <a class="cat-tile"' + (key ? ' data-cat="' + key + '"' : '') + ' href="/#' + (key ? 'cat-' + key : '') + '">\n' +
+        '            <span class="cat-tile-ico" aria-hidden="true">' + ico + '</span>\n' +
+        '            <span class="cat-tile-name">' + escapeHtml(cat.label) + '</span>\n' +
+        '            <span class="cat-tile-count">' + count + ' 个工具</span>\n' +
+        '          </a>';
+    }).join('\n');
+    return '          <div class="cat-grid">\n' + tiles + '\n          </div>';
+  })();
 
   return `<header class="site-header" id="top">
   <div class="header-inner">

@@ -863,7 +863,7 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
 body[data-page="home"] .header-search { display: none; }
 .header-search input { font-size: var(--text-base); }
 
-/* 分类选择框（重新设计：胶囊触发 + 旋转箭头 + 圆角面板 + 进场动画 + 清晰分组） */
+/* 分类选择框（图标网格：胶囊触发 + 旋转箭头 + 圆角面板 + 进场动画 + 分类图标网格） */
 .cat-mega { position: relative; }
 .cat-mega > summary {
   list-style: none; display: inline-flex; align-items: center; gap: 7px;
@@ -881,37 +881,37 @@ body[data-page="home"] .header-search { display: none; }
 .cat-mega > summary:hover { color: var(--color-text); background: var(--color-surface-2); }
 .cat-mega-panel {
   display: none; position: absolute; top: calc(100% + 10px); right: 0; z-index: 60;
-  width: min(680px, 92vw); max-height: min(70vh, 560px); overflow: auto;
-  padding: var(--space-5);
+  width: min(400px, 92vw); max-height: min(70vh, 560px); overflow: auto;
+  padding: var(--space-4);
   background: var(--color-surface); border: 1px solid var(--color-border);
   border-radius: calc(var(--radius) + 6px); box-shadow: var(--shadow-pop);
-  grid-template-columns: repeat(2, 1fr); gap: var(--space-5);
   transform-origin: top right;
 }
 .cat-mega[open] > .cat-mega-panel,
-.cat-mega:hover > .cat-mega-panel { display: grid; animation: catPop var(--dur-fast) var(--ease); }
+.cat-mega:hover > .cat-mega-panel { display: block; animation: catPop var(--dur-fast) var(--ease); }
 @keyframes catPop { from { opacity: 0; transform: translateY(-6px) scale(0.98); } to { opacity: 1; transform: none; } }
-.cat-mega-group { min-width: 0; }
-.cat-mega-title {
-  display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-3);
-  font-size: var(--text-sm); font-weight: 700; color: var(--color-text);
+.cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.cat-tile {
+  display: flex; flex-direction: column; gap: 7px; align-items: flex-start;
+  padding: var(--space-4); border-radius: var(--radius); text-decoration: none;
+  background: var(--color-surface-2); border: 1px solid var(--color-border); color: var(--color-text);
+  transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast);
 }
-.cat-mega-title .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-primary); }
-[data-cat="calc"]  .cat-mega-title .dot { background: var(--cat-calc-ink); }
-[data-cat="cal"]   .cat-mega-title .dot { background: var(--cat-cal-ink); }
-[data-cat="combo"] .cat-mega-title .dot { background: var(--cat-combo-ink); }
-[data-cat="other"] .cat-mega-title .dot { background: var(--cat-other-ink); }
-.cat-mega-list { display: grid; grid-template-columns: 1fr; gap: 1px; }
-.cat-mega-list a {
-  display: flex; align-items: center; padding: 8px 10px; border-radius: var(--radius-sm);
-  font-size: var(--text-sm); color: var(--color-muted); text-decoration: none;
+.cat-tile:hover { background: var(--color-surface); border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border)); transform: translateY(-2px); box-shadow: var(--shadow-hover); text-decoration: none; }
+.cat-tile-ico {
+  width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+  background: var(--color-primary-soft); color: var(--color-primary-ink);
   transition: background var(--dur-fast), color var(--dur-fast);
 }
-.cat-mega-list a::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-faint); margin-right: 9px; flex-shrink: 0; transition: background var(--dur-fast); }
-.cat-mega-list a:hover { background: var(--color-surface-2); color: var(--color-text); text-decoration: none; }
-.cat-mega-list a:hover::before { background: var(--color-primary); }
+.cat-tile-ico svg { width: 22px; height: 22px; }
+.cat-tile-name { font-weight: 700; font-size: var(--text-sm); letter-spacing: -0.01em; }
+.cat-tile-count { font-size: var(--text-xs); color: var(--color-muted); }
+[data-cat="calc"]  .cat-tile-ico { background-color: var(--cat-calc-bg); color: var(--cat-calc-ink); }
+[data-cat="cal"]   .cat-tile-ico { background-color: var(--cat-cal-bg); color: var(--cat-cal-ink); }
+[data-cat="combo"] .cat-tile-ico { background-color: var(--cat-combo-bg); color: var(--cat-combo-ink); }
+[data-cat="other"] .cat-tile-ico { background-color: var(--cat-other-bg); color: var(--cat-other-ink); }
 .cat-mega-all {
-  grid-column: 1 / -1; margin-top: var(--space-2); padding-top: var(--space-3);
+  display: block; margin-top: var(--space-3); padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
   font-size: var(--text-sm); font-weight: 600; color: var(--color-primary-ink); text-decoration: none;
 }
