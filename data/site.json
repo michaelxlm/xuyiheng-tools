@@ -1,7 +1,7 @@
 {
   "site_name": "一珩成长笔记",
   "short_name": "一珩工具",
-  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等20+在线工具，打开即用，无需下载。",
+  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等35个免费在线工具，打开即用，无需下载。",
   "url": "https://xuyiheng.com",
   "api_base": "https://api.xuyiheng.com",
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
@@ -15,6 +15,7 @@
   "nav": [
     { "label": "首页", "url": "/" },
     { "label": "发现", "url": "/discover.html" },
+    { "label": "工具箱", "url": "/tools.html" },
     { "label": "搜索", "url": "/search.html" },
     { "label": "关于", "url": "/about.html" }
   ],
@@ -31,7 +32,6 @@
       { "label": "基础代谢体脂", "url": "/calculator/body-fat.html", "icon": "heart" },
       { "label": "跑步配速", "url": "/calculator/pace.html", "icon": "activity" },
       { "label": "日期计算", "url": "/calculator/date-calc.html", "icon": "calendar" },
-      { "label": "字数统计", "url": "/calculator/word-count.html", "icon": "type" },
       { "label": "时区转换", "url": "/calculator/timezone.html", "icon": "globe" },
       { "label": "衣服尺码", "url": "/calculator/size.html", "icon": "shirt" },
       { "label": "装修预算", "url": "/calculator/decoration.html", "icon": "edit-3" },
@@ -39,7 +39,6 @@
       { "label": "儿童身高预测", "url": "/calculator/height-predict.html", "icon": "trending-up" },
       { "label": "宠物年龄", "url": "/calculator/pet-age.html", "icon": "paw" },
       { "label": "油耗计算", "url": "/calculator/fuel-cost.html", "icon": "droplet" },
-      { "label": "IP地址查询", "url": "/calculator/ip-query.html", "icon": "map-pin" },
       { "label": "宝宝取名", "url": "/calculator/baby-name.html", "icon": "star" },
       { "label": "密语", "url": "/calculator/secret-message.html", "icon": "lock" }
     ]},
@@ -55,14 +54,14 @@
       { "label": "趣味测试", "url": "/combo/fun-test.html", "icon": "smile" },
       { "label": "理财百宝箱", "url": "/combo/finance-toolkit.html", "icon": "bar-chart-2" },
       { "label": "人生规划", "url": "/combo/life-plan.html", "icon": "compass" },
-      { "label": "色彩研究所", "url": "/combo/color-lab.html", "icon": "droplet" }
+      { "label": "色彩研究所", "url": "/combo/color-lab.html", "icon": "droplet" },
+      { "label": "场景组合总览", "url": "/combo/index.html", "icon": "grid" }
     ]},
     { "label": "其他工具", "items": [
       { "label": "概率计算器", "url": "/probability.html", "icon": "target" },
       { "label": "随机数生成", "url": "/random.html", "icon": "shuffle" },
       { "label": "视力测试", "url": "/vision.html", "icon": "eye" },
-      { "label": "双色球", "url": "/lotto.html", "icon": "star" },
-      { "label": "实用工具箱", "url": "/tools.html", "icon": "grid" }
+      { "label": "双色球", "url": "/lotto.html", "icon": "star" }
     ]}
   ],
   "footer": {
@@ -80,6 +79,7 @@
         { "label": "宝宝取名", "url": "/calculator/baby-name.html" }
       ]},
       { "title": "关于", "links": [
+        { "label": "实用工具箱", "url": "/tools.html" },
         { "label": "关于我们", "url": "/about.html" },
         { "label": "隐私政策", "url": "/privacy.html" }
       ]}

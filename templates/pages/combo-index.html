@@ -1,0 +1,24 @@
+        <section class="page-heading">
+          <h1>场景组合工具</h1>
+          <p>把分散的单点计算器串成一条决策流：买房、买车、健康、理财、人生规划与趣味测试，进一个场景算清一整笔账。</p>
+        </section>
+
+        <div id="comboGroups"></div>
+
+        <div class="info-box mt-4"><span aria-hidden="true">🧩</span><div>场景组合把多个工具聚合成完整决策流；各项结果仅供参考，最终请结合实际情况与专业意见。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var TOOLS = window.__TOOLS__ || [];
+            var items = TOOLS.filter(function (t) { return t.key === 'combo' && t.url !== '/combo/index.html'; });
+            var cards = items.map(function (t) {
+              var icon = '<span class="tool-card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-' + (t.icon || 'compass') + '"></use></svg></span>';
+              return '<a class="tool-card is-wide" href="' + t.url + '">' + icon + '<span class="tool-card-title">' + t.label + '</span>' + (t.desc ? '<span class="tool-card-desc">' + t.desc + '</span>' : '') + '</a>';
+            }).join('');
+            document.getElementById('comboGroups').innerHTML =
+              '<section class="home-section" data-cat="combo"><h2 class="section-title"><span class="dot" aria-hidden="true"></span>场景组合<span class="count">' + items.length + '</span></h2><div class="tool-grid">' + cards + '</div></section>';
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>

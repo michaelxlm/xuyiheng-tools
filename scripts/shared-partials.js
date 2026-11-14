@@ -92,6 +92,7 @@ function renderBottomNav(site, page) {
   const tabs = [
     { label: '首页', url: '/', icon: 'home' },
     { label: '发现', url: '/discover.html', icon: 'compass' },
+    { label: '工具', url: '/tools.html', icon: 'grid' },
     { label: '搜索', url: '/search.html', icon: 'search' }
   ];
   const links = tabs.map(t => {

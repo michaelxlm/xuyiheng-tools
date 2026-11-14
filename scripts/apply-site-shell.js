@@ -119,6 +119,7 @@ function renderRuntime(cfg, v) {
 function legacyNav(legacy, site, lang) {
   const fixed = [
     { label: i18n(lang, '首页', 'Home'), url: '/' },
+    { label: '工具箱', url: '/tools.html' },
     { label: i18n(lang, '关于', 'About'), url: site.about },
     { label: i18n(lang, '站点地图', 'Sitemap'), url: site.sitemap },
     { label: i18n(lang, '全部站点', 'All sites'), url: R.HUB_PATH },

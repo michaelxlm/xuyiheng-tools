@@ -5,43 +5,26 @@
 
         <div id="toolsGroups"></div>
 
-        <div class="info-box mt-4"><span aria-hidden="true">🧰</span><div>共收录计算器、日历工具、场景组合、其他工具等数十个功能页，全部免费、无登录、无广告干扰核心计算。工具会持续更新。</div></div>
+        <div class="info-box mt-4"><span aria-hidden="true">🧰</span><div>共收录计算器、日历工具、场景组合、其他工具等 35 个功能页，全部免费、无登录、无广告干扰核心计算。工具会持续更新。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
-            var CAT = [
-              { g: '计算器', k: 'calc', items: [
-                ['个税计算器','/calculator/tax.html'],['单位换算','/calculator/unit.html'],['房贷提前还款','/calculator/prepay.html'],['养老金计算器','/calculator/pension.html'],
-                ['五险一金','/calculator/social-insurance.html'],['折扣计算','/calculator/discount.html'],['百分比','/calculator/percentage.html'],['加班费','/calculator/overtime.html'],
-                ['基础代谢体脂','/calculator/body-fat.html'],['跑步配速','/calculator/pace.html'],['日期计算','/calculator/date-calc.html'],['字数统计','/calculator/word-count.html'],
-                ['时区转换','/calculator/timezone.html'],['衣服尺码','/calculator/size.html'],['装修预算','/calculator/decoration.html'],['预产期','/calculator/due-date.html'],
-                ['儿童身高预测','/calculator/height-predict.html'],['宠物年龄','/calculator/pet-age.html'],['油耗计算','/calculator/fuel-cost.html'],['IP地址查询','/calculator/ip-query.html'],
-                ['宝宝取名','/calculator/baby-name.html'],['密语','/calculator/secret-message.html']
-              ]},
-              { g: '日历工具', k: 'cal', items: [
-                ['万年历·老黄历','/calendar.html'],['今日指南','/calendar/daily-guide.html'],['倒计时·纪念日','/calendar/countdown.html']
-              ]},
-              { g: '场景组合', k: 'combo', items: [
-                ['买房全攻略','/combo/buy-house.html'],['买车全攻略','/combo/buy-car.html'],['健康体检站','/combo/health-check.html'],['趣味测试','/combo/fun-test.html'],
-                ['理财百宝箱','/combo/finance-toolkit.html'],['人生规划','/combo/life-plan.html'],['色彩研究所','/combo/color-lab.html']
-              ]},
-              { g: '其他工具', k: 'other', items: [
-                ['概率计算器','/probability.html'],['随机数生成','/random.html'],['视力测试','/vision.html'],['双色球','/lotto.html']
-              ]},
-              { g: '关于本站', k: '', items: [
-                ['关于我们','/about.html'],['隐私政策','/privacy.html'],['搜索工具','/search.html']
-              ]}
-            ];
-            var html = CAT.map(function (grp) {
-              var cards = grp.items.map(function (it) {
-                return '<a class="tool-card" href="' + it[1] + '"><span class="tool-card-title">' + it[0] + '</span></a>';
+            var TOOLS = window.__TOOLS__ || [];
+            var ORDER = [['calc', '计算器'], ['cal', '日历工具'], ['combo', '场景组合'], ['other', '其他工具']];
+            var byKey = {};
+            TOOLS.forEach(function (t) { (byKey[t.key] = byKey[t.key] || []).push(t); });
+            var html = ORDER.map(function (g) {
+              var items = byKey[g[0]] || [];
+              if (!items.length) return '';
+              var cards = items.map(function (t) {
+                var icon = '<span class="tool-card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-' + (t.icon || 'tool') + '"></use></svg></span>';
+                return '<a class="tool-card" href="' + t.url + '">' + icon + '<span class="tool-card-title">' + t.label + '</span>' + (t.desc ? '<span class="tool-card-desc">' + t.desc + '</span>' : '') + '</a>';
               }).join('');
-              return '<section class="home-section"' + (grp.k ? ' data-cat="' + grp.k + '"' : '') + '><h2 class="section-title"><span class="dot" aria-hidden="true"></span>' + grp.g + '</h2><div class="tool-grid">' + cards + '</div></section>';
-            }).join('');
+              return '<section class="home-section" data-cat="' + g[0] + '"><h2 class="section-title"><span class="dot" aria-hidden="true"></span>' + g[1] + '<span class="count">' + items.length + '</span></h2><div class="tool-grid">' + cards + '</div></section>';
+            }).filter(Boolean).join('');
             document.getElementById('toolsGroups').innerHTML = html;
-            U.track('tool_open', { tool: 'tools' });
+            if (window.U) U.track('tool_open', { tool: 'tools' });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();

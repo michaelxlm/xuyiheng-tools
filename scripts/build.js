@@ -92,6 +92,7 @@ async function main() {
   if (!skipCheck) {
     require('@xuyiheng/static-build-kit/inject-scripts').run(); // WO-164 ④ 私有包化
     require('@xuyiheng/static-build-kit/check-links').run(); // WO-164 ④ 私有包化
+    require('./check-tools-sync').run(); // 工具清单一致性门禁（pages.json 工具全集 ↔ site.json 侧栏）
   }
 
   console.log('== 完成，用时 ' + ((Date.now() - t0) / 1000).toFixed(2) + 's ==');
