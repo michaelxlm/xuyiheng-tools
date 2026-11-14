@@ -111,7 +111,8 @@ async function run() {
 
   // 合并去重：以 code 为键，新数据覆盖旧；旧独有保留
   const map = new Map();
-  seed.draws.forEach(d => map.set(d.code, d));
+  // seed 也过一遍校验：历史快照若含脏记录，不能在合并阶段绕过 normalize 进入页面统计
+  seed.draws.forEach(d => { const n = normalize(d); if (n) map.set(n.code, n); });
   fresh.draws.forEach(d => map.set(d.code, d));
   const merged = [ ...map.values() ].sort((a, b) => b.code.localeCompare(a.code));
   const latest = merged[0] ? merged[0].date : '';
