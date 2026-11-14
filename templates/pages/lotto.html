@@ -27,6 +27,7 @@
           </form>
           <div class="ticket-wrap" id="lt-result" hidden>
             <div id="lt-tickets"></div>
+            <div class="btn-row lt-copy-row"><label class="form-label" for="lt-copy-format">复制格式</label><select class="form-input lt-copy-format" id="lt-copy-format"><option value="plain">纯号码（空格 + | 分隔）</option><option value="indexed">带注号</option><option value="comma">逗号分隔</option></select><button class="btn btn-secondary" type="button" id="lt-copy">复制全部号码</button><span class="lt-copy-hint" id="lt-copy-hint" role="status" aria-live="polite"></span></div>
           </div>
           <div class="info-box mt-4"><span>🎱</span><div>本工具为模拟随机选号，与开奖结果毫无关联。彩票是公益与娱乐，请量力而行。开奖信息以官方公告为准。</div></div>
         </div>
@@ -72,16 +73,19 @@
             <div class="lt-stat-grid" id="lt-features"></div>
           </div>
 
-          <div class="card">
+          <div class="card lt-card-trend">
             <h2 class="lt-h2">红球走势图</h2>
             <p class="lt-note">逐期展示每个红球（01–33）是否开出：红底格为该期实际开出的号码；右侧附和值、奇数个数、跨度。最多展示最近 500 期，与上方「统计范围」联动。每行就是一期开奖，仅为历史记录展示，不构成任何走势预测。</p>
             <div class="lt-modes" role="group" aria-label="走势图着色模式"><span>着色模式：</span><button type="button" class="lt-mode-btn active" data-mode="zone" aria-pressed="true">三区</button><button type="button" class="lt-mode-btn" data-mode="odd" aria-pressed="false">奇偶</button><button type="button" class="lt-mode-btn" data-mode="012" aria-pressed="false">012路</button><button type="button" class="lt-mode-btn" data-mode="none" aria-pressed="false">无</button></div>
+            <div class="lt-mode-legend" id="lt-mode-legend" aria-live="polite"></div>
+            <div class="lt-modes"><label class="form-label" for="lt-csv-format">CSV 格式</label><select class="form-input lt-csv-format" id="lt-csv-format"><option value="matrix">完整落点矩阵（含摘要列）</option><option value="compact">仅开出号码（紧凑）</option></select><button type="button" class="lt-export-btn" id="lt-export-red">导出红球走势 CSV</button></div>
             <div class="lt-trend-wrap"><table class="lt-trend" id="lt-red-trend" data-mode="zone"></table></div>
           </div>
 
-          <div class="card">
+          <div class="card lt-card-trend">
             <h2 class="lt-h2">蓝球走势图</h2>
-            <p class="lt-note">逐期展示蓝球（01–16）是否开出：蓝底格为该期实际开出的蓝球。最多展示最近 500 期，与上方「统计范围」联动。</p>
+            <p class="lt-note">逐期展示蓝球（01–16）是否开出：蓝底格为该期实际开出的蓝球。最多展示最近 500 期，与上方「统计范围」联动。着色模式由上方红球走势图统一控制。</p>
+            <div class="lt-modes"><span>导出：</span><button type="button" class="lt-export-btn" id="lt-export-blue" style="margin-left:0">导出蓝球走势 CSV</button><span>格式由上方「CSV 格式」统一控制：完整模式含 01–16 落点矩阵，紧凑模式仅列当期蓝球；均与当前统计范围一致。</span></div>
             <div class="lt-trend-wrap"><table class="lt-trend lt-trend-blue" id="lt-blue-trend" data-mode="zone"></table></div>
           </div>
 
@@ -128,6 +132,7 @@
           </form>
           <div class="ticket-wrap" id="lt-ai-result" hidden>
             <div id="lt-ai-tickets"></div>
+            <div class="btn-row lt-copy-row"><label class="form-label" for="lt-ai-copy-format">复制格式</label><select class="form-input lt-copy-format" id="lt-ai-copy-format"><option value="plain">纯号码（空格 + | 分隔）</option><option value="indexed">带注号</option><option value="comma">逗号分隔</option></select><button class="btn btn-secondary" type="button" id="lt-ai-copy">复制全部号码</button><span class="lt-copy-hint" id="lt-ai-copy-hint" role="status" aria-live="polite"></span></div>
           </div>
           <div class="card" id="lt-dantuo-card" hidden>
             <h2 class="lt-h2">胆拖参考（统计排序模板）</h2>
@@ -252,19 +257,34 @@
         .lt-cell.on { border-radius: 3px; font-weight: 700; color: #fff; }
         .lt-trend td.lt-cell.on.red { background: #e23b3b; }
         .lt-trend td.lt-cell.on.blue { background: #2563eb; }
+        /* 着色色值集中定义在走势卡片上，表格与图例共用，避免两处配色分叉 */
+        .lt-card-trend { --c-z1:#fde8e8; --c-z2:#fdf3e3; --c-z3:#e7f3ea; --c-o:#eef2ff; --c-e:#fef2f2; --c-r0:#e7f3ea; --c-r1:#fdf3e3; --c-r2:#fde8e8; }
         /* 走势图着色模式（默认三区；可切换为奇偶 / 012路 / 无） */
-        .lt-trend[data-mode="zone"] td.z1, .lt-trend[data-mode="zone"] th.z1 { background: #fde8e8; }
-        .lt-trend[data-mode="zone"] td.z2, .lt-trend[data-mode="zone"] th.z2 { background: #fdf3e3; }
-        .lt-trend[data-mode="zone"] td.z3, .lt-trend[data-mode="zone"] th.z3 { background: #e7f3ea; }
-        .lt-trend[data-mode="odd"] td.o, .lt-trend[data-mode="odd"] th.o { background: #eef2ff; }
-        .lt-trend[data-mode="odd"] td.e, .lt-trend[data-mode="odd"] th.e { background: #fef2f2; }
-        .lt-trend[data-mode="012"] td.r0, .lt-trend[data-mode="012"] th.r0 { background: #e7f3ea; }
-        .lt-trend[data-mode="012"] td.r1, .lt-trend[data-mode="012"] th.r1 { background: #fdf3e3; }
-        .lt-trend[data-mode="012"] td.r2, .lt-trend[data-mode="012"] th.r2 { background: #fde8e8; }
+        .lt-trend[data-mode="zone"] td.z1, .lt-trend[data-mode="zone"] th.z1 { background: var(--c-z1); }
+        .lt-trend[data-mode="zone"] td.z2, .lt-trend[data-mode="zone"] th.z2 { background: var(--c-z2); }
+        .lt-trend[data-mode="zone"] td.z3, .lt-trend[data-mode="zone"] th.z3 { background: var(--c-z3); }
+        .lt-trend[data-mode="odd"] td.o, .lt-trend[data-mode="odd"] th.o { background: var(--c-o); }
+        .lt-trend[data-mode="odd"] td.e, .lt-trend[data-mode="odd"] th.e { background: var(--c-e); }
+        .lt-trend[data-mode="012"] td.r0, .lt-trend[data-mode="012"] th.r0 { background: var(--c-r0); }
+        .lt-trend[data-mode="012"] td.r1, .lt-trend[data-mode="012"] th.r1 { background: var(--c-r1); }
+        .lt-trend[data-mode="012"] td.r2, .lt-trend[data-mode="012"] th.r2 { background: var(--c-r2); }
         .lt-td-ratio { color: var(--color-muted); font-weight: 600; }
         .lt-modes { display: flex; gap: 8px; align-items: center; margin: 4px 0 10px; font-size: 13px; color: var(--color-muted); flex-wrap: wrap; }
-        .lt-mode-btn { border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); padding: 3px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; }
+        .lt-mode-btn, .lt-export-btn { border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text); padding: 3px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; }
         .lt-mode-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+        .lt-export-btn { margin-left: auto; }
+        .lt-export-btn:hover, .lt-mode-btn:hover:not(.active) { border-color: var(--color-primary); color: var(--color-primary); }
+        .lt-mode-legend { display: flex; flex-wrap: wrap; gap: 5px 14px; align-items: center; margin: 0 0 10px; font-size: 12px; color: var(--color-muted); }
+        .lt-legend-cur { font-weight: 700; color: var(--color-text); }
+        .lt-legend-item { display: inline-flex; align-items: center; gap: 4px; }
+        .lt-swatch { display: inline-block; width: 13px; height: 13px; border: 1px solid var(--color-border); border-radius: 3px; flex: none; }
+        .lt-swatch.z1 { background: var(--c-z1); } .lt-swatch.z2 { background: var(--c-z2); } .lt-swatch.z3 { background: var(--c-z3); }
+        .lt-swatch.o { background: var(--c-o); } .lt-swatch.e { background: var(--c-e); }
+        .lt-swatch.r0 { background: var(--c-r0); } .lt-swatch.r1 { background: var(--c-r1); } .lt-swatch.r2 { background: var(--c-r2); }
+        .lt-copy-hint { font-size: var(--text-sm); color: var(--color-muted); }
+        .lt-copy-row { align-items: center; margin-top: var(--space-2); flex-wrap: wrap; }
+        .lt-copy-format, .lt-csv-format { width: auto; max-width: 100%; padding: 4px 8px; font-size: 13px; }
+        .lt-copy-row .form-label, .lt-modes .form-label { margin: 0; white-space: nowrap; font-size: 13px; }
         /* 频率/遗漏点击联动高亮走势图对应列 */
         .lt-pick { cursor: pointer; }
         .lt-pick.is-hl { outline: 2px solid #2563eb; outline-offset: 1px; border-radius: 4px; }
@@ -484,10 +504,82 @@
           }
 
           /* ---------- 走势图（逐期矩阵，与统计范围联动）---------- */
+          // 表格渲染与 CSV 导出共用同一份行数口径：当前统计范围，最多最近 500 期
+          function trendRows() {
+            if (!STATE.ready) return [];
+            var list = windowDraws();
+            return list.slice(0, Math.min(list.length, 500));
+          }
+          function csvCell(v) {
+            var s = String(v === null || v === undefined ? '' : v);
+            return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+          }
+          function downloadCSV(filename, lines) {
+            var text = '\uFEFF' + lines.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+            var blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          }
+          function exportTrendCsv(kind) {
+            var rows = trendRows(); if (!rows.length) return;
+            var sel = $('lt-csv-format');
+            var format = (sel && sel.value === 'compact') ? 'compact' : 'matrix';
+            var maxN = kind === 'red' ? 33 : 16, i, head = ['期号', '日期'], lines = [];
+            if (format === 'compact') {
+              if (kind === 'red') for (i = 1; i <= 6; i++) head.push('红' + i);
+              head.push('蓝球'); // 每期一行，只列实际开出的 6 红 + 1 蓝（蓝球走势图仅列当期蓝球）
+            } else {
+              for (i = 1; i <= maxN; i++) head.push(pad(i));
+              head.push.apply(head, kind === 'red' ? ['和值', '奇数个数', '跨度', '区比'] : ['蓝球']);
+            }
+            lines.push(head);
+            rows.forEach(function (d) {
+              var line = [d.code, d.date || ''], nums = d.reds.map(Number);
+              if (format === 'compact') {
+                if (kind === 'red') nums.forEach(function (x) { line.push(pad(x)); });
+                line.push(pad(d.blue));
+              } else if (kind === 'red') {
+                var set = {}; nums.forEach(function (x) { set[x] = 1; });
+                for (i = 1; i <= 33; i++) line.push(set[i] ? pad(i) : '');
+                var sum = nums.reduce(function (a, x) { return a + x; }, 0);
+                var odd = nums.filter(function (x) { return x % 2; }).length;
+                var span = nums[nums.length - 1] - nums[0];
+                var z = [0, 0, 0]; nums.forEach(function (x) { z[x <= 11 ? 0 : (x <= 22 ? 1 : 2)]++; });
+                line.push(sum, odd, span, z.join(':'));
+              } else {
+                for (i = 1; i <= 16; i++) line.push(i === Number(d.blue) ? pad(i) : '');
+                line.push(pad(d.blue));
+              }
+              lines.push(line);
+            });
+            downloadCSV('双色球' + (kind === 'red' ? '红球' : '蓝球') + '走势_' +
+              (format === 'compact' ? '开出号码' : '落点矩阵') + '_最近' + rows.length + '期.csv', lines);
+            if (window.U && window.U.track) window.U.track('lotto_export_csv', { kind: kind, format: format, rows: rows.length });
+          }
+          // 着色模式图例：色块 class 与表格配色共用同一组 CSS 变量
+          var TREND_LEGEND = {
+            zone: { items: [['z1', '01–11 一区'], ['z2', '12–22 二区'], ['z3', '23–33 三区']], note: '按红球三区范围分色，便于观察每期落点分布。' },
+            odd: { items: [['o', '奇数（01、03…）'], ['e', '偶数（02、04…）']], note: '按号码奇偶分色。' },
+            '012': { items: [['r0', '0 路（3 的倍数）'], ['r1', '1 路（余 1）'], ['r2', '2 路（余 2）']], note: '按号码除以 3 的余数分色，红球每路各 11 个。' },
+            none: { items: [], note: '未启用列底色，仅以红／蓝实色标记当期实际开出的号码。' }
+          };
+          function renderTrendModeLegend(mode) {
+            var el = $('lt-mode-legend'); if (!el) return;
+            var cfg = TREND_LEGEND[mode] || TREND_LEGEND.zone;
+            var names = { zone: '三区', odd: '奇偶', '012': '012 路', none: '无' };
+            var html = '<span class="lt-legend-cur">当前：' + esc(names[mode] || '三区') + '</span>';
+            html += cfg.items.map(function (it) {
+              return '<span class="lt-legend-item"><i class="lt-swatch ' + it[0] + '" aria-hidden="true"></i>' + esc(it[1]) + '</span>';
+            }).join('');
+            html += '<span class="lt-legend-note">' + esc(cfg.note) + '</span>';
+            el.innerHTML = html;
+          }
           function renderTrends() {
             if (!STATE.ready) return;
-            var list = windowDraws();
-            var rows = list.slice(0, Math.min(list.length, 500)); // 性能上限：最多最近 500 期
+            var rows = trendRows();
             function clsOf(n) { return (n % 2 ? 'o' : 'e') + ' r' + (n % 3); } // 奇偶 + 012 路，供着色模式切换
             // 红球走势（列按三区着色：01–11 / 12–22 / 23–33，并附每行区比小标）
             var rh = '<thead><tr><th class="lt-th-fixed">期号</th><th class="lt-th-fixed">日期</th>';
@@ -609,7 +701,7 @@
             var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
             var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha, (strategy === 'prize') ? prizeAffinity(list, 16) : null);
             var gate = computeShapeGate(list);
-            var html = '', used = {};
+            var html = '', used = {}, picks = [];
             for (var t = 0; t < count; t++) {
               var pickedR, pickedB, key, shapeFit = false, fresh = false, tries = 0;
               do {
@@ -627,7 +719,9 @@
               reasons += '<span class="reason">' + esc(reasonLabel(pickedB, wb.fN, wb.oN, omB.cur[pickedB], win, strategy, null)) + ' (蓝)</span>';
               reasons += '<span class="reason">' + (shapeFit && fresh ? '形态贴合历史分布' : '形态/去重放宽（多次重采未果）') + '</span>';
               html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' + balls + '<div class="ticket-reasons">' + reasons + '</div></div>';
+              picks.push({ reds: pickedR.slice(), blue: pickedB });
             }
+            LAST_AI = picks;
             $('lt-ai-tickets').innerHTML = html;
             $('lt-ai-result').hidden = false;
             renderDanTuo($('lt-ai-dantuo'), list);
@@ -952,19 +1046,62 @@
               var mode = b.getAttribute('data-mode');
               ['lt-red-trend', 'lt-blue-trend'].forEach(function (id) { var t = $(id); if (t) t.setAttribute('data-mode', mode); });
               document.querySelectorAll('.lt-mode-btn').forEach(function (x) { var on = (x === b); x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+              renderTrendModeLegend(mode);
             });
+          }
+
+          /* ---------- 一键复制选号结果（可切换格式 + 剪贴板兼容回退）---------- */
+          var LAST_PICK = [], LAST_AI = []; // [{ reds:[6], blue:n }]：存结构而非文本，切换格式无需重新生成
+          function formatTickets(tickets, mode) {
+            return tickets.map(function (t, i) {
+              var rs = t.reds.map(function (n) { return pad(n); }), blue = pad(t.blue);
+              if (mode === 'indexed') return '第 ' + (i + 1) + ' 注：' + rs.join(' ') + ' | ' + blue;
+              if (mode === 'comma') return rs.concat(blue).join(',');
+              return rs.join(' ') + ' | ' + blue;
+            }).join('\n');
+          }
+          function legacyCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text; ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            var okc = false;
+            try { okc = document.execCommand('copy'); } catch (err) {}
+            document.body.removeChild(ta);
+            return okc;
+          }
+          function copyPicks(tickets, formatId, btnId, hintId, trackName) {
+            if (!tickets || !tickets.length) return;
+            var fmtEl = $(formatId), mode = (fmtEl && fmtEl.value) || 'plain';
+            var text = formatTickets(tickets, mode), count = tickets.length;
+            var btn = $(btnId), hint = $(hintId);
+            function done() {
+              if (btn) btn.textContent = '已复制';
+              if (hint) hint.textContent = '已复制 ' + count + ' 注号码到剪贴板';
+              setTimeout(function () { if (btn) btn.textContent = '复制全部号码'; if (hint) hint.textContent = ''; }, 1800);
+              if (window.U && window.U.track) window.U.track(trackName, { count: count, format: mode });
+            }
+            function fail() { if (hint) hint.textContent = '复制失败，请手动选择号码'; }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(done, function () { if (legacyCopy(text)) done(); else fail(); });
+            } else { if (legacyCopy(text)) done(); else fail(); }
           }
           function boot() {
             var U = window.U;
             bindTabs();
             bindPickLink();
             bindTrendModes();
+            renderTrendModeLegend('zone');
+            $('lt-export-red').addEventListener('click', function () { exportTrendCsv('red'); });
+            $('lt-export-blue').addEventListener('click', function () { exportTrendCsv('blue'); });
+            $('lt-copy').addEventListener('click', function () { copyPicks(LAST_PICK, 'lt-copy-format', 'lt-copy', 'lt-copy-hint', 'lotto_copy'); });
+            $('lt-ai-copy').addEventListener('click', function () { copyPicks(LAST_AI, 'lt-ai-copy-format', 'lt-ai-copy', 'lt-ai-copy-hint', 'lotto_ai_copy'); });
             // 机选（现状）
             $('ltForm').addEventListener('submit', function (e) {
               e.preventDefault();
               var count = Math.floor((U && U.numInput($('lt-count'))) || 1);
               if (count < 1) count = 1; if (count > 20) count = 20;
-              var html = '';
+              var html = '', picks = [];
               for (var t = 0; t < count; t++) {
                 var pool = []; for (var i = 1; i <= 33; i++) pool.push(i); var reds = [];
                 for (var j = 0; j < 6; j++) { var k = Math.floor(Math.random() * pool.length); reds.push(pool[k]); pool.splice(k, 1); }
@@ -973,7 +1110,9 @@
                 html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' +
                   reds.map(function (r) { return '<span class="ball ball-red">' + pad(r) + '</span>'; }).join('') +
                   '<span class="ball ball-blue">' + pad(blue) + '</span></div>';
+                picks.push({ reds: reds.slice(), blue: blue });
               }
+              LAST_PICK = picks;
               $('lt-tickets').innerHTML = html; $('lt-result').hidden = false;
               if (U) U.track('calc_result', { tool: 'lotto', count: count });
             });
@@ -1050,6 +1189,14 @@
           <details>
             <summary>双色球各奖级的中奖概率是多少？</summary>
             <p>各奖级的<strong>单注理论中奖概率</strong>由组合数精确推导，详见本页「奖级中奖概率」表：一等奖约 1/1772 万、二等奖约 1/118 万、三等奖约 1/10.9 万、四等奖约 1/2300、五等奖约 1/129、六等奖约 1/17；任一奖级合计约 1/15。开奖为独立随机事件，这些概率对每一期恒定不变，历史走势不会改变它。</p>
+          </details>
+          <details>
+            <summary>选号结果可以复制或导出吗？</summary>
+            <p>可以，且两者都支持格式切换。「随机机选」和「智能选号」结果区的「复制全部号码」提供三种格式：纯号码（空格 + | 分隔）、带注号、逗号分隔；切换格式无需重新生成号码，同一批结果可反复按不同格式复制。走势分析里的红球、蓝球走势图各有「导出 CSV」，由上方统一的「CSV 格式」控制两种输出：「完整落点矩阵」逐期列出 01–33（蓝球 01–16）落点与和值、奇偶、跨度、区比等摘要列；「仅开出号码（紧凑）」每期只列 6 红 + 1 蓝（蓝球走势图仅列当期蓝球）。两者都导出当前统计范围（最多最近 500 期），文件带 UTF-8 BOM，可直接用 Excel 打开。复制与导出均在浏览器本地完成，不上传任何数据。</p>
+          </details>
+          <details>
+            <summary>走势图的着色模式代表什么？</summary>
+            <p>红球走势图上方提供四种列底色模式：「三区」按 01–11 / 12–22 / 23–33 分色，「奇偶」按号码奇偶分色，「012 路」按号码除以 3 的余数分色，「无」则关闭底色；切换后红、蓝两张走势图同步生效，按钮下方会显示当前模式的图例说明。底色只标识列所属的号码属性，与实际开出的号码（红／蓝实色格）无关，仅用于辅助阅读历史矩阵，不含任何预测含义。</p>
           </details>
           <details>
             <summary>理性购彩有哪些提醒？</summary>
