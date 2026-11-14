@@ -28,8 +28,9 @@ const BRAND_ICON_URI = 'data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.
 
 /** 路由 → 语义 slug（模板/页面资源文件名） */
 function slugOf(route) {
-  const o = String(route.output || '')
-    .replace(/\/index\.html$/, '')
+  // 全站为显式 .html 文件（URL 与磁盘产物一一对应，无目录式 /x/ 路由）；
+  // 直接基于 output 去 .html 后缀、再把 / 转 - 即可得到模板名（combo/index.html → combo-index）。
+  const o = String(route.output || route.path + '.html' || '')
     .replace(/\.html$/, '');
   if (o === 'index' || o === '') return 'home';
   return o.replace(/\//g, '-');
