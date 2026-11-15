@@ -1,7 +1,7 @@
 {
   "site_name": "一珩成长笔记",
   "short_name": "一珩工具",
-  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等35个免费在线工具，打开即用，无需下载。",
+  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 35 个免费在线工具，打开即用，无需下载。",
   "url": "https://xuyiheng.com",
   "api_base": "https://api.xuyiheng.com",
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",

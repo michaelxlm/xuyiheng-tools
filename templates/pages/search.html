@@ -27,7 +27,7 @@
             var TOOLS = window.__TOOLS__ || [];
             var $ = function (id) { return document.getElementById(id); };
             $('searchCount').textContent = TOOLS.length;
-            var HOT = ['个税', '房贷', '万年历', 'BMI', '汇率', '字数', '配速', '倒计时'];
+            var HOT = ['个税', '房贷', '万年历', 'BMI', '汇率', '配速', '倒计时'];
             $('hotWords').innerHTML = HOT.map(function (w) { return '<button type="button" class="chip" data-w="' + w + '">' + w + '</button>'; }).join('');
 
             function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
