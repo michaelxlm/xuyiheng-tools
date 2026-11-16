@@ -15,7 +15,7 @@ tags: [xuyiheng-tools, 静态站]
 
 - 35 个在线工具：计算器 / 日历工具 / 场景组合 / 其他工具（个税、房贷、单位换算、万年历老黄历、买房买车攻略、概率、随机数、视力测试等）。
 - 构建期预渲染为完整 HTML，运行时不依赖任何框架；页面脚本为原生 JS。
-- 复用旧 `main-tool` 的同域与站点键（`ad_site_key` / `tracker_project` = `main-tool`），因此广告、券位、埋点、sourceGuard 白名单等后端登记无需新增。
+- 复用旧 `main-tool` 的同域与广告分片键（`ad_site_key` = `main-tool`，广告/券位分片键不改，改了会取不到分片）；埋点自 WO-219 起改用本站独立代号 `tracker_project` = `xuyiheng-tools`（旧代号 `main-tool` 与 uni-app 小程序共用，性能腿无法把本站 cwv 归因），中台 `seoPerfAudit.PROJECT_SITE_MAP` 已登记本代号。sourceGuard 按域名匹配，与埋点代号无关。
 
 ## 技术栈
 
@@ -82,7 +82,7 @@ error_page 404 =301 /;
 
 | 能力 | 接入方式 |
 | --- | --- |
-| 埋点 | `assets/js/tracker.min.js`，`tracker_project = main-tool` |
+| 埋点 | `assets/js/tracker.min.js`，`tracker_project = xuyiheng-tools`（WO-219 独立代号；由 `scripts/prerender.js` 注入 `TrackerConfig`） |
 | 广告位 | `assets/js/slot-loader.js`（由 site-sdk 单源把 `ad-slots` / `coupon-slot` 拼接而成，本站无 img-slot；经 `?v=` 版本化）+ `data-ad-slot` 标记，`ad_site_key = main-tool` |
 | 优惠券位 | 同上 `slot-loader.js` + `data-coupon-slot` 标记 |
 | 后端 API | `assets/js/http-api.js` → `https://api.xuyiheng.com`，带 `X-Source-Guard` 头 |

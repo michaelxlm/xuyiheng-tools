@@ -366,11 +366,12 @@ function renderRoute(site, route, ctx) {
   }
 
   const scriptTags = [
-    // 本站复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
+    // AdSlotsConfig.site 仍复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
     // 否则会取错分片。本地兜底用绝对路径（深层路由 /calculator/xxx/ 下相对路径会 404）。
-    // TrackerConfig.project 必须显式覆盖：tracker.js 默认 project:'unknown'，若不声明则埋点
-    // 落到 unknown 分母，v4-ledger/trackChain 按 project 聚合会与旧 main-tool 台账分裂。
-    '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};window.TrackerConfig={project:\'main-tool\'};</script>',
+    // ⚠️ 广告位 site 与埋点 project 是两套独立口径，不要一起改：站点分片键只有 main-tool，改了广告位会取不到分片。
+    // TrackerConfig.project 用本站独立代号 xuyiheng-tools（WO-219）：旧代号 main-tool 与 uni-app 小程序共用，
+    //   性能腿无法把本站 cwv 归因（多对一），独立后中台 seoPerfAudit 的 PROJECT_SITE_MAP 已登记本代号。
+    '    <script>window.AdSlotsConfig={site:"main-tool",fallbackSrc:"/assets/js/ad-slots.json"};window.TrackerConfig={project:\'xuyiheng-tools\'};</script>',
     '    <script src="' + assetUrl('assets/js/tracker.min.js', manifest) + '" defer></script>',
     // WO-210：ad-slots / coupon-slot 合并进 slot-loader.js（本站无 img-slot）；经 assetUrl 带 ?v=<token>。
     '    <script src="' + assetUrl('assets/js/slot-loader.js', manifest) + '" defer></script>',

@@ -6,7 +6,7 @@
   "api_base": "https://api.xuyiheng.com",
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
   "ad_site_key": "main-tool",
-  "tracker_project": "main-tool",
+  "tracker_project": "xuyiheng-tools",
   "build": { "sitemapMode": "indexable", "fingerprintMode": "manifest" },
   "logo": "/assets/img/logo.svg",
   "favicon": "/assets/img/favicon.svg",
