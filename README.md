@@ -77,6 +77,8 @@ error_page 404 =301 /;
 
 > `tar` 同步不做删除，首次切换后请手动清理服务器上残留的旧目录产物：
 > `cd /www/wwwroot/uni-web && rm -rf calculator/*/ calendar/*/ combo/*/`
+>
+> 该口径的通则与「内容型过期页的删除归属」见《静态资源构建与缓存规范》§六之二：服务器上不再需要的文件由**站点侧**负责删（构建期删了 ≠ 线上删了）。若本站要从人工清理升级为脚本腿，须先确认被删 URL 有 200 回退兜底，范式见 `packages/deploy/nginx-apply-runbook.md` §7。
 
 ## 共用基础设施
 
