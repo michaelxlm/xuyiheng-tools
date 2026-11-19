@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-11-19T02:03:59.737Z",
+  "source": "main-api.trackEvents: project=xuyiheng-tools event=calc_click isBot!=true windowDays=180",
+  "totalEvents": 152,
+  "events": [
+    {
+      "tool": "random",
+      "clicks": 135
+    },
+    {
+      "tool": "height-predict",
+      "clicks": 13
+    },
+    {
+      "tool": "body-fat",
+      "clicks": 3
+    },
+    {
+      "tool": "fun-test",
+      "clicks": 1
+    }
+  ]
+}

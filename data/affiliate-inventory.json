@@ -1,32 +1,166 @@
 {
-  "_note": "决策页 next 位「站内自营相关库存」（WO-191）：scene 与 combo 页文件名 /combo/<scene>.html 一致；每条 url 仅指向本仓真实存在的页面，不含任何外部返利/佣金链接。该位最终展示条数受 site-shell-registry.js 的 next 配额约束（本站 next=1），运行时按本地点击热度择优。字段：scene / label / desc / url。",
+  "_note": "决策页 next 位场景相关库存（WO-191）：含站内自营与外部联盟位（type=affiliate，淘宝/京东联盟 CPS 链接，owner 2026-11-19 拍板填入）；外部位自动加 sponsored noopener 与广告角标；finance/life-plan 因金融合规暂不投外部位；next 配额=1，按本地热度择优。",
   "items": [
-    { "scene": "buy-house", "label": "房贷提前还款", "desc": "算清剩余本金、利息与提前还款能省多少", "url": "/calculator/prepay.html" },
-    { "scene": "buy-house", "label": "装修预算", "desc": "按面积估算主材与人工用量", "url": "/calculator/decoration.html" },
-    { "scene": "buy-house", "label": "个税计算器", "desc": "购房前后算清税后收入", "url": "/calculator/tax.html" },
-
-    { "scene": "buy-car", "label": "油耗计算", "desc": "按里程与油价估算每月用车成本", "url": "/calculator/fuel-cost.html" },
-    { "scene": "buy-car", "label": "折扣计算", "desc": "落地价里的裸车优惠、满减叠加算清楚", "url": "/calculator/discount.html" },
-    { "scene": "buy-car", "label": "百分比", "desc": "首付比例、利率与费率快速换算", "url": "/calculator/percentage.html" },
-
-    { "scene": "health-check", "label": "基础代谢体脂", "desc": "BMI、BMR 与体脂率一站式评估", "url": "/calculator/body-fat.html" },
-    { "scene": "health-check", "label": "跑步配速", "desc": "按距离与时间算配速，制定运动计划", "url": "/calculator/pace.html" },
-    { "scene": "health-check", "label": "儿童身高预测", "desc": "结合父母身高估算孩子成年身高", "url": "/calculator/height-predict.html" },
-
-    { "scene": "finance-toolkit", "label": "个税计算器", "desc": "税后收入是理财的起点", "url": "/calculator/tax.html" },
-    { "scene": "finance-toolkit", "label": "养老金计算器", "desc": "估算退休后每月可领养老金", "url": "/calculator/pension.html" },
-    { "scene": "finance-toolkit", "label": "五险一金", "desc": "算清每月个人与单位缴费明细", "url": "/calculator/social-insurance.html" },
-
-    { "scene": "life-plan", "label": "养老金计算器", "desc": "把养老目标纳入人生财务全景", "url": "/calculator/pension.html" },
-    { "scene": "life-plan", "label": "房贷提前还款", "desc": "规划提前还款对长期现金流的影响", "url": "/calculator/prepay.html" },
-    { "scene": "life-plan", "label": "倒计时·纪念日", "desc": "为人生关键节点设定日期与提醒", "url": "/calendar/countdown.html" },
-
-    { "scene": "fun-test", "label": "色彩研究所", "desc": "凭直觉选颜色，看看性格倾向（趣味）", "url": "/combo/color-lab.html" },
-    { "scene": "fun-test", "label": "随机数生成", "desc": "抽签、分组、小游戏都用得上", "url": "/random.html" },
-    { "scene": "fun-test", "label": "概率计算器", "desc": "趣味结果背后的概率直观算一算", "url": "/probability.html" },
-
-    { "scene": "color-lab", "label": "趣味测试合集", "desc": "星座速配与生命灵数，换个玩法继续逛", "url": "/combo/fun-test.html" },
-    { "scene": "color-lab", "label": "随机数生成", "desc": "随机抽一个颜色或号码", "url": "/random.html" },
-    { "scene": "color-lab", "label": "视力测试", "desc": "换个轻松的自测小工具", "url": "/vision.html" }
+    {
+      "scene": "buy-house",
+      "label": "房贷提前还款",
+      "desc": "算清剩余本金、利息与提前还款能省多少",
+      "url": "/calculator/prepay.html"
+    },
+    {
+      "scene": "buy-house",
+      "label": "装修预算",
+      "desc": "按面积估算主材与人工用量",
+      "url": "/calculator/decoration.html"
+    },
+    {
+      "scene": "buy-house",
+      "label": "个税计算器",
+      "desc": "购房前后算清税后收入",
+      "url": "/calculator/tax.html"
+    },
+    {
+      "scene": "buy-car",
+      "label": "油耗计算",
+      "desc": "按里程与油价估算每月用车成本",
+      "url": "/calculator/fuel-cost.html"
+    },
+    {
+      "scene": "buy-car",
+      "label": "折扣计算",
+      "desc": "落地价里的裸车优惠、满减叠加算清楚",
+      "url": "/calculator/discount.html"
+    },
+    {
+      "scene": "buy-car",
+      "label": "百分比",
+      "desc": "首付比例、利率与费率快速换算",
+      "url": "/calculator/percentage.html"
+    },
+    {
+      "scene": "health-check",
+      "label": "基础代谢体脂",
+      "desc": "BMI、BMR 与体脂率一站式评估",
+      "url": "/calculator/body-fat.html"
+    },
+    {
+      "scene": "health-check",
+      "label": "跑步配速",
+      "desc": "按距离与时间算配速，制定运动计划",
+      "url": "/calculator/pace.html"
+    },
+    {
+      "scene": "health-check",
+      "label": "儿童身高预测",
+      "desc": "结合父母身高估算孩子成年身高",
+      "url": "/calculator/height-predict.html"
+    },
+    {
+      "scene": "finance-toolkit",
+      "label": "个税计算器",
+      "desc": "税后收入是理财的起点",
+      "url": "/calculator/tax.html"
+    },
+    {
+      "scene": "finance-toolkit",
+      "label": "养老金计算器",
+      "desc": "估算退休后每月可领养老金",
+      "url": "/calculator/pension.html"
+    },
+    {
+      "scene": "finance-toolkit",
+      "label": "五险一金",
+      "desc": "算清每月个人与单位缴费明细",
+      "url": "/calculator/social-insurance.html"
+    },
+    {
+      "scene": "life-plan",
+      "label": "养老金计算器",
+      "desc": "把养老目标纳入人生财务全景",
+      "url": "/calculator/pension.html"
+    },
+    {
+      "scene": "life-plan",
+      "label": "房贷提前还款",
+      "desc": "规划提前还款对长期现金流的影响",
+      "url": "/calculator/prepay.html"
+    },
+    {
+      "scene": "life-plan",
+      "label": "倒计时·纪念日",
+      "desc": "为人生关键节点设定日期与提醒",
+      "url": "/calendar/countdown.html"
+    },
+    {
+      "scene": "fun-test",
+      "label": "色彩研究所",
+      "desc": "凭直觉选颜色，看看性格倾向（趣味）",
+      "url": "/combo/color-lab.html"
+    },
+    {
+      "scene": "fun-test",
+      "label": "随机数生成",
+      "desc": "抽签、分组、小游戏都用得上",
+      "url": "/random.html"
+    },
+    {
+      "scene": "fun-test",
+      "label": "概率计算器",
+      "desc": "趣味结果背后的概率直观算一算",
+      "url": "/probability.html"
+    },
+    {
+      "scene": "color-lab",
+      "label": "趣味测试合集",
+      "desc": "星座速配与生命灵数，换个玩法继续逛",
+      "url": "/combo/fun-test.html"
+    },
+    {
+      "scene": "color-lab",
+      "label": "随机数生成",
+      "desc": "随机抽一个颜色或号码",
+      "url": "/random.html"
+    },
+    {
+      "scene": "color-lab",
+      "label": "视力测试",
+      "desc": "换个轻松的自测小工具",
+      "url": "/vision.html"
+    },
+    {
+      "scene": "buy-house",
+      "label": "京东家居日用",
+      "desc": "家装家具、日用好物，通过本站链接下单",
+      "url": "https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocDQABXFRORjNVKy5sLUd2EwgDaiBXSzlUUhluJmdqFghRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBGsLGlMSXAQyU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2e44DE4WAWxgGQwVA0Z_FigA1sanEh14G18SWRcyZG5t",
+      "type": "affiliate"
+    },
+    {
+      "scene": "buy-car",
+      "label": "京东数码车品",
+      "desc": "行车记录仪、车机数码等用车好物",
+      "url": "https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMIJK1olXDYDZBoCUBVIMzZNXhpXVhgcFgcZVBsIWDoXSQVJQzZqPEQ5fQhyXA1_TwQTXXBrDwALSzNRD2M4GVoUXAAKXVtUAXsXAm4IGFwUXAEHZG5dCXtcbW44GVoUXgEDU1tdAHsXBWoBEl0VXA4HVV1fOEwXCl_fqe_CwrAKUF9UOHsnAF8PG1IBW3RDBkpbensnAl8LK2sXXAcGXW5t1sandBhKcwEdAnR8Mh8WDjBeWbGFq0pnLQYAVl5MOHsnMw",
+      "type": "affiliate"
+    },
+    {
+      "scene": "health-check",
+      "label": "天猫国际健研馆",
+      "desc": "健康器械与保健好物，入会领券",
+      "url": "https://s.click.taobao.com/t?union_lens=lensId%3APUB%401753971446%4021312f31_1cb3_19860d85200_3d38%4001%40eyJmbG9vcklkIjozODg1Miiwiic3BtQiiI6Il9wb3J0YWxfdjJfcGFnZXNfYWN0aXZpdHlfb2ZmaWNpYWxfaW5kZXhfaHRtIn0ie%3BeventPageId%3A20150318020008733&e=m%3D2%26s%3Dd%2BRZlnmfC90cQipKwQzePCperVdZeJviU%2F9%2F0taeK29yINtkUhsv0P3Kf0EWYLbqFd6tt5qxD5Ue7HM2QJc131cvUGbbeXh73apronxEECKzALVhifQ9%2BP1xjwA8EAOnQ%2BNeRhkrKyfCg%2Fx6BHtN2amAOqUjIVeCy0DxCSzwFgFd1le1%2FF%2FLHXyKwiqD2WK0Bmf7LSR66ag4aIh%2BwnIONST8IooNW8SzO5CcJgHDOBKFzyYjawoqwGqFT2L8zA8AenRgoMDA9RxaStlqWXQNCYyLB7gwfSfcbA724fELe4f8zFlMerWS1VQJD6WTFB%2BjPM6TBJOKLOENxtKElQIb6oY7q73JSNeHX8FN6lsSTYkbRsmFvkxI73SW4rOI823VUK6mtJKzTIFdrZwc4PO9PQ5VhUgdwo6QWVuGINZhiLflx1XQzb07I8YMXU3NNCg%2F",
+      "type": "affiliate"
+    },
+    {
+      "scene": "fun-test",
+      "label": "京东玩具乐器",
+      "desc": "趣味玩具与乐器，好玩不贵",
+      "url": "https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocEQAVSlRORjNVKwR8XXNnUgUCajZfZzRzUlhhCQIELwhRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBW4MGFsQWw8yU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2so_ei5WdW5tWzlOKQJ8Dig71sWDEh14G18SWRcyZG5t",
+      "type": "affiliate"
+    },
+    {
+      "scene": "color-lab",
+      "label": "京东艺术品",
+      "desc": "艺术品与文创周边，正品低价",
+      "url": "https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMAJK1olXDYDZBoCUBVIMzZNXhpXVhgcBB0YFxBCHD1WR0UlGlAFCUQcCBF0cxUPGQBOKnMDESwDaEcbM20JGloTVQ8HXVdtCEoWA2wPGloSWDYyVF9tQyUWM20JGlgSXAEHVFZtCE0SCmYOGlMSWwYKVm5aCEIn1N28zMSjVQIDXW5tOEgnBG8BD11nHFQWUixtOEonAF84GVoUWQ8yZIDTnDcUfg5dGiR2W3NXCiUBSB7JjfsZaSsVXw4ARW5tOHs",
+      "type": "affiliate"
+    }
   ]
 }

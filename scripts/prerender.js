@@ -284,11 +284,23 @@ function buildHomeContent(site) {
     ].join('\n');
   }
 
-  // WO-191：有构建期热度覆盖时按 clicks 降序重排，无数据时保持硬编码顺序
-  const featList = FEATURED.filter((u) => flat[u]).slice();
+  // WO-191：有构建期热度覆盖时，热门区取「真实 PV 最高的在侧栏工具」Top 6；
+  // 无数据时保持 FEATURED 硬编码顺序（诚实降级）。两者都须在 flat 内，绝不拼造 URL。
+  // 说明：原实现只对 FEATURED 这 6 个重排，导致高 PV 但不在硬编码名单的工具（如 random）
+  // 永远进不了热门区；本改法让真实统计真正生效，同时用上限 6 保持版位规模不变。
   const popularity = featuredPopularity();
+  let featList;
   if (popularity) {
-    featList.sort((a, b) => (popularity[b] || 0) - (popularity[a] || 0));
+    const ranked = Object.keys(popularity)
+      .filter((u) => flat[u] && popularity[u] > 0)
+      .sort((a, b) => (popularity[b] || 0) - (popularity[a] || 0));
+    // 真实 PV 不足 6 个时，余位用 FEATURED 补足（去重、仍在 flat 内）
+    featList = ranked.slice(0, FEATURED.length).slice();
+    FEATURED.forEach((u) => {
+      if (featList.length < FEATURED.length && flat[u] && featList.indexOf(u) < 0) featList.push(u);
+    });
+  } else {
+    featList = FEATURED.filter((u) => flat[u]).slice();
   }
   const featCards = featList.map((u, i) =>
     toolCardHtml({ url: u, label: flat[u].label, icon: flat[u].icon }, flat[u].cat, idx, i === 0, i === 0 ? '热门' : '')

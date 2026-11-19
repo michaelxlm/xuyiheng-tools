@@ -22,18 +22,47 @@
     catch (e) { return {}; }
   }
 
-  // ---------- 拦截 U.track 捕获 calc_click ----------
-  function hookTracker() {
-    var U = window.U;
-    if (!U || !U.track) return;
-    var orig = U.track;
-    U.track = function () {
-      if (arguments[0] === 'calc_click') {
-        var p = arguments[1] || {};
-        if (p.tool) record(p.tool);
+  // ---------- 捕获 calc_click ----------
+  // WO-191 修正：全站 calc_click 由 tracker.js 的 [data-track] 事件委托直接调内部
+  // track() 上报，不经 window.U.track / window.Tracker.track，旧钩子恒不触发。
+  // 主路径改为在 document 捕获阶段监听 data-track="calc_click" 的点击，从
+  // data-track-props 取 tool 短名；同时保留对两个公开 track 的钩子，兼容手动调用。
+  function toolFromProps(raw) {
+    if (!raw) return '';
+    try {
+      var p = JSON.parse(raw);
+      return p && typeof p.tool === 'string' ? p.tool : '';
+    } catch (e) { return ''; }
+  }
+
+  function hookDataTrack() {
+    if (!document.addEventListener) return;
+    document.addEventListener('click', function (e) {
+      var el = e.target;
+      for (var i = 0; el && i < 5; i++) {
+        if (el.getAttribute && el.getAttribute('data-track') === 'calc_click') {
+          var tool = toolFromProps(el.getAttribute('data-track-props'));
+          if (tool) record(tool);
+          return;
+        }
+        el = el.parentNode;
       }
-      return orig.apply(this, arguments);
-    };
+    }, true); // 捕获阶段，先于 tracker.js 冒泡委托
+  }
+
+  function hookTracker() {
+    [ window.U, window.Tracker ].forEach(function (obj) {
+      if (!obj || typeof obj.track !== 'function' || obj.__wo191Hooked) return;
+      var orig = obj.track;
+      obj.__wo191Hooked = true;
+      obj.track = function () {
+        if (arguments[0] === 'calc_click') {
+          var p = arguments[1] || {};
+          if (p && p.tool) record(p.tool);
+        }
+        return orig.apply(this, arguments);
+      };
+    });
   }
 
   // ---------- 决策页 next 位 ----------
@@ -52,9 +81,17 @@
     return n;
   }
 
+  // 仅接受站内绝对路径或 http(s) 外链；拒绝 javascript:/data: 等危险协议
+  function safeUrl(u) {
+    if (typeof u !== 'string') return false;
+    return u.charAt(0) === '/' || /^https?:\/\//i.test(u);
+  }
+
   // 候选池：① 自营 next（__TOOLS__ 里其它 combo 决策页）；
-  //         ② 场景库存（__AFFILIATE_INVENTORY__ 里当前 scene 的站内自营条目）。
-  // 两类合并后统一按本地点击热度择优，最终条数由 next 配额裁剪，绝不超配。
+  //         ② 场景库存（__AFFILIATE_INVENTORY__ 里当前 scene 条目，含可选的外部联盟位）。
+  // WO-191：库存条目可带 type:'affiliate' + http(s) 外链（渠道由 owner 拍板后填入），
+  //         渲染时按广告合规加 rel="sponsored noopener" + 「广告」角标；无外部数据时
+  //         全是站内自营，行为与旧版一致。两类合并按本地热度择优，由 next 配额裁剪。
   function buildCandidates(clicks) {
     var tools = window.__TOOLS__ || [];
     var inv = window.__AFFILIATE_INVENTORY__ || [];
@@ -72,10 +109,19 @@
     });
 
     inv.forEach(function (it, i) {
-      if (!it || it.scene !== scene || !it.url || it.url === cur) return;
+      if (!it || it.scene !== scene || !safeUrl(it.url) || it.url === cur) return;
+      var aff = it.type === 'affiliate';
+      // 外部联盟位必须有 label；站外链接一律视为广告条目（即便未显式标 type）
+      var external = /^https?:\/\//i.test(it.url);
+      var isAff = aff || external;
+      var heat = heatOf(it.url, clicks);
+      // WO-191：联盟位 URL 不含工具短名，本地 heat 恒 0；若不与站内同权，next=1 时
+      // 站内自营（order 更小）会永远压过联盟位。给联盟位一个基础热度 1：
+      // 用户本机点过某工具（heat>0）时仍按真实偏好优先；无记录时联盟位可展示变现。
       list.push({
         url: it.url, label: it.label, desc: (it.desc || '').slice(0, 36),
-        heat: heatOf(it.url, clicks), rank: 0, order: i
+        heat: isAff && !heat ? 1 : heat, rank: 0, order: i,
+        affiliate: isAff, external: external
       });
     });
 
@@ -97,7 +143,8 @@
       + '.combo-related-card{display:flex;flex-direction:column;gap:4px;padding:.75rem 1rem;border-radius:8px;border:1px solid var(--border,#e5e7eb);text-decoration:none;color:inherit;background:var(--surface,#fff);transition:border-color .15s}'
       + '.combo-related-card:hover{border-color:var(--accent,#2563eb)}'
       + '.crc-label{font-weight:600;font-size:.95rem}'
-      + '.crc-desc{font-size:.8rem;opacity:.65;line-height:1.3}';
+      + '.crc-desc{font-size:.8rem;opacity:.65;line-height:1.3}'
+      + '.crc-ad{font-size:.7rem;padding:1px 5px;margin-left:5px;border:1px solid var(--border,#e5e7eb);border-radius:4px;opacity:.65}';
     document.head.appendChild(s);
   }
 
@@ -118,11 +165,14 @@
     var section = document.createElement('section');
     section.className = 'combo-related';
     var h3 = document.createElement('h3');
-    h3.textContent = quota === 1 ? '继续逛 · 你最常点' : '相关场景工具';
+    var isAd = chosen.some(function (t) { return t.affiliate; });
+    h3.textContent = isAd ? '相关推荐 · 合作推广' : (quota === 1 ? '继续逛 · 你最常点' : '相关场景工具');
     section.appendChild(h3);
     var note = document.createElement('p');
     note.className = 'crc-note';
-    note.textContent = '仅依据你本机的点击记录择优，非全站热度排名；展示条数受 next 配额限制。';
+    note.textContent = isAd
+      ? '含合作推广内容（标注「广告」）；其余按你本机点击记录择优，非全站热度排名。'
+      : '仅依据你本机的点击记录择优，非全站热度排名；展示条数受 next 配额限制。';
     section.appendChild(note);
 
     var grid = document.createElement('div');
@@ -131,9 +181,19 @@
       var a = document.createElement('a');
       a.className = 'combo-related-card';
       a.href = t.url;
+      if (t.external) {
+        a.target = '_blank';
+        a.rel = 'sponsored noopener'; // 广告合规：外链一律 noopener + sponsored
+      }
       var lbl = document.createElement('span');
       lbl.className = 'crc-label';
       lbl.textContent = t.label;
+      if (t.affiliate) {
+        var ad = document.createElement('span');
+        ad.className = 'crc-ad';
+        ad.textContent = '广告';
+        lbl.appendChild(ad);
+      }
       var desc = document.createElement('span');
       desc.className = 'crc-desc';
       desc.textContent = t.desc;
@@ -146,6 +206,7 @@
   }
 
   // ---------- 启动 ----------
+  hookDataTrack();
   hookTracker();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', renderRelated);

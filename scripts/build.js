@@ -73,6 +73,14 @@ async function main() {
     console.warn('  collect-ssq 跳过：' + (e && e.message ? e.message : e));
   }
 
+  // WO-191：从已落盘的 calc_click 导出聚合热门工具 → data/tool-popularity.json
+  // （fail-soft，无导出/无有效数据时脚本自身 no-op 不写文件，首页沿用 FEATURED 硬编码）
+  try {
+    require('./aggregate-popularity');
+  } catch (e) {
+    console.warn('  aggregate-popularity 跳过：' + (e && e.message ? e.message : e));
+  }
+
   minify.run();
   const manifest = fingerprint.run();
   const ctx = { manifest };
