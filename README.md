@@ -66,16 +66,23 @@ npm run check:encoding # UTF-8 编码门禁（禁 GBK/双重乱码/BOM）
 
 全站为**显式 `.html` 多页静态站**：首页 `/`，其余页面 `/calculator/tax.html`、`/calendar/countdown.html` 等，URL 与磁盘产物一一对应（不再生成 `<路由>/index.html`）。`sitemap.xml`、canonical、OG、JSON-LD 与站点导航均由 `scripts/prerender.js` 的 `urlPathOf` 统一派生。
 
-旧版目录式 URL（`/calculator/tax/`）需在 nginx 侧 301 到新地址，避免已收录链接落 404：
+`deploy/nginx.conf`（整站参考）与 `deploy/rewrite-html_xuyiheng.com.conf`（宝塔生产机实际生效的 rewrite include）已内置旧链接兼容（2026-11-19 GSC 404 修复）：
 
-```nginx
-# 旧目录式 URL → 对应 .html（/calculator/tax/ → /calculator/tax.html）
-rewrite ^/(.+)/$ /$1.html permanent;
-# 404 回首页（与 store-web 旧路径口径一致；如需保留真 404 状态码则删除此行）
-error_page 404 =301 /;
-```
+- 旧目录式 / 无扩展名 URL：`/calculator/tax/`、`/calculator/tax` → 301 `/calculator/tax.html`；`/combo/` → 301 `/combo/index.html`。
+- 旧 uni-app H5 路由：`/pages_event/calculator/tax` → 301 `/calculator/tax.html`；`calendar/index`、`probability/index` 等异名路由已单独映射；无对应工具页的旧 H5 路由回首页。
+- 不存在的 URL 仍返回真 404（`error_page 404 /404.html`），不再回首页，避免 soft-404。
 
-> `tar` 同步不做删除，首次切换后请手动清理服务器上残留的旧目录产物：
+> 生产机实际生效文件：`/www/server/panel/vhost/rewrite/html_xuyiheng.com.conf`。2026-11-19 已备份为 `.bak-20261119`、替换、`nginx -t` 通过并 reload，线上 301/404 已复验。
+>
+> `.github/workflows/deploy.yml` 只同步静态产物，**不自动应用整份 `deploy/nginx.conf`**。修改基线配置后仍须将文件同步到生产机对应 vhost 配置，并执行 `nginx -t && nginx -s reload`。
+
+### GSC 403 归一（自动应用）
+
+GSC 报「由于禁止访问 (403) 而被屏蔽」时，根因是裸目录 URL 打在 `autoindex off` 的目录上返回 403（内容页与 Googlebot UA 实测 200）。`deploy/nginx-index-hardening.conf` 把这些裸目录统一改 404，并放行 ACME 校验目录；CI 在 `tar` 同步后通过 `deploy/apply-nginx-hardening.sh` 幂等落地（宝塔 extension 或 vhost include），脚本自带 `nginx -t` 校验与失败回滚，落不进去只标黄提示手工粘贴。部署末尾还会用 Googlebot UA 探测高发路径，出现 403 即失败。
+
+> 该片段不与 `deploy/nginx.conf` / `deploy/rewrite-html_xuyiheng.com.conf` 重复定义旧 URL 的 301 逻辑，避免正则 location 抢走存在性检查。
+
+> `tar` 同步不做删除；即使服务器残留旧目录产物，nginx 也会优先 301 到 `.html`。仍建议按规范清理，避免重复内容与额外磁盘占用：
 > `cd /www/wwwroot/uni-web && rm -rf calculator/*/ calendar/*/ combo/*/`
 >
 > 该口径的通则与「内容型过期页的删除归属」见《静态资源构建与缓存规范》§六之二：服务器上不再需要的文件由**站点侧**负责删（构建期删了 ≠ 线上删了）。若本站要从人工清理升级为脚本腿，须先确认被删 URL 有 200 回退兜底，范式见 `main-api/app/docs/06-运维部署/nginx-apply-runbook.md` §7。

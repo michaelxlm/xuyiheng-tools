@@ -66,3 +66,23 @@ jobs:
         shell: bash
         run: |
           tar cf - --exclude=.git --exclude=.github --exclude=.user.ini --exclude=node_modules --exclude=package-lock.json . | ssh -i /root/.ssh/admin.xuyiheng.com_id_ed25519 -o StrictHostKeyChecking=accept-new root@39.107.225.222 "mkdir -p /www/wwwroot/uni-web ; cd /www/wwwroot/uni-web ; tar xmf -"
+      - name: Apply nginx 403 hardening (fail-safe)
+        continue-on-error: true
+        shell: bash
+        run: |
+          # 片段已随 sync 落到站点目录；脚本自带 nginx -t 校验与失败回滚。
+          # GSC「由于禁止访问 (403) 而被屏蔽」来自旧目录式 URL 打在 autoindex off 的目录上。
+          ssh -i /root/.ssh/admin.xuyiheng.com_id_ed25519 -o StrictHostKeyChecking=accept-new \
+            root@39.107.225.222 'bash -s' < deploy/apply-nginx-hardening.sh
+      - name: Verify no 403 on legacy directory URLs
+        shell: bash
+        run: |
+          set -u
+          # 这些是 GSC 403 的高发路径；任何 403 都视为回归。
+          for path in / /robots.txt /calculator/ /calculator/tax/ /calendar/ /assets/ /data/ /scripts/ /package.json; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 \
+              -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' \
+              "https://xuyiheng.com$path") || code=000
+            echo "$path -> $code"
+            if [ "$code" = "403" ]; then echo "::error::$path 仍返回 403"; exit 1; fi
+          done
