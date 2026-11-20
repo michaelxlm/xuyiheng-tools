@@ -52,32 +52,33 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var H = C.health;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
             $('bf-sex').addEventListener('change', function () { $('bf-hip-wrap').style.display = $('bf-sex').value === 'female' ? '' : 'none'; });
             $('bf-hip-wrap').style.display = 'none';
-            function bodyFat(sex, h, neck, waist, hip) {
-              if (!(h > 0 && neck > 0 && waist > 0)) return NaN;
-              if (sex === 'male') return 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(h) + 36.76;
-              if (!(hip > 0)) return NaN;
-              return 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(h) - 78.387;
-            }
             $('bfForm').addEventListener('submit', function (e) {
               e.preventDefault();
               var sex = $('bf-sex').value, age = U.numInput($('bf-age')), h = U.numInput($('bf-height')), w = U.numInput($('bf-weight')), act = Number($('bf-activity').value);
               if (!(h > 0 && w > 0 && age > 0)) { alert('请填写年龄、身高与体重'); return; }
-              var bmr = 10 * w + 6.25 * h - 5 * age + (sex === 'male' ? 5 : -161);
+              var bmr = H.bmr(w, h, age, sex);
               var tdee = bmr * act;
               $('bf-bmr').textContent = Math.round(bmr) + ' kcal';
               $('bf-tdee').textContent = Math.round(tdee) + ' kcal';
-              var detail = row('BMI', U.round(w / (h / 100) / (h / 100), 1)) + row('活动系数', act + ' 倍');
+              var bmi = H.bmi(w, h), hw = H.healthyWeight(h);
+              var detail = row('BMI', U.round(bmi, 1) + ' · ' + H.bmiCategory(bmi)) +
+                row('健康体重区间', U.round(hw.min, 1) + ' ~ ' + U.round(hw.max, 1) + ' kg') +
+                row('理想体重（Devine）', U.round(H.devine(sex, h), 1) + ' kg') +
+                row('活动系数', act + ' 倍');
               var neck = U.numInput($('bf-neck')), waist = U.numInput($('bf-waist')), hip = U.numInput($('bf-hip'));
-              var bf = bodyFat(sex, h, neck, waist, hip);
+              if (Number.isFinite(waist)) detail += row('腰高比', U.round(H.waistToHeight(waist, h), 3));
+              var bf = H.bodyFatNavy(sex, h, neck, waist, hip);
               if (Number.isFinite(bf) && bf > 0 && bf < 75) {
                 $('bf-bf').textContent = U.round(bf, 1) + '%';
                 var fatMass = w * bf / 100;
-                detail += row('脂肪重量', U.round(fatMass, 1) + ' kg') + row('去脂体重', U.round(w - fatMass, 1) + ' kg');
+                detail += row('体脂评级', H.bodyFatCategory(sex, bf)) +
+                  row('脂肪重量', U.round(fatMass, 1) + ' kg') + row('去脂体重', U.round(w - fatMass, 1) + ' kg');
               } else {
                 $('bf-bf').textContent = '需围度';
               }

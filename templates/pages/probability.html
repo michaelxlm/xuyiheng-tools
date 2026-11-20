@@ -54,7 +54,7 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
             function pct(p) { return U.round(p * 100, 2) + '%'; }
@@ -86,15 +86,13 @@
               show('至少一次', pct(hit), row('单次概率', (p * 100) + '%') + row('重复次数', n + ' 次') + row('一次都不中', pct(Math.pow(1 - p, n))));
               U.track('calc_result', { tool: 'probability', mode: 'least' });
             });
-            function comb(n, k) { if (k > n) return 0; k = Math.min(k, n - k); var r = 1; for (var i = 0; i < k; i++) r = r * (n - i) / (i + 1); return Math.round(r); }
             $('p-comb').addEventListener('submit', function (e) { e.preventDefault();
               var n = U.numInput($('pc-n')), k = U.numInput($('pc-k'));
               if (!(n >= 0) || !(k >= 0) || k > n || n > 170) { alert('请输入 0≤k≤n≤170'); return; }
-              var c = comb(n, k);
-              show('组合数 C(n,k)', U.thousands(c), row('含义', '从 ' + n + ' 个中取 ' + k + ' 个的方法数') + row('排列数 A(n,k)', U.thousands(comb(n, k) * factorial(k))));
+              var c = C.math.comb(n, k);
+              show('组合数 C(n,k)', U.thousands(c), row('含义', '从 ' + n + ' 个中取 ' + k + ' 个的方法数') + row('排列数 A(n,k)', U.thousands(C.math.perm(n, k))) + row('阶乘 k!', U.thousands(C.math.factorial(k))));
               U.track('calc_result', { tool: 'probability', mode: 'comb' });
             });
-            function factorial(k) { var r = 1; for (var i = 2; i <= k; i++) r *= i; return r; }
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();

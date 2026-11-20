@@ -33,7 +33,7 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
             $('bhForm').addEventListener('submit', function (e) {
@@ -42,8 +42,8 @@
               if (!(price > 0)) { alert('请输入房屋总价'); return; }
               var down = U.numInput($('bh-down')); if (!Number.isFinite(down)) down = 30;
               var rate = U.numInput($('bh-rate')) || 0, years = U.numInput($('bh-years')) || 30, area = U.numInput($('bh-area')) || 0, count = $('bh-count').value;
-              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12), r = rate / 100 / 12;
-              var monthly = r > 0 ? loan * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : loan / n;
+              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12);
+              var monthly = C.loan.annuity(loan, rate, n);
               var totalInterest = monthly * n - loan;
               var deedRate = count === '1' ? (area > 90 ? 0.015 : 0.01) : 0.03;
               var deed = price * deedRate;

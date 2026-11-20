@@ -125,6 +125,18 @@
             <h3 class="card-title mt-4">提前还款方案对比</h3>
             <dl class="result-detail" id="pp-prepay-detail"></dl>
           </div>
+          <div class="btn-row mt-4">
+            <button class="btn btn-secondary" type="button" id="pp-schedule">查看完整还款计划</button>
+          </div>
+          <div class="table-wrap mt-4" id="pp-schedule-wrap" hidden>
+            <table>
+              <thead><tr><th scope="col">期数</th><th scope="col">月供</th><th scope="col">本金</th><th scope="col">利息</th><th scope="col">剩余本金</th></tr></thead>
+              <tbody id="pp-schedule-body"></tbody>
+            </table>
+          </div>
+          <div class="btn-row" id="pp-schedule-actions" hidden>
+            <button class="btn btn-secondary" type="button" id="pp-export">导出还款计划 CSV</button>
+          </div>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>等额本息月供固定；等额本金首月最多、逐月递减。提前还款按「已还期数后的剩余本金」扣除还款额重算：缩短年限保持月供不变、减少月供保持剩余期限不变。实际以贷款银行合同为准。</div></div>
@@ -132,15 +144,16 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var Ln = C.loan;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function annuityPay(bal, r, n) { return r > 0 ? bal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : bal / n; }
+            var last = null;
+            // 页面内部 r 为月利率小数；Core.loan 接口收年利率百分数，×1200 换算。
+            function annuityPay(bal, r, n) { return Ln.annuity(bal, r * 1200, n); }
             function balanceAfter(L, r, n, k, method) {
-              if (method === 'principal') return L * (1 - k / n);
-              if (r <= 0) return L * (1 - k / n);
-              var P = annuityPay(L, r, n);
-              return L * Math.pow(1 + r, k) - P * (Math.pow(1 + r, k) - 1) / r;
+              if (method === 'principal' || r <= 0) return L * (1 - k / n);
+              return Ln.balanceAfter(L, r * 1200, n, k);
             }
             function nFromPay(bal, r, pay) { if (r <= 0) return bal / pay; var v = pay / (pay - bal * r); if (v <= 0) return NaN; return Math.log(v) / Math.log(1 + r); }
             $('ppForm').addEventListener('submit', function (e) {
@@ -157,9 +170,11 @@
                 var paidInterest = P * k - (L - balanceAfter(L, r, n, k, method));
                 detail = row('总还款额', U.money(P * n)) + row('总利息', U.money(P * n - L)) + row('已还利息（' + k + ' 期）', U.money(paidInterest));
               } else {
-                var first = L / n + L * r, last = L / n + (L / n) * r, totalI = (L * r * (n + 1)) / 2;
+                var first = Ln.principalFirst(L, r * 1200, n);
+                var dec = Ln.principalDecrement(L, r * 1200, n);
+                var last = first - dec * (n - 1), totalI = (L * r * (n + 1)) / 2;
                 $('pp-p1label').textContent = '首月月供'; $('pp-p1').textContent = U.money(first);
-                detail = row('每月递减', U.money(L / n * r)) + row('末月月供', U.money(last)) + row('总利息', U.money(totalI));
+                detail = row('每月递减', U.money(dec)) + row('末月月供', U.money(last)) + row('总利息', U.money(totalI));
               }
               var bal = balanceAfter(L, r, n, k, method);
               $('pp-bal').textContent = U.money(bal);
@@ -199,9 +214,30 @@
               } else { box.hidden = true; }
 
               function P_of() { return annuityPay(L, r, n); }
+              last = { L: L, rate: rate, n: n, method: method };
+              var plan = Ln.schedule(L, rate, n, method);
+              $('pp-schedule-body').innerHTML = plan.rows.map(function (p) {
+                return '<tr><td>' + p.period + '</td><td>' + U.money(p.payment) + '</td><td>' + U.money(p.principal) + '</td><td>' + U.money(p.interest) + '</td><td>' + U.money(p.balance) + '</td></tr>';
+              }).join('');
               $('pp-result').hidden = false;
+              $('pp-schedule-wrap').hidden = true;
+              $('pp-schedule-actions').hidden = true;
               U.track('calc_result', { tool: 'prepay', method: method });
             });
+
+            $('pp-schedule').setAttribute('onclick', 'window.__ppShow && window.__ppShow()');
+            window.__ppShow = function () {
+              $('pp-schedule-wrap').hidden = false;
+              $('pp-schedule-actions').hidden = false;
+              U.track('calc_result', { tool: 'prepay', mode: 'schedule' });
+            };
+            $('pp-export').setAttribute('onclick', 'window.__ppExport && window.__ppExport()');
+            window.__ppExport = function () {
+              if (!last) return;
+              var plan = Ln.schedule(last.L, last.rate, last.n, last.method);
+              C.csv.download('还款计划.csv', plan.rows.map(function (p) { return [p.period, U.round(p.payment, 2), U.round(p.principal, 2), U.round(p.interest, 2), U.round(p.balance, 2)]; }), ['期数', '月供', '本金', '利息', '剩余本金']);
+              U.track('export_result', { tool: 'prepay' });
+            };
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -300,7 +336,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

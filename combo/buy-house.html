@@ -127,7 +127,7 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
             $('bhForm').addEventListener('submit', function (e) {
@@ -136,8 +136,8 @@
               if (!(price > 0)) { alert('请输入房屋总价'); return; }
               var down = U.numInput($('bh-down')); if (!Number.isFinite(down)) down = 30;
               var rate = U.numInput($('bh-rate')) || 0, years = U.numInput($('bh-years')) || 30, area = U.numInput($('bh-area')) || 0, count = $('bh-count').value;
-              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12), r = rate / 100 / 12;
-              var monthly = r > 0 ? loan * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : loan / n;
+              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12);
+              var monthly = C.loan.annuity(loan, rate, n);
               var totalInterest = monthly * n - loan;
               var deedRate = count === '1' ? (area > 90 ? 0.015 : 0.01) : 0.03;
               var deed = price * deedRate;
@@ -257,7 +257,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

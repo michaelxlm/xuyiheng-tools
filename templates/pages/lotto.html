@@ -766,7 +766,7 @@
           }
 
           /* ---------- Block C：walk-forward 回测（无数据泄漏）---------- */
-          function comb(n, k) { if (k < 0 || k > n) return 0; var res = 1; for (var i = 1; i <= k; i++) res = res * (n - i + 1) / i; return res; }
+          function comb(n, k) { return window.Core ? window.Core.math.comb(n, k) : (function () { if (k < 0 || k > n) return 0; var res = 1; for (var i = 1; i <= k; i++) res = res * (n - i + 1) / i; return res; })(); }
           function hyperRed(j) { return comb(6, j) * comb(27, 6 - j) / comb(33, 6); }
           // 理论参照（组合数精确，与历史范围、策略、参数均无关）：
           // 「奖级加权对照示例」与正式回测结果共用这一份，确保两处准绳完全一致。

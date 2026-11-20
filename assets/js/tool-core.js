@@ -71,16 +71,18 @@
       return { payment: k === n ? principalPart + interest : pay, principal: principalPart, interest: interest };
     },
 
-    /** 生成完整还款计划表（最多 600 期，避免误输入撑爆浏览器）。 */
-    schedule: function (principal, annualRatePct, months) {
+    /** 生成完整还款计划表（最多 600 期，避免误输入撑爆浏览器）。
+     *  method='principal' 时按等额本金（每月固定本金、利息递减）生成。 */
+    schedule: function (principal, annualRatePct, months, method) {
       var n = clamp(Math.floor(Number(months) || 0), 1, 600);
       var P = Number(principal) || 0;
       var r = (Number(annualRatePct) || 0) / 100 / 12;
       var pay = loan.annuity(P, annualRatePct, n);
+      var fixedPrincipal = P / n;
       var bal = P, out = [], totalInterest = 0;
       for (var i = 1; i <= n; i++) {
         var interest = bal * r;
-        var principalPart = (i === n ? bal : pay - interest);
+        var principalPart = i === n ? bal : (method === 'principal' ? fixedPrincipal : pay - interest);
         var payment = principalPart + interest;
         bal = Math.max(0, bal - principalPart);
         totalInterest += interest;
@@ -116,6 +118,21 @@
       var i = (Number(annualRatePct) || 0) / 100 / m;
       var n = Math.max(0, Math.floor(Number(years) * m || 0));
       return (Number(principal) || 0) * Math.pow(1 + i, n);
+    },
+    /** 期初本金 + 每年末追加的终值（年复利）。 */
+    withAnnual: function (initial, annual, annualRatePct, years) {
+      var i = (Number(annualRatePct) || 0) / 100;
+      var n = Math.max(0, Math.floor(Number(years) || 0));
+      var P = Number(initial) || 0, C = Number(annual) || 0;
+      var pow = Math.pow(1 + i, n);
+      var fvInitial = P * pow;
+      var fvAnnual = i === 0 ? C * n : C * (pow - 1) / i;
+      var invested = P + C * n;
+      return { total: fvInitial + fvAnnual, invested: invested, interest: fvInitial + fvAnnual - invested, initialFv: fvInitial, annualFv: fvAnnual };
+    },
+    /** 单利利息：本金 × 年利率 × 月数 / 12。 */
+    simpleInterest: function (principal, annualRatePct, months) {
+      return (Number(principal) || 0) * ((Number(annualRatePct) || 0) / 100) * (Number(months) || 0) / 12;
     },
     /** 期初本金 + 每月末定投的终值（月复利）。返回本金/定投/收益拆分。 */
     withMonthly: function (initial, monthly, annualRatePct, years) {

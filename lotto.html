@@ -860,7 +860,7 @@
           }
 
           /* ---------- Block C：walk-forward 回测（无数据泄漏）---------- */
-          function comb(n, k) { if (k < 0 || k > n) return 0; var res = 1; for (var i = 1; i <= k; i++) res = res * (n - i + 1) / i; return res; }
+          function comb(n, k) { return window.Core ? window.Core.math.comb(n, k) : (function () { if (k < 0 || k > n) return 0; var res = 1; for (var i = 1; i <= k; i++) res = res * (n - i + 1) / i; return res; })(); }
           function hyperRed(j) { return comb(6, j) * comb(27, 6 - j) / comb(33, 6); }
           // 理论参照（组合数精确，与历史范围、策略、参数均无关）：
           // 「奖级加权对照示例」与正式回测结果共用这一份，确保两处准绳完全一致。
@@ -1366,7 +1366,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

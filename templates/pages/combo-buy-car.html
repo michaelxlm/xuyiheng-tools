@@ -31,7 +31,7 @@
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
             var TAXI = { '1.0': 300, '1.6': 360, '2.0': 420, '2.5': 660 };
@@ -41,8 +41,8 @@
               if (!(price > 0)) { alert('请输入车辆指导价'); return; }
               var down = U.numInput($('bc-down')); if (!Number.isFinite(down)) down = 30;
               var rate = U.numInput($('bc-rate')) || 0, years = U.numInput($('bc-years')) || 3, ev = $('bc-energy').value === 'ev';
-              var loan = price * (1 - down / 100), n = Math.round(years * 12), r = rate / 100 / 12;
-              var monthly = r > 0 ? loan * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1) : loan / n;
+              var loan = price * (1 - down / 100), n = Math.round(years * 12);
+              var monthly = C.loan.annuity(loan, rate, n);
               var interest = monthly * n - loan;
               var purchase = ev ? 0 : price / 1.13 * 0.10;
               var comp = price * 0.04, force = 950, vessel = ev ? 0 : (TAXI[$('bc-disp').value] || 360);

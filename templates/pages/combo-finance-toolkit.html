@@ -50,42 +50,62 @@
         <div class="result-box" id="fx-result" hidden>
           <div class="result-row"><div><div class="result-label" id="fx-rlabel">换算结果</div><div class="result-value" id="fx-rvalue">--</div></div></div>
           <dl class="result-detail" id="fx-detail"></dl>
+          <div class="btn-row mt-4" id="ft-save-row" hidden>
+            <button class="btn btn-secondary" type="button" id="ft-save">保存此复利方案</button>
+          </div>
         </div>
+
+        <section class="card mt-4" id="ft-plans-wrap" hidden>
+          <h2 class="card-title">已保存复利方案对比</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">初始本金</th><th scope="col">每年追加</th><th scope="col">年化</th><th scope="col">年限</th><th scope="col">期末资产</th><th scope="col">累计收益</th><th scope="col">操作</th></tr></thead>
+              <tbody id="ft-plans-body"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="ft-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="ft-clear">清空方案</button>
+          </div>
+        </section>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>复利终值 = 本金×(1+r)ⁿ + 年投入×((1+r)ⁿ−1)/r；定期利息按单利；通胀反映同额资金的未来购买力。汇率数据经中台接口实时获取，若不可达会提示。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var F = C.finance, KEY = 'finance-plans';
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
             var FORMS = { ci: 'ciForm', dep: 'depForm', inf: 'infForm', fx: 'fxForm' };
             U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () {
               U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active');
               var t = b.getAttribute('data-tab'); Object.keys(FORMS).forEach(function (k) { $(FORMS[k]).hidden = k !== t; });
               $('fx-result').hidden = t !== 'fx';
             }); });
+            var lastPlan = null;
             $('ciForm').addEventListener('submit', function (e) { e.preventDefault();
-              var p = U.numInput($('ci-p')) || 0, m = U.numInput($('ci-m')) || 0, r = (U.numInput($('ci-r')) || 0) / 100, y = U.numInput($('ci-y')) || 0;
+              var p = U.numInput($('ci-p')) || 0, m = U.numInput($('ci-m')) || 0, r = U.numInput($('ci-r')) || 0, y = U.numInput($('ci-y')) || 0;
               if (!(y > 0) || (p <= 0 && m <= 0)) { alert('请输入本金/追加与年限'); return; }
-              var fv = p * Math.pow(1 + r, y) + (r > 0 ? m * (Math.pow(1 + r, y) - 1) / r : m * y);
-              var invested = p + m * y;
-              show('终值', U.money(fv), row('总投入', U.money(invested)) + row('累计收益', U.money(fv - invested)) + row('收益率', (invested > 0 ? U.round((fv - invested) / invested * 100, 1) : 0) + '%'));
+              var res = F.withAnnual(p, m, r, y);
+              lastPlan = { p: p, m: m, r: r, y: y, total: res.total, interest: res.interest };
+              show('终值', U.money(res.total), row('总投入', U.money(res.invested)) + row('累计收益', U.money(res.interest)) + row('收益率', (res.invested > 0 ? U.round(res.interest / res.invested * 100, 1) : 0) + '%') + row('翻倍年数（72 法则）', U.round(F.doubleYears(r), 1) + ' 年'));
               U.track('calc_result', { tool: 'finance-toolkit', mode: 'ci' });
             });
             $('depForm').addEventListener('submit', function (e) { e.preventDefault();
-              var p = U.numInput($('dep-p')), r = (U.numInput($('dep-r')) || 0) / 100, mth = U.numInput($('dep-m')) || 0;
+              var p = U.numInput($('dep-p')), r = U.numInput($('dep-r')) || 0, mth = U.numInput($('dep-m')) || 0;
               if (!(p > 0 && mth > 0)) { alert('请输入金额与存期'); return; }
-              var interest = p * r / 12 * mth;
+              var interest = F.simpleInterest(p, r, mth);
               show('到期本息', U.money(p + interest), row('存款本金', U.money(p)) + row('存款利息', U.money(interest)) + row('存期', mth + ' 个月'));
               U.track('calc_result', { tool: 'finance-toolkit', mode: 'dep' });
             });
             $('infForm').addEventListener('submit', function (e) { e.preventDefault();
-              var a = U.numInput($('inf-a')), r = (U.numInput($('inf-r')) || 0) / 100, y = U.numInput($('inf-y')) || 0;
+              var a = U.numInput($('inf-a')), r = U.numInput($('inf-r')) || 0, y = U.numInput($('inf-y')) || 0;
               if (!(a > 0 && y > 0)) { alert('请输入金额与年数'); return; }
-              var future = a * Math.pow(1 + r, y);
-              show('未来物价需', U.money(future), row('现金额', U.money(a)) + row('y 年后购买力', '相当于今天的 ' + U.money(a / Math.pow(1 + r, y))) + row('累计涨价', U.money(future - a)));
+              var future = F.compound(a, r, y, 1);
+              show('未来物价需', U.money(future), row('现金额', U.money(a)) + row('y 年后购买力', '相当于今天的 ' + U.money(a / (future / a))) + row('累计涨价', U.money(future - a)) + row('实际收益率（假设名义收益=通胀）', U.round(F.realRate(r, r), 1) + '%'));
               U.track('calc_result', { tool: 'finance-toolkit', mode: 'inf' });
             });
             $('fxForm').addEventListener('submit', function (e) { e.preventDefault();
@@ -102,7 +122,43 @@
               }).catch(function () { show('查询失败', '网络不可达', row('提示', '请稍后重试或检查网络')); });
               U.track('calc_result', { tool: 'finance-toolkit', mode: 'fx' });
             });
-            function show(label, value, detail) { $('fx-rlabel').textContent = label; $('fx-rvalue').textContent = value; $('fx-detail').innerHTML = detail || ''; $('fx-result').hidden = false; }
+            function show(label, value, detail) {
+              $('fx-rlabel').textContent = label; $('fx-rvalue').textContent = value;
+              $('fx-detail').innerHTML = detail || ''; $('fx-result').hidden = false;
+              $('ft-save-row').hidden = !lastPlan || $('ciForm').hidden;
+            }
+            function plans() { return C.history.list(KEY); }
+            function renderPlans() {
+              var rows = plans();
+              $('ft-plans-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              $('ft-plans-body').innerHTML = rows.map(function (r, i) {
+                return '<tr><td>' + U.money(r.p) + '</td><td>' + U.money(r.m) + '</td><td>' + r.r + '%</td><td>' + r.y + ' 年</td><td>' + U.money(r.total) + '</td><td>' + U.money(r.interest) + '</td><td><button type="button" class="btn btn-secondary ft-plan-del" data-idx="' + i + '" aria-label="删除方案">删除</button></td></tr>';
+              }).join('');
+            }
+            $('ft-save').addEventListener('click', function () {
+              if (!lastPlan) return;
+              C.history.add(KEY, lastPlan, 20);
+              renderPlans();
+              U.track('save_result', { tool: 'finance-toolkit', mode: 'ci' });
+            });
+            $('ft-plans-body').addEventListener('click', function (e) {
+              var btn = e.target.closest('.ft-plan-del'); if (!btn) return;
+              var rows = plans(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderPlans();
+            });
+            $('ft-export').addEventListener('click', function () {
+              C.csv.download('复利方案.csv', plans().map(function (r) { return [r.p, r.m, r.r, r.y, U.round(r.total, 2), U.round(r.interest, 2)]; }), ['初始本金', '每年追加', '年化(%)', '年限', '期末资产', '累计收益']);
+              U.track('export_result', { tool: 'finance-toolkit' });
+            });
+            $('ft-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部复利方案？')) return;
+              C.history.clear(KEY); renderPlans();
+            });
+            renderPlans();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
