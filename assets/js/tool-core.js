@@ -616,6 +616,38 @@
     }
   };
 
+  /* ------------------------------ 场景承接（跨页带参） ------------------------------
+     复用 tool-state.js 的 #s=<urlencoded JSON> 协议：目标页会自动回填字段并重算。
+     Core.bridgeLink('/combo/life-plan.html', { 'lp-debt': 4890 })
+       → '/combo/life-plan.html#s=%7B%22lp-debt%22%3A%224890%22%7D'
+     Core.bindBridge(container, [{ trigger:'#btn', href:'...', values:{...} }])
+     values 支持函数（调用时求值，用于取当前测算结果）。 */
+  var bridge = {
+    link: function (path, values) {
+      var o = {};
+      Object.keys(values || {}).forEach(function (k) {
+        var v = typeof values[k] === 'function' ? values[k]() : values[k];
+        if (v !== null && v !== undefined && v !== '') o[k] = String(v);
+      });
+      var keys = Object.keys(o);
+      if (!keys.length) return path;
+      try { return path + '#s=' + encodeURIComponent(JSON.stringify(o)); } catch (e) { return path; }
+    },
+    bind: function (root, items) {
+      var scope = root && root.querySelector ? root : global.document;
+      (items || []).forEach(function (it) {
+        var btn = scope.querySelector(it.trigger);
+        if (!btn || btn.__bridgeBound) return;
+        btn.__bridgeBound = true;
+        btn.addEventListener('click', function () {
+          var href = bridge.link(it.href, it.values);
+          if (it.track && global.U && global.U.track) global.U.track('bridge_click', { from: it.from || '', to: it.href });
+          try { global.location.href = href; } catch (e) {}
+        });
+      });
+    }
+  };
+
   /* ------------------------------ CSV / 历史记录 ------------------------------ */
   function csvCell(v) {
     var s = String(v == null ? '' : v);
@@ -688,6 +720,6 @@
     loan: loan, finance: finance, health: health, math: math,
     pet: pet, social: social, height: height, gestation: gestation,
     color: color, date: date, timezone: timezone,
-    csv: csv, history: history
+    bridge: bridge, csv: csv, history: history
   };
 })(window);

@@ -92,26 +92,83 @@
   <main class="site-main site-main--flat" id="main">
     <div class="main-inner">
 <nav class="cat-bar" aria-label="分类导航"><a href="/#cat-calc" data-cat="calc">计算器</a><a href="/#cat-cal" data-cat="cal">日历工具</a><a href="/#cat-combo" data-cat="combo">场景组合</a><a href="/#cat-other" data-cat="other">其他工具</a><a href="/tools.html" class="cat-bar-all">全部工具</a></nav>
-<section class="page-heading">
-          <h1>场景组合工具</h1>
-          <p>把分散的单点计算器串成一条决策流：买房、买车、健康、理财、人生规划与趣味测试，进一个场景算清一整笔账。</p>
+<style>
+        .flow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); }
+        .flow-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-5); }
+        .flow-card h2 { margin: 0 0 var(--space-1); font-size: var(--text-lg); }
+        .flow-card .flow-desc { color: var(--color-muted); font-size: var(--text-sm); margin: 0 0 var(--space-4); }
+        .flow-steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+        .flow-steps li { position: relative; padding: 0 0 var(--space-4) 2.2rem; counter-increment: step; }
+        .flow-steps li::before { content: counter(step); position: absolute; left: 0; top: 1px; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .flow-steps li::after { content: ""; position: absolute; left: .7rem; top: 1.9rem; bottom: .2rem; width: 1px; background: var(--color-border); }
+        .flow-steps li:last-child { padding-bottom: 0; }
+        .flow-steps li:last-child::after { display: none; }
+        .flow-steps a { color: var(--color-text); font-weight: 600; text-decoration: none; border-bottom: 1px dashed var(--color-border-strong); }
+        .flow-steps a:hover { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+        .flow-steps small { display: block; color: var(--color-muted); margin-top: 3px; line-height: 1.5; }
+        .flow-bridge { display: inline-block; margin-top: 4px; font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-soft); border-radius: 6px; padding: 2px 7px; }
+        </style>
+
+        <section class="page-heading">
+          <h1>场景组合 · 决策流</h1>
+          <p>按真实目标把工具串成一条流：每一步算出的结果，可以直接带进下一步继续算。点开场景，从第一步开始。</p>
         </section>
 
-        <div id="comboGroups"></div>
+        <div class="flow-grid" id="flowGrid"></div>
 
-        <div class="info-box mt-4"><span aria-hidden="true">🧩</span><div>场景组合把多个工具聚合成完整决策流；各项结果仅供参考，最终请结合实际情况与专业意见。</div></div>
+        <div class="info-box mt-4"><span aria-hidden="true">🧩</span><div>带「↗ 带入下一步」标记的工具，结果区会生成带参链接：打开下一步时自动回填上一步的数值。数据仅在本机浏览器内传递，计算结果仅供参考，请结合实际情况与专业意见。</div></div>
 
         <script>
         (function () {
           function boot() {
             var TOOLS = window.__TOOLS__ || [];
-            var items = TOOLS.filter(function (t) { return t.key === 'combo' && t.url !== '/combo/index.html'; });
-            var cards = items.map(function (t) {
-              var icon = '<span class="tool-card-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-' + (t.icon || 'compass') + '"></use></svg></span>';
-              return '<a class="tool-card is-wide" href="' + t.url + '">' + icon + '<span class="tool-card-title">' + t.label + '</span>' + (t.desc ? '<span class="tool-card-desc">' + t.desc + '</span>' : '') + '</a>';
+            var byUrl = {};
+            TOOLS.forEach(function (t) { byUrl[t.url] = t; });
+            var FLOWS = [
+              {
+                title: '🏠 安家置业', desc: '从总价与月供出发，一路算到装修与家庭现金流',
+                steps: [
+                  { url: '/combo/buy-house.html', label: '买房全攻略', note: '总价、首付、贷款月供与契税中介费', bridge: '带入下一步：月供 → 人生规划负债 / 提前还款本金' },
+                  { url: '/calculator/prepay.html', label: '房贷提前还款', note: '提前还款后省多少利息、缩短多久', bridge: '带入下一步：新月供 → 人生规划负债' },
+                  { url: '/calculator/decoration.html', label: '装修预算', note: '按房间与材料列清单，汇总主材用量与费用' },
+                  { url: '/combo/life-plan.html', label: '人生规划', note: '把月供计入支出，看储蓄率与财务自由进度', bridge: '月结余 → 理财复利年投' }
+                ]
+              },
+              {
+                title: '🚗 买车用车', desc: '落地价、月供与长期用车成本一起看',
+                steps: [
+                  { url: '/combo/buy-car.html', label: '买车全攻略', note: '购置税、保险、车船税与落地总价', bridge: '带入下一步：月供 → 人生规划负债' },
+                  { url: '/calculator/fuel-cost.html', label: '油耗记录本', note: '记录每次加油，看真实平均油耗与每公里油费' },
+                  { url: '/combo/life-plan.html', label: '人生规划', note: '把车贷与用车支出纳入月度现金流' }
+                ]
+              },
+              {
+                title: '💰 家庭财务', desc: '从现金流到投资收益，形成一份可保存的方案',
+                steps: [
+                  { url: '/combo/life-plan.html', label: '人生规划', note: '储蓄率、三情景资产预测与财务自由进度', bridge: '带入下一步：月结余 → 理财复利年投' },
+                  { url: '/combo/finance-toolkit.html', label: '理财百宝箱', note: '按年追加复利、定存利息与通胀购买力，可存多方案对比' },
+                  { url: '/calculator/social-insurance.html', label: '五险一金', note: '按城市档位算到手工资与公积金入账' }
+                ]
+              },
+              {
+                title: '🏃 健康生活', desc: '从体检指标到家庭成长记录，集中管理',
+                steps: [
+                  { url: '/combo/health-check.html', label: '健康体检站', note: 'BMI、体脂、腰高比、基础代谢与体重趋势' },
+                  { url: '/calculator/body-fat.html', label: '基础代谢体脂', note: '围度法体脂率与去脂体重，口径与健康体检站一致' },
+                  { url: '/calculator/height-predict.html', label: '儿童身高预测', note: '遗传靶身高与本地生长曲线追踪' }
+                ]
+              }
+            ];
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            document.getElementById('flowGrid').innerHTML = FLOWS.map(function (f) {
+              return '<section class="flow-card"><h2>' + esc(f.title) + '</h2><p class="flow-desc">' + esc(f.desc) + '</p><ol class="flow-steps">' +
+                f.steps.map(function (s) {
+                  var t = byUrl[s.url];
+                  var label = s.label || (t && t.label) || s.url;
+                  return '<li><a href="' + esc(s.url) + '">' + esc(label) + '</a><small>' + esc(s.note || (t && t.desc) || '') + '</small>' +
+                    (s.bridge ? '<span class="flow-bridge">↗ ' + esc(s.bridge) + '</span>' : '') + '</li>';
+                }).join('') + '</ol></section>';
             }).join('');
-            document.getElementById('comboGroups').innerHTML =
-              '<section class="home-section" data-cat="combo"><h2 class="section-title"><span class="dot" aria-hidden="true"></span>场景组合<span class="count">' + items.length + '</span></h2><div class="tool-grid">' + cards + '</div></section>';
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -188,7 +245,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=8c5ab79731" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

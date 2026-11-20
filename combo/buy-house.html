@@ -120,6 +120,10 @@
             <div><div class="result-label">购房总花费</div><div class="result-value" id="bh-total">--</div></div>
           </div>
           <dl class="result-detail" id="bh-detail"></dl>
+          <div class="btn-row mt-4">
+            <a class="btn btn-secondary" href="#" id="bh-to-plan">月供带入人生规划 →</a>
+            <a class="btn btn-secondary" href="#" id="bh-to-prepay">去算提前还款 →</a>
+          </div>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>契税按常见政策估算：首套 ≤90㎡ 1%、>90㎡ 1.5%；二套 3%（各地不同）。月供按等额本息公式计算。实际税费、中介费与贷款利率以当地政策及银行合同为准。</div></div>
@@ -153,6 +157,8 @@
                 row('契税（' + (deedRate * 100) + '%）', U.money(deed)) +
                 row('中介费（约 1%）', U.money(agent));
               $('bh-result').hidden = false;
+              $('bh-to-plan').href = C.bridge.link('/combo/life-plan.html', { 'lp-income': 20000, 'lp-expense': 8000, 'lp-debt': U.round(monthly, 2), 'lp-assets': U.round(downAmt, 2) });
+              $('bh-to-prepay').href = C.bridge.link('/calculator/prepay.html', { 'pp-loan': U.round(loan, 2), 'pp-rate': rate, 'pp-term': years });
               U.track('calc_result', { tool: 'buy-house' });
             });
           }
@@ -257,7 +263,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=8c5ab79731" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

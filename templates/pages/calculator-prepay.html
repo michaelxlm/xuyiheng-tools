@@ -33,6 +33,7 @@
           </div>
           <div class="btn-row mt-4">
             <button class="btn btn-secondary" type="button" id="pp-schedule">查看完整还款计划</button>
+            <a class="btn btn-secondary" href="#" id="pp-to-life">月供带入人生规划 →</a>
           </div>
           <div class="table-wrap mt-4" id="pp-schedule-wrap" hidden>
             <table>
@@ -88,6 +89,7 @@
 
               var pre = U.numInput($('pp-prepay'));
               var box = $('pp-prepay-box');
+              var nextMonthly = method === 'equal' ? P_of() : first;
               if (Number.isFinite(pre) && pre > 0 && pre < bal) {
                 var newBal = bal - pre;
                 var remainN = n - k;
@@ -99,6 +101,7 @@
                   shortInterest = Number.isFinite(shortN) ? shortPay * shortN - newBal : NaN;
                   savedMonths = Number.isFinite(shortN) ? Math.round(remainN - shortN) : NaN;
                   newMonthly = annuityPay(newBal, r, remainN);
+                  nextMonthly = newMonthly;
                   reduceInterest = newMonthly * remainN - newBal;
                 } else {
                   // 等额本金：直接按剩余本金重算
@@ -128,6 +131,7 @@
               $('pp-result').hidden = false;
               $('pp-schedule-wrap').hidden = true;
               $('pp-schedule-actions').hidden = true;
+              $('pp-to-life').href = C.bridge.link('/combo/life-plan.html', { 'lp-income': 20000, 'lp-expense': 8000, 'lp-debt': U.round(nextMonthly, 2) });
               U.track('calc_result', { tool: 'prepay', method: method });
             });
 

@@ -118,6 +118,9 @@
             <div><div class="result-label">落地总价</div><div class="result-value" id="bc-total">--</div></div>
           </div>
           <dl class="result-detail" id="bc-detail"></dl>
+          <div class="btn-row mt-4">
+            <a class="btn btn-secondary" href="#" id="bc-to-fuel">月供与油价带入现金流 →</a>
+          </div>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>购置税 ≈ 开票价 ÷ 1.13 × 10%（新能源按政策减免）。交强险家用 6 座以下 950 元/年；商业险按车价约 4% 首年估算；车船税按排量分档。数值为参考，实际以 4S 店与保险报价为准。</div></div>
@@ -152,6 +155,7 @@
                 row('交强险', U.money(force)) +
                 row('车船税（估）', U.money(vessel));
               $('bc-result').hidden = false;
+              $('bc-to-fuel').href = C.bridge.link('/combo/life-plan.html', { 'lp-income': 20000, 'lp-expense': 8000, 'lp-debt': U.round(monthly, 2), 'lp-assets': U.round(price * down / 100, 2) });
               U.track('calc_result', { tool: 'buy-car', energy: $('bc-energy').value });
             });
           }
@@ -256,7 +260,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
-    <script src="/assets/js/tool-core.min.js?v=1a654e6d7c" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=8c5ab79731" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

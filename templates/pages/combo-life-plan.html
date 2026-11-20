@@ -44,6 +44,9 @@
           <dl class="result-detail" id="lp-scenarios"></dl>
           <h3 class="card-title mt-4">目标反推</h3>
           <dl class="result-detail" id="lp-required"></dl>
+          <div class="btn-row mt-4">
+            <a class="btn btn-secondary" href="#" id="lp-to-finance">月结余带入理财复利 →</a>
+          </div>
         </div>
 
         <section class="card mt-4" id="lp-compare-wrap" hidden>
@@ -132,6 +135,7 @@
                 $('lp-required').innerHTML = row('提示', '填写目标年支出后可反推所需月储蓄');
               }
               $('lp-result').hidden = false;
+              $('lp-to-finance').href = C.bridge.link('/combo/finance-toolkit.html', { 'ci-p': U.round(r.assets, 2), 'ci-m': U.round(Math.max(0, r.save) * 12, 2), 'ci-r': r.rate, 'ci-y': r.years });
               U.track('calc_result', { tool: 'life-plan' });
             }
 
