@@ -1,80 +1,214 @@
+        <style>
+        .hc-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .hc-table th,.hc-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .hc-table th{color:var(--color-muted);font-weight:600}
+        .hc-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        </style>
+
         <section class="page-heading">
-          <h1>健康体检站</h1>
-          <p>快速自我健康评估：BMI 体质指数与分级、理想体重区间、基础代谢率 BMR 与每日消耗参考，几分钟了解自己的身体状况。</p>
+          <h1>健康体检站 · 身体数据追踪</h1>
+          <p>BMI 与体型分级、健康体重区间、基础代谢与按活动量估算的每日消耗；再填颈围腰围还能算体脂率与腰高比。可把每次测量存成本地记录，观察体重与 BMI 趋势。</p>
         </section>
 
         <form class="card" id="hcForm">
-          <div class="form-group"><label class="form-label" for="hc-sex">性别</label><select class="form-select" id="hc-sex"><option value="male">男</option><option value="female">女</option></select></div>
-          <div class="field-grid">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="hc-sex">性别</label><select class="form-select" id="hc-sex"><option value="male">男</option><option value="female">女</option></select></div>
             <div class="form-group"><label class="form-label" for="hc-age">年龄</label><div class="input-with-unit"><input class="form-input" id="hc-age" type="number" inputmode="numeric" min="5" max="100" placeholder="岁"></div></div>
+          </div>
+          <div class="field-grid">
             <div class="form-group"><label class="form-label" for="hc-height">身高</label><div class="input-with-unit"><input class="form-input" id="hc-height" type="number" inputmode="decimal" min="80" placeholder="cm"><span class="unit-tag">厘米</span></div></div>
             <div class="form-group"><label class="form-label" for="hc-weight">体重</label><div class="input-with-unit"><input class="form-input" id="hc-weight" type="number" inputmode="decimal" min="20" placeholder="kg"><span class="unit-tag">公斤</span></div></div>
           </div>
-          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"health-check"}'>评估</button></div>
+          <div class="form-row mt-4">
+            <div class="form-group"><label class="form-label" for="hc-activity">日常活动量</label><select class="form-select" id="hc-activity"></select></div>
+            <div class="form-group"><label class="form-label" for="hc-goal">体重目标</label><select class="form-select" id="hc-goal"><option value="maintain">保持体重</option><option value="cut">减脂（约 −400 kcal/天）</option><option value="gain">增肌（约 +250 kcal/天）</option></select></div>
+          </div>
+          <details class="mt-4">
+            <summary>体脂率选填（颈围 / 腰围 / 女性另需臀围）</summary>
+            <div class="field-grid mt-4">
+              <div class="form-group"><label class="form-label" for="hc-neck">颈围</label><div class="input-with-unit"><input class="form-input" id="hc-neck" type="number" inputmode="decimal" min="10" placeholder="cm"><span class="unit-tag">cm</span></div></div>
+              <div class="form-group"><label class="form-label" for="hc-waist">腰围</label><div class="input-with-unit"><input class="form-input" id="hc-waist" type="number" inputmode="decimal" min="30" placeholder="cm"><span class="unit-tag">cm</span></div></div>
+              <div class="form-group" id="hc-hip-wrap"><label class="form-label" for="hc-hip">臀围（女性）</label><div class="input-with-unit"><input class="form-input" id="hc-hip" type="number" inputmode="decimal" min="40" placeholder="cm"><span class="unit-tag">cm</span></div></div>
+            </div>
+          </details>
+          <div class="form-group mt-4"><label class="form-label" for="hc-date">测量日期</label><input class="form-input" id="hc-date" type="date"></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"health-check"}'>评估</button>
+            <button class="btn btn-secondary" type="button" id="hc-save">记录本次</button>
+          </div>
         </form>
 
         <div class="result-box" id="hc-result" hidden>
           <div class="result-row">
             <div><div class="result-label">BMI</div><div class="result-value" id="hc-bmi">--</div></div>
             <div><div class="result-label">体型评级</div><div class="result-value" id="hc-cat" style="font-size:var(--text-lg)">--</div></div>
+            <div><div class="result-label">每日消耗 TDEE</div><div class="result-value" id="hc-tdee">--</div></div>
           </div>
           <dl class="result-detail" id="hc-detail"></dl>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>评级采用中国成人标准：BMI &lt;18.5 偏瘦、18.5–23.9 正常、24–27.9 超重、≥28 肥胖。理想体重用 Devine 公式，BMR 用 Mifflin-St Jeor 公式。本工具仅为参考，不能替代医学诊断。</div></div>
+        <section class="card mt-4" id="hc-track" hidden>
+          <h2 class="card-title">本地测量记录</h2>
+          <div class="result-row" id="hc-stats"></div>
+          <div id="hc-chart" aria-label="体重趋势"></div>
+          <div class="table-wrap">
+            <table class="hc-table">
+              <thead><tr><th scope="col">日期</th><th scope="col">体重</th><th scope="col">BMI</th><th scope="col">体脂率</th><th scope="col">TDEE</th><th scope="col">操作</th></tr></thead>
+              <tbody id="hc-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="hc-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="hc-clear">清空记录</button>
+          </div>
+        </section>
+
+        <div class="ad-slot" data-ad-slot="next"></div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>评级采用中国成人 BMI 标准；BMR 用 Mifflin-St Jeor、理想体重用 Devine、体脂率用美国海军围度公式，均为估算。BMI 不区分肌肉与脂肪，体脂率受测量手法影响；本工具不能替代医学检查。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var H = C.health, KEY = 'health-check';
+            var last = null;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function cat(bmi) { return bmi < 18.5 ? '偏瘦' : bmi < 24 ? '正常' : bmi < 28 ? '超重' : '肥胖'; }
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+            if (!$('hc-date').value) $('hc-date').value = today();
+
+            H.ACTIVITY.forEach(function (a) {
+              var o = document.createElement('option'); o.value = a.key; o.textContent = a.label;
+              if (a.key === 'moderate') o.selected = true;
+              $('hc-activity').appendChild(o);
+            });
+            function syncSex() { $('hc-hip-wrap').hidden = $('hc-sex').value !== 'female'; }
+            $('hc-sex').addEventListener('change', syncSex);
+
+            function read() {
+              var sex = $('hc-sex').value, age = U.numInput($('hc-age'));
+              var h = U.numInput($('hc-height')), w = U.numInput($('hc-weight'));
+              if (!(h > 0 && w > 0)) { alert('请填写身高与体重'); return null; }
+              if (!Number.isFinite(age) || age <= 0) age = 30;
+              return {
+                date: $('hc-date').value || today(), sex: sex, age: age, h: h, w: w,
+                activity: $('hc-activity').value, goal: $('hc-goal').value,
+                neck: U.numInput($('hc-neck')), waist: U.numInput($('hc-waist')), hip: U.numInput($('hc-hip'))
+              };
+            }
+
+            function calculate(r) {
+              var bmi = H.bmi(r.w, r.h), bmr = H.bmr(r.w, r.h, r.age, r.sex), tdee = H.tdee(bmr, r.activity);
+              var bf = (Number.isFinite(r.neck) && Number.isFinite(r.waist)) ? H.bodyFatNavy(r.sex, r.h, r.neck, r.waist, r.hip) : NaN;
+              var whr = H.waistToHeight(r.waist, r.h);
+              return {
+                bmi: bmi, category: H.bmiCategory(bmi), bmr: bmr, tdee: tdee,
+                healthy: H.healthyWeight(r.h), ideal: H.devine(r.sex, r.h),
+                goalCal: H.weightGoal(tdee, r.goal), bf: bf, whr: whr
+              };
+            }
+
+            function show(r, c) {
+              last = { input: r, calc: c };
+              $('hc-bmi').textContent = U.round(c.bmi, 1);
+              $('hc-cat').textContent = c.category;
+              $('hc-tdee').textContent = Math.round(c.tdee) + ' kcal';
+              var detail = row('健康体重区间（BMI 18.5–23.9）', U.round(c.healthy.min, 1) + ' ~ ' + U.round(c.healthy.max, 1) + ' kg') +
+                row('理想体重（Devine）', U.round(c.ideal, 1) + ' kg') +
+                row('基础代谢 BMR', Math.round(c.bmr) + ' kcal/天') +
+                row('每日消耗 TDEE', Math.round(c.tdee) + ' kcal/天 · ' + (H.ACTIVITY.filter(function (a) { return a.key === r.activity; })[0] || {}).label) +
+                row('目标热量（' + ({ maintain: '保持', cut: '减脂', gain: '增肌' })[r.goal] + '）', Math.round(c.goalCal) + ' kcal/天');
+              if (Number.isFinite(c.bf)) detail += row('体脂率（围度法）', U.round(c.bf, 1) + '% · ' + H.bodyFatCategory(r.sex, c.bf));
+              if (Number.isFinite(r.waist) && Number.isFinite(c.whr)) detail += row('腰高比', U.round(c.whr, 3) + (c.whr < 0.5 ? ' · 低于 0.5，风险较低' : ' · 达/超 0.5，建议关注'));
+              $('hc-detail').innerHTML = detail;
+              $('hc-result').hidden = false;
+            }
+
+            function list() { return C.history.list(KEY); }
+            function renderTrack() {
+              var rows = list();
+              $('hc-track').hidden = rows.length === 0;
+              if (!rows.length) return;
+              var first = rows[rows.length - 1], cur = rows[0];
+              var delta = cur.w - first.w;
+              $('hc-stats').innerHTML =
+                '<div><div class="result-label">当前体重</div><div class="result-value">' + U.round(cur.w, 1) + ' kg</div></div>' +
+                '<div><div class="result-label">较首次变化</div><div class="result-value">' + (delta >= 0 ? '+' : '') + U.round(delta, 1) + ' kg</div></div>' +
+                '<div><div class="result-label">记录次数</div><div class="result-value">' + rows.length + '</div></div>';
+
+              var pts = rows.slice(0, 20).slice().reverse();
+              var ws = pts.map(function (p) { return p.w; });
+              var lo = Math.min.apply(null, ws) - 1, hi = Math.max.apply(null, ws) + 1;
+              var w = 640, h = 140, pad = 20;
+              function px(i) { return pad + (pts.length === 1 ? (w - pad * 2) / 2 : i * (w - pad * 2) / (pts.length - 1)); }
+              function py(v) { return h - pad - (v - lo) / ((hi - lo) || 1) * (h - pad * 2); }
+              var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + px(i).toFixed(1) + ' ' + py(p.w).toFixed(1); }).join(' ');
+              $('hc-chart').innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="' + h + '" role="img" aria-label="体重趋势"><line x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - pad) + '" y2="' + (h - pad) + '" stroke="var(--color-border-strong)"/><path d="' + d + '" fill="none" stroke="var(--color-primary)" stroke-width="2.5"/>' + pts.map(function (p, i) { return '<circle cx="' + px(i).toFixed(1) + '" cy="' + py(p.w).toFixed(1) + '" r="3.5" fill="var(--color-primary)"><title>' + esc(p.date) + ' · ' + p.w + 'kg</title></circle>'; }).join('') + '</svg>';
+
+              $('hc-tbody').innerHTML = rows.slice(0, 50).map(function (r, i) {
+                return '<tr><td>' + esc(r.date) + '</td><td>' + U.round(r.w, 1) + ' kg</td><td>' + U.round(r.bmi, 1) + '</td><td>' + (Number.isFinite(r.bf) ? U.round(r.bf, 1) + '%' : '--') + '</td><td>' + (r.tdee ? Math.round(r.tdee) + ' kcal' : '--') + '</td><td><button type="button" class="btn btn-secondary hc-del" data-idx="' + i + '" aria-label="删除记录">删除</button></td></tr>';
+              }).join('');
+            }
+
             $('hcForm').addEventListener('submit', function (e) {
               e.preventDefault();
-              var sex = $('hc-sex').value, age = U.numInput($('hc-age')), h = U.numInput($('hc-height')), w = U.numInput($('hc-weight'));
-              if (!(h > 0 && w > 0)) { alert('请填写身高与体重'); return; }
-              if (!Number.isFinite(age)) age = 30;
-              var bmi = w / (h / 100) / (h / 100);
-              var ideal = sex === 'male' ? 50 + 2.3 * ((h - 152.4) / 2.54) : 45.5 + 2.3 * ((h - 152.4) / 2.54);
-              var bmr = 10 * w + 6.25 * h - 5 * age + (sex === 'male' ? 5 : -161);
-              $('hc-bmi').textContent = U.round(bmi, 1);
-              $('hc-cat').textContent = cat(bmi);
-              $('hc-detail').innerHTML =
-                row('理想体重（Devine）', U.round(ideal, 1) + ' kg（参考 ±10%）') +
-                row('健康体重区间（BMI 18.5–24）', U.round(18.5 * (h / 100) * (h / 100), 1) + ' ~ ' + U.round(24 * (h / 100) * (h / 100), 1) + ' kg') +
-                row('基础代谢 BMR', Math.round(bmr) + ' kcal/天') +
-                row('每日消耗参考（中度活动）', Math.round(bmr * 1.55) + ' kcal/天');
-              $('hc-result').hidden = false;
-              U.track('calc_result', { tool: 'health-check', sex: sex });
+              var r = read(); if (!r) return;
+              show(r, calculate(r));
+              U.track('calc_result', { tool: 'health-check' });
             });
+            $('hc-save').addEventListener('click', function () {
+              var r = read(); if (!r) return;
+              var c = calculate(r);
+              show(r, c);
+              C.history.add(KEY, { date: r.date, w: r.w, h: r.h, bmi: c.bmi, bf: c.bf, tdee: c.tdee, sex: r.sex }, 100);
+              renderTrack();
+              U.track('save_result', { tool: 'health-check' });
+            });
+            $('hc-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.hc-del'); if (!btn) return;
+              var rows = list(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderTrack();
+            });
+            $('hc-export').addEventListener('click', function () {
+              C.csv.download('健康记录.csv', list().map(function (r) { return [r.date, r.w, r.h, U.round(r.bmi, 1), Number.isFinite(r.bf) ? U.round(r.bf, 1) : '', Math.round(r.tdee || 0)]; }), ['日期', '体重(kg)', '身高(cm)', 'BMI', '体脂率(%)', 'TDEE(kcal)']);
+              U.track('export_result', { tool: 'health-check' });
+            });
+            $('hc-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部健康记录？')) return;
+              C.history.clear(KEY); renderTrack();
+            });
+            syncSex();
+            renderTrack();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
         </script>
 
-        <div class="ad-slot" data-ad-slot="next"></div>
+<script src="/assets/js/slot-loader.js?v=cdd017a763" defer></script>
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>健康体检站按身高、体重等输入快速估算 BMI 体质指数、理想体重、基础代谢 BMR 与每日消耗，帮助自我健康评估；估算值不替代医学检查。</p>
+          <p>健康体检站用共享计算内核给出 BMI 分级、理想体重、基础代谢与按活动量估算的每日消耗，支持体脂率、腰高比与本地测量记录趋势；结果仅供自我评估。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>BMI 怎么算、准吗？</summary>
             <p>BMI=体重÷身高²，是群体层面的粗略指标，未区分肌肉与脂肪，需结合体脂等综合看。</p>
           </details>
           <details>
-            <summary>用的是哪些公式？</summary>
-            <p>BMR、TDEE 常采用 Mifflin-St Jeor 等公式，属估算。</p>
+            <summary>体脂率怎么估的？</summary>
+            <p>用美国海军围度公式，男性按身高/颈围/腰围，女性再加臀围；测量手法差异会带来误差。</p>
+          </details>
+          <details>
+            <summary>TDEE 和目标热量怎么用？</summary>
+            <p>TDEE = 基础代谢 × 活动系数；减脂约减 400 kcal、增肌约加 250 kcal，仅为起点参考，请结合实际调整。</p>
           </details>
           <details>
             <summary>结果能当诊断吗？</summary>
             <p>不能，仅供自我评估，健康问题请咨询医生。</p>
           </details>
-          <details>
-            <summary>需要输入什么？</summary>
-            <p>一般包括身高、体重、年龄、性别与活动量。</p>
-          </details>
         </section>
-
-<script src="/assets/js/slot-loader.js?v=cdd017a763" defer></script>

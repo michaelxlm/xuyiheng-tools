@@ -1,0 +1,676 @@
+/* ==========================================================================
+   tool-core.js · 计算内核（零依赖，全站工具共用）
+   --------------------------------------------------------------------------
+   背景：贷款摊销、复利、BMI/BMR、组合数等公式此前在多个模板里各写一遍，
+   口径容易漂移。这里收敛为单一实现，模板只负责取输入 / 渲染输出。
+
+   暴露：window.Core = { round, clamp, loan, finance, health, math, pet,
+                         social, height, csv, history }
+   加载：由 scripts/prerender.js 注入（在 utils.js 之后、页面脚本之前），
+         minify 生成 .min.js，fingerprint 自动带 ?v= 版本令牌。
+   ========================================================================== */
+
+(function (global) {
+  'use strict';
+
+  function round(v, d) {
+    var p = Math.pow(10, d == null ? 2 : d);
+    return Math.round((Number(v) || 0) * p) / p;
+  }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+  function valid(v) { var n = Number(v); return isFinite(n) ? n : NaN; }
+
+  /* ------------------------------ 贷款 / 摊销 ------------------------------ */
+  var loan = {
+    /** 等额本息月供。annualRatePct 传百分数（如 4.2 表示 4.2%）；零利率按本金均摊。 */
+    annuity: function (principal, annualRatePct, months) {
+      var P = Number(principal) || 0;
+      var n = Math.floor(Number(months) || 0);
+      if (n <= 0) return 0;
+      var r = (Number(annualRatePct) || 0) / 100 / 12;
+      if (r === 0) return P / n;
+      var pow = Math.pow(1 + r, n);
+      return P * r * pow / (pow - 1);
+    },
+
+    /** 等额本金首月月供（此后每月递减 P*r/n）。 */
+    principalFirst: function (principal, annualRatePct, months) {
+      var P = Number(principal) || 0;
+      var n = Math.floor(Number(months) || 0);
+      if (n <= 0) return 0;
+      return P / n + P * ((Number(annualRatePct) || 0) / 100 / 12);
+    },
+    principalDecrement: function (principal, annualRatePct, months) {
+      var n = Math.floor(Number(months) || 0);
+      return n > 0 ? (Number(principal) || 0) * ((Number(annualRatePct) || 0) / 100 / 12) / n : 0;
+    },
+
+    /** 等额本息还了 paidMonths 期后的剩余本金。 */
+    balanceAfter: function (principal, annualRatePct, months, paidMonths) {
+      var P = Number(principal) || 0;
+      var n = Math.floor(Number(months) || 0);
+      var k = clamp(Math.floor(Number(paidMonths) || 0), 0, n);
+      var r = (Number(annualRatePct) || 0) / 100 / 12;
+      if (k === 0) return P;
+      if (k >= n) return 0;
+      if (r === 0) return P * (1 - k / n);
+      var pow = Math.pow(1 + r, k);
+      var pay = loan.annuity(P, annualRatePct, n);
+      return P * pow - pay * (pow - 1) / r;
+    },
+
+    /** 某一期应还本金 / 利息（等额本息，1-based）。 */
+    partAt: function (principal, annualRatePct, months, period) {
+      var r = (Number(annualRatePct) || 0) / 100 / 12;
+      var n = Math.floor(Number(months) || 0);
+      var k = clamp(Math.floor(Number(period) || 1), 1, n);
+      var prev = loan.balanceAfter(principal, annualRatePct, n, k - 1);
+      var interest = prev * r;
+      var pay = loan.annuity(principal, annualRatePct, n);
+      var principalPart = k === n ? prev : pay - interest;
+      return { payment: k === n ? principalPart + interest : pay, principal: principalPart, interest: interest };
+    },
+
+    /** 生成完整还款计划表（最多 600 期，避免误输入撑爆浏览器）。 */
+    schedule: function (principal, annualRatePct, months) {
+      var n = clamp(Math.floor(Number(months) || 0), 1, 600);
+      var P = Number(principal) || 0;
+      var r = (Number(annualRatePct) || 0) / 100 / 12;
+      var pay = loan.annuity(P, annualRatePct, n);
+      var bal = P, out = [], totalInterest = 0;
+      for (var i = 1; i <= n; i++) {
+        var interest = bal * r;
+        var principalPart = (i === n ? bal : pay - interest);
+        var payment = principalPart + interest;
+        bal = Math.max(0, bal - principalPart);
+        totalInterest += interest;
+        out.push({ period: i, payment: payment, principal: principalPart, interest: interest, balance: bal });
+      }
+      return { rows: out, totalPayment: P + totalInterest, totalInterest: totalInterest };
+    },
+
+    /** 提前还款后：保持月供不变可缩短的期数；或保持期数不变的新月供。 */
+    prepay: function (principal, annualRatePct, months, paidMonths, amount, keepPayment) {
+      var r = (Number(annualRatePct) || 0) / 100 / 12;
+      var n = Math.floor(Number(months) || 0);
+      var remain = Math.max(0, loan.balanceAfter(principal, annualRatePct, n, paidMonths) - (Number(amount) || 0));
+      var pay = loan.annuity(principal, annualRatePct, n);
+      if (keepPayment) {
+        var k = 0;
+        while (remain > 0 && k < 1200) {
+          var it = remain * r;
+          remain -= (pay - it);
+          k++;
+        }
+        return { mode: 'shorten', months: paidMonths + k, newPayment: pay };
+      }
+      return { mode: 'reduce', months: n - paidMonths, newPayment: loan.annuity(remain, annualRatePct * 100, n - paidMonths) };
+    }
+  };
+
+  /* ------------------------------ 复利 / 理财 ------------------------------ */
+  var finance = {
+    /** 一次性投入的终值。timesPerYear 默认 1（年复利），12 为月复利。 */
+    compound: function (principal, annualRatePct, years, timesPerYear) {
+      var m = Math.floor(Number(timesPerYear) || 1);
+      var i = (Number(annualRatePct) || 0) / 100 / m;
+      var n = Math.max(0, Math.floor(Number(years) * m || 0));
+      return (Number(principal) || 0) * Math.pow(1 + i, n);
+    },
+    /** 期初本金 + 每月末定投的终值（月复利）。返回本金/定投/收益拆分。 */
+    withMonthly: function (initial, monthly, annualRatePct, years) {
+      var i = (Number(annualRatePct) || 0) / 100 / 12;
+      var n = Math.max(0, Math.floor(Number(years) * 12 || 0));
+      var P = Number(initial) || 0, C = Number(monthly) || 0;
+      var fvP = P * Math.pow(1 + i, n);
+      var fvC = i === 0 ? C * n : C * (Math.pow(1 + i, n) - 1) / i;
+      var invested = P + C * n;
+      var total = fvP + fvC;
+      return { total: total, invested: invested, interest: total - invested, initialFv: fvP, monthlyFv: fvC };
+    },
+    /** 达成目标终值所需的每月定投（月复利，期初已有 initial）。 */
+    requiredMonthly: function (initial, target, annualRatePct, years) {
+      var i = (Number(annualRatePct) || 0) / 100 / 12;
+      var n = Math.max(1, Math.floor(Number(years) * 12 || 0));
+      var fvInitial = (Number(initial) || 0) * Math.pow(1 + i, n);
+      var need = Math.max(0, (Number(target) || 0) - fvInitial);
+      return i === 0 ? need / n : need * i / (Math.pow(1 + i, n) - 1);
+    },
+    /** 费雪近似：实际利率 ≈ 名义 − 通胀（精确式为 (1+n)/(1+i)−1）。 */
+    realRate: function (nominalPct, inflationPct) {
+      return ((1 + (Number(nominalPct) || 0) / 100) / (1 + (Number(inflationPct) || 0) / 100) - 1) * 100;
+    },
+    /** 72 法则翻倍年数。 */
+    doubleYears: function (annualRatePct) {
+      var r = Number(annualRatePct) || 0;
+      return r > 0 ? 72 / r : Infinity;
+    }
+  };
+
+  /* ------------------------------ 健康指标 ------------------------------ */
+  var health = {
+    bmi: function (weightKg, heightCm) {
+      var m = (Number(heightCm) || 0) / 100;
+      return m > 0 ? (Number(weightKg) || 0) / (m * m) : NaN;
+    },
+    /** 中国成人 BMI 分类：<18.5 偏瘦 / 18.5-23.9 正常 / 24-27.9 超重 / >=28 肥胖。 */
+    bmiCategory: function (bmi) {
+      if (!isFinite(bmi)) return '--';
+      if (bmi < 18.5) return '偏瘦';
+      if (bmi < 24) return '正常';
+      if (bmi < 28) return '超重';
+      return '肥胖';
+    },
+    /** Mifflin-St Jeor 基础代谢率（kcal/天），sex: 'male' | 'female'。 */
+    bmr: function (weightKg, heightCm, age, sex) {
+      var base = 10 * (Number(weightKg) || 0) + 6.25 * (Number(heightCm) || 0) - 5 * (Number(age) || 0);
+      return base + (sex === 'female' ? -161 : 5);
+    },
+    /** Devine 理想体重（kg），sex: male | female。 */
+    devine: function (sex, heightCm) {
+      var inches = ((Number(heightCm) || 0) - 152.4) / 2.54;
+      return (sex === 'female' ? 45.5 : 50) + 2.3 * inches;
+    },
+    /** 中国成人正常 BMI 对应的体重区间（kg）。 */
+    healthyWeight: function (heightCm) {
+      var m = (Number(heightCm) || 0) / 100;
+      return { min: 18.5 * m * m, max: 23.9 * m * m };
+    },
+    /** 活动系数档位（TDEE = BMR × factor）。 */
+    ACTIVITY: [
+      { key: 'sedentary', label: '久坐（几乎不运动）', factor: 1.2 },
+      { key: 'light', label: '轻度活动（每周 1–3 次）', factor: 1.375 },
+      { key: 'moderate', label: '中度活动（每周 3–5 次）', factor: 1.55 },
+      { key: 'active', label: '高强度（每周 6–7 次）', factor: 1.725 },
+      { key: 'very', label: '体力劳动 / 专业训练', factor: 1.9 }
+    ],
+    tdee: function (bmr, level) {
+      var f = 1.55;
+      health.ACTIVITY.forEach(function (a) { if (a.key === level) f = a.factor; });
+      return (Number(bmr) || 0) * f;
+    },
+    /** 美国海军体脂率公式（颈围 / 腰围 / 女性另需臀围，单位 cm）。 */
+    bodyFatNavy: function (sex, heightCm, neckCm, waistCm, hipCm) {
+      var h = Number(heightCm), n = Number(neckCm), w = Number(waistCm), hp = Number(hipCm);
+      if (!(h > 0 && n > 0 && w > 0)) return NaN;
+      if (sex === 'female') {
+        if (!(hp > 0) || w + hp - n <= 0) return NaN;
+        return 495 / (1.29579 - 0.35004 * Math.log10(w + hp - n) + 0.22100 * Math.log10(h)) - 450;
+      }
+      if (w - n <= 0) return NaN;
+      return 495 / (1.0324 - 0.19077 * Math.log10(w - n) + 0.15456 * Math.log10(h)) - 450;
+    },
+    bodyFatCategory: function (sex, bf) {
+      if (!isFinite(bf)) return '--';
+      var female = sex === 'female';
+      if (bf < (female ? 18 : 10)) return '偏低';
+      if (bf < (female ? 25 : 18)) return '健康';
+      if (bf < (female ? 32 : 25)) return '偏高';
+      return '肥胖';
+    },
+    /** 腰高比，建议 < 0.5。 */
+    waistToHeight: function (waistCm, heightCm) {
+      var h = Number(heightCm);
+      return h > 0 ? (Number(waistCm) || 0) / h : NaN;
+    },
+    /** 体重管理每日热量目标（相对 TDEE 的粗略调整）。 */
+    weightGoal: function (tdee, goal) {
+      var t = Number(tdee) || 0;
+      if (goal === 'cut') return Math.max(1200, t - 400);
+      if (goal === 'gain') return t + 250;
+      return t;
+    }
+  };
+
+  /* ------------------------------ 组合数学 ------------------------------ */
+  var math = {
+    factorial: function (n) {
+      var k = Math.floor(Number(n));
+      if (k < 0) return NaN;
+      var r = 1;
+      for (var i = 2; i <= k; i++) r *= i;
+      return r;
+    },
+    /** 组合数 C(n,k)，用乘法式降低中间溢出；超大结果返回 Infinity（上层提示）。 */
+    comb: function (n, k) {
+      n = Math.floor(Number(n)); k = Math.floor(Number(k));
+      if (k < 0 || k > n || n < 0) return 0;
+      k = Math.min(k, n - k);
+      var r = 1;
+      for (var i = 1; i <= k; i++) r = r * (n - k + i) / i;
+      return Math.round(r);
+    },
+    /** 排列数 P(n,k)。 */
+    perm: function (n, k) {
+      n = Math.floor(Number(n)); k = Math.floor(Number(k));
+      if (k < 0 || k > n || n < 0) return 0;
+      var r = 1;
+      for (var i = 0; i < k; i++) r *= (n - i);
+      return r;
+    }
+  };
+
+  /* ------------------------------ 宠物年龄 ------------------------------ */
+  var pet = {
+    /** 犬体型对应的成年后每年折算人年（小型慢、大型快）。 */
+    DOG_SIZE: { small: 4, medium: 5, large: 6 },
+    SIZE_LABEL: { small: '小型犬', medium: '中型犬', large: '大型犬' },
+    /** 经典口径：首年 15、次年 +9（合计 24），此后按物种/体型每年递增。 */
+    humanAge: function (species, years, size) {
+      var a = Number(years);
+      if (!isFinite(a) || a < 0) return null;
+      var human;
+      if (a <= 1) human = a * 15;
+      else if (a <= 2) human = 15 + (a - 1) * 9;
+      else {
+        var per = species === 'dog' ? (pet.DOG_SIZE[size] || 5) : 4;
+        human = 24 + (a - 2) * per;
+      }
+      return {
+        human: round(human, 0),
+        rule: a <= 1 ? '首年 ≈ 15 人年/年' : a <= 2 ? '次年 ≈ 9 人年/年' : (species === 'dog' ? pet.SIZE_LABEL[size] || '中型犬' : '猫咪') + ' · ' + (a > 2 ? (species === 'dog' ? (pet.DOG_SIZE[size] || 5) : 4) : 9) + ' 人年/年',
+        stage: human < 15 ? '幼年期' : human < 24 ? '青少年期' : human < 45 ? '成年期' : human < 65 ? '熟年期' : '老年期'
+      };
+    },
+    /** 研究口径（2019 表观遗传时钟，成年犬）：human = 16·ln(age)+31，仅作对照展示。 */
+    epigeneticDog: function (years) {
+      var a = Number(years);
+      return a > 0 ? round(16 * Math.log(a) + 31, 0) : null;
+    }
+  };
+
+  /* ------------------------------ 五险一金 ------------------------------ */
+  // 城市档位为参考示例（个人%/单位%），实际以当地当年公布口径为准；UI 必须标注。
+  var social = {
+    CITIES: {
+      national: { name: '全国通用（示例）', pension: [8, 16], medical: [2, 9.5], unemploy: [0.5, 0.5], injury: 0.4, maternity: 0.8, fund: [5, 12], min: null, max: null },
+      beijing: { name: '北京', pension: [8, 16], medical: [2, 9], unemploy: [0.5, 0.5], injury: 0.4, maternity: 0.8, fund: [5, 12], min: 6821, max: 35283 },
+      shanghai: { name: '上海', pension: [8, 16], medical: [2, 9.5], unemploy: [0.5, 0.5], injury: 0.16, maternity: 1, fund: [5, 7], min: 7384, max: 36921 },
+      guangzhou: { name: '广州', pension: [8, 14], medical: [2, 5.5], unemploy: [0.2, 0.8], injury: 0.4, maternity: 1, fund: [5, 12], min: 4546, max: 26421 },
+      shenzhen: { name: '深圳', pension: [8, 15], medical: [2, 5.2], unemploy: [0.3, 0.7], injury: 0.14, maternity: 0.5, fund: [5, 12], min: 4492, max: 27486 },
+      hangzhou: { name: '杭州', pension: [8, 14], medical: [2, 9.5], unemploy: [0.5, 0.5], injury: 0.4, maternity: 1, fund: [5, 12], min: 4462, max: 24330 },
+      chengdu: { name: '成都', pension: [8, 16], medical: [2, 7.5], unemploy: [0.4, 0.6], injury: 0.4, maternity: 0.8, fund: [5, 12], min: 4511, max: 22555 },
+      wuhan: { name: '武汉', pension: [8, 16], medical: [2, 8], unemploy: [0.5, 0.7], injury: 0.4, maternity: 0.7, fund: [5, 12], min: 4224, max: 21120 },
+      xian: { name: '西安', pension: [8, 16], medical: [2, 8], unemploy: [0.5, 0.7], injury: 0.4, maternity: 1, fund: [5, 12], min: 4216, max: 21080 }
+    },
+    /** 月度个税（工资薪金预扣，综合所得年度汇算口径简化）。 */
+    monthlyTax: function (taxable) {
+      var t = Math.max(0, Number(taxable) || 0);
+      var brackets = [[3000, 0.03, 0], [12000, 0.1, 210], [25000, 0.2, 1410], [35000, 0.25, 2660], [55000, 0.3, 4410], [80000, 0.35, 7160], [Infinity, 0.45, 15160]];
+      for (var i = 0; i < brackets.length; i++) {
+        if (t <= brackets[i][0]) return Math.max(0, t * brackets[i][1] - brackets[i][2]);
+      }
+      return 0;
+    },
+    /**
+     * 计算五险一金明细 + 到手工资。
+     * @param base 申报基数（会被城市上下限夹取）
+     * @param cityKey CITIES 键
+     * @param fundPct 公积金个人比例（单位同比例）
+     * @param specialMonthly 每月专项附加扣除合计（元）
+     */
+    calc: function (base, cityKey, fundPct, specialMonthly) {
+      var city = social.CITIES[cityKey] || social.CITIES.national;
+      var raw = Number(base) || 0;
+      var b = clamp(raw, city.min || 0, city.max || Infinity);
+      var f = clamp(Number(fundPct) || 0, 0, 30);
+      var p = {
+        pension: b * city.pension[0] / 100,
+        medical: b * city.medical[0] / 100,
+        unemploy: b * city.unemploy[0] / 100,
+        fund: b * f / 100
+      };
+      var c = {
+        pension: b * city.pension[1] / 100,
+        medical: b * city.medical[1] / 100,
+        unemploy: b * city.unemploy[1] / 100,
+        injury: b * city.injury / 100,
+        maternity: b * city.maternity / 100,
+        fund: b * f / 100
+      };
+      var pTotal = p.pension + p.medical + p.unemploy + p.fund;
+      var cTotal = c.pension + c.medical + c.unemploy + c.injury + c.maternity + c.fund;
+      var special = Math.max(0, Number(specialMonthly) || 0);
+      var taxable = Math.max(0, b - pTotal - 5000 - special);
+      var tax = social.monthlyTax(taxable);
+      return {
+        cityName: city.name, base: b, rawBase: raw, clamped: Math.abs(b - raw) > 0.01,
+        min: city.min, max: city.max, fundPct: f,
+        personal: p, company: c, personalTotal: pTotal, companyTotal: cTotal,
+        account: p.fund + c.fund, taxable: taxable, tax: tax,
+        net: Math.max(0, b - pTotal - tax),
+        rates: city
+      };
+    }
+  };
+
+  /* ------------------------------ 儿童身高 ------------------------------ */
+  var height = {
+    /** 遗传靶身高（Mid-parental Height）。 */
+    midParental: function (dad, mom, sex) {
+      var d = Number(dad), m = Number(mom);
+      if (!isFinite(d) || !isFinite(m)) return null;
+      return { target: (d + m + (sex === 'girl' ? -13 : 13)) / 2, low: (d + m + (sex === 'girl' ? -13 : 13)) / 2 - 5, high: (d + m + (sex === 'girl' ? -13 : 13)) / 2 + 5 };
+    },
+    // 2~18 岁身高中位数参考（cm，简化表，仅作趋势对照，非诊疗标准）
+    MEDIAN: {
+      boy: [86.5, 94.1, 100.7, 106.7, 112.3, 117.6, 122.5, 127.3, 132.1, 137.2, 143.1, 149.8, 155.7, 160.3, 163.8, 166.4, 167.8],
+      girl: [85.3, 92.6, 99.1, 105.2, 110.8, 116.2, 121.3, 126.3, 131.5, 137.1, 142.2, 146.6, 150.0, 152.5, 154.3, 155.5, 156.2]
+    },
+    medianAt: function (sex, age) {
+      var arr = height.MEDIAN[sex === 'girl' ? 'girl' : 'boy'];
+      var i = clamp(Math.floor(Number(age) || 0) - 2, 0, arr.length - 1);
+      return arr[i];
+    },
+    /** 距离靶身高的年均增长需求（简化：按 18 岁逼近靶身高估算）。 */
+    yearlyNeed: function (currentCm, age, targetCm) {
+      var years = clamp(18 - (Number(age) || 0), 1, 16);
+      return (Number(targetCm) - Number(currentCm)) / years;
+    }
+  };
+
+  /* ------------------------------ 孕周 / 预产期 ------------------------------ */
+  var gestation = {
+    DAY: 86400000,
+    parse: function (v) {
+      if (!v || typeof v !== 'string') return null;
+      var p = v.split('-').map(Number);
+      if (p.length !== 3 || !(p[0] > 1900 && p[1] > 0 && p[2] > 0)) return null;
+      var d = new Date(p[0], p[1] - 1, p[2]);
+      return isNaN(d.getTime()) ? null : d;
+    },
+    fmt: function (d) {
+      if (!d || isNaN(d.getTime())) return '--';
+      var pad = function (x) { return (x < 10 ? '0' : '') + x; };
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    },
+    addDays: function (d, n) { return new Date(d.getTime() + (Number(n) || 0) * gestation.DAY); },
+    /** LMP 口径：预产期 = 末次月经 + 280 + (周期−28) 天；受孕日 ≈ +14 天。 */
+    fromLmp: function (lmp, cycle) {
+      var d = gestation.parse(lmp); if (!d) return null;
+      var c = clamp(Number(cycle) || 28, 15, 60);
+      return { due: gestation.addDays(d, 280 + (c - 28)), anchor: d, method: 'LMP', cycle: c, conception: gestation.addDays(d, 14) };
+    },
+    /** 受孕日口径：预产期 = 受孕日 + 266 天。 */
+    fromConception: function (date) {
+      var d = gestation.parse(date); if (!d) return null;
+      return { due: gestation.addDays(d, 266), anchor: d, method: '受孕日' };
+    },
+    /** B 超口径：预产期 = 检查日 + 280 − 检查时孕天数。 */
+    fromUltrasound: function (date, weeks, days) {
+      var d = gestation.parse(date); if (!d) return null;
+      var ga = clamp(Math.floor(Number(weeks) || 0) * 7 + (Math.floor(Number(days)) || 0), 0, 280);
+      return { due: gestation.addDays(d, 280 - ga), anchor: d, method: 'B超', gaDays: ga };
+    },
+    /** 以某日为基准的孕周信息（不传 asOf 则用今天）。 */
+    weekInfo: function (lmp, asOf) {
+      var start = gestation.parse(lmp);
+      var now = asOf ? gestation.parse(asOf) : new Date();
+      if (!start || !now || isNaN(now.getTime())) return null;
+      now.setHours(0, 0, 0, 0);
+      var days = Math.floor((now - start) / gestation.DAY);
+      var safe = Math.max(0, days);
+      var due = gestation.addDays(start, 280);
+      return {
+        days: days, weeks: Math.floor(safe / 7), dayOfWeek: safe % 7,
+        trimester: days < 98 ? '孕早期（第 1 孕期）' : days < 196 ? '孕中期（第 2 孕期）' : '孕晚期（第 3 孕期）',
+        daysLeft: Math.round((due - now) / gestation.DAY), due: due
+      };
+    },
+    /** 常规产检节点（按末次月经起算的孕周）。 */
+    CHECKUPS: [
+      { w: 7, name: '首次 B 超', desc: '确认宫内孕、核对孕周' },
+      { w: 12, name: 'NT 检查', desc: '颈项透明层 + 早期筛查（11–13⁺⁶ 周）' },
+      { w: 18, name: '唐筛 / 无创 DNA', desc: '中期染色体筛查（15–20 周）' },
+      { w: 22, name: '大排畸', desc: '系统超声筛查（20–24 周）' },
+      { w: 26, name: '糖耐量 OGTT', desc: '妊娠期糖尿病筛查（24–28 周）' },
+      { w: 31, name: '小排畸', desc: '生长与结构复查（30–32 周）' },
+      { w: 35, name: '胎心监护', desc: '开始定期胎监（34–36 周）' },
+      { w: 38, name: '每周产检', desc: '临产前监测（37 周起）' }
+    ],
+    checkups: function (lmp) {
+      var start = gestation.parse(lmp); if (!start) return [];
+      return gestation.CHECKUPS.map(function (c) {
+        return { week: c.w, name: c.name, desc: c.desc, date: gestation.addDays(start, c.w * 7) };
+      });
+    }
+  };
+
+  /* ------------------------------ 颜色 / 对比度 ------------------------------ */
+  var color = {
+    hexToRgb: function (hex) {
+      var s = String(hex || '').trim().replace('#', '');
+      if (/^[0-9a-fA-F]{3}$/.test(s)) s = s.split('').map(function (c) { return c + c; }).join('');
+      if (!/^[0-9a-fA-F]{6}$/.test(s)) return null;
+      return { r: parseInt(s.slice(0, 2), 16), g: parseInt(s.slice(2, 4), 16), b: parseInt(s.slice(4, 6), 16) };
+    },
+    rgbToHex: function (r, g, b) {
+      var h = function (v) { return ('0' + clamp(Math.round(Number(v) || 0), 0, 255).toString(16)).slice(-2); };
+      return '#' + h(r) + h(g) + h(b);
+    },
+    rgbToHsl: function (r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+      var h = 0, s = 0, l = (max + min) / 2;
+      if (d) {
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+        else if (max === g) h = ((b - r) / d + 2) / 6;
+        else h = ((r - g) / d + 4) / 6;
+      }
+      return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+    },
+    hslToRgb: function (h, s, l) {
+      h = ((Number(h) || 0) % 360 + 360) % 360 / 360;
+      s = clamp((Number(s) || 0) / 100, 0, 1); l = clamp((Number(l) || 0) / 100, 0, 1);
+      function hue(p, q, t) {
+        if (t < 0) t += 1; if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      }
+      if (s === 0) { var g = Math.round(l * 255); return { r: g, g: g, b: g }; }
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+      return {
+        r: Math.round(hue(p, q, h + 1 / 3) * 255),
+        g: Math.round(hue(p, q, h) * 255),
+        b: Math.round(hue(p, q, h - 1 / 3) * 255)
+      };
+    },
+    /** WCAG 相对亮度与对比度。 */
+    luminance: function (hex) {
+      var c = color.hexToRgb(hex); if (!c) return null;
+      var a = [c.r, c.g, c.b].map(function (v) {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+    },
+    contrast: function (a, b) {
+      var la = color.luminance(a), lb = color.luminance(b);
+      if (la === null || lb === null) return NaN;
+      var hi = Math.max(la, lb), lo = Math.min(la, lb);
+      return (hi + 0.05) / (lo + 0.05);
+    },
+    wcagLevel: function (ratio, large) {
+      if (!isFinite(ratio)) return '--';
+      if (ratio >= 7) return 'AAA';
+      if (ratio >= 4.5) return 'AA';
+      if (large && ratio >= 3) return 'AA（大字号）';
+      return '不达标';
+    },
+    readableText: function (bg) {
+      var a = color.contrast(bg, '#ffffff'), b = color.contrast(bg, '#111111');
+      return a >= b ? '#ffffff' : '#111111';
+    },
+    /** 基于 HSL 的和谐配色：complementary / analogous / triadic / split。 */
+    harmonies: function (hex, type) {
+      var c = color.hexToRgb(hex); if (!c) return [];
+      var hsl = color.rgbToHsl(c.r, c.g, c.b);
+      var offsets = type === 'analogous' ? [-30, 0, 30] : type === 'triadic' ? [0, 120, 240] : type === 'split' ? [0, 150, 210] : [0, 180];
+      return offsets.map(function (o) {
+        var rgb = color.hslToRgb(hsl.h + o, hsl.s, hsl.l);
+        return color.rgbToHex(rgb.r, rgb.g, rgb.b);
+      });
+    }
+  };
+
+  /* ------------------------------ 日期 / 工作日 ------------------------------ */
+  var date = {
+    DAY: 86400000,
+    WEEKDAYS: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+    parse: function (v) { return gestation.parse(v); },
+    fmt: function (d) { return gestation.fmt(d); },
+    addDays: function (d, n) { return gestation.addDays(d, n); },
+    dayOfYear: function (d) { return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / date.DAY); },
+    isLeap: function (y) { return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0; },
+    daysInMonth: function (y, m) { return new Date(y, m, 0).getDate(); },
+    /** 两日期相差天数（取绝对值）与含首尾天数。 */
+    diff: function (a, b) {
+      var days = Math.round(Math.abs(b - a) / date.DAY);
+      return { days: days, inclusive: days + 1, weeks: days / 7, months: days / 30.44 };
+    },
+    /** 区间内工作日数（仅排除周六日，不含法定节假日）；inclusive 控制是否含结束日。 */
+    workdays: function (a, b, inclusive) {
+      var s = new Date(a), e = new Date(b);
+      if (s > e) { var t = s; s = e; e = t; }
+      if (!inclusive) e = date.addDays(e, -1);
+      if (s > e) return 0;
+      var count = 0, guard = 0;
+      for (var d = new Date(s); d <= e && guard < 36500; d = date.addDays(d, 1), guard++) {
+        var w = d.getDay(); if (w !== 0 && w !== 6) count++;
+      }
+      return count;
+    },
+    /** 从某日向前/向后推 n 个工作日。 */
+    addWorkdays: function (base, n) {
+      var d = new Date(base), step = n >= 0 ? 1 : -1, left = Math.abs(Math.floor(Number(n) || 0)), guard = 0;
+      while (left > 0 && guard < 36500) {
+        d = date.addDays(d, step); guard++;
+        var w = d.getDay(); if (w !== 0 && w !== 6) left--;
+      }
+      return d;
+    },
+    /** 精确到年/月/日的年龄。 */
+    age: function (birth, asOf) {
+      var now = asOf || new Date();
+      var y = now.getFullYear() - birth.getFullYear();
+      var m = now.getMonth() - birth.getMonth();
+      var d = now.getDate() - birth.getDate();
+      if (d < 0) { m--; d += date.daysInMonth(now.getFullYear(), now.getMonth()); }
+      if (m < 0) { y--; m += 12; }
+      return { years: y, months: m, days: d, totalDays: Math.floor((now - birth) / date.DAY) };
+    }
+  };
+
+  /* ------------------------------ 时区 ------------------------------ */
+  var timezone = {
+    ZONES: [
+      { name: '北京', off: 8 }, { name: '东京', off: 9 }, { name: '首尔', off: 9 },
+      { name: '新加坡', off: 8 }, { name: '孟买', off: 5.5 }, { name: '迪拜', off: 4 },
+      { name: '莫斯科', off: 3 }, { name: '柏林', off: 2 }, { name: '巴黎', off: 2 },
+      { name: '伦敦', off: 0 }, { name: '圣保罗', off: -3 }, { name: '纽约', off: -5 },
+      { name: '多伦多', off: -5 }, { name: '洛杉矶', off: -8 }, { name: '檀香山', off: -10 },
+      { name: '奥克兰', off: 12 }
+    ],
+    wallToUtc: function (y, mo, d, h, mi, off) {
+      return Date.UTC(y, mo - 1, d, h, mi) - (Number(off) || 0) * 3600000;
+    },
+    fmtWall: function (utcMs, off) {
+      var dt = new Date(utcMs + (Number(off) || 0) * 3600000);
+      var pad = function (x) { return (x < 10 ? '0' : '') + x; };
+      return dt.getUTCFullYear() + '-' + pad(dt.getUTCMonth() + 1) + '-' + pad(dt.getUTCDate()) + ' ' + pad(dt.getUTCHours()) + ':' + pad(dt.getUTCMinutes());
+    },
+    /** 同一时刻在各时区的当地时间。 */
+    at: function (utcMs) {
+      return timezone.ZONES.map(function (z) { return { name: z.name, off: z.off, local: timezone.fmtWall(utcMs, z.off) }; });
+    },
+    /** 两地都在 [start,end) 工作时段内的 UTC 整点。 */
+    overlap: function (fromOff, toOff, start, end) {
+      start = start == null ? 9 : start; end = end == null ? 18 : end;
+      var out = [];
+      for (var utc = 0; utc < 24; utc++) {
+        var h1 = ((utc + fromOff) % 24 + 24) % 24;
+        var h2 = ((utc + toOff) % 24 + 24) % 24;
+        if (h1 >= start && h1 < end && h2 >= start && h2 < end) out.push(utc);
+      }
+      return out;
+    }
+  };
+
+  /* ------------------------------ CSV / 历史记录 ------------------------------ */
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  var csv = {
+    /** rows: [[cell,...],...] */
+    toCsv: function (rows, header) {
+      var all = header ? [header].concat(rows || []) : (rows || []);
+      return '\ufeff' + all.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    },
+    download: function (filename, rows, header) {
+      try {
+        var blob = new global.Blob([csv.toCsv(rows, header)], { type: 'text/csv;charset=utf-8' });
+        var url = global.URL.createObjectURL(blob);
+        var a = global.document.createElement('a');
+        a.href = url; a.download = filename || 'export.csv';
+        global.document.body.appendChild(a); a.click();
+        global.document.body.removeChild(a);
+        global.setTimeout(function () { global.URL.revokeObjectURL(url); }, 1500);
+        return true;
+      } catch (e) { return false; }
+    }
+  };
+
+  var history = {
+    key: function (k) { return 'xt_hist:' + k; },
+    list: function (k) {
+      try {
+        var a = JSON.parse(global.localStorage.getItem(history.key(k)));
+        return Array.isArray(a) ? a : [];
+      } catch (e) { return []; }
+    },
+    add: function (k, entry, limit) {
+      try {
+        var a = history.list(k);
+        var e = Object.assign({}, entry, { t: Date.now() });
+        a.unshift(e);
+        global.localStorage.setItem(history.key(k), JSON.stringify(a.slice(0, limit || 30)));
+        return e;
+      } catch (e) { return null; }
+    },
+    clear: function (k) {
+      try { global.localStorage.removeItem(history.key(k)); return true; } catch (e) { return false; }
+    }
+  };
+
+  /* ------------------------------ 表单输入归一化 ------------------------------
+     历史模板里不少 inputmode="decimal" 的 number 输入没写 step，浏览器默认 step=1，
+     输入 7.85 / 12.5 这类小数会被原生校验拦住，submit 事件根本不触发。
+     在共享内核统一补 step="any"：一次修复存量 40+ 处，也防后续模板再踩。 */
+  function normalizeDecimalInputs() {
+    try {
+      var list = global.document.querySelectorAll('input[type="number"][inputmode="decimal"]');
+      for (var i = 0; i < list.length; i++) {
+        if (!list[i].hasAttribute('step')) list[i].setAttribute('step', 'any');
+      }
+    } catch (e) { /* 无 DOM 环境（如 Node 单测）静默跳过 */ }
+  }
+  if (global.document) {
+    if (global.document.readyState === 'loading') {
+      global.document.addEventListener('DOMContentLoaded', normalizeDecimalInputs);
+    } else {
+      normalizeDecimalInputs();
+    }
+  }
+
+  global.Core = {
+    round: round, clamp: clamp, valid: valid,
+    loan: loan, finance: finance, health: health, math: math,
+    pet: pet, social: social, height: height, gestation: gestation,
+    color: color, date: date, timezone: timezone,
+    csv: csv, history: history
+  };
+})(window);

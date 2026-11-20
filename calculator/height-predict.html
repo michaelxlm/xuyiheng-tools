@@ -92,54 +92,200 @@
   <main class="site-main site-main--flat" id="main">
     <div class="main-inner">
 <nav class="cat-bar" aria-label="分类导航"><a href="/#cat-calc" data-cat="calc">计算器</a><a href="/#cat-cal" data-cat="cal">日历工具</a><a href="/#cat-combo" data-cat="combo">场景组合</a><a href="/#cat-other" data-cat="other">其他工具</a><a href="/tools.html" class="cat-bar-all">全部工具</a></nav>
-<section class="page-heading">
-          <h1>儿童身高预测</h1>
-          <p>基于遗传靶身高（Mid-parental Height）公式，输入父母身高与孩子性别，预测孩子成年后的目标身高及合理波动区间。</p>
+<style>
+        #hp-track [hidden]{display:none}
+        .hp-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .hp-table th,.hp-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .hp-table th{color:var(--color-muted);font-weight:600}
+        .hp-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        .hp-ref{display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--space-2)}
+        .hp-ref span{border:1px solid var(--color-border);border-radius:6px;padding:3px 7px;font-size:var(--text-xs);color:var(--color-muted)}
+        </style>
+
+        <section class="page-heading">
+          <h1>儿童身高预测 · 生长追踪</h1>
+          <p>先按遗传靶身高算出成年目标区间，再结合孩子当前身高与年龄，对照同龄中位水平推算趋势；可把每次测量存成本地记录，画出自己的生长曲线并与参考中位线对比。</p>
         </section>
 
         <form class="card" id="hpForm">
-          <div class="form-group">
-            <label class="form-label" for="hp-sex">孩子性别</label>
-            <select class="form-select" id="hp-sex">
-              <option value="boy">男孩</option>
-              <option value="girl">女孩</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="hp-sex">孩子性别</label><select class="form-select" id="hp-sex"><option value="boy">男孩</option><option value="girl">女孩</option></select></div>
+            <div class="form-group"><label class="form-label" for="hp-age">实际年龄</label><div class="input-with-unit"><input class="form-input" id="hp-age" type="number" inputmode="decimal" step="any" min="0" max="18" placeholder="如 8"><span class="unit-tag">岁</span></div></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label" for="hp-dad">父亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-dad" type="number" inputmode="decimal" min="120" max="220" placeholder="如 175"><span class="unit-tag">cm</span></div></div>
-            <div class="form-group"><label class="form-label" for="hp-mom">母亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-mom" type="number" inputmode="decimal" min="120" max="220" placeholder="如 165"><span class="unit-tag">cm</span></div></div>
+            <div class="form-group"><label class="form-label" for="hp-dad">父亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-dad" type="number" inputmode="decimal" step="any" min="120" max="220" placeholder="如 175"><span class="unit-tag">cm</span></div></div>
+            <div class="form-group"><label class="form-label" for="hp-mom">母亲身高</label><div class="input-with-unit"><input class="form-input" id="hp-mom" type="number" inputmode="decimal" step="any" min="120" max="220" placeholder="如 165"><span class="unit-tag">cm</span></div></div>
           </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="hp-current">孩子当前身高</label><div class="input-with-unit"><input class="form-input" id="hp-current" type="number" inputmode="decimal" step="any" min="50" max="220" placeholder="如 128"><span class="unit-tag">cm</span></div></div>
+            <div class="form-group"><label class="form-label" for="hp-bone">骨龄（选填）</label><div class="input-with-unit"><input class="form-input" id="hp-bone" type="number" inputmode="decimal" step="any" min="0" max="20" placeholder="如 7.5"><span class="unit-tag">岁</span></div></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="hp-date">测量日期</label><input class="form-input" id="hp-date" type="date"></div>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"height-predict"}'>预测身高</button>
+            <button class="btn btn-secondary" type="button" id="hp-save">记录本次测量</button>
           </div>
         </form>
 
         <div class="result-box" id="hp-result" hidden>
-          <div class="result-row"><div><div class="result-label">遗传靶身高</div><div class="result-value" id="hp-target">--</div></div></div>
+          <div class="result-row">
+            <div><div class="result-label">遗传靶身高</div><div class="result-value" id="hp-target">--</div></div>
+            <div><div class="result-label">按当前水平推算成年身高</div><div class="result-value" id="hp-project">--</div></div>
+          </div>
           <dl class="result-detail" id="hp-detail"></dl>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>靶身高公式：男孩 =（父 + 母 + 13）÷ 2；女孩 =（父 + 母 − 13）÷ 2，正常波动范围约为 ±5cm。遗传约占成年身高的 70%，营养、睡眠与运动同样关键。</div></div>
+        <section class="card mt-4" id="hp-track" hidden>
+          <h2 class="card-title">本地生长记录</h2>
+          <div class="result-row" id="hp-stats"></div>
+          <div id="hp-chart" class="hp-chart" aria-label="生长曲线与同龄中位线对比"></div>
+          <div class="table-wrap">
+            <table class="hp-table">
+              <thead><tr><th scope="col">日期</th><th scope="col">年龄</th><th scope="col">身高</th><th scope="col">同龄中位</th><th scope="col">差值</th><th scope="col">操作</th></tr></thead>
+              <tbody id="hp-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="hp-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="hp-clear">清空记录</button>
+          </div>
+        </section>
+
+        <details class="card mt-4">
+          <summary>同龄身高中位数参考（2~18 岁）</summary>
+          <div class="hp-ref" id="hp-ref"></div>
+          <p style="margin-top:8px">中位数来自简化的公开参考表，仅作趋势对照，不是诊断或百分位判定标准。</p>
+        </details>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>靶身高公式：男孩 =（父 + 母 + 13）÷ 2，女孩 =（父 + 母 − 13）÷ 2，正常波动约 ±5cm。遗传约占七成，营养、睡眠、运动与疾病都会影响最终身高；如明显偏离生长曲线，请咨询儿科或内分泌科。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var KEY = 'height-predict';
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+            if (!$('hp-date').value) $('hp-date').value = today();
+
+            function sex() { return $('hp-sex').value === 'girl' ? 'girl' : 'boy'; }
+            function read() {
+              var dad = U.numInput($('hp-dad')), mom = U.numInput($('hp-mom'));
+              if (!Number.isFinite(dad) || !Number.isFinite(mom)) { alert('请输入父母身高'); return null; }
+              var age = U.numInput($('hp-age')), cur = U.numInput($('hp-current'));
+              var bone = U.numInput($('hp-bone'));
+              var m = C.height.midParental(dad, mom, sex());
+              if (!m) return null;
+              return {
+                dad: dad, mom: mom, sex: sex(), age: age, current: cur,
+                bone: Number.isFinite(bone) ? bone : null,
+                date: $('hp-date').value || today(),
+                target: m.target, low: m.low, high: m.high
+              };
+            }
+
+            function show(r) {
+              var hasGrowth = Number.isFinite(r.age) && Number.isFinite(r.current) && r.age > 0 && r.current > 0;
+              var median = hasGrowth ? C.height.medianAt(r.sex, r.age) : NaN;
+              var project = hasGrowth && median > 0 ? r.current / median * C.height.medianAt(r.sex, 18) : NaN;
+              $('hp-target').textContent = U.round(r.target, 1) + ' cm';
+              $('hp-project').textContent = hasGrowth ? U.round(project, 1) + ' cm' : '--';
+              var detail = row('合理区间（±5cm）', U.round(r.low, 1) + ' ~ ' + U.round(r.high, 1) + ' cm') +
+                row('计算公式', r.sex === 'girl' ? '（' + r.dad + ' + ' + r.mom + ' − 13）÷ 2' : '（' + r.dad + ' + ' + r.mom + ' + 13）÷ 2');
+              if (hasGrowth) {
+                detail += row('同龄中位身高（' + U.round(r.age, 1) + ' 岁）', U.round(median, 1) + ' cm') +
+                  row('与中位差', (r.current >= median ? '+' : '') + U.round(r.current - median, 1) + ' cm') +
+                  row('距靶身高年均需求', U.round(C.height.yearlyNeed(r.current, r.age, r.target), 1) + ' cm/年（按 18 岁逼近估算）');
+                if (Number.isFinite(r.bone)) {
+                  var adj = C.height.yearlyNeed(r.current, r.bone, r.target);
+                  detail += row('骨龄校正（' + U.round(r.bone, 1) + ' 岁）', '按骨龄估算年均需 ' + U.round(adj, 1) + ' cm；骨龄超前 / 落后需由医生判读');
+                }
+                detail += row('推算方法', '按当前身高相对同龄中位的比例外推至 18 岁中位数，仅作趋势参考');
+              } else {
+                detail += row('补充当前身高与年龄', '可推算相对同龄水平的成年趋势并绘制生长曲线');
+              }
+              $('hp-detail').innerHTML = detail;
+              $('hp-result').hidden = false;
+            }
+
+            function list() { return C.history.list(KEY); }
+            function renderRef() {
+              var arr = C.height.MEDIAN[sex()];
+              $('hp-ref').innerHTML = arr.map(function (v, i) { return '<span>' + (i + 2) + ' 岁 · ' + v + 'cm</span>'; }).join('');
+            }
+            function renderTrack() {
+              var rows = list().filter(function (r) { return r.sex === sex(); }).slice().reverse();
+              var wrap = $('hp-track');
+              wrap.hidden = rows.length === 0;
+              if (!rows.length) return;
+              renderRef();
+              var diffs = rows.map(function (r) { return r.h - C.height.medianAt(r.sex, r.age); });
+              var avgDiff = diffs.reduce(function (a, b) { return a + b; }, 0) / diffs.length;
+              var first = rows[0], last = rows[rows.length - 1];
+              var years = Math.max(0.5, last.age - first.age);
+              $('hp-stats').innerHTML =
+                '<div><div class="result-label">记录次数</div><div class="result-value">' + rows.length + '</div></div>' +
+                '<div><div class="result-label">平均高于中位</div><div class="result-value">' + (avgDiff >= 0 ? '+' : '') + U.round(avgDiff, 1) + ' cm</div></div>' +
+                '<div><div class="result-label">近期年增速</div><div class="result-value">' + U.round((last.h - first.h) / years, 1) + ' cm/年</div></div>';
+
+              var pts = rows.map(function (r) { return { x: r.age, y: r.h, m: C.height.medianAt(r.sex, r.age), date: r.date }; });
+              var xs = pts.map(function (p) { return p.x; });
+              var ys = pts.map(function (p) { return p.y; }).concat(pts.map(function (p) { return p.m; }));
+              var xmin = Math.min.apply(null, xs) - 0.5, xmax = Math.max.apply(null, xs) + 0.5;
+              var ymin = Math.min.apply(null, ys) - 3, ymax = Math.max.apply(null, ys) + 3;
+              var w = 640, h = 180, pad = 24;
+              function px(x) { return pad + (x - xmin) / ((xmax - xmin) || 1) * (w - pad * 2); }
+              function py(y) { return h - pad - (y - ymin) / ((ymax - ymin) || 1) * (h - pad * 2); }
+              function path(key) { return pts.map(function (p, i) { return (i ? 'L' : 'M') + px(p[key === 'm' ? 'x' : 'x']).toFixed(1) + ' ' + py(p[key]).toFixed(1); }).join(' '); }
+              $('hp-chart').innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="' + h + '" role="img" aria-label="生长曲线：实测与同龄中位">' +
+                '<line x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - pad) + '" y2="' + (h - pad) + '" stroke="var(--color-border-strong)"/>' +
+                '<path d="' + path('m') + '" fill="none" stroke="var(--color-faint)" stroke-width="2" stroke-dasharray="5 4"/>' +
+                '<path d="' + path('y') + '" fill="none" stroke="var(--color-primary)" stroke-width="2.5"/>' +
+                pts.map(function (p) { return '<circle cx="' + px(p.x).toFixed(1) + '" cy="' + py(p.y).toFixed(1) + '" r="4" fill="var(--color-primary)"><title>' + esc(p.date) + ' · ' + U.round(p.y, 1) + 'cm</title></circle>'; }).join('') +
+                '</svg><p style="font-size:var(--text-xs);color:var(--color-muted);margin-top:4px">实线：本机记录的身高　虚线：同龄中位数参考</p>';
+
+              $('hp-tbody').innerHTML = list().filter(function (r) { return r.sex === sex(); }).slice(0, 50).map(function (r, i) {
+                var med = C.height.medianAt(r.sex, r.age), d = r.h - med;
+                return '<tr><td>' + esc(r.date) + '</td><td>' + U.round(r.age, 1) + ' 岁</td><td>' + U.round(r.h, 1) + ' cm</td><td>' + U.round(med, 1) + ' cm</td><td>' + (d >= 0 ? '+' : '') + U.round(d, 1) + ' cm</td><td><button type="button" class="btn btn-secondary hp-del" data-id="' + esc(r.id) + '" aria-label="删除该记录">删除</button></td></tr>';
+              }).join('');
+            }
+
+            $('hp-sex').addEventListener('change', function () { renderRef(); renderTrack(); });
             $('hpForm').addEventListener('submit', function (e) {
               e.preventDefault();
-              var dad = U.numInput($('hp-dad')), mom = U.numInput($('hp-mom'));
-              if (!Number.isFinite(dad) || !Number.isFinite(mom)) { alert('请输入父母身高'); return; }
-              var boy = $('hp-sex').value === 'boy';
-              var target = boy ? (dad + mom + 13) / 2 : (dad + mom - 13) / 2;
-              $('hp-target').textContent = U.round(target, 1) + ' cm';
-              $('hp-detail').innerHTML =
-                row('范围（±5cm）', U.round(target - 5, 1) + ' ~ ' + U.round(target + 5, 1) + ' cm') +
-                row('计算公式', boy ? '（' + dad + ' + ' + mom + ' + 13）÷ 2' : '（' + dad + ' + ' + mom + ' − 13）÷ 2');
-              $('hp-result').hidden = false;
-              U.track('calc_result', { tool: 'height-predict', sex: boy ? 'boy' : 'girl' });
+              var r = read(); if (!r) return;
+              show(r);
+              U.track('calc_result', { tool: 'height-predict', sex: r.sex });
             });
+            $('hp-save').addEventListener('click', function () {
+              var r = read(); if (!r) return;
+              if (!Number.isFinite(r.age) || !Number.isFinite(r.current)) { alert('记录生长曲线需要填写年龄与当前身高'); return; }
+              show(r);
+              var entry = { id: String(Date.now()), date: r.date, sex: r.sex, age: r.age, h: r.current, target: r.target };
+              C.history.add(KEY, entry, 100);
+              renderTrack();
+              U.track('save_result', { tool: 'height-predict' });
+            });
+            $('hp-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.hp-del'); if (!btn) return;
+              var id = btn.getAttribute('data-id');
+              var rows = list().filter(function (r) { return String(r.id) !== id; });
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderTrack();
+            });
+            $('hp-export').addEventListener('click', function () {
+              var rows = list().filter(function (r) { return r.sex === sex(); }).map(function (r) { return [r.date, r.age, r.h, U.round(C.height.medianAt(r.sex, r.age), 1), U.round(r.h - C.height.medianAt(r.sex, r.age), 1), U.round(r.target, 1)]; });
+              C.csv.download('身高记录.csv', rows, ['日期', '年龄(岁)', '身高(cm)', '同龄中位(cm)', '差值(cm)', '遗传靶身高(cm)']);
+              U.track('export_result', { tool: 'height-predict' });
+            });
+            $('hp-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部身高记录？')) return;
+              C.history.clear(KEY); renderTrack();
+            });
+            renderRef();
+            renderTrack();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -147,23 +293,23 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>工具按遗传靶身高公式，用父母身高与孩子性别预测成年身高范围，属统计性估算；后天营养、睡眠与运动影响很大。</p>
+          <p>儿童身高预测结合遗传靶身高公式与当前身高 / 年龄，对照同龄中位水平给出趋势参考，支持把多次测量保存在本机形成生长曲线。结果仅供家庭观察，不是医学诊断。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>用的是哪个公式？</summary>
-            <p>常用遗传靶身高法：男孩（父+母+13）÷2、女孩（父+母−13）÷2，并给出上下浮动区间。</p>
+            <p>遗传靶身高法：男孩（父+母+13）÷2、女孩（父+母−13）÷2，波动约 ±5cm；成年趋势按当前身高相对同龄中位的比例外推。</p>
+          </details>
+          <details>
+            <summary>骨龄有什么用？</summary>
+            <p>骨龄比实际年龄更贴近生长潜力，填了会额外给出按骨龄估算的年均增长需求；判读需由医生结合片子进行。</p>
           </details>
           <details>
             <summary>预测准吗？</summary>
-            <p>只反映遗传潜力区间，实际身高受营养、睡眠、运动与健康影响，存在较大偏差。</p>
+            <p>只反映遗传潜力与当前趋势，营养、睡眠、运动与疾病影响很大，不能当作医学结论。</p>
           </details>
           <details>
-            <summary>需要输入什么？</summary>
-            <p>父亲身高、母亲身高与孩子性别（单位需统一）。</p>
-          </details>
-          <details>
-            <summary>能当医学结论吗？</summary>
-            <p>不能，如关注生长发育请咨询儿科或内分泌科。</p>
+            <summary>记录会上传吗？</summary>
+            <p>不会。身高记录仅存在当前浏览器本地，可导出 CSV 保存，换设备不会同步。</p>
           </details>
         </section>
         <section class="home-section" id="related" aria-label="相关工具">
@@ -238,6 +384,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

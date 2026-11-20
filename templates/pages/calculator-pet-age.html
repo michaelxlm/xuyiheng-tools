@@ -1,22 +1,29 @@
+        <style>
+        #pa-breed-row[hidden],#pa-size-row[hidden]{display:none}
+        .pa-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .pa-table th,.pa-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .pa-table th{color:var(--color-muted);font-weight:600}
+        .pa-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        </style>
+
         <section class="page-heading">
-          <h1>宠物年龄换算</h1>
-          <p>输入猫或狗的实际年龄，按通行对照口径换算为 Equivalent 人类年龄，并给出所处生命阶段提示。</p>
+          <h1>宠物年龄换算 · 多宠对比</h1>
+          <p>按通行口径把猫犬年龄折算为人类年龄：猫咪按成年后每年 4 岁，狗狗再按小型 / 中型 / 大型细分；可挑常见品种、看生命阶段里程碑，并把多只宠物放在一起对比。</p>
         </section>
 
         <form class="card" id="paForm">
-          <div class="form-group">
-            <label class="form-label" for="pa-type">宠物类型</label>
-            <select class="form-select" id="pa-type">
-              <option value="cat">猫咪</option>
-              <option value="dog">狗狗</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="pa-type">宠物类型</label><select class="form-select" id="pa-type"><option value="cat">猫咪</option><option value="dog">狗狗</option></select></div>
+            <div class="form-group"><label class="form-label" for="pa-name">昵称（选填，用于对比）</label><input class="form-input" id="pa-name" type="text" maxlength="16" placeholder="如 团子"></div>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="pa-age">实际年龄</label>
-            <div class="input-with-unit"><input class="form-input" id="pa-age" type="number" inputmode="decimal" min="0" max="30" placeholder="如 2"><span class="unit-tag">岁</span></div>
+          <div class="form-row">
+            <div class="form-group" id="pa-breed-row"><label class="form-label" for="pa-breed">常见品种（选填）</label><select class="form-select" id="pa-breed"><option value="">自定义 / 未知</option></select></div>
+            <div class="form-group" id="pa-size-row" hidden><label class="form-label" for="pa-size">狗狗体型</label><select class="form-select" id="pa-size"><option value="small">小型犬</option><option value="medium" selected>中型犬</option><option value="large">大型犬</option></select></div>
           </div>
+          <div class="form-group"><label class="form-label" for="pa-age">实际年龄</label><div class="input-with-unit"><input class="form-input" id="pa-age" type="number" inputmode="decimal" step="any" min="0" max="30" placeholder="如 2"><span class="unit-tag">岁</span></div></div>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"pet-age"}'>换算</button>
+            <button class="btn btn-secondary" type="button" id="pa-add">加入对比</button>
           </div>
         </form>
 
@@ -25,37 +32,137 @@
           <dl class="result-detail" id="pa-detail"></dl>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>换算口径：犬猫出生后第一年约相当于人类 15 岁，第二年约 +9 岁（合计 24 岁），此后猫每年 +4 岁、犬每年 +5 岁。个体差异较大，仅供趣味参考。</div></div>
+        <section class="card mt-4" id="pa-compare-wrap" hidden>
+          <h2 class="card-title">多宠对比</h2>
+          <div class="table-wrap">
+            <table class="pa-table">
+              <thead><tr><th scope="col">昵称</th><th scope="col">种类</th><th scope="col">实际年龄</th><th scope="col">人类年龄</th><th scope="col">生命阶段</th><th scope="col">操作</th></tr></thead>
+              <tbody id="pa-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="pa-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="pa-clear">清空对比</button>
+          </div>
+        </section>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>换算口径：首年约相当于人类 15 岁，次年 +9 岁（合计 24 岁），此后猫每年 +4、犬按体型每年 +4~6 岁。个体差异很大，仅供趣味参考，健康与喂养请以兽医意见为准。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var KEY = 'pet-age-compare';
+            var BREEDS = {
+              cat: ['英短', '美短', '布偶', '橘猫', '中华田园猫', '暹罗', '缅因'],
+              dog: {
+                small: ['吉娃娃', '博美', '玩具贵宾', '约克夏', '比熊'],
+                medium: ['柯基', '柴犬', '边境牧羊犬', '雪纳瑞', '比格'],
+                large: ['金毛', '拉布拉多', '德国牧羊犬', '阿拉斯加', '萨摩耶']
+              }
+            };
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function stage(human) {
-              if (human < 15) return '幼年期';
-              if (human < 24) return '青少年期';
-              if (human < 45) return '成年期';
-              if (human < 65) return '熟年期';
-              return '老年期';
-            }
-            function calc() {
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+            function fillBreeds() {
               var type = $('pa-type').value;
-              var age = U.numInput($('pa-age'));
-              if (!Number.isFinite(age) || age < 0) { alert('请输入有效年龄'); return; }
-              var human;
-              if (age <= 1) human = age * 15;
-              else if (age <= 2) human = 15 + (age - 1) * 9;
-              else human = 24 + (age - 2) * (type === 'cat' ? 4 : 5);
-              human = Math.round(human);
-              $('pa-label').textContent = (type === 'cat' ? '猫咪' : '狗狗') + '「' + age + ' 岁」相当于人类';
-              $('pa-human').textContent = human + ' 岁';
-              $('pa-detail').innerHTML = row('生命阶段', stage(human)) + row('换算规则', age <= 1 ? '首年 15 岁/年' : age <= 2 ? '次年 9 岁/年' : (type === 'cat' ? '此后 4 岁/年' : '此后 5 岁/年'));
-              $('pa-result').hidden = false;
-              U.track('calc_result', { tool: 'pet-age', type: type });
+              $('pa-breed-row').hidden = false;
+              $('pa-size-row').hidden = type !== 'dog';
+              var sel = $('pa-breed');
+              var list = type === 'dog' ? [].concat(BREEDS.dog.small, BREEDS.dog.medium, BREEDS.dog.large) : BREEDS.cat;
+              sel.innerHTML = '<option value="">自定义 / 未知</option>' + list.map(function (b) { return '<option value="' + esc(b) + '">' + esc(b) + '</option>'; }).join('');
             }
-            $('paForm').addEventListener('submit', function (e) { e.preventDefault(); calc(); });
+            function syncSize() {
+              if ($('pa-type').value !== 'dog') return;
+              var b = $('pa-breed').value;
+              if (!b) return;
+              if (BREEDS.dog.small.indexOf(b) >= 0) $('pa-size').value = 'small';
+              else if (BREEDS.dog.medium.indexOf(b) >= 0) $('pa-size').value = 'medium';
+              else if (BREEDS.dog.large.indexOf(b) >= 0) $('pa-size').value = 'large';
+            }
+
+            function read() {
+              var type = $('pa-type').value, age = U.numInput($('pa-age'));
+              if (!Number.isFinite(age) || age < 0) { alert('请输入有效年龄'); return null; }
+              var size = type === 'dog' ? $('pa-size').value : null;
+              var r = C.pet.humanAge(type, age, size);
+              if (!r) { alert('请输入有效年龄'); return null; }
+              return {
+                type: type, age: age, size: size, breed: $('pa-breed').value,
+                name: ($('pa-name').value || '').trim().slice(0, 16) || (type === 'cat' ? '猫咪' : '狗狗'),
+                human: r.human, stage: r.stage, rule: r.rule
+              };
+            }
+
+            function milestone(r) {
+              var marks = [15, 24, 45, 65];
+              var names = ['青少年期', '成年期', '熟年期', '老年期'];
+              for (var i = 0; i < marks.length; i++) {
+                if (r.human < marks[i]) {
+                  var per = r.age <= 1 ? 15 : r.age <= 2 ? 9 : (r.type === 'dog' ? C.pet.DOG_SIZE[r.size] || 5 : 4);
+                  return names[i] + '（人类 ' + marks[i] + ' 岁）约还有 ' + U.round((marks[i] - r.human) / per, 1) + ' 年';
+                }
+              }
+              return '已进入老年期';
+            }
+
+            function show(r) {
+              var label = r.breed ? r.breed : (r.type === 'cat' ? '猫咪' : C.pet.SIZE_LABEL[r.size] || '狗狗');
+              $('pa-label').textContent = label + '「' + r.age + ' 岁」相当于人类';
+              $('pa-human').textContent = r.human + ' 岁';
+              var detail = row('生命阶段', r.stage) + row('换算规则', r.rule) + row('下一里程碑', milestone(r));
+              if (r.type === 'dog') {
+                var epi = C.pet.epigeneticDog(r.age);
+                detail += row('研究口径（成年犬）', epi == null ? '不适用' : '约 ' + epi + ' 人年 · 2019 表观遗传时钟，与经典口径仅供对照');
+              }
+              $('pa-detail').innerHTML = detail;
+              $('pa-result').hidden = false;
+            }
+
+            function list() { return C.history.list(KEY); }
+            function renderCompare() {
+              var rows = list();
+              $('pa-compare-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              $('pa-tbody').innerHTML = rows.map(function (r, i) {
+                return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.breed || (r.type === 'cat' ? '猫咪' : C.pet.SIZE_LABEL[r.size] || '狗狗')) + '</td><td>' + r.age + ' 岁</td><td>' + r.human + ' 岁</td><td>' + esc(r.stage) + '</td><td><button type="button" class="btn btn-secondary pa-del" data-idx="' + i + '" aria-label="移除' + esc(r.name) + '">移除</button></td></tr>';
+              }).join('');
+            }
+
+            $('pa-type').addEventListener('change', fillBreeds);
+            $('pa-breed').addEventListener('change', syncSize);
+            $('paForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var r = read(); if (!r) return;
+              show(r);
+              U.track('calc_result', { tool: 'pet-age', type: r.type, size: r.size || '' });
+            });
+            $('pa-add').addEventListener('click', function () {
+              var r = read(); if (!r) return;
+              show(r);
+              C.history.add(KEY, r, 20);
+              renderCompare();
+              U.track('save_result', { tool: 'pet-age' });
+            });
+            $('pa-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.pa-del'); if (!btn) return;
+              var rows = list(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderCompare();
+            });
+            $('pa-export').addEventListener('click', function () {
+              C.csv.download('宠物年龄对比.csv', list().map(function (r) { return [r.name, r.type === 'cat' ? '猫咪' : '狗狗', r.breed || C.pet.SIZE_LABEL[r.size] || '', r.age, r.human, r.stage]; }), ['昵称', '种类', '品种/体型', '实际年龄(岁)', '人类年龄(岁)', '生命阶段']);
+              U.track('export_result', { tool: 'pet-age' });
+            });
+            $('pa-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部对比记录？')) return;
+              C.history.clear(KEY); renderCompare();
+            });
+            fillBreeds();
+            renderCompare();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -63,22 +170,22 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>宠物年龄换算按通用对照口径，把猫或犬的实际年龄折算为“相当于人类年龄”，并给出生命阶段说明，属科普性对照，非医学标准。</p>
+          <p>宠物年龄换算把猫犬的实际年龄折算为相当于人类年龄，并按体型（犬）细分成年后的衰老速度，给出生命阶段与下一里程碑；可保存多只宠物本地对比。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>换算有科学依据吗？</summary>
-            <p>“人年对照”是通俗近似，猫犬衰老速度并非每年等比，仅便于理解生命阶段。</p>
+            <p>“人年对照”是通俗近似，猫犬衰老速度并非每年等比，仅便于理解生命阶段；研究口径也只是一组对照值，均非医学诊断。</p>
           </details>
           <details>
-            <summary>猫和狗换算一样吗？</summary>
-            <p>不同，犬还受体型与品种影响，工具按所选种类采用对应通用口径。</p>
+            <summary>为什么狗狗要分体型？</summary>
+            <p>大型犬通常衰老更快、寿命更短，因此成年后每年折算的人年略高于小型犬；品种选择会自动带出对应体型，也可手动改。</p>
           </details>
           <details>
-            <summary>需要输入什么？</summary>
-            <p>宠物种类（猫或犬）与实际年龄，部分口径还考虑体型。</p>
+            <summary>对比记录存在哪里？</summary>
+            <p>只存在当前浏览器本地，可导出 CSV 保存；清空浏览器数据会一并删除。</p>
           </details>
           <details>
             <summary>能指导喂养或就医吗？</summary>
-            <p>只作参考，健康与喂养请以兽医意见为准。</p>
+            <p>不能。老年期只是提示，个体差异很大，健康与喂养请以兽医意见为准。</p>
           </details>
         </section>

@@ -92,22 +92,42 @@
   <main class="site-main site-main--flat" id="main">
     <div class="main-inner">
 <nav class="cat-bar" aria-label="分类导航"><a href="/#cat-calc" data-cat="calc">计算器</a><a href="/#cat-cal" data-cat="cal">日历工具</a><a href="/#cat-combo" data-cat="combo">场景组合</a><a href="/#cat-other" data-cat="other">其他工具</a><a href="/tools.html" class="cat-bar-all">全部工具</a></nav>
-<section class="page-heading">
-          <h1>油耗计算器</h1>
-          <p>输入行驶里程、加油量与油价，计算百公里油耗、每公里油费与油费总额，反向也可由百公里油耗推算耗油量。</p>
+<style>
+        .xt-details{border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0 var(--space-4);margin:var(--space-3) 0;background:var(--color-surface)}
+        .xt-details>summary{cursor:pointer;padding:var(--space-3) 0;font-weight:550;color:var(--color-text)}
+        .table-wrap{overflow-x:auto;margin-top:var(--space-4)}
+        #fc-table{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
+        #fc-table th,#fc-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        #fc-table th{color:var(--color-muted);font-weight:600}
+        .fc-chart{margin-top:var(--space-4);min-height:120px}
+        .fc-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        </style>
+
+        <section class="page-heading">
+          <h1>油耗计算器 · 加油记录本</h1>
+          <p>既能单次算百公里油耗与每公里油费，也能把每次加油存成本地记录：自动汇总平均油耗、波动区间与总花费，画出趋势并导出 CSV。数据只存在你的浏览器里。</p>
         </section>
 
         <form class="card" id="fcForm">
           <div class="form-row">
-            <div class="form-group"><label class="form-label" for="fc-dist">行驶里程</label><div class="input-with-unit"><input class="form-input" id="fc-dist" type="number" inputmode="decimal" min="0" placeholder="如 480"><span class="unit-tag">km</span></div></div>
-            <div class="form-group"><label class="form-label" for="fc-fuel">消耗燃油</label><div class="input-with-unit"><input class="form-input" id="fc-fuel" type="number" inputmode="decimal" min="0" placeholder="如 36"><span class="unit-tag">L</span></div></div>
+            <div class="form-group"><label class="form-label" for="fc-date">加油日期</label><input class="form-input" id="fc-date" type="date"></div>
+            <div class="form-group"><label class="form-label" for="fc-dist">行驶里程</label><div class="input-with-unit"><input class="form-input" id="fc-dist" type="number" inputmode="decimal" step="any" min="0" placeholder="如 480"><span class="unit-tag">km</span></div></div>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="fc-price">当前油价</label>
-            <div class="input-with-unit"><input class="form-input" id="fc-price" type="number" inputmode="decimal" min="0" placeholder="如 7.85"><span class="unit-tag">元/升</span></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="fc-fuel">消耗燃油</label><div class="input-with-unit"><input class="form-input" id="fc-fuel" type="number" inputmode="decimal" step="any" min="0" placeholder="如 36"><span class="unit-tag">L</span></div></div>
+            <div class="form-group"><label class="form-label" for="fc-price">当前油价</label><div class="input-with-unit"><input class="form-input" id="fc-price" type="number" inputmode="decimal" step="any" min="0" placeholder="如 7.85"><span class="unit-tag">元/升</span></div></div>
           </div>
+          <div class="form-group"><label class="form-label" for="fc-note">备注（选填）</label><input class="form-input" id="fc-note" type="text" maxlength="40" placeholder="如 中石化 / 高速"></div>
+          <details class="xt-details">
+            <summary>用里程表读数自动填里程（选填）</summary>
+            <div class="form-row mt-4">
+              <div class="form-group"><label class="form-label" for="fc-odo-prev">上次表显</label><div class="input-with-unit"><input class="form-input" id="fc-odo-prev" type="number" inputmode="decimal" step="any" min="0" placeholder="如 12800"><span class="unit-tag">km</span></div></div>
+              <div class="form-group"><label class="form-label" for="fc-odo-now">本次表显</label><div class="input-with-unit"><input class="form-input" id="fc-odo-now" type="number" inputmode="decimal" step="any" min="0" placeholder="如 13280"><span class="unit-tag">km</span></div></div>
+            </div>
+          </details>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fuel-cost"}'>计算油耗</button>
+            <button class="btn btn-secondary" type="button" id="fc-save">保存本次记录</button>
           </div>
         </form>
 
@@ -119,28 +139,133 @@
           <dl class="result-detail" id="fc-detail"></dl>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>百公里油耗 = 消耗燃油 ÷ 行驶里程 × 100。每公里油费 = 百公里油耗 ÷ 100 × 油价。建议加满油前后各记录一次里程与油量以获得更准结果。</div></div>
+        <section class="card mt-4" id="fc-log-wrap" hidden>
+          <h2 class="card-title">加油记录与趋势</h2>
+          <div class="result-row" id="fc-stats"></div>
+          <div id="fc-chart" class="fc-chart" aria-label="历次百公里油耗趋势图"></div>
+          <div class="table-wrap">
+            <table id="fc-table">
+              <thead><tr><th scope="col">日期</th><th scope="col">里程</th><th scope="col">加油量</th><th scope="col">油价</th><th scope="col">百公里油耗</th><th scope="col">油费</th><th scope="col">备注</th><th scope="col">操作</th></tr></thead>
+              <tbody id="fc-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="fc-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="fc-clear">清空记录</button>
+          </div>
+        </section>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>百公里油耗 = 加油量 ÷ 行驶里程 × 100。建议每次「加满」后记录里程表与加油量，多次记录的平均比单次更能反映真实油耗；记录保存在本机浏览器，换设备不会同步。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var KEY = 'fuel-cost';
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+            if (!$('fc-date').value) $('fc-date').value = today();
+
+            function readInputs() {
+              var prev = U.numInput($('fc-odo-prev')), now = U.numInput($('fc-odo-now'));
+              if (Number.isFinite(prev) && Number.isFinite(now) && now > prev) $('fc-dist').value = U.round(now - prev, 1);
+              var dist = U.numInput($('fc-dist')), fuel = U.numInput($('fc-fuel')), price = U.numInput($('fc-price'));
+              if (!(dist > 0 && fuel > 0)) { alert('请输入有效里程与加油量'); return null; }
+              var hasPrice = Number.isFinite(price) && price > 0;
+              return {
+                date: $('fc-date').value || today(),
+                dist: dist, fuel: fuel, price: hasPrice ? price : null,
+                note: ($('fc-note').value || '').trim().slice(0, 40),
+                per100: fuel / dist * 100,
+                perKm: hasPrice ? fuel * price / dist : null,
+                cost: hasPrice ? fuel * price : null
+              };
+            }
+
+            function show(r) {
+              $('fc-per100').textContent = U.round(r.per100, 2) + ' L';
+              $('fc-perkm').textContent = r.perKm == null ? '需填油价' : U.money(r.perKm) + ' /km';
+              $('fc-detail').innerHTML =
+                row('总油费', r.cost == null ? '--' : U.money(r.cost)) +
+                row('总耗油', U.round(r.fuel, 2) + ' L') +
+                row('本次里程', U.round(r.dist, 1) + ' km') +
+                row('加油日期', r.date);
+              $('fc-result').hidden = false;
+            }
+
+            function records() { return C.history.list(KEY); }
+
+            function renderLog() {
+              var rows = records();
+              var wrap = $('fc-log-wrap');
+              wrap.hidden = rows.length === 0;
+              if (!rows.length) return;
+
+              var totalDist = 0, totalFuel = 0, totalCost = 0, vals = [];
+              rows.forEach(function (r) {
+                totalDist += r.dist; totalFuel += r.fuel; totalCost += (r.cost || 0);
+                if (isFinite(r.per100)) vals.push(r.per100);
+              });
+              var avg = vals.length ? vals.reduce(function (a, b) { return a + b; }, 0) / vals.length : NaN;
+              var weighted = totalDist > 0 ? totalFuel / totalDist * 100 : NaN;
+              var sd = vals.length > 1 ? Math.sqrt(vals.reduce(function (a, b) { return a + (b - avg) * (b - avg); }, 0) / (vals.length - 1)) : 0;
+              $('fc-stats').innerHTML =
+                '<div><div class="result-label">平均百公里油耗</div><div class="result-value">' + U.round(weighted, 2) + ' L</div></div>' +
+                '<div><div class="result-label">最低 / 最高</div><div class="result-value">' + U.round(Math.min.apply(null, vals), 1) + ' / ' + U.round(Math.max.apply(null, vals), 1) + '</div></div>' +
+                '<div><div class="result-label">波动（标准差）</div><div class="result-value">' + U.round(sd, 2) + '</div></div>' +
+                '<div><div class="result-label">累计里程 / 油费</div><div class="result-value">' + U.round(totalDist, 0) + ' km · ' + U.money(totalCost) + '</div></div>';
+
+              var recent = rows.slice(0, 20).slice().reverse();
+              var lo = Math.min.apply(null, recent.map(function (r) { return r.per100; }));
+              var hi = Math.max.apply(null, recent.map(function (r) { return r.per100; }));
+              var span = (hi - lo) || 1;
+              var w = 640, h = 120, pad = 16, bw = Math.max(6, (w - pad * 2) / recent.length * 0.62);
+              $('fc-chart').innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" height="' + h + '" role="img" aria-label="近 ' + recent.length + ' 次油耗趋势"><line x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - pad) + '" y2="' + (h - pad) + '" stroke="var(--color-border-strong)"/>' + recent.map(function (r, i) {
+                var x = pad + (i + 0.5) * ((w - pad * 2) / recent.length) - bw / 2;
+                var bh = Math.max(2, (r.per100 - lo) / span * (h - pad * 2 - 8) + 8);
+                var color = r.per100 > weighted * 1.1 ? 'var(--color-danger)' : (r.per100 < weighted * 0.9 ? 'var(--color-success)' : 'var(--color-primary)');
+                return '<rect x="' + x.toFixed(1) + '" y="' + (h - pad - bh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="3" fill="' + color + '" opacity=".85"><title>' + esc(r.date) + ' · ' + U.round(r.per100, 2) + ' L/100km</title></rect>';
+              }).join('') + '</svg>';
+
+              $('fc-tbody').innerHTML = rows.slice(0, 50).map(function (r, i) {
+                return '<tr><td>' + esc(r.date) + '</td><td>' + U.round(r.dist, 1) + ' km</td><td>' + U.round(r.fuel, 2) + ' L</td><td>' + (r.price ? U.money(r.price) : '--') + '</td><td>' + U.round(r.per100, 2) + ' L</td><td>' + (r.cost ? U.money(r.cost) : '--') + '</td><td>' + esc(r.note) + '</td><td><button type="button" class="btn btn-secondary fc-del" data-idx="' + i + '" aria-label="删除这条记录">删除</button></td></tr>';
+              }).join('');
+            }
+
             $('fcForm').addEventListener('submit', function (e) {
               e.preventDefault();
-              var dist = U.numInput($('fc-dist')), fuel = U.numInput($('fc-fuel')), price = U.numInput($('fc-price'));
-              if (!Number.isFinite(dist) || dist <= 0 || !Number.isFinite(fuel) || fuel <= 0) { alert('请输入有效里程与加油量'); return; }
-              var per100 = fuel / dist * 100;
-              var hasPrice = Number.isFinite(price) && price > 0;
-              var perKm = hasPrice ? per100 / 100 * price : NaN;
-              $('fc-per100').textContent = U.round(per100, 2) + ' L';
-              $('fc-perkm').textContent = hasPrice ? U.money(perKm) + ' /km' : '需填油价';
-              var detail = row('总油费', hasPrice ? U.money(fuel * price) : '--') + row('总耗油', U.round(fuel, 2) + ' L');
-              $('fc-detail').innerHTML = detail;
-              $('fc-result').hidden = false;
+              var r = readInputs(); if (!r) return;
+              show(r);
               U.track('calc_result', { tool: 'fuel-cost' });
             });
+            $('fc-save').addEventListener('click', function () {
+              var r = readInputs(); if (!r) return;
+              show(r);
+              C.history.add(KEY, r, 100);
+              renderLog();
+              U.track('save_result', { tool: 'fuel-cost' });
+            });
+            $('fc-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.fc-del'); if (!btn) return;
+              var rows = records(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderLog();
+            });
+            $('fc-export').addEventListener('click', function () {
+              var rows = records().map(function (r) { return [r.date, U.round(r.dist, 1), U.round(r.fuel, 2), r.price || '', U.round(r.per100, 2), r.cost || '', r.note]; });
+              C.csv.download('加油记录.csv', rows, ['日期', '里程(km)', '加油量(L)', '油价(元/L)', '百公里油耗(L)', '油费(元)', '备注']);
+              U.track('export_result', { tool: 'fuel-cost' });
+            });
+            $('fc-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部加油记录？此操作不可撤销。')) return;
+              C.history.clear(KEY); renderLog();
+            });
+            renderLog();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -148,23 +273,23 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>油耗计算器输入行驶里程与加油量，算出百公里油耗与每公里油费，帮助估算用车成本；结果是基于记录的估算。</p>
+          <p>油耗计算器把单次油耗测算与多次加油记录合在一起：历史记录在本地汇总出平均油耗、波动与累计花费，并按时间显示趋势。所有数据仅保存在当前浏览器。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>百公里油耗怎么算？</summary>
-            <p>用加油量除以行驶里程再乘以 100，得到每百公里耗油升数。</p>
+            <p>用加油量除以行驶里程再乘以 100，得到每百公里耗油升数。多次记录时同时给出按总油量/总里程加权的平均值，比单次更可靠。</p>
           </details>
           <details>
-            <summary>需要哪些输入？</summary>
-            <p>行驶里程、加油升数，以及可选的油价用于计算每公里油费。</p>
+            <summary>记录会上传到服务器吗？</summary>
+            <p>不会。记录仅存在本机浏览器的 localStorage，清空浏览器数据会一并删除，换设备也不会同步。</p>
           </details>
           <details>
             <summary>为什么和仪表盘不一样？</summary>
             <p>仪表多按瞬时或区间工况计算，工具基于加油—里程记录，方法与时间窗口不同会有偏差。</p>
           </details>
           <details>
-            <summary>数据会被上传吗？</summary>
-            <p>计算在浏览器本地完成，不上传你输入的内容。</p>
+            <summary>趋势图里的颜色代表什么？</summary>
+            <p>高于平均油耗 10% 标红、低于平均 10% 标绿，其余为主色，便于快速定位异常加油周期。</p>
           </details>
         </section>
         <section class="home-section" id="related" aria-label="相关工具">
@@ -239,6 +364,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

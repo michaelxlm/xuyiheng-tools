@@ -1,56 +1,183 @@
+        <style>
+        .dd-mode-row[hidden]{display:none}
+        .dd-timeline{list-style:none;margin:var(--space-3) 0 0;padding:0;border-left:2px solid var(--color-border-strong);margin-left:8px}
+        .dd-timeline li{position:relative;padding:0 0 14px 20px;font-size:var(--text-sm)}
+        .dd-timeline li::before{content:"";position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--color-border-strong)}
+        .dd-timeline li.soon::before{background:var(--color-primary)}
+        .dd-timeline li.past::before{background:var(--color-success)}
+        .dd-timeline b{font-weight:650}
+        .dd-timeline small{display:block;color:var(--color-muted);margin-top:2px}
+        .dd-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .dd-table th,.dd-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .dd-table th{color:var(--color-muted);font-weight:600}
+        .dd-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        </style>
+
         <section class="page-heading">
-          <h1>预产期计算器</h1>
-          <p>按内格勒法则（Naegele）由末次月经首日推算预产期，支持自定义月经周期修正，并实时查询当前孕周、孕期阶段与剩余天数。</p>
+          <h1>预产期计算器 · 孕周时间轴</h1>
+          <p>支持末次月经、受孕日与 B 超三种口径推算预产期，自动给出当前孕周、孕期阶段与倒计时，并列出 8 个常规产检节点；可保存多组测算本地对比。</p>
         </section>
 
         <form class="card" id="ddForm">
-          <div class="form-group"><label class="form-label" for="dd-lmp">末次月经首日</label><input class="form-input" id="dd-lmp" type="date"></div>
-          <div class="form-group"><label class="form-label" for="dd-cycle">月经周期天数</label><div class="input-with-unit"><input class="form-input" id="dd-cycle" type="number" inputmode="numeric" min="20" max="45" value="28"><span class="unit-tag">天</span></div></div>
+          <div class="form-group"><label class="form-label" for="dd-mode">推算口径</label><select class="form-select" id="dd-mode"><option value="lmp">末次月经（Naegele 法则）</option><option value="conception">受孕日 / 排卵日</option><option value="ultrasound">B 超孕周</option></select></div>
+          <div class="dd-mode-row" id="dd-lmp-row">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="dd-lmp">末次月经首日</label><input class="form-input" id="dd-lmp" type="date"></div>
+              <div class="form-group"><label class="form-label" for="dd-cycle">月经周期天数</label><div class="input-with-unit"><input class="form-input" id="dd-cycle" type="number" inputmode="numeric" min="20" max="45" value="28"><span class="unit-tag">天</span></div></div>
+            </div>
+          </div>
+          <div class="dd-mode-row" id="dd-conception-row" hidden>
+            <div class="form-group"><label class="form-label" for="dd-conception">受孕日 / 排卵日</label><input class="form-input" id="dd-conception" type="date"></div>
+          </div>
+          <div class="dd-mode-row" id="dd-us-row" hidden>
+            <div class="form-group"><label class="form-label" for="dd-us-date">B 超检查日期</label><input class="form-input" id="dd-us-date" type="date"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="dd-us-week">检查时孕周</label><div class="input-with-unit"><input class="form-input" id="dd-us-week" type="number" inputmode="numeric" min="0" max="40" placeholder="如 8"><span class="unit-tag">周</span></div></div>
+              <div class="form-group"><label class="form-label" for="dd-us-day">零头天数</label><div class="input-with-unit"><input class="form-input" id="dd-us-day" type="number" inputmode="numeric" min="0" max="6" value="0"><span class="unit-tag">天</span></div></div>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label" for="dd-name">备注（选填，用于保存对比）</label><input class="form-input" id="dd-name" type="text" maxlength="16" placeholder="如 第一次"></div>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"due-date"}'>推算预产期</button>
+            <button class="btn btn-secondary" type="button" id="dd-save">保存此测算</button>
           </div>
         </form>
 
         <div class="result-box" id="dd-result" hidden>
-          <div class="result-row"><div><div class="result-label">预产期</div><div class="result-value" id="dd-due">--</div></div></div>
+          <div class="result-row">
+            <div><div class="result-label">预产期</div><div class="result-value" id="dd-due">--</div></div>
+            <div><div class="result-label">当前孕周</div><div class="result-value" id="dd-week">--</div></div>
+            <div><div class="result-label">距预产期</div><div class="result-value" id="dd-left">--</div></div>
+          </div>
           <dl class="result-detail" id="dd-detail"></dl>
+          <h3 class="card-title mt-4">产检时间轴</h3>
+          <ul class="dd-timeline" id="dd-timeline"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>内格勒法则：预产期 = 末次月经月份 − 3（或 +9）、日期 + 7，即末次月经 + 280 天。周期非 28 天时按「+(周期−28)」天修正。结果仅供参考，请以产科检查为准。</div></div>
+        <section class="card mt-4" id="dd-compare-wrap" hidden>
+          <h2 class="card-title">已保存测算</h2>
+          <div class="table-wrap">
+            <table class="dd-table">
+              <thead><tr><th scope="col">备注</th><th scope="col">口径</th><th scope="col">基准日</th><th scope="col">预产期</th><th scope="col">距今天</th><th scope="col">操作</th></tr></thead>
+              <tbody id="dd-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="dd-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="dd-clear">清空测算</button>
+          </div>
+        </section>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>预产期是估算日期，只有约 5% 宝宝在预产期当天出生，前后两周内都属常见范围。B 超口径在孕早期核对孕周更可靠；最终以产科医生结合检查的判断为准。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var G = C.gestation, KEY = 'due-date';
+            var last = null;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            var DAY = 86400000;
-            function fmt(d) { var pad = function (x) { return (x < 10 ? '0' : '') + x; }; return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-            function trimester(w) { return w < 14 ? '孕早期（第 1 孕期）' : w < 28 ? '孕中期（第 2 孕期）' : '孕晚期（第 3 孕期）'; }
-            $('ddForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var v = $('dd-lmp').value; if (!v) { alert('请选择末次月经日期'); return; }
-              var p = v.split('-').map(Number);
-              var lmp = new Date(p[0], p[1] - 1, p[2]);
-              var cycle = U.numInput($('dd-cycle')); if (!Number.isFinite(cycle) || cycle <= 0) cycle = 28;
-              var due = new Date(lmp.getTime() + (280 + (cycle - 28)) * DAY);
-              var today = new Date(); today.setHours(0, 0, 0, 0);
-              var passed = Math.floor((today - lmp) / DAY);
-              $('dd-due').textContent = fmt(due);
-              var detail = '';
-              if (passed >= 0 && passed <= 290) {
-                detail = row('当前孕周', Math.floor(passed / 7) + ' 周 ' + (passed % 7) + ' 天') +
-                  row('孕期阶段', trimester(passed / 7)) +
-                  row('距离预产期', Math.max(0, Math.round((due - today) / DAY)) + ' 天');
-              } else if (passed < 0) {
-                detail = row('提示', '末次月经日期晚于今天');
-              } else {
-                detail = row('距末次月经', passed + ' 天');
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function todayStr() { return G.fmt(new Date()); }
+
+            function syncMode() {
+              var m = $('dd-mode').value;
+              $('dd-lmp-row').hidden = m !== 'lmp';
+              $('dd-conception-row').hidden = m !== 'conception';
+              $('dd-us-row').hidden = m !== 'ultrasound';
+            }
+
+            function calc() {
+              var m = $('dd-mode').value, r;
+              if (m === 'lmp') r = G.fromLmp($('dd-lmp').value, U.numInput($('dd-cycle')));
+              else if (m === 'conception') r = G.fromConception($('dd-conception').value);
+              else r = G.fromUltrasound($('dd-us-date').value, U.numInput($('dd-us-week')), U.numInput($('dd-us-day')));
+              if (!r) { alert('请填写有效的日期'); return null; }
+              return r;
+            }
+
+            function effectiveLmp(r) {
+              if (r.method === 'LMP') return G.fmt(r.anchor);
+              return G.fmt(G.addDays(r.due, -280));
+            }
+
+            function show(r) {
+              last = r;
+              var lmp = effectiveLmp(r);
+              var w = G.weekInfo(lmp);
+              $('dd-due').textContent = G.fmt(r.due);
+              $('dd-week').textContent = w ? (w.weeks + ' 周 ' + w.dayOfWeek + ' 天') : '--';
+              $('dd-left').textContent = w ? (w.daysLeft >= 0 ? w.daysLeft + ' 天' : '已过 ' + (-w.daysLeft) + ' 天') : '--';
+              var detail = row('推算口径', r.method + (r.method === 'LMP' ? ' · 周期 ' + r.cycle + ' 天' : '')) +
+                row('基准日', G.fmt(r.anchor));
+              if (r.method === 'LMP') detail += row('预计受孕 / 排卵日', G.fmt(r.conception) + '（末次月经 +14 天，仅估算）');
+              if (r.method === 'B超') detail += row('检查时孕周', Math.floor(r.gaDays / 7) + ' 周 ' + (r.gaDays % 7) + ' 天');
+              if (w) {
+                detail += row('孕期阶段', w.trimeter) +
+                  row('距末次月经', w.days + ' 天') +
+                  row('足月（37 周）倒计时', w.daysLeft - 21 >= 0 ? (w.daysLeft - 21) + ' 天' : '已足月');
               }
               $('dd-detail').innerHTML = detail;
+
+              var now = new Date(); now.setHours(0, 0, 0, 0);
+              $('dd-timeline').innerHTML = G.checkups(lmp).map(function (c) {
+                var diff = Math.round((c.date - now) / G.DAY);
+                var cls = diff < -7 ? 'past' : diff <= 14 ? 'soon' : '';
+                var label = diff < 0 ? '已过 ' + (-diff) + ' 天' : diff === 0 ? '就是今天' : '还有 ' + diff + ' 天';
+                return '<li class="' + cls + '"><b>' + esc(c.name) + '</b> · 孕 ' + c.week + ' 周 · ' + G.fmt(c.date) + '<small>' + esc(c.desc) + ' · ' + label + '</small></li>';
+              }).join('');
               $('dd-result').hidden = false;
-              U.track('calc_result', { tool: 'due-date' });
+            }
+
+            function list() { return C.history.list(KEY); }
+            function renderCompare() {
+              var rows = list();
+              $('dd-compare-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              var now = new Date(); now.setHours(0, 0, 0, 0);
+              $('dd-tbody').innerHTML = rows.map(function (r, i) {
+                var d = G.parse(r.due);
+                var left = d ? Math.round((d - now) / G.DAY) : NaN;
+                return '<tr><td>' + esc(r.name) + '</td><td>' + esc(r.method) + '</td><td>' + esc(r.anchor) + '</td><td>' + esc(r.due) + '</td><td>' + (left >= 0 ? left + ' 天' : '已过 ' + (-left) + ' 天') + '</td><td><button type="button" class="btn btn-secondary dd-del" data-idx="' + i + '" aria-label="删除测算">删除</button></td></tr>';
+              }).join('');
+            }
+
+            $('dd-mode').addEventListener('change', syncMode);
+            $('ddForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var r = calc(); if (!r) return;
+              show(r);
+              U.track('calc_result', { tool: 'due-date', method: r.method });
             });
+            $('dd-save').addEventListener('click', function () {
+              var r = calc(); if (!r) return;
+              show(r);
+              C.history.add(KEY, {
+                name: ($('dd-name').value || '').trim().slice(0, 16) || r.method + ' 测算',
+                method: r.method, anchor: G.fmt(r.anchor), due: G.fmt(r.due)
+              }, 20);
+              renderCompare();
+              U.track('save_result', { tool: 'due-date' });
+            });
+            $('dd-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.dd-del'); if (!btn) return;
+              var rows = list(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderCompare();
+            });
+            $('dd-export').addEventListener('click', function () {
+              C.csv.download('预产期测算.csv', list().map(function (r) { return [r.name, r.method, r.anchor, r.due]; }), ['备注', '口径', '基准日', '预产期']);
+              U.track('export_result', { tool: 'due-date' });
+            });
+            $('dd-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部预产期测算？')) return;
+              C.history.clear(KEY); renderCompare();
+            });
+            syncMode();
+            renderCompare();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -58,22 +185,22 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>预产期计算器按内格勒法则（Naegele），用末次月经首日与月经周期推算预产期，并实时显示当前孕周；预产期为估算，实际分娩日期存在个体差异。</p>
+          <p>预产期计算器支持末次月经、受孕日与 B 超三种口径，输出预产期、孕周、孕期阶段、倒计时与常规产检时间轴。所有结果均为估算，请以产科检查为准。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>用的是什么算法？</summary>
-            <p>按内格勒法则推算：以末次月经首日约加 280 天（10 个妊娠月），并按你的周期长度调整。</p>
+            <summary>三种口径该用哪个？</summary>
+            <p>月经规律时常用末次月经；明确受孕日可用受孕日口径；月经不规律或记不清时，孕早期 B 超核对通常更可靠。</p>
           </details>
           <details>
-            <summary>周期不是 28 天怎么办？</summary>
-            <p>工具支持输入个人月经周期长度进行修正，周期偏长或偏短都会相应平移预产期。</p>
+            <summary>为什么各口径结果差一两天？</summary>
+            <p>受孕日 +266 天与末次月经 +280 天理论等价，但实际排卵日会波动，B 超测量也有误差，差几天属正常。</p>
           </details>
           <details>
-            <summary>预产期一定会在那天生吗？</summary>
-            <p>不一定，多数宝宝在预产期前后两周内出生都属正常。</p>
+            <summary>产检时间轴准吗？</summary>
+            <p>列出的是通用节点的参考周数，具体安排以医院与医生建议为准，高危妊娠会更密集。</p>
           </details>
           <details>
             <summary>能替代产检吗？</summary>
-            <p>不能，具体孕周与预产期请以医生超声核对为准。</p>
+            <p>不能。预产期与孕周请以医生结合超声的检查结论为准。</p>
           </details>
         </section>

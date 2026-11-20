@@ -388,6 +388,8 @@ function renderRoute(site, route, ctx) {
     // WO-210：ad-slots / coupon-slot 合并进 slot-loader.js（本站无 img-slot）；经 assetUrl 带 ?v=<token>。
     '    <script src="' + assetUrl('assets/js/slot-loader.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/utils.min.js', manifest) + '" defer></script>',
+    // 共享计算内核：收敛贷款/复利/BMI/组合数等重复公式，须在 utils 之后、页面脚本之前
+    '    <script src="' + assetUrl('assets/js/tool-core.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/http-api.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',
   ];

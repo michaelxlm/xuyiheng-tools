@@ -1,11 +1,20 @@
+        <style>
+        .ft-card{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;border:1px solid var(--color-border);border-radius:var(--radius);padding:var(--space-4);background:var(--color-surface-2)}
+        .ft-card b{font-size:1.35rem;color:var(--color-primary)}
+        .ft-mine{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--space-3)}
+        .ft-mine span{border:1px solid var(--color-border);border-radius:8px;padding:6px 10px;font-size:var(--text-sm)}
+        .ft-del{min-height:28px;padding:2px 8px;font-size:var(--text-xs);margin-left:6px}
+        </style>
+
         <section class="page-heading">
           <h1>趣味测试合集<span class="ent-badge">娱乐</span></h1>
-          <p>娱乐向小测试：输入双方生日测星座契合度（缘分指数），以及生日数字生命灵数解读。纯属娱乐，给生活添点乐趣，请勿当真。</p>
+          <p>星座速配、生命灵数与生日档案三合一：输入生日即可生成一张可复制的趣味卡片，结果也能保存在本机。纯属娱乐，请勿当真。</p>
         </section>
 
         <div class="chips" role="tablist">
           <button type="button" class="chip active" data-tab="love" role="tab">💕 星座速配</button>
           <button type="button" class="chip" data-tab="num" role="tab">🔢 生命灵数</button>
+          <button type="button" class="chip" data-tab="profile" role="tab">🎂 生日档案</button>
         </div>
 
         <form class="card" id="loveForm">
@@ -21,48 +30,175 @@
           <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fun-test","mode":"num"}'>测算灵数</button></div>
         </form>
 
+        <form class="card" id="profileForm" hidden>
+          <div class="form-group"><label class="form-label" for="pf-date">出生日期</label><input class="form-input" id="pf-date" type="date"></div>
+          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"fun-test","mode":"profile"}'>生成生日档案</button></div>
+        </form>
+
         <div class="result-box" id="ft-result" hidden>
           <div class="result-row"><div><div class="result-label" id="ft-rlabel">结果</div><div class="result-value" id="ft-rvalue">--</div></div></div>
-          <dl class="result-detail" id="ft-detail"></dl>
+          <div class="ft-card mt-4" id="ft-card"></div>
+          <dl class="result-detail mt-4" id="ft-detail"></dl>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="ft-copy">复制趣味卡片</button>
+            <button class="btn btn-secondary" type="button" id="ft-save">保存这一条</button>
+          </div>
         </div>
 
-        <div class="info-box mt-4"><span>🎈</span><div>本工具结果为趣味内容，非科学结论，仅供娱乐参考。</div></div>
+        <section class="card mt-4" id="ft-mine-wrap" hidden>
+          <h2 class="card-title">我保存的趣味结果</h2>
+          <div class="ft-mine" id="ft-mine"></div>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="ft-mine-clear">清空保存</button></div>
+        </section>
+
+        <div class="info-box mt-4"><span>🎈</span><div>本工具结果为趣味内容，非科学结论，星座速配按四元素粗略估算，生命灵数为数字游戏，请勿据此做重要决定。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var KEY = 'fun-test';
+            var last = null;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            var Z = [['摩羯','土',1,20],['水瓶','风',2,19],['双鱼','水',3,21],['白羊','火',4,20],['金牛','土',5,21],['双子','风',6,22],['巨蟹','水',7,23],['狮子','火',8,23],['处女','土',9,23],['天秤','风',10,24],['天蝎','水',11,23],['射手','火',12,22],['摩羯','土',1,20]];
-            function sign(m, d) { for (var i = 0; i < 12; i++) { var s = Z[i], nx = Z[i + 1]; if (m === s[2] && d >= s[3]) return s; if (m === nx[2] && d < nx[3]) return s; } return m === 1 ? Z[11] : Z[0]; }
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+            var ZODIAC = [
+              { name: '摩羯', element: '土', from: [12, 22], to: [1, 19] },
+              { name: '水瓶', element: '风', from: [1, 20], to: [2, 18] },
+              { name: '双鱼', element: '水', from: [2, 19], to: [3, 20] },
+              { name: '白羊', element: '火', from: [3, 21], to: [4, 19] },
+              { name: '金牛', element: '土', from: [4, 20], to: [5, 20] },
+              { name: '双子', element: '风', from: [5, 21], to: [6, 21] },
+              { name: '巨蟹', element: '水', from: [6, 22], to: [7, 22] },
+              { name: '狮子', element: '火', from: [7, 23], to: [8, 22] },
+              { name: '处女', element: '土', from: [8, 23], to: [9, 22] },
+              { name: '天秤', element: '风', from: [9, 23], to: [10, 23] },
+              { name: '天蝎', element: '水', from: [10, 24], to: [11, 22] },
+              { name: '射手', element: '火', from: [11, 23], to: [12, 21] }
+            ];
+            function sign(m, d) {
+              for (var i = 0; i < ZODIAC.length; i++) {
+                var z = ZODIAC[i], f = z.from, t = z.to;
+                if (f[0] > t[0]) {
+                  if (m > f[0] || m < t[0]) return z;
+                  if (m === f[0] && d >= f[1]) return z;
+                  if (m === t[0] && d <= t[1]) return z;
+                } else {
+                  if (m > f[0] && m < t[0]) return z;
+                  if (m === f[0] && d >= f[1]) return z;
+                  if (m === t[0] && d <= t[1]) return z;
+                }
+              }
+              return ZODIAC[0];
+            }
+            var SHENG = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+            function zodiac(year) { return SHENG[((year - 2020) % 12 + 12) % 12]; }
             var FLOW = { 土: { 土: 88, 风: 62, 水: 90, 火: 68 }, 风: { 土: 62, 风: 85, 水: 66, 火: 90 }, 水: { 土: 90, 风: 66, 水: 86, 火: 72 }, 火: { 土: 68, 风: 90, 水: 72, 火: 84 } };
             var NUM = { 1: '领导者 · 独立开创', 2: '协调者 · 温柔体贴', 3: '表达者 · 乐观创意', 4: '建设者 · 稳健务实', 5: '自由人 · 适应力强', 6: '奉献者 · 重视家庭', 7: '思想者 · 理性钻研', 8: '掌控者 · 目标驱动', 9: '理想家 · 博爱慷慨', 11: '大师数 · 直觉洞察', 22: '大师数 · 宏大构建', 33: '大师数 · 大爱导师' };
-            U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active'); var t = b.getAttribute('data-tab'); $('loveForm').hidden = t !== 'love'; $('numForm').hidden = t !== 'num'; $('ft-result').hidden = true; }); });
+            function lifeNumber(ds) {
+              var s = 0;
+              for (var i = 0; i < ds.length; i++) s += +ds[i];
+              while (s > 9 && s !== 11 && s !== 22 && s !== 33) s = String(s).split('').reduce(function (a, c) { return a + +c; }, 0);
+              return s;
+            }
+            function parts(v) { var p = String(v).split('-').map(Number); return { y: p[0], m: p[1], d: p[2] }; }
+
+            function setResult(label, value, card, detail, share, mode) {
+              last = { label: label, value: value, share: share, mode: mode };
+              $('ft-rlabel').textContent = label;
+              $('ft-rvalue').textContent = value;
+              $('ft-card').innerHTML = card;
+              $('ft-detail').innerHTML = detail;
+              $('ft-result').hidden = false;
+            }
+
+            U.qsa('[data-tab]').forEach(function (b) { b.addEventListener('click', function () {
+              U.qsa('[data-tab]').forEach(function (x) { x.classList.remove('active'); });
+              b.classList.add('active');
+              var t = b.getAttribute('data-tab');
+              $('loveForm').hidden = t !== 'love';
+              $('numForm').hidden = t !== 'num';
+              $('profileForm').hidden = t !== 'profile';
+              $('ft-result').hidden = true;
+            }); });
+
             $('loveForm').addEventListener('submit', function (e) {
               e.preventDefault();
               if (!$('lv-a').value || !$('lv-b').value) { alert('请选择两个生日'); return; }
-              var a = $('lv-a').value.split('-'), b = $('lv-b').value.split('-');
-              var sa = sign(+a[1], +a[2]), sb = sign(+b[1], +b[2]);
-              var score = FLOW[sa[1]][sb[1]] - (sa[0] === sb[0] ? -3 : 0);
-              $('ft-rlabel').textContent = sa[0] + ' ♥ ' + sb[0];
-              $('ft-rvalue').textContent = '契合度 ' + score + '%';
-              $('ft-detail').innerHTML = row('缘分评级', score >= 88 ? '天作之合 ✨' : score >= 75 ? '相当合拍 😊' : score >= 65 ? '需要磨合 🤝' : '个性差异大 😅') + row('元素', sa[1] + '象 与 ' + sb[1] + '象');
-              $('ft-result').hidden = false;
+              var a = parts($('lv-a').value), b = parts($('lv-b').value);
+              var sa = sign(a.m, a.d), sb = sign(b.m, b.d);
+              var score = FLOW[sa.element][sb.element] - (sa.name === sb.name ? -3 : 0);
+              var rating = score >= 88 ? '天作之合 ✨' : score >= 75 ? '相当合拍 😊' : score >= 65 ? '需要磨合 🤝' : '个性差异大 😅';
+              setResult(sa.name + ' ♥ ' + sb.name, '契合度 ' + score + '%',
+                '<b>' + score + '%</b><span>' + esc(rating) + '</span><span>' + sa.name + '（' + sa.element + '象）× ' + sb.name + '（' + sb.element + '象）</span>',
+                row('缘分评级', rating) + row('元素', sa.element + '象 与 ' + sb.element + '象') + row('生肖', zodiac(a.y) + ' 与 ' + zodiac(b.y)),
+                '【一珩工具·趣味速配】' + sa.name + ' × ' + sb.name + '，契合度 ' + score + '% · ' + rating, 'love');
               U.track('calc_result', { tool: 'fun-test', mode: 'love' });
             });
+
             $('numForm').addEventListener('submit', function (e) {
               e.preventDefault();
               if (!$('nm-date').value) { alert('请选择出生日期'); return; }
-              var ds = $('nm-date').value.replace(/-/g, ''), s = 0;
-              for (var i = 0; i < ds.length; i++) s += +ds[i];
-              while (s > 9 && s !== 11 && s !== 22 && s !== 33) { s = String(s).split('').reduce(function (a, c) { return a + +c; }, 0); }
-              $('ft-rlabel').textContent = '生命灵数';
-              $('ft-rvalue').textContent = s;
-              $('ft-detail').innerHTML = row('解读', NUM[s] || '独特数字');
-              $('ft-result').hidden = false;
+              var v = $('nm-date').value, n = lifeNumber(v.replace(/-/g, ''));
+              setResult('生命灵数', String(n),
+                '<b>' + n + '</b><span>' + esc(NUM[n] || '独特数字') + '</span>',
+                row('解读', NUM[n] || '独特数字') + row('生日数字', v.replace(/-/g, '')),
+                '【一珩工具·生命灵数】我的灵数是 ' + n + ' · ' + (NUM[n] || '独特数字'), 'num');
               U.track('calc_result', { tool: 'fun-test', mode: 'num' });
             });
+
+            $('profileForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              if (!$('pf-date').value) { alert('请选择出生日期'); return; }
+              var v = $('pf-date').value, p = parts(v), s = sign(p.m, p.d);
+              var n = lifeNumber(v.replace(/-/g, ''));
+              var age = C.date.age(C.date.parse(v));
+              var season = p.m >= 3 && p.m <= 5 ? '春' : p.m >= 6 && p.m <= 8 ? '夏' : p.m >= 9 && p.m <= 11 ? '秋' : '冬';
+              setResult('生日档案', s.name + ' · ' + zodiac(p.y),
+                '<b>' + s.name + '</b><span>' + zodiac(p.y) + '年 · ' + season + '季</span><span>灵数 ' + n + '</span>',
+                row('星座 / 元素', s.name + ' · ' + s.element + '象') +
+                row('生肖', zodiac(p.y)) +
+                row('生命灵数', n + ' · ' + (NUM[n] || '独特数字')) +
+                row('年龄', age.years + ' 岁 · 已出生 ' + U.thousands(Math.max(0, age.totalDays)) + ' 天') +
+                row('年内第几天', C.date.dayOfYear(C.date.parse(v)) + ' 天'),
+                '【一珩工具·生日档案】' + v + ' · ' + s.name + '座 · ' + zodiac(p.y) + '年 · 灵数 ' + n, 'profile');
+              U.track('calc_result', { tool: 'fun-test', mode: 'profile' });
+            });
+
+            function list() { return C.history.list(KEY); }
+            function renderMine() {
+              var rows = list();
+              $('ft-mine-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              $('ft-mine').innerHTML = rows.map(function (r, i) {
+                return '<span>' + esc(r.label) + ' · ' + esc(r.value) + '<button type="button" class="btn btn-secondary ft-del" data-idx="' + i + '" aria-label="删除结果">×</button></span>';
+              }).join('');
+            }
+            $('ft-save').addEventListener('click', function () {
+              if (!last) return;
+              C.history.add(KEY, { label: last.label, value: last.value, mode: last.mode }, 20);
+              renderMine();
+              U.track('save_result', { tool: 'fun-test' });
+            });
+            $('ft-copy').addEventListener('click', function () {
+              if (!last) return;
+              try { navigator.clipboard.writeText(last.share); } catch (e) {}
+              U.track('copy_result', { tool: 'fun-test' });
+            });
+            $('ft-mine').addEventListener('click', function (e) {
+              var btn = e.target.closest('.ft-del'); if (!btn) return;
+              var rows = list(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderMine();
+            });
+            $('ft-mine-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机保存的趣味结果？')) return;
+              C.history.clear(KEY); renderMine();
+            });
+            renderMine();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -72,19 +208,19 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>趣味测试合集包含缘分、星座运势、生日密码等趣味小游戏，仅供娱乐，不具备科学或命理预测效力。</p>
+          <p>趣味测试合集包含星座速配、生命灵数与生日档案，支持一键复制趣味卡片和本地保存。所有结果纯属娱乐，不具备科学或命理依据。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>这些测试准吗？</summary>
-            <p>属娱乐性质，没有科学与命理依据，请勿据此做重要决定。</p>
+            <p>属娱乐性质，星座按四元素粗略估算、灵数是数字游戏，请勿据此做重要决定。</p>
           </details>
           <details>
-            <summary>会保存我的答案吗？</summary>
-            <p>结果多由所选选项即时生成，具体以站点隐私说明为准。</p>
+            <summary>会保存我的生日吗？</summary>
+            <p>保存的只是测试结果的文字描述，位于当前浏览器本地；清空浏览器数据会一并删除。</p>
           </details>
           <details>
-            <summary>星座运势能指导生活吗？</summary>
-            <p>仅供娱乐参考。</p>
+            <summary>星座分界怎么定？</summary>
+            <p>按通用公历日期区间划分，例如 1 月 20 日起为水瓶、2 月 19 日起为双鱼。</p>
           </details>
           <details>
             <summary>适合未成年人吗？</summary>

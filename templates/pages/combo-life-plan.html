@@ -1,6 +1,15 @@
+        <style>
+        .progress { height: 10px; background: var(--color-surface-2); border-radius: 999px; overflow: hidden; margin: var(--space-3) 0; }
+        .progress-bar { height: 100%; width: 0; background: var(--color-primary); border-radius: 999px; transition: width var(--dur-base) var(--ease); }
+        .lp-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .lp-table th,.lp-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .lp-table th{color:var(--color-muted);font-weight:600}
+        .lp-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        </style>
+
         <section class="page-heading">
-          <h1>人生规划计算器</h1>
-          <p>综合收入、支出、负债与投资，生成一份个人财务全景报告：储蓄率、资产增长预测、财务自由进度，帮你看清当前所处阶段与通往目标的路径。</p>
+          <h1>人生规划 · 财务全景</h1>
+          <p>从现金流出发测算储蓄率、财务自由进度与达成时间，同时给出保守 / 基准 / 乐观三情景资产预测，并可反推「想在 N 年后达到目标需要每月存多少」。</p>
         </section>
 
         <form class="card" id="lpForm">
@@ -15,65 +24,156 @@
             <div class="form-group"><label class="form-label" for="lp-assets">现有净资产</label><div class="input-with-unit"><input class="form-input" id="lp-assets" type="number" inputmode="decimal" placeholder="元"></div></div>
             <div class="form-group"><label class="form-label" for="lp-return">预期年化收益</label><div class="input-with-unit"><input class="form-input" id="lp-return" type="number" inputmode="decimal" step="0.1" value="5"><span class="unit-tag">%</span></div></div>
             <div class="form-group"><label class="form-label" for="lp-goal">财务自由目标年支出</label><div class="input-with-unit"><input class="form-input" id="lp-goal" type="number" inputmode="decimal" placeholder="元/年"></div></div>
+            <div class="form-group"><label class="form-label" for="lp-years">规划年限</label><div class="input-with-unit"><input class="form-input" id="lp-years" type="number" inputmode="decimal" value="10" min="1" max="60"><span class="unit-tag">年</span></div></div>
           </div>
-          <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"life-plan"}'>生成财务全景</button></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"life-plan"}'>生成财务全景</button>
+            <button class="btn btn-secondary" type="button" id="lp-save">保存此方案</button>
+          </div>
         </form>
 
         <div class="result-box" id="lp-result" hidden>
           <div class="result-row">
             <div><div class="result-label">储蓄率</div><div class="result-value" id="lp-rate">--</div></div>
-            <div><div class="result-label">10 年后资产</div><div class="result-value" id="lp-future">--</div></div>
+            <div><div class="result-label" id="lp-future-label">10 年后资产</div><div class="result-value" id="lp-future">--</div></div>
             <div><div class="result-label">财务自由进度</div><div class="result-value" id="lp-progress">--</div></div>
           </div>
           <div class="progress" id="lp-bar-wrap"><div class="progress-bar" id="lp-bar"></div></div>
           <dl class="result-detail" id="lp-detail"></dl>
+          <h3 class="card-title mt-4">三情景资产预测</h3>
+          <dl class="result-detail" id="lp-scenarios"></dl>
+          <h3 class="card-title mt-4">目标反推</h3>
+          <dl class="result-detail" id="lp-required"></dl>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>财务自由线按「目标年支出 ÷ 4%（安全提取率 4% Rule）」估算所需资产。资产预测 = 现有资产×(1+r)ⁿ + 年结余×((1+r)ⁿ−1)/r。假设结余全部投资、收益率恒定，实际会有波动。</div></div>
+        <section class="card mt-4" id="lp-compare-wrap" hidden>
+          <h2 class="card-title">已保存方案</h2>
+          <div class="table-wrap">
+            <table class="lp-table">
+              <thead><tr><th scope="col">月收入</th><th scope="col">月结余</th><th scope="col">储蓄率</th><th scope="col">年化</th><th scope="col">规划年限</th><th scope="col">期末资产</th><th scope="col">操作</th></tr></thead>
+              <tbody id="lp-tbody"></tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" type="button" id="lp-export">导出 CSV</button>
+            <button class="btn btn-secondary" type="button" id="lp-clear">清空方案</button>
+          </div>
+        </section>
 
-        <style>
-        .progress { height: 10px; background: var(--color-surface-2); border-radius: 999px; overflow: hidden; margin: var(--space-3) 0; }
-        .progress-bar { height: 100%; width: 0; background: var(--color-primary); border-radius: 999px; transition: width var(--dur-base) var(--ease); }
-        </style>
+        <div class="info-box mt-4"><span>ℹ️</span><div>财务自由线按「目标年支出 ÷ 4%（安全提取率）」估算；资产预测使用共享复利内核的期初本金 + 月末定投模型，三情景按基准收益率的 60% / 100% / 150% 取值。假设结余全部投资、收益恒定，实际会波动。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var F = C.finance, KEY = 'life-plan';
+            var last = null;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            $('lpForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var inc = U.numInput($('lp-income')), exp = U.numInput($('lp-expense')) || 0, debt = U.numInput($('lp-debt')) || 0;
-              var assets = U.numInput($('lp-assets')) || 0, r = (U.numInput($('lp-return')) || 0) / 100, goal = U.numInput($('lp-goal')) || 0;
-              if (!(inc > 0)) { alert('请输入月收入'); return; }
-              var save = inc - exp - debt;
-              var rate = save / inc * 100;
-              var n10 = assets * Math.pow(1 + r, 10) + (r > 0 ? save * 12 * (Math.pow(1 + r, 10) - 1) / r : save * 12 * 10);
-              var freedomNeed = goal > 0 ? goal / 0.04 : 0;
-              var progress = freedomNeed > 0 ? Math.min(100, assets / freedomNeed * 100) : 0;
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+            function read() {
+              var income = U.numInput($('lp-income'));
+              if (!(income > 0)) { alert('请输入税后月收入'); return null; }
+              var exp = U.numInput($('lp-expense')) || 0, debt = U.numInput($('lp-debt')) || 0;
+              var assets = U.numInput($('lp-assets')) || 0, rate = U.numInput($('lp-return'));
+              if (!Number.isFinite(rate)) rate = 5;
+              var goal = U.numInput($('lp-goal')) || 0;
+              var years = U.numInput($('lp-years')) || 10;
+              years = C.clamp(years, 1, 60);
+              return { income: income, exp: exp, debt: debt, assets: assets, rate: rate, goal: goal, years: years, save: income - exp - debt };
+            }
+
+            function show(r) {
+              last = r;
+              var rate = r.save / r.income * 100;
+              var proj = F.withMonthly(r.assets, r.save, r.rate, r.years);
+              var freedomNeed = r.goal > 0 ? r.goal / 0.04 : 0;
+              var progress = freedomNeed > 0 ? C.clamp(r.assets / freedomNeed * 100, 0, 100) : 0;
               $('lp-rate').textContent = U.round(rate, 1) + '%';
-              $('lp-future').textContent = U.money(n10);
+              $('lp-future-label').textContent = r.years + ' 年后资产';
+              $('lp-future').textContent = U.money(proj.total);
               $('lp-progress').textContent = freedomNeed > 0 ? U.round(progress, 1) + '%' : '未设目标';
               $('lp-bar').style.width = progress + '%';
               var yrs = null;
               if (freedomNeed > 0) {
-                if (assets >= freedomNeed) yrs = 0;
-                else if (save > 0) {
-                  var S = save * 12;
-                  yrs = r > 0
-                    ? Math.ceil(Math.log((freedomNeed + S / r) / (assets + S / r)) / Math.log(1 + r))
-                    : Math.ceil((freedomNeed - assets) / S);
+                if (r.assets >= freedomNeed) yrs = 0;
+                else if (r.save > 0) {
+                  var n = 0, bal = r.assets;
+                  while (bal < freedomNeed && n < 100) { bal = bal * (1 + r.rate / 100) + r.save * 12; n++; }
+                  yrs = n;
                 }
               }
               $('lp-detail').innerHTML =
-                row('月度结余', U.money(save)) +
-                row('年度可投资额', U.money(save * 12)) +
-                (freedomNeed > 0 ? row('财务自由所需资产', U.money(freedomNeed)) + row('预计达成', yrs === 0 ? '已达成 🎉' : (yrs && yrs !== '—' ? '约 ' + yrs + ' 年' : '结余不足，暂无法达成')) : '') +
-                row('资产负债健康提示', rate >= 30 ? '储蓄率健康' : rate >= 10 ? '尚可，可优化支出' : '结余偏低，建议控制支出');
+                row('月度结余', U.money(r.save)) +
+                row('年度可投资额', U.money(r.save * 12)) +
+                row('累计投入本金', U.money(proj.invested)) +
+                row('投资收益', U.money(proj.interest)) +
+                (freedomNeed > 0 ? row('财务自由所需资产', U.money(freedomNeed)) + row('预计达成', yrs === 0 ? '已达成' : (yrs ? '约 ' + yrs + ' 年' : '结余不足，暂无法达成')) : '') +
+                row('储蓄率评估', rate >= 30 ? '健康（≥30%）' : rate >= 10 ? '尚可，可优化支出' : '结余偏低，建议控制支出');
+
+              $('lp-scenarios').innerHTML = [
+                { name: '保守（收益 ×0.6）', rate: r.rate * 0.6 },
+                { name: '基准（你的输入）', rate: r.rate },
+                { name: '乐观（收益 ×1.5）', rate: r.rate * 1.5 }
+              ].map(function (s) {
+                var p = F.withMonthly(r.assets, r.save, s.rate, r.years);
+                return row(s.name, U.money(p.total) + '（收益 ' + U.money(p.interest) + '）');
+              }).join('');
+
+              if (freedomNeed > 0) {
+                var req = F.requiredMonthly(r.assets, freedomNeed, r.rate, r.years);
+                $('lp-required').innerHTML =
+                  row('目标资产', U.money(freedomNeed)) +
+                  row(r.years + ' 年达成所需月投', U.money(req)) +
+                  row('当前月结余', U.money(r.save)) +
+                  row('缺口', req > r.save ? '每月还需多存 ' + U.money(req - r.save) : '当前结余已足够');
+              } else {
+                $('lp-required').innerHTML = row('提示', '填写目标年支出后可反推所需月储蓄');
+              }
               $('lp-result').hidden = false;
               U.track('calc_result', { tool: 'life-plan' });
+            }
+
+            function list() { return C.history.list(KEY); }
+            function renderCompare() {
+              var rows = list();
+              $('lp-compare-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              $('lp-tbody').innerHTML = rows.map(function (r, i) {
+                return '<tr><td>' + U.money(r.income) + '</td><td>' + U.money(r.save) + '</td><td>' + U.round(r.rate, 1) + '%</td><td>' + r.annual + '%</td><td>' + r.years + ' 年</td><td>' + U.money(r.future) + '</td><td><button type="button" class="btn btn-secondary lp-del" data-idx="' + i + '" aria-label="删除方案">删除</button></td></tr>';
+              }).join('');
+            }
+
+            $('lpForm').addEventListener('submit', function (e) { e.preventDefault(); var r = read(); if (r) show(r); });
+            $('lp-save').addEventListener('click', function () {
+              var r = read(); if (!r) return;
+              show(r);
+              var p = F.withMonthly(r.assets, r.save, r.rate, r.years);
+              C.history.add(KEY, {
+                income: r.income, save: r.save, rate: r.save / r.income * 100,
+                annual: r.rate, years: r.years, future: p.total
+              }, 20);
+              renderCompare();
+              U.track('save_result', { tool: 'life-plan' });
             });
+            $('lp-tbody').addEventListener('click', function (e) {
+              var btn = e.target.closest('.lp-del'); if (!btn) return;
+              var rows = list(), i = +btn.getAttribute('data-idx');
+              if (!isFinite(i) || !rows[i]) return;
+              rows.splice(i, 1);
+              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
+              renderCompare();
+            });
+            $('lp-export').addEventListener('click', function () {
+              C.csv.download('人生规划方案.csv', list().map(function (r) { return [r.income, r.save, U.round(r.rate, 1), r.annual, r.years, U.round(r.future, 2)]; }), ['月收入', '月结余', '储蓄率(%)', '年化(%)', '规划年限', '期末资产']);
+              U.track('export_result', { tool: 'life-plan' });
+            });
+            $('lp-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机全部已存方案？')) return;
+              C.history.clear(KEY); renderCompare();
+            });
+            renderCompare();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -83,23 +183,23 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>人生规划计算器综合房贷、车贷、养老与投资等输入，生成一份财务全景概览，帮助你横向了解各项目的相对关系；结果为基于假设的估算，不构成规划建议。</p>
+          <p>人生规划计算器用共享复利内核给出储蓄率、财务自由进度、三情景资产预测与目标所需月储蓄反推，支持多方案本地对比；结果基于假设，不构成投资建议。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>综合了哪些方面？</summary>
-            <p>通常涵盖房贷、车贷、养老储备与投资等模块的汇总。</p>
+            <summary>财务自由线怎么算？</summary>
+            <p>按 4% 安全提取率：所需资产 = 目标年支出 ÷ 4%。这是通用经验值，实际需结合年龄与风险偏好。</p>
           </details>
           <details>
-            <summary>数字准吗？</summary>
-            <p>全部基于你输入的假设，未来收入、利率与支出变化会显著影响结果。</p>
+            <summary>三情景是怎么设定的？</summary>
+            <p>按你输入年化收益的 60% / 100% / 150% 分别计算，展示不同市场表现下的资产区间。</p>
+          </details>
+          <details>
+            <summary>反推的月储蓄靠谱吗？</summary>
+            <p>按恒定收益与月末定投模型求解，没考虑收入增长、通胀与税费，请作为起点参考。</p>
           </details>
           <details>
             <summary>能替代理财规划师吗？</summary>
             <p>不能，仅提供概览，重大规划请咨询专业人士。</p>
-          </details>
-          <details>
-            <summary>需要输入很多数据吗？</summary>
-            <p>是的，输入越贴近实际，概览越有参考价值。</p>
           </details>
         </section>
 

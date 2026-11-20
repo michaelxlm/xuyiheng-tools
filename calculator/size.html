@@ -92,72 +92,119 @@
   <main class="site-main site-main--flat" id="main">
     <div class="main-inner">
 <nav class="cat-bar" aria-label="分类导航"><a href="/#cat-calc" data-cat="calc">计算器</a><a href="/#cat-cal" data-cat="cal">日历工具</a><a href="/#cat-combo" data-cat="combo">场景组合</a><a href="/#cat-other" data-cat="other">其他工具</a><a href="/tools.html" class="cat-bar-all">全部工具</a></nav>
-<section class="page-heading">
-          <h1>衣服尺码对照表</h1>
-          <p>网购衣服不再选错码。覆盖男/女装常见尺码，提供中国 CN、国际、美国 US、欧洲 EU、英国 UK、日本 JP 六套标准对照，输入任一脚码即可高亮对应整行。</p>
+<style>
+        .sz-table{width:100%;border-collapse:collapse;background:var(--color-surface);border-radius:var(--radius);overflow:hidden;font-size:var(--text-sm)}
+        .sz-table th,.sz-table td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
+        .sz-table th{background:var(--color-surface-2);color:var(--color-muted);font-weight:600}
+        .sz-table tr.match td{background:var(--color-primary-soft);font-weight:650}
+        .sz-table tr.recommend td{outline:2px solid var(--color-primary);outline-offset:-2px}
+        .sz-card{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:var(--space-3)}
+        .sz-card span{border:1px solid var(--color-border);border-radius:8px;padding:6px 10px;font-size:var(--text-sm)}
+        </style>
+
+        <section class="page-heading">
+          <h1>尺码对照 · 测量反查</h1>
+          <p>覆盖上装、下装、童装、成人鞋与童鞋五类场景，中 / 美 / 欧 / 英 / 日多标准互查；输入测量值可反查推荐尺码，并保存自己的常用尺码。</p>
         </section>
 
         <div class="card">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="sz-gender">服装类别</label>
-              <select class="form-select" id="sz-gender">
-                <option value="men">男装 · 上装</option>
-                <option value="women">女装 · 上装</option>
+              <label class="form-label" for="sz-cat">尺码类别</label>
+              <select class="form-select" id="sz-cat">
+                <option value="men_top">男装 · 上装</option>
+                <option value="women_top">女装 · 上装</option>
+                <option value="men_pants">男装 · 下装</option>
+                <option value="women_pants">女装 · 下装</option>
+                <option value="kids">童装</option>
+                <option value="shoes">成人鞋码</option>
+                <option value="kids_shoes">童鞋</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="sz-query">输入你的尺码（如 40 / M / 170）</label>
-              <input class="form-input" id="sz-query" type="text" placeholder="支持 CN / US / EU / UK / JP / 国际码">
+              <label class="form-label" for="sz-query">输入尺码关键词（任一标准均可）</label>
+              <input class="form-input" id="sz-query" type="text" placeholder="如 40 / M / 170 / 25.5">
             </div>
+          </div>
+          <div class="form-row mt-4">
+            <div class="form-group">
+              <label class="form-label" for="sz-measure-label">按测量值反查</label>
+              <div class="input-with-unit"><input class="form-input" id="sz-measure" type="number" inputmode="decimal" min="0" step="0.1" placeholder="如 96"><span class="unit-tag" id="sz-measure-unit">cm</span></div>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end"><button class="btn btn-secondary" type="button" id="sz-recommend" style="width:100%">推荐尺码</button></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="button" id="sz-save">保存我的尺码</button>
           </div>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table" id="sz-table">
-            <thead><tr><th>国际</th><th>中国 CN</th><th>美国 US</th><th>欧洲 EU</th><th>英国 UK</th><th>日本 JP</th><th>参考胸围(cm)</th></tr></thead>
+        <div class="result-box" id="sz-reco-box" hidden>
+          <div class="result-row"><div><div class="result-label">按测量值推荐</div><div class="result-value" id="sz-reco-value">--</div></div></div>
+          <dl class="result-detail" id="sz-reco-detail"></dl>
+        </div>
+
+        <div class="table-wrap mt-4">
+          <table class="sz-table" id="sz-table">
+            <thead id="sz-head"></thead>
             <tbody id="sz-body"></tbody>
           </table>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>各品牌版型差异较大，本表为通用参考。胸围/腰围实测数据最可靠：软尺水平绕胸部最丰满处一周即为胸围。命中行已高亮，如无匹配请核对标准体系。</div></div>
+        <section class="card mt-4" id="sz-mine-wrap" hidden>
+          <h2 class="card-title">我保存的尺码</h2>
+          <div class="sz-card" id="sz-mine"></div>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="sz-mine-clear">清空保存</button></div>
+        </section>
 
-        <style>
-        .table-wrap { overflow-x: auto; }
-        .data-table { width: 100%; border-collapse: collapse; background: var(--color-surface); border-radius: var(--radius); overflow: hidden; font-size: var(--text-sm); }
-        .data-table th, .data-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
-        .data-table th { background: var(--color-surface-2); color: var(--color-muted); font-weight: 600; }
-        .data-table tr.match td { background: var(--color-primary-light); font-weight: 600; }
-        </style>
+        <details class="card mt-4">
+          <summary>怎么测量才准？</summary>
+          <ul style="line-height:1.8;margin-top:var(--space-2)">
+            <li><b>胸围</b>：软尺水平绕过胸部最丰满处一周，保持自然呼吸。</li>
+            <li><b>腰围</b>：在肚脐上方或腰部最细处水平绕一圈，不要收腹。</li>
+            <li><b>臀围</b>：双脚并拢，软尺绕过臀部最宽处。</li>
+            <li><b>脚长</b>：赤脚踩纸，标出脚跟与最长脚趾，量两点直线距离。</li>
+          </ul>
+        </details>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>各品牌版型差异较大，本表为通用参考；修身 / 宽松、不同面料与批次都会影响实际穿着。下单前请优先核对具体商品的实测尺码表。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
-            var DATA = {
-              men: [
-                ['XS', '165/84A', '34', '44', '34', 'S', '81-84'],
-                ['S', '170/88A', '36', '46', '36', 'M', '85-89'],
-                ['M', '175/92A', '38-40', '48-50', '38-40', 'L', '90-96'],
-                ['L', '180/100A', '42', '52', '42', 'XL', '101-106'],
-                ['XL', '185/108A', '44-46', '54-56', '44-46', '2L', '107-113'],
-                ['XXL', '190/116A', '48', '58', '48', '3L', '114-119'],
-              ],
-              women: [
-                ['XS', '155/80A', '0-2', '34', '4-6', '5S', '78-81'],
-                ['S', '160/84A', '4-6', '36', '8-10', '7S', '82-85'],
-                ['M', '165/88A', '8-10', '38-40', '12-14', '9M', '86-91'],
-                ['L', '170/92A', '12-14', '42', '16', '11L', '92-97'],
-                ['XL', '175/100A', '16', '44', '18', '13LL', '98-104'],
-                ['XXL', '180/108A', '18', '46', '20', '4L', '105-112'],
-              ],
+            var KEY = 'size-chart';
+            var D = {
+              men_top: { label: '男装 · 上装', cols: ['国际', '中国 CN', '美国 US', '欧洲 EU', '英国 UK', '日本 JP', '胸围 cm'], probe: 6,
+                rows: [['XS','165/84A','34','44','34','S','81-84'],['S','170/88A','36','46','36','M','85-89'],['M','175/92A','38-40','48-50','38-40','L','90-96'],['L','180/100A','42','52','42','XL','101-106'],['XL','185/108A','44-46','54-56','44-46','2L','107-113'],['XXL','190/116A','48','58','48','3L','114-119']] },
+              women_top: { label: '女装 · 上装', cols: ['国际', '中国 CN', '美国 US', '欧洲 EU', '英国 UK', '日本 JP', '胸围 cm'], probe: 6,
+                rows: [['XS','155/80A','0-2','34','4-6','5S','78-81'],['S','160/84A','4-6','36','8-10','7S','82-85'],['M','165/88A','8-10','38-40','12-14','9M','86-91'],['L','170/92A','12-14','42','16','11L','92-97'],['XL','175/100A','16','44','18','13LL','98-104'],['XXL','180/108A','18','46','20','4L','105-112']] },
+              men_pants: { label: '男装 · 下装', cols: ['腰围 cm', '中国 CN', '美国 US', '欧洲 EU', '英国 UK', '国际'], probe: 0,
+                rows: [['72-76','30','30','46','30','S'],['77-81','32','32','48','32','M'],['82-86','34','34','50','34','L'],['87-91','36','36','52','36','XL'],['92-96','38','38','54','38','XXL'],['97-101','40','40','56','40','3XL']] },
+              women_pants: { label: '女装 · 下装', cols: ['腰围 cm', '中国 CN', '美国 US', '欧洲 EU', '英国 UK', '国际'], probe: 0,
+                rows: [['60-64','25','0','34','6','XS'],['65-69','26','2','36','8','S'],['70-74','27','4','38','10','M'],['75-79','28','6','40','12','L'],['80-84','29','8','42','14','XL'],['85-89','30','10','44','16','XXL']] },
+              kids: { label: '童装', cols: ['年龄', '身高 cm', '中国 CN', '国际', '美国 US', '欧洲 EU', '日本 JP'], probe: 1,
+                rows: [['2 岁','86-92','90','XS','2T','86','90'],['4 岁','98-104','105','S','4T','98','100'],['6 岁','110-116','115','M','6T','110','110'],['8 岁','122-128','125','L','8T','122','120'],['10 岁','134-140','135','XL','10T','134','130'],['12 岁','146-152','145','XXL','12T','146','140']] },
+              shoes: { label: '成人鞋码', cols: ['脚长 cm', '中国 CN', '美国 US(男)', '美国 US(女)', '欧洲 EU', '英国 UK', '日本 JP'], probe: 0,
+                rows: [['23.5','37','6','7.5','36.5','4.5','23.5'],['24.0','38','6.5','8','37','5','24'],['24.5','39','7','8.5','38','5.5','24.5'],['25.0','40','7.5','9','39','6','25'],['25.5','41','8','9.5','40','6.5','25.5'],['26.0','42','8.5','10','41','7','26'],['26.5','43','9','10.5','42','7.5','26.5'],['27.0','44','10','11','43','8.5','27'],['28.0','45','11','12','44','9.5','28']] },
+              kids_shoes: { label: '童鞋', cols: ['脚长 cm', '中国 CN', '美国 US', '欧洲 EU', '英国 UK', '日本 JP', '参考年龄'], probe: 0,
+                rows: [['16.0','26','8C','27','8.5','16','2-3 岁'],['17.0','28','10C','29','10.5','17','3-4 岁'],['18.5','30','12C','31','12.5','18.5','4-5 岁'],['20.0','32','1Y','33','13.5','20','5-6 岁'],['21.5','34','3Y','35','2','21.5','6-7 岁'],['23.0','36','5Y','37','4','23','8-9 岁']] }
             };
+            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+            function current() { return D[$('sz-cat').value]; }
+            function probeValue(cell) {
+              var m = String(cell).match(/-?\d+(?:\.\d+)?/);
+              return m ? Number(m[0]) : NaN;
+            }
+            function probeLabel(d) { return d.cols[d.probe]; }
+
             function render() {
-              var rows = DATA[$('sz-gender').value];
-              $('sz-body').innerHTML = rows.map(function (r) {
-                return '<tr><td>' + r.join('</td><td>') + '</td></tr>';
+              var d = current();
+              $('sz-head').innerHTML = '<tr>' + d.cols.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') + '</tr>';
+              $('sz-body').innerHTML = d.rows.map(function (r) {
+                return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>';
               }).join('');
+              $('sz-measure-unit').textContent = probeLabel(d).indexOf('cm') >= 0 ? 'cm' : '值';
               highlight();
             }
             function highlight() {
@@ -167,9 +214,56 @@
                 tr.classList.toggle('match', !!hit);
               });
             }
-            $('sz-gender').addEventListener('change', render);
+            function recommend() {
+              var d = current(), v = U.numInput($('sz-measure'));
+              if (!Number.isFinite(v) || v <= 0) { alert('请输入测量值'); return; }
+              var best = -1, bestDiff = Infinity;
+              d.rows.forEach(function (r, i) {
+                var raw = String(r[d.probe]);
+                var nums = (raw.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+                if (!nums.length) return;
+                var center = nums.length > 1 ? (nums[0] + nums[1]) / 2 : nums[0];
+                var diff = Math.abs(center - v);
+                if (diff < bestDiff) { bestDiff = diff; best = i; }
+              });
+              if (best < 0) { alert('该类别没有可反查的数据'); return; }
+              U.qsa('#sz-body tr').forEach(function (tr, i) { tr.classList.toggle('recommend', i === best); });
+              var row = d.rows[best];
+              $('sz-reco-value').textContent = row[0] + (row[1] ? ' / ' + row[1] : '');
+              $('sz-reco-detail').innerHTML =
+                '<div class="result-detail-row"><dt>输入测量值</dt><dd>' + v + ' ' + ($('sz-measure-unit').textContent === 'cm' ? 'cm' : '') + '</dd></div>' +
+                '<div class="result-detail-row"><dt>对照项</dt><dd>' + esc(probeLabel(d)) + ' · ' + esc(row[d.probe]) + '</dd></div>' +
+                '<div class="result-detail-row"><dt>全码对照</dt><dd>' + esc(d.cols.map(function (c, i) { return c + ' ' + row[i]; }).join(' · ')) + '</dd></div>';
+              $('sz-reco-box').hidden = false;
+              U.track('calc_result', { tool: 'size', cat: $('sz-cat').value });
+            }
+            function mine() { return C.history.list(KEY); }
+            function renderMine() {
+              var rows = mine();
+              $('sz-mine-wrap').hidden = rows.length === 0;
+              if (!rows.length) return;
+              $('sz-mine').innerHTML = rows.map(function (r) {
+                return '<span><b>' + esc(D[r.cat] ? D[r.cat].label : r.cat) + '</b> · ' + esc(r.size) + (r.measure ? ' · ' + esc(r.measure) : '') + '</span>';
+              }).join('');
+            }
+
+            $('sz-cat').addEventListener('change', function () { render(); $('sz-reco-box').hidden = true; });
             $('sz-query').addEventListener('input', highlight);
+            $('sz-recommend').addEventListener('click', recommend);
+            $('sz-save').addEventListener('click', function () {
+              var d = current(), q = String($('sz-query').value).trim();
+              var size = q || ($('sz-reco-box').hidden ? '' : $('sz-reco-value').textContent);
+              if (!size) { alert('请先输入尺码关键词或反查推荐'); return; }
+              C.history.add(KEY, { cat: $('sz-cat').value, size: size.slice(0, 40), measure: $('sz-measure').value }, 20);
+              renderMine();
+              U.track('save_result', { tool: 'size' });
+            });
+            $('sz-mine-clear').addEventListener('click', function () {
+              if (!confirm('确定清空本机保存的尺码？')) return;
+              C.history.clear(KEY); renderMine();
+            });
             render();
+            renderMine();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -177,23 +271,23 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>尺码对照表支持中国、美国、欧洲、日本、韩国等常见服装尺码相互对照，帮助网购时选码；不同品牌版型差异大，最终以商品尺码表为准。</p>
+          <p>尺码对照表覆盖上装、下装、童装、成人鞋与童鞋，支持多标准互查、按测量值反查推荐与保存常用尺码；不同品牌版型差异大，请以商品实测表为准。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>这些换算可靠吗？</summary>
-            <p>仅提供通用对照参考，品牌与版型差异显著，请以具体商品的尺寸表为准。</p>
-          </details>
-          <details>
-            <summary>按什么测量选码？</summary>
-            <p>建议测量胸围、腰围、臀围等，再对照商品实测数据，而非仅看字母码。</p>
-          </details>
-          <details>
             <summary>覆盖哪些尺码体系？</summary>
-            <p>常见中国、美国、欧洲、日本、韩国等服装尺码。</p>
+            <p>上装 / 下装含中国、美国、欧洲、英国、日本码，童装与鞋码按各自常用标准列出。</p>
           </details>
           <details>
-            <summary>童装、鞋码也适用吗？</summary>
-            <p>本页以服装为主，鞋码与童装另有体系，需另行核对。</p>
+            <summary>反查推荐可靠吗？</summary>
+            <p>按测量值取最接近的参考区间，只是快速定位；版型与面料差异会让实际穿着不同。</p>
+          </details>
+          <details>
+            <summary>鞋码按脚长还是脚宽？</summary>
+            <p>本表按脚长对照；脚宽、脚背高低也影响合脚程度，宽脚建议结合实际试穿。</p>
+          </details>
+          <details>
+            <summary>保存的尺码在哪？</summary>
+            <p>只存在当前浏览器本地，清空浏览器数据会一并删除。</p>
           </details>
         </section>
         <section class="home-section" id="related" aria-label="相关工具">
@@ -268,6 +362,7 @@
     <script src="/assets/js/tracker.min.js?v=8c0bef3151" defer></script>
     <script src="/assets/js/slot-loader.js?v=c31713a635" defer></script>
     <script src="/assets/js/utils.min.js?v=32de2d2bf0" defer></script>
+    <script src="/assets/js/tool-core.min.js?v=39f85b780b" defer></script>
     <script src="/assets/js/http-api.min.js?v=5a6b36d2be" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
     <script src="/assets/js/tool-state.min.js?v=870f5af098" defer></script>

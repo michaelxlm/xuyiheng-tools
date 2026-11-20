@@ -1,20 +1,25 @@
         <section class="page-heading">
-          <h1>日期计算器</h1>
-          <p>支持三种常用场景：计算两个日期间隔天数、由某日期加减天数推算目标日期、查询任意日期是星期几及年内第几天。</p>
+          <h1>日期计算器 · 工作日与年龄</h1>
+          <p>六种常用场景：日期间隔、日期加减、星期查询、精确工作日统计、周岁年龄计算、按工作日推算日期。按公历规则计算，工作日仅排除周六日。</p>
         </section>
 
         <form class="card" id="dcForm">
           <div class="form-group">
             <label class="form-label" for="dc-mode">计算方式</label>
             <select class="form-select" id="dc-mode">
-              <option value="diff">日期间隔（两日期相差天数）</option>
-              <option value="add">日期推算（加减天数）</option>
-              <option value="weekday">星期查询（某日是星期几）</option>
+              <option value="diff">日期间隔（相差天数）</option>
+              <option value="workdays">工作日统计（排除周末）</option>
+              <option value="add">日期推算（加减自然日）</option>
+              <option value="addworkday">按工作日推算日期</option>
+              <option value="age">年龄计算（精确到年月日）</option>
+              <option value="weekday">星期查询</option>
             </select>
           </div>
           <div class="form-group" id="dc-g1"><label class="form-label" for="dc-d1" id="dc-l1">开始日期</label><input class="form-input" id="dc-d1" type="date"></div>
-          <div class="form-group" id="dc-g2"><label class="form-label" for="dc-d2">结束日期</label><input class="form-input" id="dc-d2" type="date"></div>
+          <div class="form-group" id="dc-g2"><label class="form-label" for="dc-d2" id="dc-l2">结束日期</label><input class="form-input" id="dc-d2" type="date"></div>
           <div class="form-group" id="dc-gd"><label class="form-label" for="dc-days">加减天数（负数为向前）</label><div class="input-with-unit"><input class="form-input" id="dc-days" type="number" inputmode="numeric" placeholder="如 100"><span class="unit-tag">天</span></div></div>
+          <div class="form-group" id="dc-g3"><label class="form-label" for="dc-asof">计算截至日期</label><input class="form-input" id="dc-asof" type="date"></div>
+          <div class="form-group" id="dc-g4" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="dc-inc" style="width:auto;min-height:auto"><label class="form-label" for="dc-inc" style="margin:0">包含结束日</label></div>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"date-calc"}'>计算</button>
           </div>
@@ -25,46 +30,85 @@
           <dl class="result-detail" id="dc-detail"></dl>
         </div>
 
+        <div class="info-box mt-4"><span>ℹ️</span><div>工作日仅排除周六、周日，不含法定节假日与调休；如遇跨年节假日安排，请以国家公布的日历为准。年龄按公历周岁计算，未到生日当天的月份不计入。</div></div>
+
         <script>
         (function () {
           function boot() {
-            var U = window.U; if (!U) return;
+            var U = window.U, C = window.Core; if (!U || !C) return;
             var $ = function (id) { return document.getElementById(id); };
+            var D = C.date;
             function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            var WD = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-            var DAY = 86400000;
-            function parseDate(id) { var v = $(id).value; if (!v) return null; var p = v.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
-            function fmt(d) { var pad = function (x) { return (x < 10 ? '0' : '') + x; }; return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-            function dayOfYear(d) { var s = new Date(d.getFullYear(), 0, 0); return Math.floor((d - s) / DAY); }
-            var G = { diff: ['dc-g1', 'dc-g2'], add: ['dc-g1', 'dc-gd'], weekday: ['dc-g1'] };
+            var G = {
+              diff: ['dc-g1', 'dc-g2'],
+              workdays: ['dc-g1', 'dc-g2', 'dc-g4'],
+              add: ['dc-g1', 'dc-gd'],
+              addworkday: ['dc-g1', 'dc-gd'],
+              age: ['dc-g1', 'dc-g3'],
+              weekday: ['dc-g1']
+            };
             function syncMode() {
               var m = $('dc-mode').value, on = G[m];
-              ['dc-g1', 'dc-g2', 'dc-gd'].forEach(function (id) { $(id).hidden = on.indexOf(id) < 0; });
-              $('dc-l1').textContent = m === 'add' ? '起始日期' : '日期';
+              ['dc-g1', 'dc-g2', 'dc-gd', 'dc-g3', 'dc-g4'].forEach(function (id) { $(id).hidden = on.indexOf(id) < 0; });
+              $('dc-l1').textContent = m === 'age' ? '出生日期' : (m === 'add' || m === 'addworkday' ? '起始日期' : (m === 'weekday' ? '日期' : '开始日期'));
+              $('dc-l2').textContent = m === 'workdays' ? '结束日期' : '对比日期';
             }
-            $('dc-mode').addEventListener('change', syncMode); syncMode();
+            function parse(id) { return D.parse($(id).value); }
+
+            $('dc-mode').addEventListener('change', syncMode);
             $('dcForm').addEventListener('submit', function (e) {
               e.preventDefault();
-              var m = $('dc-mode').value, d1 = parseDate('dc-d1'), label = '', out = '', detail = '';
+              var m = $('dc-mode').value, d1 = parse('dc-d1'), label = '', out = '', detail = '';
               if (!d1) { alert('请选择日期'); return; }
-              if (m === 'diff') {
-                var d2 = parseDate('dc-d2'); if (!d2) { alert('请选择结束日期'); return; }
-                var days = Math.round(Math.abs(d2 - d1) / DAY);
-                label = '相差天数'; out = U.thousands(days) + ' 天';
-                detail = row('约合', U.round(days / 7, 1) + ' 周 / ' + U.round(days / 30, 1) + ' 个月') + row('含工作日', Math.ceil(days / 7) * 5 + '（近似）');
-              } else if (m === 'add') {
+              if (m === 'diff' || m === 'workdays') {
+                var d2 = parse('dc-d2'); if (!d2) { alert('请选择第二个日期'); return; }
+                var diff = D.diff(d1, d2);
+                if (m === 'diff') {
+                  label = '相差天数'; out = U.thousands(diff.days) + ' 天';
+                  detail = row('含首尾', U.thousands(diff.inclusive) + ' 天') +
+                    row('约合', U.round(diff.weeks, 1) + ' 周 / ' + U.round(diff.months, 1) + ' 个月') +
+                    row('区间工作日', D.workdays(d1, d2, true) + ' 天（不含节假日）');
+                } else {
+                  var inc = $('dc-inc').checked;
+                  var wd = D.workdays(d1, d2, inc);
+                  label = '工作日数'; out = U.thousands(wd) + ' 天';
+                  detail = row('总天数', diff.days + ' 天' + (inc ? '（含首尾）' : '（不含结束日）')) +
+                    row('周末天数', Math.max(0, diff.inclusive - D.workdays(d1, d2, true)) + ' 天') +
+                    row('约合周数', U.round(wd / 5, 1) + ' 个工作周');
+                }
+              } else if (m === 'add' || m === 'addworkday') {
                 var n = U.numInput($('dc-days')); if (!Number.isFinite(n)) { alert('请输入天数'); return; }
-                var r = new Date(d1.getTime() + n * DAY);
-                label = n >= 0 ? '推算日期' : '回退日期'; out = fmt(r);
-                detail = row('星期', WD[r.getDay()]) + row('年内第几天', dayOfYear(r) + ' 天');
+                var r = m === 'add' ? D.addDays(d1, n) : D.addWorkdays(d1, n);
+                label = n >= 0 ? (m === 'add' ? '推算日期' : '推算工作日') : (m === 'add' ? '回退日期' : '回退工作日');
+                out = D.fmt(r);
+                detail = row('星期', D.WEEKDAYS[r.getDay()]) +
+                  row('年内第几天', D.dayOfYear(r) + ' 天') +
+                  row('该年是否闰年', D.isLeap(r.getFullYear()) ? '是' : '否');
+                if (m === 'addworkday') {
+                  var natural = Math.round((r - d1) / D.DAY);
+                  detail += row('跨过自然日', natural + ' 天') + row('其中周末', Math.max(0, natural - Math.abs(n)) + ' 天（近似）');
+                }
+              } else if (m === 'age') {
+                var asOf = parse('dc-asof') || new Date();
+                var a = D.age(d1, asOf);
+                label = '周岁年龄'; out = a.years + ' 岁 ' + a.months + ' 个月 ' + a.days + ' 天';
+                var next = new Date(asOf.getFullYear(), d1.getMonth(), d1.getDate());
+                if (next < asOf) next = new Date(asOf.getFullYear() + 1, d1.getMonth(), d1.getDate());
+                detail = row('已出生', U.thousands(a.totalDays) + ' 天') +
+                  row('截至日期', D.fmt(asOf)) +
+                  row('下次生日', D.fmt(next) + ' · 还有 ' + Math.round((next - asOf) / D.DAY) + ' 天');
               } else {
-                label = fmt(d1); out = WD[d1.getDay()];
-                detail = row('年内第几天', dayOfYear(d1)) + row('剩余天数', 365 - dayOfYear(d1) + '（平年）');
+                label = D.fmt(d1); out = D.WEEKDAYS[d1.getDay()];
+                var total = D.isLeap(d1.getFullYear()) ? 366 : 365;
+                detail = row('年内第几天', D.dayOfYear(d1) + ' 天') +
+                  row('本年剩余', (total - D.dayOfYear(d1)) + ' 天') +
+                  row('该年是否闰年', D.isLeap(d1.getFullYear()) ? '是（366 天）' : '否（365 天）');
               }
               $('dc-rlabel').textContent = label; $('dc-rvalue').textContent = out;
               $('dc-detail').innerHTML = detail; $('dc-result').hidden = false;
               U.track('calc_result', { tool: 'date-calc', mode: m });
             });
+            syncMode();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -72,19 +116,19 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>日期计算器可求两个日期之间的间隔天数、对某日期加减天数得到新日期，以及查询任意日期是星期几，按公历（Gregorian）规则计算。</p>
+          <p>日期计算器支持间隔天数、工作日统计、自然日与工作日加减、周岁年龄和星期查询，按公历规则计算；工作日仅排除周末，不含法定节假日。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>计算按什么历法？</summary>
-            <p>按公历规则计算，含闰年判断；如需农历请以权威农历为准。</p>
-          </details>
-          <details>
             <summary>“间隔天数”含首尾吗？</summary>
-            <p>页面会区分“相差天数”与“含首尾天数”，请按需选择对应结果。</p>
+            <p>相差天数不含首尾，结果区另列含首尾天数；工作日模式可勾选是否包含结束日。</p>
           </details>
           <details>
-            <summary>支持多大的年份范围？</summary>
-            <p>支持常见年份范围，极端或超远日期可能受浏览器日期实现限制。</p>
+            <summary>工作日统计准吗？</summary>
+            <p>仅排除周六日，不含法定节假日与调休；涉及合同或考勤请以官方日历为准。</p>
+          </details>
+          <details>
+            <summary>年龄按虚岁还是周岁？</summary>
+            <p>按公历周岁精确到年月日，可选任意截至日期。</p>
           </details>
           <details>
             <summary>结果可作法律或合同期限依据吗？</summary>
