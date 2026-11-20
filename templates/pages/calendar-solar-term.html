@@ -1,0 +1,178 @@
+        <section class="page-heading">
+          <h1>二十四节气查询</h1>
+          <p>按年份查询二十四节气的公历日期、农历对照与干支生肖，并附节气由来和时节描述。数据由天行数据接口提供，支持单个节气速查与全年一览。</p>
+        </section>
+
+        <form class="card" id="jqForm">
+          <div class="form-group">
+            <label class="form-label" for="jq-year">查询年份</label>
+            <div class="input-with-unit"><input class="form-input" id="jq-year" type="number" inputmode="numeric" min="1900" max="2100" placeholder="如 2026"><span class="unit-tag">年</span></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="button" id="jq-all" data-track="calc_click" data-track-props='{"tool":"solar-term","mode":"year"}'>查看全年二十四节气</button>
+          </div>
+        </form>
+
+        <div class="card mt-3">
+          <div class="text-sm text-muted mb-2">点击节气名称查询详情</div>
+          <div id="jq-groups"></div>
+        </div>
+
+        <div class="result-box" id="jq-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label" id="jq-rlabel">节气</div><div class="result-value" id="jq-rvalue">--</div></div>
+          </div>
+          <dl class="result-detail" id="jq-detail"></dl>
+        </div>
+
+        <div class="card mt-3" id="jq-yearbox" hidden>
+          <h3 id="jq-year-title">全年二十四节气速查</h3>
+          <div class="text-sm text-muted" id="jq-progress" hidden></div>
+          <div class="table-wrap mt-2">
+            <table class="data-table" id="jq-table">
+              <thead><tr><th>节气</th><th>公历日期</th><th>农历</th><th>干支生肖</th><th>节气由来</th></tr></thead>
+              <tbody id="jq-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>节气日期按太阳到达黄经的精确时刻确定，存在每年前后一两天的浮动。页面展示的公历日期为接口给出的当年实际交节时间，“某月某日或某日”为该节气的常见日期范围。</div></div>
+
+        <script>
+        (function () {
+          var GROUPS = [
+            { name: '春', items: ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨'] },
+            { name: '夏', items: ['立夏', '小满', '芒种', '夏至', '小暑', '大暑'] },
+            { name: '秋', items: ['立秋', '处暑', '白露', '秋分', '寒露', '霜降'] },
+            { name: '冬', items: ['立冬', '小雪', '大雪', '冬至', '小寒', '大寒'] }
+          ];
+          var ALL = [].concat.apply([], GROUPS.map(function (g) { return g.items; }));
+
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var API = window.API;
+            var seq = 0;
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+            function year() {
+              var y = parseInt($('jq-year').value, 10);
+              if (!Number.isFinite(y) || y < 1900 || y > 2100) { alert('请输入 1900~2100 之间的年份'); return null; }
+              return y;
+            }
+            function query(word, y) {
+              return API.get(API.endpoints.tianapi, { type: 'jieqi', word: word, year: y }).then(function (res) {
+                var d = (res && res.data) || {};
+                if (String(res && res.code) !== '0' || !d.name) throw new Error((res && res.msg) || '无数据');
+                return d;
+              });
+            }
+
+            var box = $('jq-groups');
+            GROUPS.forEach(function (g) {
+              var wrap = document.createElement('div');
+              wrap.className = 'mb-2';
+              var title = document.createElement('div');
+              title.className = 'text-sm text-muted mb-1'; title.textContent = g.name + '季';
+              wrap.appendChild(title);
+              var line = document.createElement('div');
+              line.style.cssText = 'display:flex;flex-wrap:wrap;gap:.5rem';
+              g.items.forEach(function (name) {
+                var b = document.createElement('button');
+                b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.textContent = name;
+                b.addEventListener('click', function () { showOne(name); });
+                line.appendChild(b);
+              });
+              wrap.appendChild(line);
+              box.appendChild(wrap);
+            });
+
+            function showOne(name) {
+              var y = year(); if (!y) return;
+              var my = ++seq;
+              $('jq-rlabel').textContent = y + '年 · ' + name;
+              $('jq-rvalue').textContent = '查询中…';
+              $('jq-detail').innerHTML = '';
+              $('jq-result').hidden = false;
+              if (!API) { $('jq-rvalue').textContent = '离线不可用'; return; }
+              query(name, y).then(function (d) {
+                if (my !== seq) return;
+                $('jq-rvalue').textContent = d.day || (d.date && d.date.gregdate) || name;
+                var detail = '';
+                if (d.date && d.date.gregdate) detail += row('公历交节', d.date.gregdate);
+                if (d.date && d.date.lunardate) detail += row('农历', d.date.lunardate);
+                if (d.date && d.date.cnyear) detail += row('干支年', d.date.cnyear + '年 · ' + (d.date.cnzodiac || '') + '年');
+                if (d.date && d.date.cnmonth) detail += row('农历月日', d.date.cnmonth + d.date.cnday);
+                if (d.yuanyin) detail += row('节气由来', d.yuanyin);
+                if (d.shiju) detail += row('时节诗句', d.shiju);
+                if (d.jieshao) detail += row('节气介绍', d.jieshao);
+                $('jq-detail').innerHTML = detail || row('提示', '该年份暂未返回详细资料');
+                U.track('calc_result', { tool: 'solar-term', word: name });
+              }).catch(function (e) {
+                if (my !== seq) return;
+                $('jq-rvalue').textContent = '查询失败';
+                $('jq-detail').innerHTML = row('说明', (e && e.message) || '接口暂不可用，请稍后重试');
+              });
+            }
+
+            function showYear() {
+              var y = year(); if (!y) return;
+              var my = ++seq;
+              $('jq-yearbox').hidden = false;
+              $('jq-year-title').textContent = y + '年 · 二十四节气速查';
+              $('jq-tbody').innerHTML = '';
+              $('jq-progress').hidden = false;
+              if (!API) { $('jq-progress').textContent = '接口脚本未加载，无法获取全年数据'; return; }
+              var i = 0, ok = 0;
+              function next() {
+                if (my !== seq) return;
+                if (i >= ALL.length) {
+                  $('jq-progress').textContent = '已加载 ' + ok + '/' + ALL.length + ' 个节气';
+                  return;
+                }
+                var word = ALL[i++];
+                $('jq-progress').textContent = '正在获取 ' + word + '（' + i + '/' + ALL.length + '）…';
+                query(word, y).then(function (d) {
+                  ok++;
+                  var tbody = $('jq-tbody');
+                  var tr = document.createElement('tr');
+                  var date = d.date || {};
+                  [word, date.gregdate || d.day || '—', date.lunardate || '—',
+                   date.cnyear ? (date.cnyear + '年 · ' + (date.cnzodiac || '') + '年') : '—',
+                   d.yuanyin || '—'].forEach(function (v) {
+                    var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
+                  });
+                  tbody.appendChild(tr);
+                }).catch(function () {}).then(function () { setTimeout(next, 220); });
+              }
+              next();
+              U.track('calc_result', { tool: 'solar-term', mode: 'year' });
+            }
+
+            $('jq-all').addEventListener('click', showYear);
+            $('jq-year').value = new Date().getFullYear();
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于二十四节气</h2>
+          <p>二十四节气是中国古代订立的用来指导农事的补充历法，反映太阳在黄道上的位置变化，2016 年被列入联合国教科文组织人类非物质文化遗产代表作名录。本工具按年份查询各节气的交节日期、农历对照与相关民俗内容。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>节气日期每年都一样吗？</summary>
+            <p>不完全一样。节气按太阳到达指定黄经的时刻确定，受闰年等因素影响，同一节气在不同年份的公历日期可能相差一两天。</p>
+          </details>
+          <details>
+            <summary>“立春”为什么有时在农历上一年？</summary>
+            <p>节气按公历（太阳历）划分，农历是阴阳合历，两者年份起点不同，因此立春的农历日期可能落在上一农历年。</p>
+          </details>
+          <details>
+            <summary>全年一览为什么要逐个加载？</summary>
+            <p>全年数据由接口按节气逐个返回，页面以串行方式加载并做了节奏控制，避免瞬间并发请求失败；已加载的结果会被接口缓存，再次查看更快。</p>
+          </details>
+          <details>
+            <summary>数据来源可靠吗？</summary>
+            <p>节气日期与民俗内容来自天行数据接口；若接口暂不可用，页面会给出明确提示，不会用未经核实的本地数据冒充。</p>
+          </details>
+        </section>

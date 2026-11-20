@@ -1,7 +1,7 @@
 {
   "site_name": "一珩成长笔记",
   "short_name": "一珩工具",
-  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 35 个免费在线工具，打开即用，无需下载。",
+  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 37 个免费在线工具，打开即用，无需下载。",
   "url": "https://xuyiheng.com",
   "api_base": "https://api.xuyiheng.com",
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
@@ -38,12 +38,14 @@
       { "label": "预产期", "url": "/calculator/due-date.html", "icon": "gift" },
       { "label": "儿童身高预测", "url": "/calculator/height-predict.html", "icon": "trending-up" },
       { "label": "宠物年龄", "url": "/calculator/pet-age.html", "icon": "paw" },
+      { "label": "科学计算器", "url": "/calculator/scientific.html", "icon": "hash" },
       { "label": "油耗计算", "url": "/calculator/fuel-cost.html", "icon": "droplet" },
       { "label": "宝宝取名", "url": "/calculator/baby-name.html", "icon": "star" },
       { "label": "密语", "url": "/calculator/secret-message.html", "icon": "lock" }
     ]},
     { "label": "日历工具", "items": [
       { "label": "万年历·老黄历", "url": "/calendar.html", "icon": "calendar" },
+      { "label": "二十四节气", "url": "/calendar/solar-term.html", "icon": "leaf" },
       { "label": "今日指南", "url": "/calendar/daily-guide.html", "icon": "sun" },
       { "label": "倒计时·纪念日", "url": "/calendar/countdown.html", "icon": "clock" }
     ]},

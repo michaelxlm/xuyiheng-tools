@@ -47,6 +47,21 @@
           <dl class="result-detail" id="bf-detail"></dl>
         </div>
 
+        <div class="card mt-3" id="bf-ext">
+          <h3>天行体脂参考（第三方口径对照）</h3>
+          <div class="text-sm text-muted mb-2">按上方填写的年龄、身高、体重与性别查询，获取体脂率、正常区间与理想体重的另一套参考口径，便于与本地围度估算结果对照。</div>
+          <div class="btn-row">
+            <button class="btn btn-outline" type="button" id="bf-query-ext">查询天行参考值</button>
+          </div>
+          <div class="result-box mt-2" id="bf-ext-result" hidden>
+            <div class="result-row">
+              <div><div class="result-label">体脂率</div><div class="result-value" id="bfe-bfr">--</div></div>
+              <div><div class="result-label">理想体重</div><div class="result-value" id="bfe-ideal">--</div></div>
+            </div>
+            <dl class="result-detail" id="bfe-detail"></dl>
+          </div>
+        </div>
+
         <div class="info-box mt-4"><span>ℹ️</span><div>BMR（Mifflin-St Jeor）：男 = 10×体重 + 6.25×身高 − 5×年龄 + 5；女 = 同式 − 161。体脂率采用美国海军法（对数围度公式），需颈围、腰围（女性加臀围），单位厘米。</div></div>
 
         <script>
@@ -85,6 +100,29 @@
               $('bf-detail').innerHTML = detail;
               $('bf-result').hidden = false;
               U.track('calc_result', { tool: 'body-fat', sex: sex });
+            });
+
+            var API = window.API;
+            $('bf-query-ext').addEventListener('click', function () {
+              var sex = $('bf-sex').value === 'female' ? '0' : '1';
+              var age = U.numInput($('bf-age')), h = U.numInput($('bf-height')), w = U.numInput($('bf-weight'));
+              if (!(h > 0 && w > 0 && age > 0)) { alert('请先填写年龄、身高与体重'); return; }
+              if (!API) { $('bfe-detail').innerHTML = row('说明', '接口脚本未加载，暂不可用'); $('bf-ext-result').hidden = false; return; }
+              $('bfe-bfr').textContent = '查询中…';
+              $('bf-ext-result').hidden = false;
+              API.get(API.endpoints.tianapi, { type: 'bfrsum', age: age, height: h, weight: w, sex: sex }).then(function (res) {
+                var d = (res && res.data) || {};
+                if (String(res && res.code) !== '0' || !d.bfr) { $('bfe-bfr').textContent = '查询失败'; $('bfe-detail').innerHTML = row('说明', (res && res.msg) || '接口暂不可用'); return; }
+                $('bfe-bfr').textContent = d.bfr;
+                $('bfe-ideal').textContent = d.idealweight != null ? d.idealweight + ' kg' : '--';
+                var detail = row('正常体脂区间', d.normbfr || '—') + row('正常体重区间', d.normweight || '—') +
+                  row('健康评估', d.healthy || '—') + row('建议', d.tip || '—');
+                $('bfe-detail').innerHTML = detail;
+                U.track('calc_result', { tool: 'body-fat', mode: 'tianapi' });
+              }).catch(function () {
+                $('bfe-bfr').textContent = '查询失败';
+                $('bfe-detail').innerHTML = row('说明', '网络不可用，请稍后重试');
+              });
             });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

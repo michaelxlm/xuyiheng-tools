@@ -1,18 +1,18 @@
 # 一珩成长笔记
 
-> 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 35 个免费在线工具，打开即用，无需下载。
+> 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 37 个免费在线工具，打开即用，无需下载。
 
 本站为纯在线工具站，无需注册登录，打开即用。以下按分类列出全部页面（Markdown 链接）。
 
 ## 首页
-- [首页](https://xuyiheng.com/): 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 35 个免费在线工具，打开即用，无需下载。
+- [首页](https://xuyiheng.com/): 纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 37 个免费在线工具，打开即用，无需下载。
 
 ## 核心页面
 - [发现](https://xuyiheng.com/discover.html): 探索一珩成长笔记的精彩发现页面，发现更多有趣内容、实用计算器、日历工具、趣味测试和生活服务。
 - [搜索工具](https://xuyiheng.com/search.html): 搜索一珩成长笔记全站实用工具，快速找到你想要的在线计算与查询工具。
 
 ## 关于
-- [关于一珩成长笔记](https://xuyiheng.com/about.html): 了解一珩成长笔记——纯实用工具站，提供万年历、各类计算器、星座运势、老黄历等 35 个在线工具，打开即用，无需下载。
+- [关于一珩成长笔记](https://xuyiheng.com/about.html): 了解一珩成长笔记——纯实用工具站，提供万年历、各类计算器、星座运势、老黄历等 37 个在线工具，打开即用，无需下载。
 - [隐私政策](https://xuyiheng.com/privacy.html): 一珩成长笔记隐私政策：无登录态设计，不收集账号与身份信息，仅采集匿名浏览数据，说明数据收集、使用、存储与第三方服务情况。
 
 ## 计算器
@@ -25,6 +25,7 @@
 - [密语](https://xuyiheng.com/calculator/secret-message.html): 密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。
 - [衣服尺码对照表](https://xuyiheng.com/calculator/size.html): 国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。
 - [基础代谢与体脂率计算器](https://xuyiheng.com/calculator/body-fat.html): 在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。
+- [科学计算器](https://xuyiheng.com/calculator/scientific.html): 在线科学计算器，支持阶乘、平方根、正弦余弦正切、反正切、自然对数、指数与取整运算；联网由天行接口计算，离线自动切换本地引擎。
 - [折扣到手价计算](https://xuyiheng.com/calculator/discount.html): 在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。
 - [日期计算器](https://xuyiheng.com/calculator/date-calc.html): 在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。
 - [房贷提前还款计算器](https://xuyiheng.com/calculator/prepay.html): 在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。
@@ -38,6 +39,7 @@
 - [油耗计算器](https://xuyiheng.com/calculator/fuel-cost.html): 在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。
 
 ## 日历工具
+- [二十四节气查询](https://xuyiheng.com/calendar/solar-term.html): 按年份查询二十四节气的公历日期、农历对照与干支生肖，附节气由来、时节诗句与全年一览，数据来自天行数据接口。
 - [万年历老黄历查询](https://xuyiheng.com/calendar.html): 在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。
 - [今日指南](https://xuyiheng.com/calendar/daily-guide.html): 每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。
 - [重要日子](https://xuyiheng.com/calendar/countdown.html): 在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。
