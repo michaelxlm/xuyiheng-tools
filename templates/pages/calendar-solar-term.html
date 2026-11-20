@@ -123,26 +123,43 @@
               $('jq-progress').hidden = false;
               if (!API) { $('jq-progress').textContent = '接口脚本未加载，无法获取全年数据'; return; }
               var i = 0, ok = 0;
+              function appendRow(word, d) {
+                var tr = document.createElement('tr');
+                var date = (d && d.date) || {};
+                [word, date.gregdate || (d && d.day) || '—', date.lunardate || '—',
+                 date.cnyear ? (date.cnyear + '年 · ' + (date.cnzodiac || '') + '年') : '—',
+                 (d && d.yuanyin) || '—'].forEach(function (v) {
+                  var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
+                });
+                $('jq-tbody').appendChild(tr);
+              }
+              function fetchWithRetry(word, attempt, done) {
+                query(word, y).then(function (d) { done(d); }).catch(function (e) {
+                  var msg = String((e && e.message) || '');
+                  // 天行 QPS 限流（code 50003）：指数退避重试，避免全年一览漏行
+                  if (attempt < 3 && /频繁|50003|稍后/.test(msg)) {
+                    setTimeout(function () { fetchWithRetry(word, attempt + 1, done); }, 1200 * (attempt + 1));
+                    return;
+                  }
+                  done(null);
+                });
+              }
               function next() {
                 if (my !== seq) return;
                 if (i >= ALL.length) {
                   $('jq-progress').textContent = '已加载 ' + ok + '/' + ALL.length + ' 个节气';
                   return;
                 }
-                var word = ALL[i++];
-                $('jq-progress').textContent = '正在获取 ' + word + '（' + i + '/' + ALL.length + '）…';
-                query(word, y).then(function (d) {
-                  ok++;
-                  var tbody = $('jq-tbody');
-                  var tr = document.createElement('tr');
-                  var date = d.date || {};
-                  [word, date.gregdate || d.day || '—', date.lunardate || '—',
-                   date.cnyear ? (date.cnyear + '年 · ' + (date.cnzodiac || '') + '年') : '—',
-                   d.yuanyin || '—'].forEach(function (v) {
-                    var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
-                  });
-                  tbody.appendChild(tr);
-                }).catch(function () {}).then(function () { setTimeout(next, 220); });
+                var word = ALL[i];
+                $('jq-progress').textContent = '正在获取 ' + word + '（' + (i + 1) + '/' + ALL.length + '）…';
+                fetchWithRetry(word, 0, function (d) {
+                  if (my !== seq) return;
+                  if (d) ok++;
+                  appendRow(word, d);
+                  i++;
+                  // 串行间隔放大到 500ms：接口按 QPS 限流，过快会触发 50003
+                  setTimeout(next, 500);
+                });
               }
               next();
               U.track('calc_result', { tool: 'solar-term', mode: 'year' });
