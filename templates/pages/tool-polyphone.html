@@ -1,0 +1,95 @@
+        <section class="page-heading">
+          <h1>多音字查询</h1>
+          <p>输入一个汉字，查询它在不同词语中的读音示例，帮助辨析多音字、纠正朗读发音。数据来自天行数据接口。</p>
+        </section>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="ph-char">汉字</label>
+            <div class="input-with-unit"><input class="form-input" id="ph-char" type="text" maxlength="4" placeholder="如 行、重、长、乐" autocomplete="off"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="button" id="ph-query" data-track="calc_click" data-track-props='{"tool":"polyphone"}'>查询多音字</button>
+          </div>
+          <div class="chip-row mt-3" id="ph-hot" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+        </div>
+
+        <div class="result-box" id="ph-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">汉字</div><div class="result-value" id="ph-hanzi">--</div></div>
+            <div><div class="result-label">读音示例</div><div class="result-value" id="ph-count">--</div></div>
+          </div>
+          <ul class="result-list" id="ph-list"></ul>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>多音字是指一个汉字有两个或以上读音，不同读音往往对应不同词义或用法。结果以「词语（拼音）」形式给出，括号中标注该词里的实际读音。每次输入单个汉字查询效果最佳。</div></div>
+
+        <script>
+        (function () {
+          var HOT = ['行', '重', '长', '乐', '朝', '差', '着', '薄'];
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var API = window.API;
+            var seq = 0;
+
+            HOT.forEach(function (c) {
+              var b = document.createElement('button');
+              b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.textContent = c;
+              b.addEventListener('click', function () { $('ph-char').value = c; query(c); });
+              $('ph-hot').appendChild(b);
+            });
+
+            function query(word) {
+              word = String(word || '').trim();
+              if (!word) { alert('请输入一个汉字'); return; }
+              if (!API) { $('ph-result').hidden = false; $('ph-list').innerHTML = '<li>接口脚本未加载，暂不可用</li>'; return; }
+              var my = ++seq;
+              $('ph-hanzi').textContent = '查询中…'; $('ph-count').textContent = ''; $('ph-list').innerHTML = '';
+              $('ph-result').hidden = false;
+              API.get(API.endpoints.tianapi, { type: 'duoyinzi', word: word }).then(function (res) {
+                if (my !== seq) return;
+                var d = (res && res.data) || {};
+                var list = d.list || [];
+                if (String(res && res.code) !== '0' || !list.length) {
+                  $('ph-hanzi').textContent = '未找到';
+                  $('ph-count').textContent = '—';
+                  $('ph-list').innerHTML = '<li>' + ((res && res.msg) || '未查询到该字的多音信息，请确认输入为汉字') + '</li>';
+                  return;
+                }
+                $('ph-hanzi').textContent = d.hanzi || word;
+                $('ph-count').textContent = list.length + ' 条';
+                $('ph-list').innerHTML = list.map(function (x) {
+                  return '<li>' + String(x).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</li>';
+                }).join('');
+                U.track('calc_result', { tool: 'polyphone', word: word });
+              }).catch(function () {
+                if (my !== seq) return;
+                $('ph-hanzi').textContent = '查询失败';
+                $('ph-list').innerHTML = '<li>网络不可用，请稍后重试</li>';
+              });
+            }
+            $('ph-query').addEventListener('click', function () { query($('ph-char').value); });
+            $('ph-char').addEventListener('keydown', function (e) { if (e.key === 'Enter') query($('ph-char').value); });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于多音字查询</h2>
+          <p>本工具查询一个汉字在不同词语中的读音示例，帮助区分多音字的不同读法，适用于语文学习、普通话练习与教学备课。数据来自天行数据接口。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>一次能查几个字？</summary>
+            <p>建议一次输入单个汉字。多音字的读音依赖具体词语，逐字查询能得到最清晰的示例。</p>
+          </details>
+          <details>
+            <summary>结果里的括号是什么？</summary>
+            <p>括号内标注该词语中这个汉字的实际读音，例如「银行（háng）」表示「行」在「银行」中读 háng。</p>
+          </details>
+          <details>
+            <summary>为什么有的字查不到？</summary>
+            <p>只有被词库收录的多音字才有结果；单音字或未被收录的生僻字可能返回空，属正常情况。</p>
+          </details>
+        </section>

@@ -1,0 +1,100 @@
+        <section class="page-heading">
+          <h1>成语词典</h1>
+          <p>按成语名称查询拼音、释义、典故出处与例句，帮助理解成语来历与用法。词库数据来自天行数据接口。</p>
+        </section>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="idi-word">成语</label>
+            <div class="input-with-unit"><input class="form-input" id="idi-word" type="text" placeholder="如 一心一意、画蛇添足" autocomplete="off"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="button" id="idi-query" data-track="calc_click" data-track-props='{"tool":"idiom"}'>查询成语</button>
+          </div>
+          <div class="chip-row mt-3" id="idi-hot" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+        </div>
+
+        <div class="result-box" id="idi-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">成语</div><div class="result-value" id="idi-title">--</div></div>
+            <div><div class="result-label">拼音</div><div class="result-value" id="idi-pinyin">--</div></div>
+          </div>
+          <dl class="result-detail" id="idi-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>成语是汉语中约定俗成的固定短语，多承载典故与文化含义。查询结果包含释义（典故）、出处与例句，可作为语文学习与写作参考。</div></div>
+
+        <script>
+        (function () {
+          var HOT = ['一心一意', '画蛇添足', '守株待兔', '亡羊补牢', '掩耳盗铃', '刻舟求剑', '胸有成竹', '水滴石穿'];
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var API = window.API;
+            var seq = 0;
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+
+            HOT.forEach(function (w) {
+              var b = document.createElement('button');
+              b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.textContent = w;
+              b.addEventListener('click', function () { $('idi-word').value = w; query(w); });
+              $('idi-hot').appendChild(b);
+            });
+
+            function query(word) {
+              word = String(word || '').trim();
+              if (!word) { alert('请输入成语名称'); return; }
+              if (!API) { $('idi-detail').innerHTML = row('说明', '接口脚本未加载，暂不可用'); $('idi-result').hidden = false; return; }
+              var my = ++seq;
+              $('idi-title').textContent = '查询中…'; $('idi-pinyin').textContent = ''; $('idi-detail').innerHTML = '';
+              $('idi-result').hidden = false;
+              API.get(API.endpoints.tianapi, { type: 'chengyu', word: word }).then(function (res) {
+                if (my !== seq) return;
+                var list = (res && res.data && res.data.list) || [];
+                if (String(res && res.code) !== '0' || !list.length) {
+                  $('idi-title').textContent = '未找到';
+                  $('idi-detail').innerHTML = row('说明', (res && res.msg) || '词库中暂无该成语，请检查写法');
+                  return;
+                }
+                var d = list[0] || {};
+                $('idi-title').textContent = d.chengyu || word;
+                $('idi-pinyin').textContent = d.pinyin || '—';
+                var detail = row('释义', d.diangu || '—') +
+                  row('出处', d.chuchu || '—') +
+                  row('例句', d.fanli || '—') +
+                  row('拼音首字母', d.pysx || '—');
+                if (list.length > 1) {
+                  detail += row('其他匹配', list.slice(1, 6).map(function (x) { return x.chengyu; }).join('、'));
+                }
+                $('idi-detail').innerHTML = detail;
+                U.track('calc_result', { tool: 'idiom', word: word });
+              }).catch(function () {
+                if (my !== seq) return;
+                $('idi-title').textContent = '查询失败';
+                $('idi-detail').innerHTML = row('说明', '网络不可用，请稍后重试');
+              });
+            }
+            $('idi-query').addEventListener('click', function () { query($('idi-word').value); });
+            $('idi-word').addEventListener('keydown', function (e) { if (e.key === 'Enter') query($('idi-word').value); });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于成语词典</h2>
+          <p>本工具提供成语的拼音、释义、典故出处与例句查询，帮助你准确理解成语含义与来源，适用于语文学习、备课与写作。词库内容来自天行数据接口。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>查不到某个成语怎么办？</summary>
+            <p>请先确认成语写法是否正确、是否为四字标准形式；部分生僻成语或变体写法可能未被词库收录。</p>
+          </details>
+          <details>
+            <summary>「释义」和「出处」有什么区别？</summary>
+            <p>释义说明成语的含义与用法，出处则标注其文献来源与典故背景，两者结合能更完整地理解成语。</p>
+          </details>
+          <details>
+            <summary>拼音中的多音字怎么读？</summary>
+            <p>结果中的拼音按该成语的标准读法标注；若需查询单个汉字的多音情况，可使用本站的「多音字查询」工具。</p>
+          </details>
+        </section>

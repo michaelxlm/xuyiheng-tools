@@ -1,0 +1,112 @@
+        <section class="page-heading">
+          <h1>空气质量查询（AQI）</h1>
+          <p>按城市查询实时空气质量指数 AQI、等级与首要污染物，并展示 PM2.5、PM10、二氧化硫等分项浓度。数据来自天行数据接口。</p>
+        </section>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label" for="aq-area">城市 / 地区</label>
+            <div class="input-with-unit"><input class="form-input" id="aq-area" type="text" placeholder="如 上海、北京、武汉" autocomplete="off"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" type="button" id="aq-query" data-track="calc_click" data-track-props='{"tool":"air-quality"}'>查询空气质量</button>
+          </div>
+          <div class="chip-row mt-3" id="aq-hot" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
+        </div>
+
+        <div class="result-box" id="aq-result" hidden>
+          <div class="result-row">
+            <div><div class="result-label">AQI 指数</div><div class="result-value" id="aq-aqi">--</div></div>
+            <div><div class="result-label">空气质量</div><div class="result-value" id="aq-quality">--</div></div>
+          </div>
+          <dl class="result-detail" id="aq-detail"></dl>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>AQI 为空气质量指数，数值越低空气越好：0~50 优、51~100 良、101~150 轻度污染、151~200 中度污染、201~300 重度污染、&gt;300 严重污染。较小地区可能返回其上级地区的监测数据，数据时间以结果中标注为准。</div></div>
+
+        <script>
+        (function () {
+          var HOT = ['北京', '上海', '广州', '深圳', '武汉', '成都', '杭州', '西安'];
+          var LEVEL_STYLE = function (n) {
+            if (n <= 50) return '#2e9e5b'; if (n <= 100) return '#c8a021';
+            if (n <= 150) return '#e08b2c'; if (n <= 200) return '#d7563f';
+            return '#9b3b52';
+          };
+          function boot() {
+            var U = window.U; if (!U) return;
+            var $ = function (id) { return document.getElementById(id); };
+            var API = window.API;
+            var seq = 0;
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
+
+            HOT.forEach(function (city) {
+              var b = document.createElement('button');
+              b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.textContent = city;
+              b.addEventListener('click', function () { $('aq-area').value = city; query(city); });
+              $('aq-hot').appendChild(b);
+            });
+
+            function query(area) {
+              area = String(area || '').trim();
+              if (!area) { alert('请输入城市或地区名称'); return; }
+              if (!API) { $('aq-detail').innerHTML = row('说明', '接口脚本未加载，暂不可用'); $('aq-result').hidden = false; return; }
+              var my = ++seq;
+              $('aq-aqi').textContent = '查询中…'; $('aq-quality').textContent = ''; $('aq-detail').innerHTML = '';
+              $('aq-result').hidden = false;
+              API.get(API.endpoints.tianapi, { type: 'aqi', area: area }).then(function (res) {
+                if (my !== seq) return;
+                var d = (res && res.data) || {};
+                if (String(res && res.code) !== '0' || !d.aqi) {
+                  $('aq-aqi').textContent = '查询失败';
+                  $('aq-detail').innerHTML = row('说明', (res && res.msg) || '未查询到该地区，请换个城市名试试');
+                  return;
+                }
+                var aqi = Number(d.aqi);
+                $('aq-aqi').textContent = d.aqi;
+                $('aq-aqi').style.color = LEVEL_STYLE(aqi);
+                $('aq-quality').textContent = d.quality || '—';
+                var detail = row('监测地区', d.area || area) +
+                  row('首要污染物', d.primary_pollutant || '无') +
+                  row('PM2.5', (d.pm2_5 && d.pm2_5 !== '_' ? d.pm2_5 + ' μg/m³' : '—')) +
+                  row('PM10', (d.pm10 && d.pm10 !== '_' ? d.pm10 + ' μg/m³' : '—')) +
+                  row('二氧化硫 SO₂', (d.so2 && d.so2 !== '_' ? d.so2 + ' μg/m³' : '—')) +
+                  row('二氧化氮 NO₂', (d.no2 && d.no2 !== '_' ? d.no2 + ' μg/m³' : '—')) +
+                  row('臭氧 O₃', (d.o3 && d.o3 !== '_' ? d.o3 + ' μg/m³' : '—')) +
+                  row('一氧化碳 CO', (d.co && d.co !== '_' ? d.co + ' mg/m³' : '—')) +
+                  row('数据时间', d.time || '—');
+                $('aq-detail').innerHTML = detail;
+                U.track('calc_result', { tool: 'air-quality', aqi: aqi });
+              }).catch(function () {
+                if (my !== seq) return;
+                $('aq-aqi').textContent = '查询失败';
+                $('aq-detail').innerHTML = row('说明', '网络不可用，请稍后重试');
+              });
+            }
+            $('aq-query').addEventListener('click', function () { query($('aq-area').value); });
+            $('aq-area').addEventListener('keydown', function (e) { if (e.key === 'Enter') query($('aq-area').value); });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于空气质量查询</h2>
+          <p>本工具按城市名查询空气质量指数（AQI）与各污染物分项浓度，帮助了解当日空气状况，安排出行与户外活动。数据来自天行数据接口，按地区实时监测值更新。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details>
+            <summary>AQI 数值代表什么？</summary>
+            <p>AQI 是综合多种污染物浓度的无量纲指数：0~50 优、51~100 良、101~150 轻度污染、151~200 中度污染、201~300 重度污染、大于 300 严重污染。数值越高对健康影响越大。</p>
+          </details>
+          <details>
+            <summary>为什么小城市查不到自己的监测点？</summary>
+            <p>接口覆盖全国三百多个城市与地区，较小地区通常返回其上级城市的监测数据，结果中的「监测地区」会标明实际口径。</p>
+          </details>
+          <details>
+            <summary>数据多久更新一次？</summary>
+            <p>监测数据按站点的实际更新频率刷新，页面结果中标注了「数据时间」；工具对查询结果做 30 分钟缓存以平衡时效与调用量。</p>
+          </details>
+          <details>
+            <summary>PM2.5 和 PM10 有什么区别？</summary>
+            <p>PM2.5 是直径小于等于 2.5 微米的细颗粒物，可深入肺部；PM10 是直径小于等于 10 微米的可吸入颗粒物。两者都是空气质量评价的重要指标。</p>
+          </details>
+        </section>

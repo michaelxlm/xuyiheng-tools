@@ -51,7 +51,8 @@
           <h3>天行体脂参考（第三方口径对照）</h3>
           <div class="text-sm text-muted mb-2">按上方填写的年龄、身高、体重与性别查询，获取体脂率、正常区间与理想体重的另一套参考口径，便于与本地围度估算结果对照。</div>
           <div class="btn-row">
-            <button class="btn btn-outline" type="button" id="bf-query-ext">查询天行参考值</button>
+            <button class="btn btn-outline" type="button" id="bf-query-ext">查询天行体脂参考</button>
+            <button class="btn btn-outline" type="button" id="bf-query-bmi">查询天行 BMI 参考</button>
           </div>
           <div class="result-box mt-2" id="bf-ext-result" hidden>
             <div class="result-row">
@@ -59,6 +60,13 @@
               <div><div class="result-label">理想体重</div><div class="result-value" id="bfe-ideal">--</div></div>
             </div>
             <dl class="result-detail" id="bfe-detail"></dl>
+          </div>
+          <div class="result-box mt-2" id="bf-bmi-result" hidden>
+            <div class="result-row">
+              <div><div class="result-label">BMI 指数</div><div class="result-value" id="bfb-bmi">--</div></div>
+              <div><div class="result-label">理想体重</div><div class="result-value" id="bfb-ideal">--</div></div>
+            </div>
+            <dl class="result-detail" id="bfb-detail"></dl>
           </div>
         </div>
 
@@ -122,6 +130,27 @@
               }).catch(function () {
                 $('bfe-bfr').textContent = '查询失败';
                 $('bfe-detail').innerHTML = row('说明', '网络不可用，请稍后重试');
+              });
+            });
+
+            $('bf-query-bmi').addEventListener('click', function () {
+              var h = U.numInput($('bf-height')), w = U.numInput($('bf-weight'));
+              if (!(h > 0 && w > 0)) { alert('请先填写身高与体重'); return; }
+              if (!API) { $('bfb-detail').innerHTML = row('说明', '接口脚本未加载，暂不可用'); $('bf-bmi-result').hidden = false; return; }
+              $('bfb-bmi').textContent = '查询中…';
+              $('bf-bmi-result').hidden = false;
+              API.get(API.endpoints.tianapi, { type: 'bmi', height: h, weight: w }).then(function (res) {
+                var d = (res && res.data) || {};
+                if (String(res && res.code) !== '0' || d.bmi == null) { $('bfb-bmi').textContent = '查询失败'; $('bfb-detail').innerHTML = row('说明', (res && res.msg) || '接口暂不可用'); return; }
+                $('bfb-bmi').textContent = d.bmi;
+                $('bfb-ideal').textContent = d.idealweight != null ? d.idealweight + ' kg' : '--';
+                $('bfb-detail').innerHTML = row('正常 BMI 区间', d.normbmi || '—') +
+                  row('正常体重区间', d.normweight || '—') +
+                  row('健康评估', d.healthy || '—') + row('建议', d.tip || '—');
+                U.track('calc_result', { tool: 'body-fat', mode: 'tianapi-bmi' });
+              }).catch(function () {
+                $('bfb-bmi').textContent = '查询失败';
+                $('bfb-detail').innerHTML = row('说明', '网络不可用，请稍后重试');
               });
             });
           }
