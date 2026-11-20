@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-19",
+  "updated": "2026-11-20",
   "_note": "由 scripts/aggregate-popularity.js 从导出文件聚合生成；仅含真实统计，不编造 PV。无数据时清空 tools 即回到 FEATURED 硬编码顺序。",
   "tools": [
     {
