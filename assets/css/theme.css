@@ -60,8 +60,7 @@
   --shadow-hover: 0 10px 30px -8px rgba(49, 46, 129, 0.18), 0 2px 6px rgba(20, 23, 38, 0.06);
   --shadow-pop: 0 12px 32px -10px rgba(20, 23, 38, 0.22);
 
-  /* 布局尺度 */
-  --maxw: 1180px;
+  /* 布局尺度：宽度统一取 tokens.css 的 --maxw（1140px），本站不再放宽 */
   --header-h: 62px;
   --sidebar-w: 248px;
   --bottom-nav-h: 60px;
@@ -790,11 +789,7 @@ html.reveal-on .reveal.d3 { transition-delay: 180ms; }
   .header-actions { margin-left: var(--space-1); }
 }
 
-/* ---------- 响应式：宽屏自适应（逐级放宽内容宽度，大屏不再居中过窄） ---------- */
-@media (min-width: 1280px) { :root { --maxw: 1280px; } }
-@media (min-width: 1440px) { :root { --maxw: 1420px; --sidebar-w: 264px; } }
-@media (min-width: 1720px) { :root { --maxw: 1600px; } }
-@media (min-width: 2000px) { :root { --maxw: 1760px; } }
+/* ---------- 布局宽度：十站统一 1140px（tokens.css --maxw），宽屏不再逐级放宽 ---------- */
 
 /* ---------- 响应式：1024px+ PC 双栏 ---------- */
 @media (min-width: 768px) {
