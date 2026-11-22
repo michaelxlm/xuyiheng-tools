@@ -182,35 +182,9 @@
     doc.addEventListener('change', handle, true);
   }
 
-  /* ---------------- 首页「最近使用」区块（读 utils 的 xt_recent） ---------------- */
-  function renderRecentOnHome() {
-    if (!isHome()) return;
-    var recent;
-    try { recent = JSON.parse(global.localStorage.getItem('xt_recent')) || []; } catch (e) { return; }
-    recent = recent.filter(function (p) { return p && p !== '/' && !/search\.html$/.test(p); }).slice(0, 8);
-    if (recent.length < 2) return;
-    var mainInner = qs('#main .main-inner') || qs('#main');
-    if (!mainInner) return;
-    var links = recent.map(function (p) {
-      var a = qs('a[href="' + p + '"]');
-      var label = a ? (a.textContent || '').trim() : p;
-      var ep = String(p).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      var el = String(label || p).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-      return '<a href="' + ep + '">' + el + '</a>';
-    }).join('');
-    var sec = doc.createElement('section');
-    sec.className = 'xt-recent-home';
-    sec.innerHTML = '<h2>最近使用</h2><div class="xt-recent-list">' + links + '</div>' +
-      '<p class="xt-recent-note">仅保存在本浏览器，清除站点数据即可移除。</p>';
-    var hero = qs('.hero', mainInner);
-    var featured = qs('#featured', mainInner);
-    if (featured && featured.parentNode === mainInner) mainInner.insertBefore(sec, featured.nextSibling);
-    else if (hero && hero.parentNode === mainInner) mainInner.insertBefore(sec, hero.nextSibling);
-    else mainInner.insertBefore(sec, mainInner.firstChild);
-  }
-
+  // 首页「最近使用」由 layout.js 统一渲染为 .tool-card（#recent / #recent-grid）。
+  // 这里曾另注入一份 .xt-recent-home 纯文本区块，既没有样式又与卡片版重复，已移除。
   function init() {
-    renderRecentOnHome();
     if (isSensitive()) return;
     restoreState();
     bindSave();
