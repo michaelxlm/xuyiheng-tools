@@ -75,6 +75,26 @@ function buildJsonLd(site, route) {
       description: site.description,
       logo: origin + (site.logo || '/assets/img/logo.svg'),
     });
+    // 全量工具清单：与首页可见卡片同源（site.sidebar_categories），参照 color-tool 首页 ItemList。
+    // 不另设硬编码数组，新增/改名工具只改 site.json 并经 check-tools-sync 双向校验。
+    const toolEntries = [];
+    (site.sidebar_categories || []).forEach((cat) => {
+      (cat.items || []).forEach((it) => {
+        const r = routesIndex()[it.url] || {};
+        const entry = { '@type': 'ListItem', position: toolEntries.length + 1, name: it.label, url: origin + it.url };
+        if (r.description) entry.description = r.description;
+        toolEntries.push(entry);
+      });
+    });
+    if (toolEntries.length) {
+      graph.push({
+        '@type': 'ItemList',
+        '@id': origin + '/#tool-list',
+        name: site.site_name + ' 全部工具',
+        numberOfItems: toolEntries.length,
+        itemListElement: toolEntries,
+      });
+    }
   }
 
   if (route.type === 'tool') {
@@ -238,6 +258,47 @@ function toolCardHtml(item, catLabel, idx, wide, badge) {
     '<span class="tool-card-desc">' + P.escapeHtml((r.description || '').slice(0, 60)) + '</span></a>';
 }
 
+/* 首页「全部工具速览」：把 site.json 的全部工具按分类压成一屏可见的紧凑入口，
+   参照 color-tool 首页把工具直接摆出来的做法。仍由 site.sidebar_categories 单一源派生。 */
+function buildQuickTools(site) {
+  const cats = site.sidebar_categories || [];
+  const total = cats.reduce((n, c) => n + (c.items || []).length, 0);
+  const groups = cats.map((cat) => {
+    const key = P.catKey(cat.label);
+    const links = (cat.items || []).map((it) =>
+      '<a class="quick-link" href="' + P.escapeHtml(it.url) + '">' + P.escapeHtml(it.label) + '</a>'
+    ).join('');
+    return '          <div class="quick-group"' + (key ? ' data-cat="' + P.escapeHtml(key) + '"' : '') + '>\n' +
+      '            <h3 class="quick-group-title">' + P.escapeHtml(cat.label) + '<span class="count">' + (cat.items || []).length + '</span></h3>\n' +
+      '            <div class="quick-links">' + links + '</div>\n' +
+      '          </div>';
+  }).join('\n');
+  return [
+    '        <section class="home-section home-quick" id="all-tools">',
+    '          <h2 class="section-title"><span class="dot" aria-hidden="true"></span>全部工具 · 一屏速览<span class="count">' + total + '</span></h2>',
+    '          <p class="section-sub">按类别列出全部 ' + total + ' 个工具，点名称直接打开；下方是带说明的卡片视图。</p>',
+    '          <div class="quick-grid">',
+    groups,
+    '          </div>',
+    '        </section>',
+  ].join('\n');
+}
+
+/* 无 JS 兜底：color-tool 同款 <noscript> 全量工具清单，侧栏单源派生 */
+function buildNoscriptToolList(site) {
+  const idx = routesIndex();
+  const lines = ['  <noscript>', '    <div class="noscript-tools">', '      <h2>全部工具</h2>', '      <ul>'];
+  (site.sidebar_categories || []).forEach((cat) => {
+    (cat.items || []).forEach((it) => {
+      const r = idx[it.url] || {};
+      lines.push('        <li><a href="' + P.escapeHtml(it.url) + '">' + P.escapeHtml(it.label) + '</a>' +
+        (r.description ? ' - ' + P.escapeHtml(String(r.description).slice(0, 60)) : '') + '</li>');
+    });
+  });
+  lines.push('      </ul>', '      <p>以上工具全部在浏览器本地运行，无需注册登录。启用 JavaScript 可使用搜索与分类定位。</p>', '    </div>', '  </noscript>');
+  return lines.join('\n');
+}
+
 function buildHomeContent(site) {
   const idx = routesIndex();
   const cats = site.sidebar_categories || [];
@@ -331,7 +392,8 @@ function buildHomeContent(site) {
       '        </section>';
   }).join('\n');
 
-  return hero + '\n' + recent + '\n' + scenario + '\n' + featured + '\n' + sections;
+  const quick = buildQuickTools(site);
+  return hero + '\n' + quick + '\n' + recent + '\n' + scenario + '\n' + featured + '\n' + sections;
 }
 
 /* ---------------------------- 工具注册表（供前端动态拼卡片） ----------------------------
@@ -471,6 +533,7 @@ function renderRoute(site, route, ctx) {
   ].join('\n');
 
   const catBarNav = route.path === 'index' ? '' : P.renderCatBar(site, { absolute: true });
+  const noScriptTools = route.path === 'index' ? buildNoscriptToolList(site) : '';
 
   const body = [
     '<body data-page="' + P.escapeHtml(slug) + '" data-page-id="' + P.escapeHtml(slug) + '">',
@@ -480,7 +543,9 @@ function renderRoute(site, route, ctx) {
     '<div class="site-body">',
     '  <main class="site-main' + (route.path === 'index' ? '' : ' site-main--flat') + '" id="main">',
     '    <div class="main-inner">',
-    (catBarNav ? catBarNav + '\n' : '') + content + (related ? '\n' + related : '') + '\n' + slots,
+    (catBarNav ? catBarNav + '\n' : '') + content +
+      (noScriptTools ? '\n' + noScriptTools : '') +
+      (related ? '\n' + related : '') + '\n' + slots,
     '    </div>',
     '  </main>',
     '</div>',
