@@ -78,6 +78,8 @@
           <div id="ntDist"></div>
           <h3 class="ft-section-title">主要相位明细</h3>
           <div id="ntAspects"></div>
+          <div class="mt-3" id="ntAspectStats"></div>
+          <div class="mt-2" id="ntEmpty"></div>
           <h3 class="ft-section-title">行星关键词</h3>
           <div class="ft-kv-grid" id="ntNotes"></div>
           <h3 class="ft-section-title">十二宫落星</h3>
@@ -172,6 +174,14 @@
                         '</td><td>' + a.orb + '°</td><td>' + esc(a.note) + '</td></tr>';
                     }).join('') + '</tbody></table>'
                   : '<p class="text-sm text-muted">前七颗星之间无显著相位。</p>';
+                $('ntAspectStats').innerHTML = '<span class="text-sm text-muted">相位统计：</span>' +
+                  Object.keys(n.aspectStats).map(function (k) {
+                    return '<span class="ft-chip">' + esc(k) + ' ' + n.aspectStats[k] + ' 组</span>';
+                  }).join(' ');
+                $('ntEmpty').innerHTML = '<span class="text-sm text-muted">空宫：</span>' +
+                  (n.emptyHouses.length ? n.emptyHouses.map(function (h) {
+                    return '<span class="ft-chip">第 ' + h + ' 宫</span>';
+                  }).join(' ') : '<span class="ft-chip">无</span>');
                 $('ntNotes').innerHTML = n.planetNotes.map(function (p) {
                   return kv(p.glyph + ' ' + p.name, p.sign + ' · 第' + p.house + '宫 · ' + p.note);
                 }).join('');

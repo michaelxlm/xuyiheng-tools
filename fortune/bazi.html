@@ -145,6 +145,12 @@
           <div id="bzWuxing"></div>
           <h3 class="ft-section-title">十神结构</h3>
           <div class="ft-kv-grid" id="bzGods"></div>
+          <h3 class="ft-section-title">四柱定位</h3>
+          <div class="ft-kv-grid" id="bzPillarNotes"></div>
+          <h3 class="ft-section-title">藏干十神</h3>
+          <div class="ft-kv-grid" id="bzHiddenGods"></div>
+          <h3 class="ft-section-title">五行生克参考</h3>
+          <div id="bzFlow"></div>
           <h3 class="ft-section-title">当前大运与流年</h3>
           <div class="ft-kv-grid" id="bzNow"></div>
           <h3 class="ft-section-title">排盘解读</h3>
@@ -201,6 +207,14 @@
                 }).join('');
                 $('bzGods').innerHTML = Object.keys(b.gods).sort(function (x, y) { return b.gods[y] - b.gods[x]; })
                   .map(function (k) { return kv(k + ' × ' + b.gods[k], b.godBriefs[k] || ''); }).join('');
+                $('bzPillarNotes').innerHTML = b.pillarNotes.map(function (p) {
+                  return kv(p.name + ' · ' + p.ganzhi, p.role);
+                }).join('');
+                $('bzHiddenGods').innerHTML = Object.keys(b.hiddenGods).sort(function (x, y) { return b.hiddenGods[y] - b.hiddenGods[x]; })
+                  .map(function (k) { return kv(k + ' × ' + b.hiddenGods[k], b.godBriefs[k] || ''); }).join('');
+                $('bzFlow').innerHTML = '<div class="ft-kv-grid">' + kv('较多五行', b.wuxingFlow.top + '（' + b.wuxingFlow.maxCount + '处）') +
+                  kv('较少五行', b.wuxingFlow.low + '（' + b.wuxingFlow.minCount + '处）') + '</div>' +
+                  '<p class="text-sm text-muted mt-3">相生：' + esc(b.wuxingFlow.generate) + '<br>相克：' + esc(b.wuxingFlow.control) + '</p>';
                 $('bzNow').innerHTML = kv('当前大运', b.dayun.current.ganzhi + '（' + b.dayun.current.god + ' · ' + b.dayun.current.age + '岁）') +
                   kv('流年 ' + b.liuNian.year, b.liuNian.ganzhi + ' · ' + b.liuNian.god) +
                   kv('起运', b.dayun.direction + ' · 约 ' + b.dayun.startAge + ' 岁');

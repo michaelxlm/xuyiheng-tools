@@ -27,6 +27,11 @@
           <div class="ft-tarot-cards" id="trCards"></div>
           <h3 class="ft-section-title">整体解读</h3>
           <p class="text-sm" id="trReading"></p>
+          <ul class="ft-note-list" id="trReadingList"></ul>
+          <h3 class="ft-section-title">行动建议</h3>
+          <div class="ft-tip-list" id="trActions"></div>
+          <h3 class="ft-section-title">牌阵说明</h3>
+          <ul class="ft-note-list" id="trGuide"></ul>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>牌组为 22 张大阿尔卡那，中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
@@ -88,6 +93,9 @@
                     '<span class="ft-tarot-advice">' + esc(c.advice) + '</span></div>';
                 }).join('');
                 $('trReading').textContent = d.reading;
+                $('trReadingList').innerHTML = d.readingList.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
+                $('trActions').innerHTML = d.actionSteps.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
+                $('trGuide').innerHTML = d.spreadGuide.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · ' + d.summary;
                 $('trResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'tarot' });

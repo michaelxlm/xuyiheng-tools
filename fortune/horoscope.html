@@ -120,8 +120,12 @@
           <div class="ft-lucky" id="hoLucky"></div>
           <h3 class="ft-section-title">分维度提示</h3>
           <div class="ft-kv-grid" id="hoDetails"></div>
+          <h3 class="ft-section-title">幸运元素说明</h3>
+          <div class="ft-kv-grid" id="hoLuckyNotes"></div>
           <h3 class="ft-section-title">今日宜忌</h3>
           <div id="hoDoAvoid"></div>
+          <h3 class="ft-section-title">今日解读</h3>
+          <ul class="ft-note-list" id="hoReading"></ul>
           <p class="text-sm text-muted mt-3" id="hoAdvice"></p>
         </div>
 
@@ -162,6 +166,9 @@
                 $('hoDetails').innerHTML = [ [ '爱情', h.details.love ], [ '事业', h.details.career ],
                   [ '财运', h.details.money ], [ '健康', h.details.health ] ]
                   .map(function (x) { return kv(x[0], x[1]); }).join('');
+                $('hoLuckyNotes').innerHTML = [ [ '幸运色', h.colorMeaning ], [ '幸运数字', h.numberMeaning ], [ '幸运方位', h.directionMeaning ] ]
+                  .map(function (x) { return kv(x[0], x[1]); }).join('');
+                $('hoReading').innerHTML = h.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('hoDoAvoid').innerHTML = '<div><strong>宜</strong> ' + h.doList.map(function (s) {
                   return '<span class="ft-tag">' + esc(s) + '</span>';
                 }).join(' ') + '</div><div class="mt-2"><strong>忌</strong> ' + h.avoidList.map(function (s) {

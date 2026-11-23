@@ -28,6 +28,8 @@
           <p class="text-sm text-muted mt-3" id="zmDesc"></p>
           <h3 class="ft-section-title">相处提示</h3>
           <div class="ft-tip-list" id="zmTips"></div>
+          <h3 class="ft-section-title">配对解读</h3>
+          <ul class="ft-note-list" id="zmInsights"></ul>
           <h3 class="ft-section-title">近年同生肖年份</h3>
           <div id="zmYears"></div>
         </div>
@@ -91,6 +93,7 @@
                   '<span class="text-sm text-muted">' + esc(r.elementNote) + '</span>';
                 $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
                 $('zmTips').innerHTML = r.tips.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
+                $('zmInsights').innerHTML = r.insights.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('zmYears').innerHTML = '<div><span class="text-sm text-muted">' + esc(r.a) + '：' +
                   r.yearsA.map(function (y) { return '<span class="ft-chip">' + y + '</span>'; }).join(' ') + '</div>' +
                   '<div class="mt-2"><span class="text-sm text-muted">' + esc(r.b) + '：' +

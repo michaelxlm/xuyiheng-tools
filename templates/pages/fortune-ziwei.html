@@ -48,6 +48,10 @@
           <div id="zwCore"></div>
           <h3 class="ft-section-title">主星关键词</h3>
           <div class="ft-kv-grid" id="zwStarNotes"></div>
+          <h3 class="ft-section-title">四化说明</h3>
+          <div class="ft-kv-grid" id="zwHuaNotes"></div>
+          <h3 class="ft-section-title">十二宫指引</h3>
+          <div id="zwGuide"></div>
           <h3 class="ft-section-title">排盘解读</h3>
           <ul class="ft-note-list" id="zwReading"></ul>
         </div>
@@ -106,6 +110,14 @@
                 $('zwStarNotes').innerHTML = z.starNotes.slice(0, 12).map(function (n) {
                   return kv(n.name + ' · ' + n.palace, n.note);
                 }).join('');
+                $('zwHuaNotes').innerHTML = z.siHuaNotes.map(function (h) {
+                  return kv(h.star + ' · ' + h.type, h.note + (h.palace ? '（' + h.palace + '）' : ''));
+                }).join('');
+                $('zwGuide').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>干支</th><th>关注领域</th><th>宫内星曜</th></tr></thead><tbody>' +
+                  z.palaceGuide.map(function (p) {
+                    return '<tr><td>' + esc(p.name) + '</td><td>' + esc(p.ganzhi) + '</td><td>' + esc(p.role) +
+                      '</td><td>' + (p.stars.length ? esc(p.stars.join('、')) : '<span class="text-muted">空宫</span>') + '</td></tr>';
+                  }).join('') + '</tbody></table>';
                 $('zwReading').innerHTML = z.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('zwResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'ziwei' });
