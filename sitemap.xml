@@ -271,6 +271,42 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://xuyiheng.com/fortune/bazi.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xuyiheng.com/fortune/ziwei.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xuyiheng.com/fortune/natal.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xuyiheng.com/fortune/horoscope.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xuyiheng.com/fortune/zodiac-match.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xuyiheng.com/fortune/tarot.html</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://xuyiheng.com/tools.html</loc>
     <lastmod>2026-11-23</lastmod>
     <changefreq>weekly</changefreq>

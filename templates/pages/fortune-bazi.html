@@ -1,0 +1,100 @@
+        <section class="page-heading">
+          <h1>八字排盘 · 四柱干支与五行</h1>
+          <p>输入公历出生日期与时辰，本地生成年、月、日、时四柱干支，附藏干十神、纳音与五行分布。出生信息只在浏览器内参与计算，不上传、不留存。</p>
+        </section>
+
+        <form class="card" id="bzForm">
+          <div class="ft-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="bz-date">公历出生日期</label>
+              <input class="form-input" id="bz-date" type="date" min="1900-01-01" max="2050-12-31" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bz-hour">出生时辰</label>
+              <select class="form-select" id="bz-hour">
+                <option value="0">子时 23:00–01:00</option>
+                <option value="1">丑时 01:00–03:00</option>
+                <option value="3">寅时 03:00–05:00</option>
+                <option value="5">卯时 05:00–07:00</option>
+                <option value="7">辰时 07:00–09:00</option>
+                <option value="9">巳时 09:00–11:00</option>
+                <option value="11" selected>午时 11:00–13:00</option>
+                <option value="13">未时 13:00–15:00</option>
+                <option value="15">申时 15:00–17:00</option>
+                <option value="17">酉时 17:00–19:00</option>
+                <option value="19">戌时 19:00–21:00</option>
+                <option value="21">亥时 21:00–23:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row mt-3">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>开始排盘</button>
+          </div>
+          <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。</p>
+        </form>
+
+        <div class="result-box" id="bzResult" hidden>
+          <div class="ft-pillars" id="bzPillars"></div>
+          <dl class="result-detail mt-3" id="bzDetail"></dl>
+          <h3 class="mt-4">五行分布（四柱天干 + 地支本气）</h3>
+          <div id="bzWuxing"></div>
+          <p class="text-sm text-muted mt-3" id="bzNote"></p>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>年柱以立春（约 2 月 4 日）换年，月柱按各月节气的常用近似日期换月，日柱按儒略日推算，时柱按「日上起时」口诀。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var F = window.Fortune; if (!F) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function row(k, v) { return '<div class="result-detail-row"><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; }
+            var dateInput = $('bz-date');
+            (function () {
+              var t = new Date();
+              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+            })();
+            $('bzForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var p = (dateInput.value || '').split('-');
+              if (p.length !== 3) { alert('请选择出生日期'); return; }
+              var b = F.bazi(+p[0], +p[1], +p[2], Number($('bz-hour').value));
+              var html = '';
+              b.detail.forEach(function (d, i) {
+                html += '<div class="ft-pillar' + (i === 2 ? ' is-day' : '') + '">' +
+                  '<div class="ft-label">' + esc(d.name) + '</div>' +
+                  '<div class="ft-gz"><span class="s">' + esc(d.gz.charAt(0)) + '</span><span>' + esc(d.gz.charAt(1)) + '</span></div>' +
+                  '<div class="ft-sub">藏干 ' + esc(d.hidden) + '</div>' +
+                  '<div class="ft-sub">' + esc(d.nayin) + '</div>' +
+                  '<span class="ft-god">' + esc(d.god) + '</span></div>';
+              });
+              $('bzPillars').innerHTML = html;
+              $('bzDetail').innerHTML = row('日主', b.dayName + '（' + b.dayWx + '）') +
+                row('农历', b.lunar ? b.lunar.lub + b.lunar.dayName : '超出本地农历范围') +
+                row('生肖', b.zodiac) +
+                row('生扶 / 克泄耗', b.support + ' / ' + b.drain) +
+                row('强弱倾向', b.tendency);
+              var max = Math.max.apply(null, b.count) || 1;
+              $('bzWuxing').innerHTML = F.WUXING.map(function (w, i) {
+                return '<div class="ft-wx-row"><span>' + w + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
+                  Math.round(b.count[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.count[i] + '</span></div>';
+              }).join('');
+              $('bzNote').textContent = '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断；十神按日主与其他天干的生克关系标注。';
+              $('bzResult').hidden = false;
+              if (window.U && U.track) U.track('calc_result', { tool: 'bazi' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于本工具</h2>
+          <p>八字排盘以出生的年月日时配成四柱干支，再按五行生克观察结构。本页只做可复现的规则计算与展示，不对性格、运势或人生走向作任何预测。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details><summary>年柱为什么按立春而不是春节？</summary><p>命理排盘通常以立春作为一年起点，与民俗中以农历正月初一换年的口径不同，立春前后出生者两种口径会不一致。</p></details>
+          <details><summary>藏干和十神是什么意思？</summary><p>藏干是地支中暗含的天干，十神是相对日主与其他天干的生克关系名称，用来描述结构，不代表吉凶结论。</p></details>
+          <details><summary>23 点出生算哪一天？</summary><p>本工具把 23:00–01:00 作为子时，归入当日的时柱。部分流派主张晚子时换日，请以你采用的口径复核。</p></details>
+          <details><summary>隐私如何保障？</summary><p>出生日期与时辰全在浏览器本地计算，不上传服务器，也不写入本地存储。</p></details>
+        </section>

@@ -1,0 +1,91 @@
+        <section class="page-heading">
+          <h1>紫微斗数排盘 · 十二宫命盘</h1>
+          <p>输入公历出生日期与时辰，页面在浏览器本地换算农历，排出命宫、身宫、十二宫与十四主星位置。无需注册，出生信息不上传。</p>
+        </section>
+
+        <form class="card" id="zwForm">
+          <div class="ft-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="zw-date">公历出生日期</label>
+              <input class="form-input" id="zw-date" type="date" min="1900-01-01" max="2050-12-31" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="zw-hour">出生时辰</label>
+              <select class="form-select" id="zw-hour">
+                <option value="0">子时 23:00–01:00</option>
+                <option value="1">丑时 01:00–03:00</option>
+                <option value="3">寅时 03:00–05:00</option>
+                <option value="5">卯时 05:00–07:00</option>
+                <option value="7">辰时 07:00–09:00</option>
+                <option value="9">巳时 09:00–11:00</option>
+                <option value="11" selected>午时 11:00–13:00</option>
+                <option value="13">未时 13:00–15:00</option>
+                <option value="15">申时 15:00–17:00</option>
+                <option value="17">酉时 17:00–19:00</option>
+                <option value="19">戌时 19:00–21:00</option>
+                <option value="21">亥时 21:00–23:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row mt-3">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"ziwei"}'>排出命盘</button>
+          </div>
+          <p class="ft-disclaimer">紫微斗数属传统民俗文化，无科学依据，结果仅供娱乐参考。</p>
+        </form>
+
+        <div class="result-box" id="zwResult" hidden>
+          <div class="ft-ziwei-summary" id="zwSummary"></div>
+          <div class="ft-palaces mt-3" id="zwPalaces"></div>
+          <p class="text-sm text-muted mt-3">实线框为命宫，虚线框为身宫；蓝色星标为十四主星，橙色为文昌、文曲、左辅、右弼。</p>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>本页采用通行三合派口径：寅宫起正月顺数生月，命宫逆数时辰、身宫顺数时辰，十二宫自命宫逆行；五行局取命宫干支纳音，紫微按生日与局数补数定位。未纳入四化、辅佐煞曜与流年，属简化排盘。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var F = window.Fortune; if (!F) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            var dateInput = $('zw-date');
+            (function () {
+              var t = new Date();
+              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+            })();
+            var MAJOR = { '紫微':1,'天机':1,'太阳':1,'武曲':1,'天同':1,'廉贞':1,'天府':1,'太阴':1,'贪狼':1,'巨门':1,'天相':1,'天梁':1,'七杀':1,'破军':1 };
+            $('zwForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var p = (dateInput.value || '').split('-');
+              if (p.length !== 3) { alert('请选择出生日期'); return; }
+              var z = F.ziwei(+p[0], +p[1], +p[2], Number($('zw-hour').value));
+              if (!z) { alert('仅支持 1900–2050 年出生'); return; }
+              $('zwSummary').innerHTML = [
+                '农历 ' + z.lunar.lub + z.lunar.dayName, z.lunar.gz + '年 · ' + z.lunar.ani + '年',
+                z.juName, '命宫 ' + z.palaces[0].ganzhi, '身宫 ' + z.palaces.filter(function (p) { return p.isShen; }).map(function (p) { return p.ganzhi; }).join(''),
+                '紫微在' + F.ZHI[z.ziwei], '天府在' + F.ZHI[z.tianfu]
+              ].map(function (s) { return '<span class="ft-chip">' + esc(s) + '</span>'; }).join('');
+              $('zwPalaces').innerHTML = z.palaces.map(function (p) {
+                var cls = 'ft-palace' + (p.isMing ? ' is-ming' : '') + (p.isShen ? ' is-shen' : '');
+                var stars = p.stars.map(function (s) {
+                  return '<span class="ft-star' + (MAJOR[s] ? ' major' : '') + '">' + esc(s) + '</span>';
+                }).join('') || '<span class="text-muted">—</span>';
+                return '<div class="' + cls + '"><div class="ft-palace-head"><span class="ft-palace-name">' + esc(p.name) +
+                  '</span><span class="ft-palace-gz">' + esc(p.ganzhi) + '</span></div><div class="ft-palace-stars">' + stars + '</div></div>';
+              }).join('');
+              $('zwResult').hidden = false;
+              if (window.U && U.track) U.track('calc_result', { tool: 'ziwei' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于本工具</h2>
+          <p>紫微斗数把出生时刻映射到十二个宫位，再按规则安放主星。本页展示的是一套可复现的排盘规则，不包含任何结果解释或命运判断。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details><summary>农历闰月怎么处理？</summary><p>本地农历表会标出闰月，排盘按实际农历月序进行；极少数闰月生日的流派口径不同，请以你采用的资料复核。</p></details>
+          <details><summary>为什么命宫和身宫有时在同一格？</summary><p>命宫逆数时辰、身宫顺数时辰，子时或特定月令下可能重合，属正常情况。</p></details>
+          <details><summary>十四主星够用吗？</summary><p>本页只排十四主星与四颗常用辅星，完整命盘还包含四化、煞曜与流曜，属于更进阶的范围。</p></details>
+          <details><summary>隐私如何保障？</summary><p>生日与时辰只在本地换算，不上传也不保存。</p></details>
+        </section>

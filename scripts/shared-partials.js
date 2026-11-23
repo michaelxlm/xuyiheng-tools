@@ -16,7 +16,7 @@ function escapeHtml(input) {
 const I = require('./icons');
 
 /* 分类 → 色相键（与 theme.css 的 [data-cat] 规则对应） */
-const CAT_KEY = { '计算器': 'calc', '日历工具': 'cal', '场景组合': 'combo', '其他工具': 'other' };
+const CAT_KEY = { '计算器': 'calc', '日历工具': 'cal', '场景组合': 'combo', '其他工具': 'other', '命理星盘': 'fortune' };
 function catKey(label) { return CAT_KEY[label] || ''; }
 
 /* 内联 SVG 图标（stroke=currentColor，随主题变色） */
@@ -34,7 +34,8 @@ function renderHeader(site, page) {
     calc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><circle cx="8" cy="10" r="1.2"></circle><circle cx="12" cy="10" r="1.2"></circle><circle cx="16" cy="10" r="1.2"></circle><circle cx="8" cy="14" r="1.2"></circle><circle cx="12" cy="14" r="1.2"></circle><circle cx="16" cy="14" r="1.2"></circle><circle cx="8" cy="18" r="1.2"></circle><circle cx="12" cy="18" r="1.2"></circle><circle cx="16" cy="18" r="1.2"></circle></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>',
     combo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>',
-    other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>'
+    other: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>',
+    fortune: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 0 18c-2.5 0-4.5-2-4.5-4.5S9.5 12 12 12s4.5-2 4.5-4.5S14.5 3 12 3z"></path><circle cx="12" cy="7.5" r="1"></circle><circle cx="12" cy="16.5" r="1"></circle></svg>'
   };
   const cats = (function () {
     const tiles = (site.sidebar_categories || []).map(function (cat) {

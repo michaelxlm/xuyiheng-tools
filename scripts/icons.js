@@ -55,7 +55,10 @@ const ICONS = {
   'grid': '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>',
   'info': '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>',
   'search': '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>',
-  'wrench': '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>'
+  'wrench': '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>',
+  // —— 命理星盘 ——
+  'taiji': '<circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 0 18c-2.5 0-4.5-2-4.5-4.5S9.5 12 12 12s4.5-2 4.5-4.5S14.5 3 12 3z"></path><circle cx="12" cy="7.5" r="1"></circle><circle cx="12" cy="16.5" r="1"></circle>',
+  'cards': '<rect x="7" y="3" width="14" height="18" rx="2"></rect><path d="M4 6v13a2 2 0 0 0 2 2h11"></path><path d="M14 8l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z"></path>'
 };
 
 /** 单个 symbol（仅几何；描边表现交给 .ico） */

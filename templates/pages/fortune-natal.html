@@ -1,0 +1,157 @@
+        <section class="page-heading">
+          <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
+          <p>按出生时间、地点与时区计算十大行星的地心黄经、所在星座与整宫制宫位，并绘制星盘轮盘。天文计算在浏览器本地完成，不上传出生资料。</p>
+        </section>
+
+        <form class="card" id="ntForm">
+          <div class="ft-form-grid ft-grid-3">
+            <div class="form-group">
+              <label class="form-label" for="nt-date">出生日期</label>
+              <input class="form-input" id="nt-date" type="date" min="1800-01-01" max="2050-12-31" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nt-time">出生时间（当地）</label>
+              <input class="form-input" id="nt-time" type="time" value="12:00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nt-tz">时区</label>
+              <select class="form-select" id="nt-tz">
+                <option value="8" selected>UTC+8 中国</option>
+                <option value="9">UTC+9 日本</option>
+                <option value="7">UTC+7 东南亚</option>
+                <option value="5.5">UTC+5:30 印度</option>
+                <option value="0">UTC+0 伦敦</option>
+                <option value="-5">UTC-5 纽约</option>
+                <option value="-8">UTC-8 洛杉矶</option>
+                <option value="10">UTC+10 悉尼</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nt-city">城市（可选）</label>
+              <select class="form-select" id="nt-city">
+                <option value="39.9,116.4" selected>北京</option>
+                <option value="31.2,121.5">上海</option>
+                <option value="23.1,113.3">广州</option>
+                <option value="22.5,114.1">深圳</option>
+                <option value="30.7,104.1">成都</option>
+                <option value="22.3,114.2">香港</option>
+                <option value="25.0,121.6">台北</option>
+                <option value="35.7,139.7">东京</option>
+                <option value="51.5,-0.1">伦敦</option>
+                <option value="40.7,-74.0">纽约</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nt-lat">纬度（北正南负）</label>
+              <input class="form-input" id="nt-lat" type="number" step="0.1" min="-90" max="90" value="39.9">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="nt-lon">经度（东正西负）</label>
+              <input class="form-input" id="nt-lon" type="number" step="0.1" min="-180" max="180" value="116.4">
+            </div>
+          </div>
+          <div class="btn-row mt-3">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>生成星盘</button>
+          </div>
+          <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。</p>
+        </form>
+
+        <div class="result-box" id="ntResult" hidden>
+          <div class="ft-trio" id="ntTrio"></div>
+          <div class="ft-natal-grid mt-4">
+            <div id="ntWheel"></div>
+            <div>
+              <h3>行星位置</h3>
+              <table class="ft-planet-table">
+                <thead><tr><th>星体</th><th>星座</th><th>度数</th><th>宫位</th></tr></thead>
+                <tbody id="ntPlanets"></tbody>
+              </table>
+              <p class="text-sm text-muted mt-3" id="ntNote"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由本地恒星时推算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var F = window.Fortune; if (!F) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            var dateInput = $('nt-date');
+            (function () {
+              var t = new Date();
+              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+            })();
+            $('nt-city').addEventListener('change', function () {
+              var p = this.value.split(',');
+              $('nt-lat').value = p[0]; $('nt-lon').value = p[1];
+            });
+            function point(theta, r) {
+              var a = theta * Math.PI / 180;
+              return [200 + r * Math.cos(a), 200 - r * Math.sin(a)];
+            }
+            function drawWheel(n) {
+              var s = '<svg class="ft-wheel" viewBox="0 0 400 400" role="img" aria-label="本命星盘轮盘">';
+              var c = 'var(--color-border)', ink = 'var(--color-text)', mute = 'var(--color-muted)';
+              s += '<circle cx="200" cy="200" r="160" fill="none" stroke="' + c + '" stroke-width="1.5"></circle>';
+              s += '<circle cx="200" cy="200" r="112" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
+              s += '<circle cx="200" cy="200" r="56" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
+              for (var k = 0; k < 12; k++) {
+                var edge = point(180 + k * 30, 160), inner = point(180 + k * 30, 56);
+                s += '<line x1="' + edge[0].toFixed(1) + '" y1="' + edge[1].toFixed(1) + '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '" stroke="' + c + '" stroke-width="1"></line>';
+                var mid = point(180 + k * 30 + 15, 138);
+                s += '<text x="' + mid[0].toFixed(1) + '" y="' + mid[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="' + mute + '">' +
+                  esc(F.SIGNS[(F.signIndex(n.asc) + k) % 12]) + '</text>';
+              }
+              n.planets.forEach(function (p, i) {
+                var theta = 180 + p.lon - n.asc;
+                var rr = i < 2 ? 92 : (i < 5 ? 132 : 84);
+                var q = point(theta, rr);
+                s += '<text x="' + q[0].toFixed(1) + '" y="' + q[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="20" fill="var(--cat-fortune-ink)">' + esc(p.glyph) + '</text>';
+                var deg = point(theta, rr - 18);
+                s += '<text x="' + deg[0].toFixed(1) + '" y="' + deg[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="' + mute + '">' + p.degree + '°</text>';
+              });
+              var a1 = point(180, 172), a2 = point(180, 148);
+              s += '<line x1="' + a1[0].toFixed(1) + '" y1="' + a1[1].toFixed(1) + '" x2="' + a2[0].toFixed(1) + '" y2="' + a2[1].toFixed(1) + '" stroke="var(--color-primary)" stroke-width="2"></line>';
+              s += '<text x="' + a1[0].toFixed(1) + '" y="' + (a1[1] - 12).toFixed(1) + '" text-anchor="middle" font-size="12" fill="var(--color-primary)">ASC</text>';
+              var mt = point(180 + n.mc - n.asc, 172);
+              s += '<text x="' + mt[0].toFixed(1) + '" y="' + mt[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="var(--color-primary)">MC</text>';
+              s += '<text x="200" y="196" text-anchor="middle" font-size="12" fill="' + ink + '">本命盘</text>';
+              s += '<text x="200" y="214" text-anchor="middle" font-size="10" fill="' + mute + '">整宫制</text></svg>';
+              return s;
+            }
+            $('ntForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var p = (dateInput.value || '').split('-'), t = ($('nt-time').value || '12:00').split(':');
+              if (p.length !== 3 || t.length !== 2) { alert('请填写出生日期与时间'); return; }
+              var lat = Number($('nt-lat').value), lon = Number($('nt-lon').value);
+              if (!isFinite(lat) || !isFinite(lon)) { alert('请填写有效的经纬度'); return; }
+              var n = F.natal(+p[0], +p[1], +p[2], +t[0], +t[1], lat, lon, Number($('nt-tz').value));
+              $('ntTrio').innerHTML = [
+                ['☉ 太阳', n.sun], ['☽ 月亮', n.moon], ['ASC 上升', n.rising]
+              ].map(function (x) { return '<div class="ft-trio-item"><span>' + x[0] + '</span><strong>' + esc(x[1]) + '</strong></div>'; }).join('');
+              $('ntWheel').innerHTML = drawWheel(n);
+              $('ntPlanets').innerHTML = n.planets.map(function (p) {
+                return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
+                  '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td></tr>';
+              }).join('');
+              $('ntNote').textContent = '天顶落在' + n.mcSign + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';
+              $('ntResult').hidden = false;
+              if (window.U && U.track) U.track('calc_result', { tool: 'natal' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于本工具</h2>
+          <p>星盘把出生时刻的天体位置投影到黄道十二星座与十二宫位。本页只呈现天文计算结果与通行符号，不提供性格论断或事件预测。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details><summary>为什么需要精确出生时间？</summary><p>上升星座约每两小时换一个，时间偏差会直接改变第一宫与行星宫位；不确定时可用整点近似，但结果仅作概览。</p></details>
+          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入大致经纬度；若出生地不在列表，可手动填写任意经纬度。</p></details>
+          <details><summary>行星度数会随时间变化吗？</summary><p>会。月亮每天约行 13°，因此出生时间对月亮影响明显；外行星变化很慢，日期准确即可。</p></details>
+          <details><summary>为什么显示「整宫制」？</summary><p>整宫制把每个星座整体作为一个宫位，上升所在星座即第一宫，规则简单、便于阅读；其他分宫制会给出不同宫位边界。</p></details>
+        </section>

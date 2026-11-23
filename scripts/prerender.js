@@ -211,7 +211,9 @@ const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 // 「场景组合」为主入口（见 buildHomeContent），FEATURED 退居「热门工具」次级区，放单点高频工具
 const FEATURED = ['/calculator/tax.html', '/calendar.html', '/calculator/prepay.html', '/calculator/pension.html', '/calculator/baby-name.html', '/vision.html'];
 // 娱乐向场景（与工具站专业调性区隔，卡片加「娱乐」徽标）
-const ENTERTAINMENT = ['/combo/fun-test.html', '/combo/color-lab.html'];
+const ENTERTAINMENT = ['/combo/fun-test.html', '/combo/color-lab.html',
+  '/fortune/bazi.html', '/fortune/ziwei.html', '/fortune/natal.html',
+  '/fortune/horoscope.html', '/fortune/zodiac-match.html', '/fortune/tarot.html'];
 
 /* WO-191 构建期可选热度覆盖：data/tool-popularity.json 有数据时按 clicks 降序
    重排 FEATURED；文件缺失 / tools 为空 / 无正点击数时返回 null，保持原硬编码
@@ -438,6 +440,10 @@ function renderRoute(site, route, ctx) {
   if (hasPageAsset('css', slug, 'css')) {
     cssLinks.push('    <link rel="stylesheet" href="' + assetUrl('assets/css/pages/' + slug + '.min.css', manifest) + '">');
   }
+  const isFortune = String(route.path || '').indexOf('fortune/') === 0;
+  if (isFortune) {
+    cssLinks.push('    <link rel="stylesheet" href="' + assetUrl('assets/css/fortune.min.css', manifest) + '">');
+  }
 
   const scriptTags = [
     // AdSlotsConfig.site 仍复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
@@ -455,6 +461,9 @@ function renderRoute(site, route, ctx) {
     '    <script src="' + assetUrl('assets/js/http-api.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',
   ];
+  if (isFortune) {
+    scriptTags.push('    <script src="' + assetUrl('assets/js/fortune.min.js', manifest) + '" defer></script>');
+  }
   if (hasPageAsset('js', slug, 'js')) {
     scriptTags.push('    <script src="' + assetUrl('assets/js/pages/' + slug + '.min.js', manifest) + '" defer></script>');
   }

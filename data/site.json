@@ -1,7 +1,7 @@
 {
   "site_name": "一珩成长笔记",
   "short_name": "一珩工具",
-  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算等 40 个免费在线工具，打开即用，无需下载。",
+  "description": "纯实用工具站，提供万年历、房贷车贷计算器、星座运势、老黄历、BMI测试、个税计算、八字排盘、紫微斗数与本命星盘等 46 个免费在线工具，打开即用，无需下载。",
   "url": "https://xuyiheng.com",
   "api_base": "https://api.xuyiheng.com",
   "oss_base": "https://antucao.oss-cn-beijing.aliyuncs.com",
@@ -67,6 +67,14 @@
       { "label": "空气质量", "url": "/tool/air-quality.html", "icon": "wind" },
       { "label": "成语词典", "url": "/tool/idiom.html", "icon": "book-open" },
       { "label": "多音字查询", "url": "/tool/polyphone.html", "icon": "type" }
+    ]},
+    { "label": "命理星盘", "items": [
+      { "label": "八字排盘", "url": "/fortune/bazi.html", "icon": "taiji" },
+      { "label": "紫微斗数", "url": "/fortune/ziwei.html", "icon": "star" },
+      { "label": "本命星盘", "url": "/fortune/natal.html", "icon": "compass" },
+      { "label": "星座运势", "url": "/fortune/horoscope.html", "icon": "sun" },
+      { "label": "生肖配对", "url": "/fortune/zodiac-match.html", "icon": "heart" },
+      { "label": "塔罗占卜", "url": "/fortune/tarot.html", "icon": "cards" }
     ]}
   ],
   "footer": {

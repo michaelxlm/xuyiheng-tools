@@ -1,0 +1,78 @@
+        <section class="page-heading">
+          <h1>生肖配对 · 六合三合相冲速查</h1>
+          <p>输入双方出生年份，查看生肖、干支五行与传统合冲关系。所有换算在本地完成，结果只是民俗关系的展示，不代表任何匹配度结论。</p>
+        </section>
+
+        <form class="card" id="zmForm">
+          <div class="ft-form-grid">
+            <div class="form-group">
+              <label class="form-label" for="zm-a">第一方出生年份</label>
+              <input class="form-input" id="zm-a" type="number" min="1900" max="2050" value="1990" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="zm-b">第二方出生年份</label>
+              <input class="form-input" id="zm-b" type="number" min="1900" max="2050" value="1992" required>
+            </div>
+          </div>
+          <div class="btn-row mt-3">
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"zodiac-match"}'>查看配对</button>
+          </div>
+          <p class="ft-disclaimer">民俗娱乐内容，无科学依据，关系质量取决于具体的人与相处方式。</p>
+        </form>
+
+        <div class="result-box" id="zmResult" hidden>
+          <div class="ft-match-pair" id="zmPair"></div>
+          <div class="ft-match-score" id="zmScore"></div>
+          <p class="text-sm text-muted mt-3" id="zmDesc"></p>
+        </div>
+
+        <div class="card mt-4">
+          <h3 class="mt-0">传统关系速查</h3>
+          <table class="ft-ref-table">
+            <thead><tr><th>关系</th><th>组合</th></tr></thead>
+            <tbody>
+              <tr><td>六合</td><td>鼠牛 · 虎猪 · 兔狗 · 龙鸡 · 蛇猴 · 马羊</td></tr>
+              <tr><td>三合</td><td>鼠龙猴 · 牛蛇鸡 · 虎马狗 · 兔羊猪</td></tr>
+              <tr><td>相冲</td><td>鼠马 · 牛羊 · 虎猴 · 兔鸡 · 龙狗 · 蛇猪</td></tr>
+              <tr><td>相害</td><td>鼠羊 · 牛马 · 虎蛇 · 兔龙 · 猴猪 · 鸡狗</td></tr>
+              <tr><td>自刑</td><td>龙 · 马 · 鸡 · 猪（同生肖时）</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box mt-4"><span>ℹ️</span><div>生肖按农历年地支取象，工具用年份干支换算，未细化到立春或春节当天。分数是对上述传统关系的量化展示，不是匹配度测算，也不具备预测意义。</div></div>
+
+        <script>
+        (function () {
+          function boot() {
+            var F = window.Fortune; if (!F) return;
+            var $ = function (id) { return document.getElementById(id); };
+            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            $('zmForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              var a = Number($('zm-a').value), b = Number($('zm-b').value);
+              if (!(a >= 1900 && a <= 2050 && b >= 1900 && b <= 2050)) { alert('请输入 1900–2050 之间的年份'); return; }
+              var r = F.zodiacMatch(a, b);
+              $('zmPair').innerHTML =
+                '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aYear) + ' · ' + esc(r.wx.split(' / ')[0]) + '</span></div>' +
+                '<div class="ft-match-vs">×</div>' +
+                '<div class="ft-match-side"><span class="text-sm text-muted">' + b + '</span><strong>' + esc(r.b) + '</strong><span class="text-sm text-muted">' + esc(r.bYear) + ' · ' + esc(r.wx.split(' / ')[1]) + '</span></div>';
+              $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.kind) + '</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
+              $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
+              $('zmResult').hidden = false;
+              if (window.U && U.track) U.track('calc_result', { tool: 'zodiac-match' });
+            });
+          }
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+        })();
+        </script>
+
+<section class="tool-info">
+          <h2>关于本工具</h2>
+          <p>生肖配对以十二地支之间的六合、三合、相冲、相害关系为依据，配合年份纳音五行作展示。它属于民俗文化，不用于判断关系好坏。</p>
+          <h2 style="margin-top:1.5em">常见问题</h2>
+          <details><summary>过完生日才算新生肖吗？</summary><p>生肖按农历年而非公历生日切换；立春或春节前后出生者，请以当年农历日期确认。</p></details>
+          <details><summary>六合和三合哪个更好？</summary><p>传统上两者都被视为和合关系，没有高下之分；本页分数只是展示规则强弱，不含价值判断。</p></details>
+          <details><summary>生肖相同怎么办？</summary><p>同生肖按地支相同处理，其中辰、午、酉、亥四个地支在同生肖时归为自刑。</p></details>
+          <details><summary>能用来判断婚恋吗？</summary><p>不能。相处方式、价值观与沟通能力远比生肖组合重要。</p></details>
+        </section>
