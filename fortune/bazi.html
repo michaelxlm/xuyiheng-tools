@@ -214,13 +214,14 @@
                     Math.round(b.weighted[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.weighted[i] +
                     (b.count[i] ? '' : '（缺）') + '</span></div>';
                 }).join('');
+                var th = b.tiaohou || { need: '—', satisfied: true, note: '' };
                 $('bzPattern').innerHTML = '<div class="ft-kv-grid">' +
                   kv('格局 · ' + b.pattern.name, b.pattern.how) +
                   kv('用神（' + b.yongshen.way + '）', b.yongshen.label + ' · 五行' + b.yongshen.element) +
                   kv('忌神', b.jishen.label + ' · 五行' + b.jishen.element) +
-                  kv('调候', b.tiaohou.need + (b.tiaohou.satisfied ? '（原局已见）' : '（原局未现）')) + '</div>' +
+                  kv('调候', th.need + (th.satisfied ? '（原局已见）' : '（原局未现）')) + '</div>' +
                   '<p class="text-sm mt-2">' + esc(b.pattern.text) + '</p>' +
-                  '<p class="text-sm text-muted mt-1">' + esc(b.tiaohou.note) + '</p>';
+                  '<p class="text-sm text-muted mt-1">' + esc(th.note) + '</p>';
                 $('bzShenSha').innerHTML = '<table class="ft-ref-table"><thead><tr><th>神煞</th><th>基准</th><th>命局</th><th>释义</th></tr></thead><tbody>' +
                   b.shenSha.map(function (s) {
                     return '<tr' + (s.present ? ' class="is-active"' : '') + '><td>' + esc(s.name) + '</td><td>' + esc(s.key) +
