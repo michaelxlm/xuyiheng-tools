@@ -462,7 +462,8 @@ function renderRoute(site, route, ctx) {
     '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',
   ];
   if (isFortune) {
-    scriptTags.push('    <script src="' + assetUrl('assets/js/fortune.min.js', manifest) + '" defer></script>');
+    // 命理计算已上移中台（main-api/app/lib/fortune-engine.js），站内只注入请求适配层。
+    scriptTags.push('    <script src="' + assetUrl('assets/js/fortune-api.min.js', manifest) + '" defer></script>');
   }
   if (hasPageAsset('js', slug, 'js')) {
     scriptTags.push('    <script src="' + assetUrl('assets/js/pages/' + slug + '.min.js', manifest) + '" defer></script>');

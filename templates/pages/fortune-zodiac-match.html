@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>生肖配对 · 六合三合相冲速查</h1>
-          <p>输入双方出生年份，查看生肖、干支五行与传统合冲关系。所有换算在本地完成，结果只是民俗关系的展示，不代表任何匹配度结论。</p>
+          <p>输入双方出生年份，由中台换算生肖、干支纳音五行与传统六合三合相冲相害关系。测算结果在中台留痕，可在管理端查看；结果只是民俗关系展示，不代表任何匹配度结论。</p>
         </section>
 
         <form class="card" id="zmForm">
@@ -17,7 +17,7 @@
           <div class="btn-row mt-3">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"zodiac-match"}'>查看配对</button>
           </div>
-          <p class="ft-disclaimer">民俗娱乐内容，无科学依据，关系质量取决于具体的人与相处方式。</p>
+          <p class="ft-disclaimer">民俗娱乐内容，无科学依据，关系质量取决于具体的人与相处方式。提交即表示同意中台处理本次出生年份用于测算与留痕。</p>
         </form>
 
         <div class="result-box" id="zmResult" hidden>
@@ -40,27 +40,30 @@
           </table>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>生肖按农历年地支取象，工具用年份干支换算，未细化到立春或春节当天。分数是对上述传统关系的量化展示，不是匹配度测算，也不具备预测意义。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台按农历年地支取象，用年份干支与纳音五行换算，未细化到立春或春节当天。分数是对上述传统关系的量化展示，不是匹配度测算，也不具备预测意义。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var F = window.Fortune; if (!F) return;
+            var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             $('zmForm').addEventListener('submit', function (e) {
               e.preventDefault();
               var a = Number($('zm-a').value), b = Number($('zm-b').value);
               if (!(a >= 1900 && a <= 2050 && b >= 1900 && b <= 2050)) { alert('请输入 1900–2050 之间的年份'); return; }
-              var r = F.zodiacMatch(a, b);
-              $('zmPair').innerHTML =
-                '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aYear) + ' · ' + esc(r.wx.split(' / ')[0]) + '</span></div>' +
-                '<div class="ft-match-vs">×</div>' +
-                '<div class="ft-match-side"><span class="text-sm text-muted">' + b + '</span><strong>' + esc(r.b) + '</strong><span class="text-sm text-muted">' + esc(r.bYear) + ' · ' + esc(r.wx.split(' / ')[1]) + '</span></div>';
-              $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.kind) + '</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
-              $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
-              $('zmResult').hidden = false;
-              if (window.U && U.track) U.track('calc_result', { tool: 'zodiac-match' });
+              F.run($('zmForm').querySelector('button[type=submit]'), 'zodiacMatch', {
+                yearA: a, yearB: b
+              }).then(function (r) {
+                $('zmPair').innerHTML =
+                  '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aGanzhi) + ' · ' + esc(r.elements.split(' / ')[0]) + '</span></div>' +
+                  '<div class="ft-match-vs">×</div>' +
+                  '<div class="ft-match-side"><span class="text-sm text-muted">' + b + '</span><strong>' + esc(r.b) + '</strong><span class="text-sm text-muted">' + esc(r.bGanzhi) + ' · ' + esc(r.elements.split(' / ')[1]) + '</span></div>';
+                $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.relation) + '</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
+                $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
+                $('zmResult').hidden = false;
+                if (window.U && U.track) U.track('calc_result', { tool: 'zodiac-match' });
+              }).catch(function (err) { alert('配对失败：' + (err && err.message ? err.message : '请稍后重试')); });
             });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

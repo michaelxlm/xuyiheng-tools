@@ -7,7 +7,7 @@
   "mcp": {
     "endpoint": "/api/v1/mcp",
     "protocol": "JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额",
-    "tools": [ "history_of_today", "history_list", "dream_search", "color_list" ]
+    "tools": [ "history_of_today", "history_list", "dream_search", "color_list", "content_search", "history_timeline", "color_palette", "fortune_bazi", "fortune_ziwei", "fortune_natal", "fortune_horoscope", "fortune_zodiac_match", "fortune_tarot", "fortune_record_get" ]
   },
   "datasets": [
     { "id": "history", "label": "历史上的今天", "path": "/api/v1/front/automate/history/", "params": "mdmm（可选，MMDD）" },

@@ -65,12 +65,12 @@
 - [实用工具箱](https://xuyiheng.com/tools.html): 精选实用在线工具合集，涵盖计算、查询、生活等各类工具，一站满足日常需求。
 
 ## fortune
-- [八字排盘](https://xuyiheng.com/fortune/bazi.html): 在线八字排盘，输入出生日期与时辰生成年月日时四柱干支、藏干十神、纳音与五行统计。纯本地计算，隐私优先，结果仅供传统文化娱乐参考。
-- [紫微斗数排盘](https://xuyiheng.com/fortune/ziwei.html): 在线紫微斗数排盘，输入公历生日与时辰，本地换算农历并排出命宫身宫、十二宫、五行局与十四主星位置。结果仅供传统文化娱乐参考。
-- [本命星盘](https://xuyiheng.com/fortune/natal.html): 在线本命星盘，按出生时间地点计算太阳、月亮、上升与十大行星黄经、星座和宫位，并绘制星盘轮盘。天文算法本地运行，结果仅供娱乐参考。
-- [星座运势](https://xuyiheng.com/fortune/horoscope.html): 按日期与星座查看综合、爱情、事业、财运、健康星级与幸运色、幸运数字、幸运方位。完全本地生成，供娱乐参考。
-- [生肖配对](https://xuyiheng.com/fortune/zodiac-match.html): 输入双方出生年份，查询生肖、干支五行与六合、三合、相冲、相害、自刑等传统合冲关系，附通俗解读。仅供民俗娱乐参考。
-- [塔罗占卜](https://xuyiheng.com/fortune/tarot.html): 在线塔罗抽牌，支持今日指引与过去现在未来三张牌阵，展示大阿尔卡那正逆位关键词。纯本地洗牌，仅供娱乐参考。
+- [八字排盘](https://xuyiheng.com/fortune/bazi.html): 在线八字排盘，输入出生日期与时辰由中台生成四柱干支、藏干十神、纳音、旬空、大运与五行统计，结果留痕可复核，仅供传统文化娱乐参考。
+- [紫微斗数排盘](https://xuyiheng.com/fortune/ziwei.html): 在线紫微斗数排盘，输入公历生日与时辰，由中台换算农历并排出命宫身宫、十二宫、五行局、十四主星、四化与流年，结果留痕可复核，仅供传统文化娱乐参考。
+- [本命星盘](https://xuyiheng.com/fortune/natal.html): 在线本命星盘，按出生时间地点由中台计算太阳、月亮、上升、十大行星黄经、星座宫位、相位与元素分布并绘制轮盘，结果留痕可复核，仅供娱乐参考。
+- [星座运势](https://xuyiheng.com/fortune/horoscope.html): 按日期与星座由中台生成综合、爱情、事业、财运、健康星级与幸运色、幸运数字、幸运方位，结果稳定且留痕可复核，供娱乐参考。
+- [生肖配对](https://xuyiheng.com/fortune/zodiac-match.html): 输入双方出生年份，由中台查询生肖、干支纳音五行与六合、三合、相冲、相害、自刑等传统合冲关系，结果留痕可复核。仅供民俗娱乐参考。
+- [塔罗占卜](https://xuyiheng.com/fortune/tarot.html): 在线塔罗抽牌，由中台用问题文字与日期确定性洗牌，支持今日指引与过去现在未来三张牌阵，展示大阿尔卡那正逆位关键词并留痕，仅供娱乐参考。
 
 ## Datasets
 
@@ -80,6 +80,6 @@
 - [周公解梦](https://api.xuyiheng.com/api/v1/front/automate/dream/): dream 数据集（入参：keyword）；鉴权 x-api-key 请求头。
 - [中国传统色彩](https://api.xuyiheng.com/api/v1/front/automate/color/): color 数据集；鉴权 x-api-key 请求头。
 - [文档解析数据集（AI 摘要 + 元信息）](https://api.xuyiheng.com/api/v1/front/documents/): documents 数据集；鉴权 x-api-key 请求头。
-- [MCP Server](https://api.xuyiheng.com/api/v1/mcp): JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额。工具：history_of_today / history_list / dream_search / color_list。
+- [MCP Server](https://api.xuyiheng.com/api/v1/mcp): JSON-RPC 2.0（Streamable HTTP），与 REST 共用同一把 x-api-key 与配额。工具：history_of_today / history_list / dream_search / color_list / content_search / history_timeline / color_palette / fortune_bazi / fortune_ziwei / fortune_natal / fortune_horoscope / fortune_zodiac_match / fortune_tarot / fortune_record_get。
 - 接入与 Key 申请：开发者门户 https://api.xuyiheng.com/public/developer.html
 

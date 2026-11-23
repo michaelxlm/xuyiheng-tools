@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>星座运势 · 十二星座每日参考</h1>
-          <p>选择日期与星座，查看综合、爱情、事业、财运、健康星级与幸运色、幸运数字、幸运方位。结果由浏览器本地生成，无需联网，同一天同一星座保持稳定。</p>
+          <p>选择日期与星座，由中台生成综合、爱情、事业、财运、健康星级与幸运色、幸运数字、幸运方位。同一天同一星座结果稳定，测算在中台留痕，可在管理端查看；纯娱乐内容，无科学依据。</p>
         </section>
 
         <form class="card" id="hoForm">
@@ -32,12 +32,12 @@
           <div class="ft-sign-tabs" id="hoTabs"></div>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>本页不请求任何运势接口：以「日期 + 星座」为种子在本地确定性生成。换一天会得到另一组结果；它只是一种稳定的娱乐化输出，不是对未来的预测。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台以「日期 + 星座」为种子确定性生成星级与提示，换一天会得到另一组结果；它只是一种稳定的娱乐化输出，不是对未来的预测。页面加载时不会自动测算，只有点击「查看运势」或切换星座才会发起请求并留痕。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var F = window.Fortune; if (!F) return;
+            var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             var dateInput = $('ho-date'), signSel = $('ho-sign');
@@ -52,31 +52,34 @@
               for (var i = 1; i <= 5; i++) s += i <= n ? '★' : '<span class="off">☆</span>';
               return '<span class="ft-stars">' + s + '</span>';
             }
-            function render() {
+            function render(btn) {
               var sign = signSel.value, key = dateInput.value;
               if (!key) { alert('请选择日期'); return; }
-              var h = F.horoscope(sign, key);
-              $('hoTitle').textContent = sign + '座 · 今日运势';
-              $('hoDateChip').textContent = key;
-              $('hoScores').innerHTML = [
-                ['综合', h.scores.overall], ['爱情', h.scores.love], ['事业', h.scores.career],
-                ['财运', h.scores.money], ['健康', h.scores.health]
-              ].map(function (x) { return '<div class="ft-score-row"><span>' + x[0] + '</span>' + stars(x[1]) + '</div>'; }).join('');
-              $('hoLucky').innerHTML = ['幸运色 ' + h.color, '幸运数字 ' + h.number, '幸运方位 ' + h.direction]
-                .map(function (s) { return '<span class="ft-chip">' + esc(s) + '</span>'; }).join('');
-              $('hoAdvice').textContent = '今日提示：' + h.advice;
-              $('hoResult').hidden = false;
-              Array.prototype.forEach.call($('hoTabs').children, function (b) {
-                b.className = 'ft-sign-tab' + (b.getAttribute('data-sign') === sign ? ' is-active' : '');
-              });
+              F.run(btn, 'horoscope', { sign: sign, date: key }).then(function (h) {
+                $('hoTitle').textContent = h.sign + '座 · 今日运势';
+                $('hoDateChip').textContent = h.date;
+                $('hoScores').innerHTML = [
+                  ['综合', h.scores.overall], ['爱情', h.scores.love], ['事业', h.scores.career],
+                  ['财运', h.scores.money], ['健康', h.scores.health]
+                ].map(function (x) { return '<div class="ft-score-row"><span>' + x[0] + '</span>' + stars(x[1]) + '</div>'; }).join('');
+                $('hoLucky').innerHTML = ['幸运色 ' + h.color, '幸运数字 ' + h.number, '幸运方位 ' + h.direction]
+                  .map(function (s) { return '<span class="ft-chip">' + esc(s) + '</span>'; }).join('');
+                $('hoAdvice').textContent = '今日提示：' + h.advice + ' ' + h.highlight;
+                $('hoResult').hidden = false;
+                Array.prototype.forEach.call($('hoTabs').children, function (b) {
+                  b.className = 'ft-sign-tab' + (b.getAttribute('data-sign') === h.sign ? ' is-active' : '');
+                });
+                if (window.U && U.track) U.track('calc_result', { tool: 'horoscope' });
+              }).catch(function (err) { alert('获取运势失败：' + (err && err.message ? err.message : '请稍后重试')); });
             }
-            $('hoForm').addEventListener('submit', function (e) { e.preventDefault(); render(); });
+            $('hoForm').addEventListener('submit', function (e) {
+              e.preventDefault();
+              render($('hoForm').querySelector('button[type=submit]'));
+            });
             $('hoTabs').addEventListener('click', function (e) {
               var b = e.target.closest('.ft-sign-tab'); if (!b) return;
-              signSel.value = b.getAttribute('data-sign'); render();
-              if (window.U && U.track) U.track('calc_result', { tool: 'horoscope' });
+              signSel.value = b.getAttribute('data-sign'); render(null);
             });
-            render();
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -84,10 +87,10 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>星座运势依据日期与星座在浏览器本地生成星级与提示，用于轻松阅读，不涉及任何真实预测或个人数据。</p>
+          <p>星座运势依据日期与星座在中台生成星级与提示，用于轻松阅读，不涉及任何真实预测；仅提交星座与日期，不采集个人身份信息。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>结果每天都会变吗？</summary><p>会。日期参与种子计算，同一天同一星座结果一致，换日期则重新生成。</p></details>
           <details><summary>为什么不同网站运势不一样？</summary><p>各站的生成规则或数据源不同；本页明确是本地确定性娱乐输出，没有权威口径。</p></details>
           <details><summary>十二星座按什么日期划分？</summary><p>日常星座按阳历出生日期的黄道区间划分，本页选项卡直接对应这十二个星座名称。</p></details>
-          <details><summary>会收集我的星座或日期吗？</summary><p>不会，所有计算在本地完成，不发起请求、不写入存储。</p></details>
+          <details><summary>会收集我的星座或日期吗？</summary><p>点击查询后会向中台提交所选星座与日期用于生成结果并留痕；页面不写入本地存储，也不采集姓名、联系方式等身份信息。</p></details>
         </section>

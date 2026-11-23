@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>八字排盘 · 四柱干支与五行</h1>
-          <p>输入公历出生日期与时辰，本地生成年、月、日、时四柱干支，附藏干十神、纳音与五行分布。出生信息只在浏览器内参与计算，不上传、不留存。</p>
+          <p>输入公历出生日期与时辰，由中台排定年、月、日、时四柱干支，附藏干十神、纳音、旬空、大运与五行分布。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="bzForm">
@@ -26,11 +26,18 @@
                 <option value="21">亥时 21:00–23:00</option>
               </select>
             </div>
+            <div class="form-group">
+              <label class="form-label" for="bz-gender">性别（用于大运顺逆）</label>
+              <select class="form-select" id="bz-gender">
+                <option value="male" selected>男</option>
+                <option value="female">女</option>
+              </select>
+            </div>
           </div>
           <div class="btn-row mt-3">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>开始排盘</button>
           </div>
-          <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。</p>
+          <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。提交即表示同意中台处理本次出生信息用于测算与留痕。</p>
         </form>
 
         <div class="result-box" id="bzResult" hidden>
@@ -38,15 +45,16 @@
           <dl class="result-detail mt-3" id="bzDetail"></dl>
           <h3 class="mt-4">五行分布（四柱天干 + 地支本气）</h3>
           <div id="bzWuxing"></div>
+          <div class="mt-3" id="bzDayun"></div>
           <p class="text-sm text-muted mt-3" id="bzNote"></p>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>年柱以立春（约 2 月 4 日）换年，月柱按各月节气的常用近似日期换月，日柱按儒略日推算，时柱按「日上起时」口诀。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>年柱以立春（约 2 月 4 日）换年，月柱按各月节气的常用近似日期换月，日柱按儒略日推算，时柱按「日上起时」口诀；大运按阳年男／阴年女顺行、反之逆行，起运岁数按到节气边界的天数近似。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var F = window.Fortune; if (!F) return;
+            var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             function row(k, v) { return '<div class="result-detail-row"><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; }
@@ -59,30 +67,42 @@
               e.preventDefault();
               var p = (dateInput.value || '').split('-');
               if (p.length !== 3) { alert('请选择出生日期'); return; }
-              var b = F.bazi(+p[0], +p[1], +p[2], Number($('bz-hour').value));
-              var html = '';
-              b.detail.forEach(function (d, i) {
-                html += '<div class="ft-pillar' + (i === 2 ? ' is-day' : '') + '">' +
-                  '<div class="ft-label">' + esc(d.name) + '</div>' +
-                  '<div class="ft-gz"><span class="s">' + esc(d.gz.charAt(0)) + '</span><span>' + esc(d.gz.charAt(1)) + '</span></div>' +
-                  '<div class="ft-sub">藏干 ' + esc(d.hidden) + '</div>' +
-                  '<div class="ft-sub">' + esc(d.nayin) + '</div>' +
-                  '<span class="ft-god">' + esc(d.god) + '</span></div>';
-              });
-              $('bzPillars').innerHTML = html;
-              $('bzDetail').innerHTML = row('日主', b.dayName + '（' + b.dayWx + '）') +
-                row('农历', b.lunar ? b.lunar.lub + b.lunar.dayName : '超出本地农历范围') +
-                row('生肖', b.zodiac) +
-                row('生扶 / 克泄耗', b.support + ' / ' + b.drain) +
-                row('强弱倾向', b.tendency);
-              var max = Math.max.apply(null, b.count) || 1;
-              $('bzWuxing').innerHTML = F.WUXING.map(function (w, i) {
-                return '<div class="ft-wx-row"><span>' + w + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
-                  Math.round(b.count[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.count[i] + '</span></div>';
-              }).join('');
-              $('bzNote').textContent = '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断；十神按日主与其他天干的生克关系标注。';
-              $('bzResult').hidden = false;
-              if (window.U && U.track) U.track('calc_result', { tool: 'bazi' });
+              var btn = $('bzForm').querySelector('button[type=submit]');
+              F.run(btn, 'bazi', {
+                date: dateInput.value,
+                hour: Number($('bz-hour').value),
+                gender: $('bz-gender').value
+              }).then(function (b) {
+                var html = '';
+                b.pillars.forEach(function (d, i) {
+                  html += '<div class="ft-pillar' + (i === 2 ? ' is-day' : '') + '">' +
+                    '<div class="ft-label">' + esc(d.name) + '</div>' +
+                    '<div class="ft-gz"><span class="s">' + esc(d.ganzhi.charAt(0)) + '</span><span>' + esc(d.ganzhi.charAt(1)) + '</span></div>' +
+                    '<div class="ft-sub">藏干 ' + esc(d.hidden.join('、')) + '</div>' +
+                    '<div class="ft-sub">' + esc(d.nayin) + '</div>' +
+                    '<span class="ft-god">' + esc(d.god) + '</span></div>';
+                });
+                $('bzPillars').innerHTML = html;
+                $('bzDetail').innerHTML = row('日主', b.dayMaster + '（' + b.dayElement + '）') +
+                  row('农历', b.lunar || '超出中台农历表范围') +
+                  row('生肖', b.zodiac) +
+                  row('生扶 / 克泄耗', b.support + ' / ' + b.drain) +
+                  row('强弱倾向', b.tendency) +
+                  row('旬空', b.xunkong.join('、')) +
+                  row('月令节气', b.jie.name + '（约 ' + b.jie.day + ' 日）');
+                var max = Math.max.apply(null, b.count) || 1;
+                $('bzWuxing').innerHTML = F.WUXING.map(function (w, i) {
+                  return '<div class="ft-wx-row"><span>' + w + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
+                    Math.round(b.count[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.count[i] + '</span></div>';
+                }).join('');
+                $('bzDayun').innerHTML = '<strong>大运：</strong>' + esc(b.dayun.direction) + ' · 约 ' + b.dayun.startAge +
+                  ' 岁起运 · ' + b.dayun.items.map(function (d) {
+                    return esc(d.ganzhi) + '（' + d.age + '岁）';
+                  }).join('、');
+                $('bzNote').textContent = '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断；十神与大运由中台按统一规则推算。';
+                $('bzResult').hidden = false;
+                if (window.U && U.track) U.track('calc_result', { tool: 'bazi' });
+              }).catch(function (err) { alert('排盘失败：' + (err && err.message ? err.message : '请稍后重试')); });
             });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
@@ -96,5 +116,5 @@
           <details><summary>年柱为什么按立春而不是春节？</summary><p>命理排盘通常以立春作为一年起点，与民俗中以农历正月初一换年的口径不同，立春前后出生者两种口径会不一致。</p></details>
           <details><summary>藏干和十神是什么意思？</summary><p>藏干是地支中暗含的天干，十神是相对日主与其他天干的生克关系名称，用来描述结构，不代表吉凶结论。</p></details>
           <details><summary>23 点出生算哪一天？</summary><p>本工具把 23:00–01:00 作为子时，归入当日的时柱。部分流派主张晚子时换日，请以你采用的口径复核。</p></details>
-          <details><summary>隐私如何保障？</summary><p>出生日期与时辰全在浏览器本地计算，不上传服务器，也不写入本地存储。</p></details>
+          <details><summary>隐私如何保障？</summary><p>出生日期、时辰与性别仅用于本次中台测算并在服务端留痕，便于审计与复核；浏览器端不再保存这些输入，页面也不写入本地存储。请勿在输入框填写与测算无关的敏感信息。</p></details>
         </section>

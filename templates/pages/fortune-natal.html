@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
-          <p>按出生时间、地点与时区计算十大行星的地心黄经、所在星座与整宫制宫位，并绘制星盘轮盘。天文计算在浏览器本地完成，不上传出生资料。</p>
+          <p>按出生时间、地点与时区，由中台计算十大行星的地心黄经、所在星座、整宫制宫位、相位与元素分布，并绘制星盘轮盘。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="ntForm">
@@ -53,7 +53,7 @@
           <div class="btn-row mt-3">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>生成星盘</button>
           </div>
-          <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。</p>
+          <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。提交即表示同意中台处理本次出生资料用于测算与留痕。</p>
         </form>
 
         <div class="result-box" id="ntResult" hidden>
@@ -69,14 +69,15 @@
               <p class="text-sm text-muted mt-3" id="ntNote"></p>
             </div>
           </div>
+          <div id="ntExtra" class="mt-3"></div>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由本地恒星时推算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由格林尼治恒星时推算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var F = window.Fortune; if (!F) return;
+            var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             var dateInput = $('nt-date');
@@ -95,6 +96,7 @@
             function drawWheel(n) {
               var s = '<svg class="ft-wheel" viewBox="0 0 400 400" role="img" aria-label="本命星盘轮盘">';
               var c = 'var(--color-border)', ink = 'var(--color-text)', mute = 'var(--color-muted)';
+              var ascIdx = Math.max(0, F.SIGNS.indexOf(n.rising));
               s += '<circle cx="200" cy="200" r="160" fill="none" stroke="' + c + '" stroke-width="1.5"></circle>';
               s += '<circle cx="200" cy="200" r="112" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
               s += '<circle cx="200" cy="200" r="56" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
@@ -103,10 +105,10 @@
                 s += '<line x1="' + edge[0].toFixed(1) + '" y1="' + edge[1].toFixed(1) + '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '" stroke="' + c + '" stroke-width="1"></line>';
                 var mid = point(180 + k * 30 + 15, 138);
                 s += '<text x="' + mid[0].toFixed(1) + '" y="' + mid[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="' + mute + '">' +
-                  esc(F.SIGNS[(F.signIndex(n.asc) + k) % 12]) + '</text>';
+                  esc(F.SIGNS[(ascIdx + k) % 12]) + '</text>';
               }
               n.planets.forEach(function (p, i) {
-                var theta = 180 + p.lon - n.asc;
+                var theta = 180 + p.longitude - n.asc;
                 var rr = i < 2 ? 92 : (i < 5 ? 132 : 84);
                 var q = point(theta, rr);
                 s += '<text x="' + q[0].toFixed(1) + '" y="' + q[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="20" fill="var(--cat-fortune-ink)">' + esc(p.glyph) + '</text>';
@@ -128,18 +130,32 @@
               if (p.length !== 3 || t.length !== 2) { alert('请填写出生日期与时间'); return; }
               var lat = Number($('nt-lat').value), lon = Number($('nt-lon').value);
               if (!isFinite(lat) || !isFinite(lon)) { alert('请填写有效的经纬度'); return; }
-              var n = F.natal(+p[0], +p[1], +p[2], +t[0], +t[1], lat, lon, Number($('nt-tz').value));
-              $('ntTrio').innerHTML = [
-                ['☉ 太阳', n.sun], ['☽ 月亮', n.moon], ['ASC 上升', n.rising]
-              ].map(function (x) { return '<div class="ft-trio-item"><span>' + x[0] + '</span><strong>' + esc(x[1]) + '</strong></div>'; }).join('');
-              $('ntWheel').innerHTML = drawWheel(n);
-              $('ntPlanets').innerHTML = n.planets.map(function (p) {
-                return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
-                  '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td></tr>';
-              }).join('');
-              $('ntNote').textContent = '天顶落在' + n.mcSign + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';
-              $('ntResult').hidden = false;
-              if (window.U && U.track) U.track('calc_result', { tool: 'natal' });
+              F.run($('ntForm').querySelector('button[type=submit]'), 'natal', {
+                date: dateInput.value,
+                time: $('nt-time').value,
+                tz: Number($('nt-tz').value),
+                lat: lat,
+                lon: lon
+              }).then(function (n) {
+                $('ntTrio').innerHTML = [
+                  ['☉ 太阳', n.sun], ['☽ 月亮', n.moon], ['MC 天顶', n.midheaven], ['ASC 上升', n.rising]
+                ].map(function (x) { return '<div class="ft-trio-item"><span>' + x[0] + '</span><strong>' + esc(x[1]) + '</strong></div>'; }).join('');
+                $('ntWheel').innerHTML = drawWheel(n);
+                $('ntPlanets').innerHTML = n.planets.map(function (p) {
+                  return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
+                    '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td></tr>';
+                }).join('');
+                function pairText(o) { return Object.keys(o).map(function (k) { return k + ' ' + o[k]; }).join('、'); }
+                $('ntExtra').innerHTML = '<strong>主要相位：</strong>' +
+                  (n.aspects.length ? esc(n.aspects.slice(0, 8).map(function (a) {
+                    return a.a + '·' + a.b + ' ' + a.type;
+                  }).join('、')) : '无显著相位') +
+                  '<br><strong>元素分布：</strong>' + esc(pairText(n.elements)) +
+                  '<br><strong>模态分布：</strong>' + esc(pairText(n.modalities));
+                $('ntNote').textContent = '天顶落在' + n.midheaven + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';
+                $('ntResult').hidden = false;
+                if (window.U && U.track) U.track('calc_result', { tool: 'natal' });
+              }).catch(function (err) { alert('生成星盘失败：' + (err && err.message ? err.message : '请稍后重试')); });
             });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

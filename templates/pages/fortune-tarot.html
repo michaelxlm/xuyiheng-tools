@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>塔罗占卜 · 大阿尔卡那牌阵</h1>
-          <p>输入一个想问的问题，抽取大阿尔卡那牌，支持「今日一张」与「过去 · 现在 · 未来」三张牌阵。洗牌与解读都在浏览器本地完成，不联网、不记录。</p>
+          <p>输入一个想问的问题，由中台抽取大阿尔卡那牌，支持「今日一张」与「过去 · 现在 · 未来」三张牌阵。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐与自我反思。</p>
         </section>
 
         <form class="card" id="trForm">
@@ -21,7 +21,7 @@
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tarot"}'>抽牌</button>
             <button class="btn btn-outline" type="button" id="tr-again">换一组</button>
           </div>
-          <p class="ft-disclaimer">塔罗无科学依据，正逆位关键词仅供娱乐与自我反思，请勿据此做重大决定。</p>
+          <p class="ft-disclaimer">塔罗无科学依据，正逆位关键词仅供娱乐与自我反思，请勿据此做重大决定。提交即表示同意中台处理本次问题文字用于测算与留痕。</p>
         </form>
 
         <div class="result-box" id="trResult" hidden>
@@ -29,34 +29,44 @@
           <div class="ft-tarot-cards" id="trCards"></div>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>牌组为 22 张大阿尔卡那，洗牌用问题文字、日期与刷新种子在浏览器本地生成；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>牌组为 22 张大阿尔卡那，中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
 
         <script>
         (function () {
           function boot() {
-            var F = window.Fortune; if (!F) return;
+            var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             var nonce = 0;
-            function draw() {
+            function draw(btn) {
               var q = ($('tr-question').value || '今日指引').trim();
               var count = Number($('tr-spread').value);
               var t = new Date();
               var dateKey = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-              var cards = F.tarotDraw(q + '|' + dateKey + '|' + nonce, count);
-              $('trCards').innerHTML = cards.map(function (c) {
-                return '<div class="ft-tarot-card' + (c.reversed ? ' is-reversed' : '') + '">' +
-                  '<span class="ft-tarot-pos">' + esc(c.position) + '</span>' +
-                  '<span class="ft-tarot-num">' + esc(c.numeral) + '</span>' +
-                  '<strong class="ft-tarot-name">' + esc(c.name) + '</strong>' +
-                  '<span class="ft-tarot-orient">' + (c.reversed ? '逆位' : '正位') + '</span>' +
-                  '<span class="ft-tarot-meaning">' + esc(c.meaning) + '</span></div>';
-              }).join('');
-              $('trSeedNote').textContent = '问题：' + q + ' · ' + dateKey + ' · ' + (count === 1 ? '单张指引' : '三张牌阵');
-              $('trResult').hidden = false;
+              F.run(btn, 'tarot', {
+                question: q,
+                spread: count,
+                date: dateKey,
+                seed: String(nonce)
+              }).then(function (d) {
+                $('trCards').innerHTML = d.cards.map(function (c) {
+                  return '<div class="ft-tarot-card' + (c.reversed ? ' is-reversed' : '') + '">' +
+                    '<span class="ft-tarot-pos">' + esc(c.position) + '</span>' +
+                    '<span class="ft-tarot-num">' + esc(c.numeral) + '</span>' +
+                    '<strong class="ft-tarot-name">' + esc(c.name) + '</strong>' +
+                    '<span class="ft-tarot-orient">' + (c.reversed ? '逆位' : '正位') + '</span>' +
+                    '<span class="ft-tarot-meaning">' + esc(c.meaning) + '</span></div>';
+                }).join('');
+                $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · ' + d.summary;
+                $('trResult').hidden = false;
+                if (window.U && U.track) U.track('calc_result', { tool: 'tarot' });
+              }).catch(function (err) { alert('抽牌失败：' + (err && err.message ? err.message : '请稍后重试')); });
             }
-            $('trForm').addEventListener('submit', function (e) { e.preventDefault(); nonce++; draw(); });
-            $('tr-again').addEventListener('click', function () { nonce++; draw(); });
+            $('trForm').addEventListener('submit', function (e) {
+              e.preventDefault(); nonce++;
+              draw($('trForm').querySelector('button[type=submit]'));
+            });
+            $('tr-again').addEventListener('click', function () { nonce++; draw(this); });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
         })();
@@ -69,5 +79,5 @@
           <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与本地洗牌种子；写得更具体，得到的提示也更容易对应到当下情境。</p></details>
           <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>
           <details><summary>为什么每次抽牌不一样？</summary><p>每次抽牌都会加入新的刷新种子，因此结果会变化；这正好说明它不构成稳定预测。</p></details>
-          <details><summary>会保存我输入的问题吗？</summary><p>不会，问题只用于当次本地洗牌，页面不上传、不写入存储。</p></details>
+          <details><summary>会保存我输入的问题吗？</summary><p>问题文字会随本次请求提交到中台，作为洗牌种子并留痕以便复核；页面不写入本地存储。请勿填写姓名、联系方式等与占卜无关的敏感信息。</p></details>
         </section>
