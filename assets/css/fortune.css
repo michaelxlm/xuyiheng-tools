@@ -41,6 +41,8 @@
 .ft-palace-stars { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 .ft-star { padding: 2px 6px; border-radius: 6px; background: var(--cat-fortune-bg); color: var(--cat-fortune-ink); font-size: var(--text-xs); font-weight: 650; }
 .ft-star.major { background: var(--color-primary-soft); color: var(--color-primary-ink); }
+.ft-star.sha { background: rgba(180, 85, 46, .14); color: #b4552e; border: 1px solid rgba(180, 85, 46, .35); }
+.ft-br-bright { font-size: var(--text-xs); opacity: .72; margin-left: 2px; }
 .ft-ziwei-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .ft-chip { padding: 4px 10px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); font-size: var(--text-sm); background: var(--color-surface-2); }
 

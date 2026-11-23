@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>紫微斗数排盘 · 十二宫命盘</h1>
-          <p>只选公历出生日期即可排盘，时辰已预填；流年可留空。中台换算农历并排出命身宫、十二宫、十四主星、四化，另附三方四正、主星关键词与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
+          <p>只选公历出生日期即可排盘，时辰与性别已预填；流年可留空。中台换算农历并排出命身宫、十二宫、十四主星与辅煞曜、庙旺亮度、生年与宫干四化、长生博士十二神、大限与格局线索，另附三方四正与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="zwForm">
@@ -27,6 +27,13 @@
               </select>
             </div>
             <div class="form-group">
+              <label class="form-label" for="zw-gender">性别（用于大限顺逆）</label>
+              <select class="form-select" id="zw-gender">
+                <option value="male" selected>男</option>
+                <option value="female">女</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label class="form-label" for="zw-flow">流年（可不填）</label>
               <input class="form-input" id="zw-flow" type="number" min="1900" max="2100" placeholder="留空即只排本命盘">
               <div class="ft-quick-row"><button type="button" class="ft-quick" data-flow="now">用今年</button><button type="button" class="ft-quick" data-flow="clear">不排流年</button></div>
@@ -35,28 +42,32 @@
           <div class="btn-row mt-3">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"ziwei"}'>一键排盘</button>
           </div>
-          <p class="text-sm text-muted mt-3">时辰已预填午时；不确定时辰可直接用默认值。</p>
+          <p class="text-sm text-muted mt-3">时辰已预填午时；性别只影响大限顺逆（阳男阴女顺行）。</p>
           <p class="ft-disclaimer">紫微斗数属传统民俗文化，无科学依据，结果仅供娱乐参考。提交即表示同意中台处理本次出生信息用于测算与留痕。</p>
         </form>
 
-        <div class="result-box" id="zwResult" hidden>
+       <div class="result-box" id="zwResult" hidden>
           <div class="ft-ziwei-summary" id="zwSummary"></div>
           <div id="zwSihua" class="mt-3"></div>
           <div class="ft-palaces mt-3" id="zwPalaces"></div>
-          <p class="text-sm text-muted mt-3">实线框为命宫，虚线框为身宫；蓝色星标为十四主星，橙色为文昌、文曲、左辅、右弼。</p>
+          <p class="text-sm text-muted mt-3">实线框为命宫，虚线框为身宫；蓝色为主星，本色为辅曜，橙红为煞曜；星名后为庙旺亮度。</p>
+          <h3 class="ft-section-title">格局线索</h3>
+          <div id="zwGeju"></div>
           <h3 class="ft-section-title">三方四正</h3>
           <div id="zwCore"></div>
-          <h3 class="ft-section-title">主星关键词</h3>
-          <div class="ft-kv-grid" id="zwStarNotes"></div>
+          <h3 class="ft-section-title">大限一览（起运岁＝局数）</h3>
+          <div id="zwDaxian"></div>
+          <h3 class="ft-section-title">星曜亮度与释义</h3>
+          <div id="zwStarNotes"></div>
           <h3 class="ft-section-title">四化说明</h3>
           <div class="ft-kv-grid" id="zwHuaNotes"></div>
-          <h3 class="ft-section-title">十二宫指引</h3>
+          <h3 class="ft-section-title">十二宫指引（含长生博士与宫干飞四化）</h3>
           <div id="zwGuide"></div>
           <h3 class="ft-section-title">排盘解读</h3>
           <ul class="ft-note-list" id="zwReading"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台采用通行三合派口径：寅宫起正月顺数生月，命宫逆数时辰、身宫顺数时辰，十二宫自命宫逆行；五行局取命宫干支纳音，紫微按生日与局数补数定位，并给出四化与可选流年宫。未纳入煞曜与流曜，属简化排盘。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台采用通行三合派口径：寅宫起正月顺数生月，命宫逆数时辰、身宫顺数时辰，十二宫自命宫逆行；五行局取命宫干支纳音，紫微依生日除局数补数进退定位，天府关于寅申轴镜像。全盘安十四主星＋昌曲辅弼四辅＋禄存羊陀火铃地空地劫六煞＋鸾喜马刑姚解台辅封诰，并排生年与宫干四化、长生博士十二神与大限；未排天魁钺与流曜，属可复核的规则化简化。</div></div>
 
         <script>
         (function () {
@@ -77,13 +88,14 @@
               e.preventDefault();
               var p = (dateInput.value || '').split('-');
               if (p.length !== 3) { alert('请选择出生日期'); return; }
-              var input = { date: dateInput.value, hour: Number($('zw-hour').value) };
+              var input = { date: dateInput.value, hour: Number($('zw-hour').value), gender: $('zw-gender').value };
               if ($('zw-flow').value) input.flowYear = Number($('zw-flow').value);
               F.run($('zwForm').querySelector('button[type=submit]'), 'ziwei', input).then(function (z) {
                 var chips = [
                   '农历 ' + z.lunar, z.lunarYear + '年', z.juName,
                   '命宫 ' + z.ming.ganzhi, '身宫 ' + z.shen.ganzhi,
-                  '紫微在' + z.ziwei, '天府在' + z.tianfu
+                  '紫微在' + z.ziwei, '天府在' + z.tianfu, '禄存在' + z.lucun,
+                  '命主' + z.mingZhu + ' · 身主' + z.shenZhu
                 ];
                 if (z.flowYear) chips.push('流年 ' + z.flowYear.ganzhi + ' · ' + z.flowYear.palace);
                 $('zwSummary').innerHTML = chips.map(function (s) {
@@ -98,25 +110,46 @@
                   (z.flowYear ? '<br><strong>流年四化：</strong>' + huaChips(z.flowYear.siHua) : '');
                 $('zwPalaces').innerHTML = z.palaces.map(function (p) {
                   var cls = 'ft-palace' + (p.isMing ? ' is-ming' : '') + (p.isShen ? ' is-shen' : '');
-                  var stars = p.stars.map(function (s) {
-                    return '<span class="ft-star' + (MAJOR[s] ? ' major' : '') + '">' + esc(s) + '</span>';
-                  }).join('') || '<span class="text-muted">—</span>';
+                  var stars = p.starDetail.map(function (s) {
+                    var tier = s.tier === 'major' ? ' major' : (s.tier === 'sha' ? ' sha' : '');
+                    return '<span class="ft-star' + tier + '" title="' + esc(s.note) + '">' + esc(s.name) +
+                      (s.brightness ? '<span class="ft-br-bright">' + esc(s.brightness) + '</span>' : '') + '</span>';
+                  }).join('') || '<span class="text-muted">空宫</span>';
                   return '<div class="' + cls + '"><div class="ft-palace-head"><span class="ft-palace-name">' + esc(p.name) +
-                    '</span><span class="ft-palace-gz">' + esc(p.ganzhi) + '</span></div><div class="ft-palace-stars">' + stars + '</div></div>';
+                    '</span><span class="ft-palace-gz">' + esc(p.ganzhi) + '</span></div><div class="ft-palace-stars">' + stars + '</div>' +
+                    '<div class="ft-palace-head mt-1"><span>' + esc(p.changSheng || '') + '</span><span>' + esc(p.boshi || '') + '</span></div></div>';
                 }).join('');
+                $('zwGeju').innerHTML = (z.geju && z.geju.length)
+                  ? '<div class="ft-kv-grid">' + z.geju.map(function (g) { return kv(g.name, g.text); }).join('') + '</div>'
+                  : '<p class="text-sm text-muted">未成杀破狼、机月同梁等常见结构，命宫为单主星配置。</p>';
+                $('zwDaxian').innerHTML = '<table class="ft-ref-table"><thead><tr><th>大限</th><th>年龄</th><th>宫位</th><th>干支</th><th>主星</th></tr></thead><tbody>' +
+                  z.daxian.items.map(function (d) {
+                    var cur = z.daxian.current && d.order === z.daxian.current.order;
+                    return '<tr' + (cur ? ' class="is-active"' : '') + '><td>第' + d.order + '限</td><td>' + d.from + '–' + d.to +
+                      ' 岁</td><td>' + esc(d.palace) + '</td><td>' + esc(d.ganzhi) + '</td><td>' +
+                      (d.stars.length ? esc(d.stars.join('、')) : '<span class="text-muted">无主星</span>') + '</td></tr>';
+                  }).join('') + '</tbody></table>' +
+                  '<p class="text-sm text-muted mt-2">大限' + esc(z.daxian.direction) + '，' + z.ju + ' 岁起限' +
+                  (z.daxian.current ? '；当前正行' + z.daxian.current.palace + '（' + z.daxian.current.from + '–' + z.daxian.current.to + ' 岁）' : '；当前年龄已出十二限范围') + '。</p>';
                 $('zwCore').innerHTML = z.corePalaces.map(function (p) {
                   return kv(p.palace, p.stars.filter(function (s) { return MAJOR[s]; }).join('、') || '辅星');
                 }).join('');
-                $('zwStarNotes').innerHTML = z.starNotes.slice(0, 12).map(function (n) {
-                  return kv(n.name + ' · ' + n.palace, n.note);
-                }).join('');
+                var TIER_NAME = { major: '主星', fu: '辅曜', sha: '煞曜', huaster: '杂曜' };
+                $('zwStarNotes').innerHTML = '<table class="ft-ref-table"><thead><tr><th>星曜</th><th>等级</th><th>宫位</th><th>亮度</th><th>释义</th></tr></thead><tbody>' +
+                  z.starNotes.map(function (n) {
+                    return '<tr><td>' + esc(n.name) + '</td><td>' + esc(TIER_NAME[n.tier] || n.tier) + '</td><td>' + esc(n.palace) +
+                      '</td><td>' + (n.brightness ? esc(n.brightness) : '<span class="text-muted">—</span>') +
+                      '</td><td class="text-sm">' + esc(n.note) + '</td></tr>';
+                  }).join('') + '</tbody></table>';
                 $('zwHuaNotes').innerHTML = z.siHuaNotes.map(function (h) {
                   return kv(h.star + ' · ' + h.type, h.note + (h.palace ? '（' + h.palace + '）' : ''));
                 }).join('');
-                $('zwGuide').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>干支</th><th>关注领域</th><th>宫内星曜</th></tr></thead><tbody>' +
+                $('zwGuide').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>干支</th><th>关注领域</th><th>宫内星曜</th><th>长生/博士</th><th>宫干飞四化</th></tr></thead><tbody>' +
                   z.palaceGuide.map(function (p) {
                     return '<tr><td>' + esc(p.name) + '</td><td>' + esc(p.ganzhi) + '</td><td>' + esc(p.role) +
-                      '</td><td>' + (p.stars.length ? esc(p.stars.join('、')) : '<span class="text-muted">空宫</span>') + '</td></tr>';
+                      '</td><td>' + (p.stars.length ? esc(p.stars.join('、')) : '<span class="text-muted">空宫</span>') +
+                      '</td><td>' + esc((p.changSheng || '—') + ' / ' + (p.boshi || '—')) +
+                      '</td><td class="text-sm">' + (p.fly.length ? esc(p.fly.join('；')) : '—') + '</td></tr>';
                   }).join('') + '</tbody></table>';
                 $('zwReading').innerHTML = z.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('zwResult').hidden = false;
@@ -134,6 +167,6 @@
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>农历闰月怎么处理？</summary><p>本地农历表会标出闰月，排盘按实际农历月序进行；极少数闰月生日的流派口径不同，请以你采用的资料复核。</p></details>
           <details><summary>为什么命宫和身宫有时在同一格？</summary><p>命宫逆数时辰、身宫顺数时辰，子时或特定月令下可能重合，属正常情况。</p></details>
-          <details><summary>十四主星够用吗？</summary><p>本页只排十四主星与四颗常用辅星，完整命盘还包含四化、煞曜与流曜，属于更进阶的范围。</p></details>
+          <details><summary>煞曜也排吗？</summary><p>本页排十四主星＋昌曲辅弼四辅＋禄存羊陀火铃地空地劫六煞及鸾喜马刑等杂曜，并标庙旺亮度与大限；未排天魁钺与流曜、大小限，属可复核的简化盘。</p></details>
           <details><summary>隐私如何保障？</summary><p>生日、时辰与可选流年仅用于本次中台测算并在服务端留痕，便于审计与复核；浏览器端不再保存这些输入，页面也不写入本地存储。</p></details>
         </section>

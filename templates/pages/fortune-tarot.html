@@ -1,6 +1,6 @@
         <section class="page-heading">
-          <h1>塔罗占卜 · 大阿尔卡那牌阵</h1>
-          <p>点选问题方向即可抽牌，无需输入文字。中台抽取大阿尔卡那牌，支持单张与三张牌阵，并给出关键词、行动提示和整体解读。结果留痕可复核；无科学依据，仅供娱乐与自我反思。</p>
+          <h1>塔罗占卜 · 完整 78 张牌阵</h1>
+          <p>点选问题方向即可抽牌，无需输入文字。中台从完整 78 张牌（22 大阿尔卡那＋56 小阿尔卡那四花色）中抽牌，支持单张与三张牌阵，每张牌附元素、星象对应、核心牌义与行动提示。结果留痕可复核；无科学依据，仅供娱乐与自我反思。</p>
         </section>
 
         <form class="card" id="trForm">
@@ -34,7 +34,7 @@
           <ul class="ft-note-list" id="trGuide"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>牌组为 22 张大阿尔卡那，中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>牌组为完整 78 张：22 张大阿尔卡那＋56 张小阿尔卡那（权杖／圣杯／宝剑／星币各 14 张），每张牌附金色黎明体系的行星与星座对应。中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
 
         <script>
         (function () {
@@ -90,13 +90,15 @@
                     '<span class="ft-tarot-keywords">' + c.keywords.map(function (k) {
                       return '<span class="ft-tag">' + esc(k) + '</span>';
                     }).join(' ') + '</span>' +
-                    '<span class="ft-tarot-advice">' + esc(c.advice) + '</span></div>';
+                    '<span class="ft-tag">' + esc(c.major ? '大阿尔卡那' : c.suit) + ' · ' + esc(c.element) + '象</span>' +
+                    (c.astro ? '<span class="ft-tag">' + esc(c.astro) + '</span>' : '') +
+                    '<span class="ft-tarot-advice">' + esc(c.core) + '<br>' + esc(c.advice) + '</span></div>';
                 }).join('');
                 $('trReading').textContent = d.reading;
                 $('trReadingList').innerHTML = d.readingList.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('trActions').innerHTML = d.actionSteps.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
                 $('trGuide').innerHTML = d.spreadGuide.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · ' + d.summary;
+                $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · 牌池 ' + d.deckSize + ' 张 · ' + d.summary;
                 $('trResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'tarot' });
               }).catch(function (err) { alert('抽牌失败：' + (err && err.message ? err.message : '请稍后重试')); });
@@ -113,7 +115,7 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>塔罗牌是一种文化性的自我反思工具。本页由中台对 22 张大阿尔卡那做可复现抽牌，给出关键词与行动提示，不对任何具体问题给出答案。</p>
+          <p>塔罗牌是一种文化性的自我反思工具。本页由中台对完整 78 张塔罗牌做可复现抽牌，附元素、星象对应与行动提示，不对任何具体问题给出答案。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与中台洗牌种子；不想填写时直接点选问题方向即可。</p></details>
           <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>

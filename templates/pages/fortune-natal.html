@@ -68,12 +68,16 @@
             <div>
               <h3>行星位置</h3>
               <table class="ft-planet-table">
-                <thead><tr><th>星体</th><th>星座</th><th>度数</th><th>宫位</th></tr></thead>
+                <thead><tr><th>星体</th><th>星座</th><th>度数</th><th>宫位</th><th>运动</th></tr></thead>
                 <tbody id="ntPlanets"></tbody>
               </table>
               <p class="text-sm text-muted mt-3" id="ntNote"></p>
             </div>
           </div>
+          <h3 class="ft-section-title">月相与逆行</h3>
+          <div id="ntSky"></div>
+          <h3 class="ft-section-title">行星守护（宫主星）</h3>
+          <div id="ntRulers"></div>
           <h3 class="ft-section-title">元素与模态分布</h3>
           <div id="ntDist"></div>
           <h3 class="ft-section-title">主要相位明细</h3>
@@ -88,7 +92,7 @@
           <ul class="ft-note-list" id="ntReading"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由格林尼治恒星时推算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由格林尼治恒星时推算；逆行由相邻时刻黄经差（日速度为负）判定，月相按日月黄经差计算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
 
         <script>
         (function () {
@@ -164,8 +168,17 @@
                 $('ntWheel').innerHTML = drawWheel(n);
                 $('ntPlanets').innerHTML = n.planets.map(function (p) {
                   return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
-                    '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td></tr>';
+                    '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td><td>' +
+                    (p.retrograde ? '<strong>℞ 逆行</strong> ' : '') + '<span class="text-muted">' + p.speed + '°/日</span></td></tr>';
                 }).join('');
+                $('ntSky').innerHTML = '<div class="ft-kv-grid">' +
+                  kv('出生日月相 · ' + n.moonPhase.name, '日月黄经差 ' + n.moonPhase.angle + '°，月面照亮约 ' + n.moonPhase.illum + '%') +
+                  kv('逆行星体（前七星）', n.retrogrades.length ? n.retrogrades.join('、') : '无，均顺行') + '</div>' +
+                  '<p class="text-sm text-muted mt-2">' + esc(n.moonPhase.sentence) + '</p>';
+                $('ntRulers').innerHTML = '<table class="ft-ref-table"><thead><tr><th>行星</th><th>守护星座（现代）</th><th>传统守护</th></tr></thead><tbody>' +
+                  n.rulers.map(function (r) {
+                    return '<tr><td>' + esc(r.planet) + '</td><td>' + esc(r.rules) + '</td><td>' + esc(r.rulesTrad || '—') + '</td></tr>';
+                  }).join('') + '</tbody></table>';
                 $('ntDist').innerHTML = '<strong>元素</strong>' + bars(n.elements) + '<div class="mt-3"><strong>模态</strong>' + bars(n.modalities) + '</div>';
                 $('ntAspects').innerHTML = n.aspectDetail.length
                   ? '<table class="ft-ref-table"><thead><tr><th>星体</th><th>相位</th><th>容差</th><th>说明</th></tr></thead><tbody>' +
@@ -183,12 +196,13 @@
                     return '<span class="ft-chip">第 ' + h + ' 宫</span>';
                   }).join(' ') : '<span class="ft-chip">无</span>');
                 $('ntNotes').innerHTML = n.planetNotes.map(function (p) {
-                  return kv(p.glyph + ' ' + p.name, p.sign + ' · 第' + p.house + '宫 · ' + p.note);
+                  return kv(p.glyph + ' ' + p.name, p.sign + ' · 第' + p.house + '宫' + (p.retrograde ? ' · ℞逆行' : '') + ' · ' + p.note);
                 }).join('');
-                $('ntHouses').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>星座</th><th>落星</th></tr></thead><tbody>' +
+                $('ntHouses').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>星座</th><th>落星</th><th>主题</th><th>宫主星</th></tr></thead><tbody>' +
                   n.houses.map(function (h) {
                     return '<tr><td>第 ' + h.house + ' 宫</td><td>' + esc(h.sign) + '</td><td>' +
-                      (h.planets.length ? esc(h.planets.join('、')) : '<span class="text-muted">空宫</span>') + '</td></tr>';
+                      (h.planets.length ? esc(h.planets.join('、')) : '<span class="text-muted">空宫</span>') +
+                      '</td><td class="text-sm">' + esc(h.topic) + '</td><td class="text-sm">' + esc(h.ruler) + '（落第' + h.rulerHouse + '宫 · ' + esc(h.rulerSign) + '）</td></tr>';
                   }).join('') + '</tbody></table>';
                 $('ntReading').innerHTML = n.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('ntNote').textContent = '天顶落在' + n.midheaven + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';

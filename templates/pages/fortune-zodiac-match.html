@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>生肖配对 · 六合三合相冲速查</h1>
-          <p>点选双方生肖即可，年份自动取最近同名年份；无需手填。中台给出干支纳音、六合三合冲害关系、相处提示与近年同生肖年份，并留痕可复核。结果只是民俗关系展示，不代表匹配度结论。</p>
+          <p>点选双方生肖即可，年份自动取最近同名年份；无需手填。中台按地支六合三合冲刑害破、天干合冲、纳音生克给出关系明细、爱情／朋友／合作多维分、当年太岁关系与民俗性格注解，并留痕可复核。结果只是民俗关系展示，不代表匹配度结论。</p>
         </section>
 
         <form class="card" id="zmForm">
@@ -25,6 +25,12 @@
           <div class="ft-match-pair" id="zmPair"></div>
           <div class="ft-match-score" id="zmScore"></div>
           <div id="zmBar"></div>
+          <div class="mt-2" id="zmRels"></div>
+          <h3 class="ft-section-title">多维参考分与当年太岁</h3>
+          <div id="zmDims"></div>
+          <div class="mt-3" id="zmTaiSui"></div>
+          <h3 class="ft-section-title">民俗性格</h3>
+          <div class="ft-kv-grid" id="zmFolk"></div>
           <p class="text-sm text-muted mt-3" id="zmDesc"></p>
           <h3 class="ft-section-title">相处提示</h3>
           <div class="ft-tip-list" id="zmTips"></div>
@@ -48,7 +54,7 @@
           </table>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台按农历年地支取象，用年份干支与纳音五行换算，未细化到立春或春节当天。分数是对上述传统关系的量化展示，不是匹配度测算，也不具备预测意义。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div>中台按农历年地支取生肖，关系判定覆盖六合、三合、相冲、三刑（含无恩/恃势/无礼/自刑分类）、相害、相破，另参天干五合相冲与纳音五行生克；多维分是在同一关系底分上按不同领域的权重微调得出，当年太岁关系按流年地支查询。分数与年份自动取最近同名生肖年，未细化到立春当天。</div></div>
 
         <script>
         (function () {
@@ -88,9 +94,21 @@
                   '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aGanzhi) + ' · ' + esc(r.elements.split(' / ')[0]) + '</span></div>' +
                   '<div class="ft-match-vs">×</div>' +
                   '<div class="ft-match-side"><span class="text-sm text-muted">' + b + '</span><strong>' + esc(r.b) + '</strong><span class="text-sm text-muted">' + esc(r.bGanzhi) + ' · ' + esc(r.elements.split(' / ')[1]) + '</span></div>';
-                $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.relation) + '（' + esc(r.scoreLabel) + '）</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
+                $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.relation) + '（' + esc(r.scoreLabel) + '）</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel) + ' · ' + esc(r.ganRel);
                 $('zmBar').innerHTML = '<span class="ft-bar" style="display:block;max-width:420px"><i style="width:' + r.score + '%"></i></span>' +
                   '<span class="text-sm text-muted">' + esc(r.elementNote) + '</span>';
+                $('zmRels').innerHTML = (r.rels && r.rels.length)
+                  ? '<span class="text-sm text-muted">全部地支关系：</span>' + r.rels.map(function (x) {
+                      return '<span class="ft-tag">' + esc(x) + '</span>'; }).join(' ')
+                  : '<span class="text-sm text-muted">两地支间无额外刑冲合害破关系。</span>';
+                var DIMS = [ [ '爱情', r.dims.love ], [ '朋友', r.dims.friend ], [ '合作', r.dims.work ] ];
+                $('zmDims').innerHTML = '<div class="ft-kv-grid">' + DIMS.map(function (x) {
+                  return '<div class="ft-kv"><span>' + x[0] + ' <b>' + x[1] + '</b>/100</span><strong><span class="ft-bar" style="width:100px;display:inline-block;vertical-align:middle"><i style="width:' + x[1] + '%"></i></span></strong></div>';
+                }).join('') + '</div>';
+                $('zmTaiSui').innerHTML = '<div class="ft-kv-grid">' +
+                  kv(r.taiSui.year + ' 年太岁在' + r.taiSui.animal, r.a + '：' + r.taiSui.a + ' · ' + r.b + '：' + r.taiSui.b) + '</div>' +
+                  '<p class="text-sm text-muted mt-1">值／冲／害／刑太岁为民俗说法，仅作展示，不作任何建议。</p>';
+                $('zmFolk').innerHTML = kv(r.a + '（' + esc(r.aGanzhi) + '）', r.folk.a) + kv(r.b + '（' + esc(r.bGanzhi) + '）', r.folk.b);
                 $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
                 $('zmTips').innerHTML = r.tips.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
                 $('zmInsights').innerHTML = r.insights.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
