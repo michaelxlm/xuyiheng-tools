@@ -117,6 +117,17 @@ async function run() {
   const merged = [ ...map.values() ].sort((a, b) => b.code.localeCompare(a.code));
   const latest = merged[0] ? merged[0].date : '';
 
+  // 新鲜度守卫：快照比本次任一源更新时给显式告警（合并仍保留更新期，不静默回退）
+  const seedLatest = seed.draws.reduce((m, d) => (d.code > m ? d.code : m), '');
+  const freshLatest = fresh.draws.reduce((m, d) => (d.code > m ? d.code : m), '');
+  if (seedLatest && freshLatest && seedLatest > freshLatest) {
+    console.warn(`  [collect-ssq] 注意：本地快照最新 ${seedLatest} 新于数据源 ${freshLatest}，将保留快照新期`);
+  }
+  if (latest) {
+    const days = Math.floor((Date.now() - Date.parse(`${latest}T00:00:00`)) / 86400000);
+    if (days > 7) console.warn(`  [collect-ssq] 注意：最新开奖距今 ${days} 天，可能源站尚未更新或采集任务失败`);
+  }
+
   fs.writeFileSync(OUT, JSON.stringify({ updated_at: latest, total: merged.length, draws: merged }));
   const kb = (fs.statSync(OUT).size / 1024).toFixed(1);
   console.log(`  写入 data/ssq-draws.json：${merged.length} 期（最新 ${latest}），${kb} KB`);

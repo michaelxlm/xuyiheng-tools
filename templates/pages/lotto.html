@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>双色球走势分析与智能选号</h1>
-          <p>双色球号码工具：一键随机机选、基于近十年开奖历史的号码热度与遗漏统计、以及加权随机的智能选号（娱乐）。红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个。所有计算均在浏览器本地完成，仅供娱乐参考，理性购彩。</p>
+          <p>双色球号码工具：一键随机机选、基于近十年开奖历史的号码热度与遗漏统计、贴近真实开奖形态分布的仿真选号（娱乐），以及热冷加权等偏好策略。红球从 01–33 选 6 个（不重复），蓝球从 01–16 选 1 个。所有计算均在浏览器本地完成，仅供娱乐参考，理性购彩。</p>
         </section>
 
         <div class="lt-tabs" role="tablist" aria-label="双色球工具">
@@ -99,16 +99,17 @@
 
         <!-- ===== Tab 3：智能选号（娱乐） ===== -->
         <div class="lt-panel" role="tabpanel" id="panel-ai" aria-labelledby="tab-ai" tabindex="0" hidden>
-          <div class="lt-warn">⚠️ 智能选号基于历史频率与遗漏的加权随机采样，属于统计娱乐玩法。开奖为独立随机事件，<strong>任何算法都无法提高选中机会，也不能保证任何结果</strong>，生成号码仅供娱乐。</div>
+          <div class="lt-warn">⚠️ 默认「仿真贴合」按真实开奖的随机过程均匀采样，使生成号码的<strong>形态分布</strong>更接近历史；热冷/均衡等加权策略仅改变号码偏好，会偏离真实分布。开奖为独立随机事件，<strong>任何算法都无法提高选中机会，也不能保证任何结果</strong>，生成号码仅供娱乐。</div>
           <form class="card" id="ltAiForm">
             <div class="field-grid">
               <div class="form-group">
                 <label class="form-label" for="lt-ai-strategy">选号策略</label>
                 <select class="form-input" id="lt-ai-strategy">
-                  <option value="hot">热号偏好（近期高频号码权重更大）</option>
-                  <option value="cold">冷号偏好（长期未出号码权重更大）</option>
-                  <option value="balanced" selected>均衡（频率与遗漏加权平衡）</option>
-                  <option value="prize">奖级概率加权（按历史三区密度倾斜）</option>
+                  <option value="sim" selected>仿真贴合（贴近真实开奖形态分布，推荐）</option>
+                  <option value="balanced">均衡（频率+遗漏加权，娱乐偏好）</option>
+                  <option value="hot">热号偏好（近期高频，娱乐偏好）</option>
+                  <option value="cold">冷号偏好（长期未出，娱乐偏好）</option>
+                  <option value="prize">奖级概率加权（三区密度倾斜，娱乐偏好）</option>
                 </select>
               </div>
               <div class="form-group">
@@ -134,6 +135,11 @@
             <div id="lt-ai-tickets"></div>
             <div class="btn-row lt-copy-row"><label class="form-label" for="lt-ai-copy-format">复制格式</label><select class="form-input lt-copy-format" id="lt-ai-copy-format"><option value="plain">纯号码（空格 + | 分隔）</option><option value="indexed">带注号</option><option value="comma">逗号分隔</option></select><button class="btn btn-secondary" type="button" id="lt-ai-copy">复制全部号码</button><span class="lt-copy-hint" id="lt-ai-copy-hint" role="status" aria-live="polite"></span></div>
           </div>
+          <div class="card" id="lt-ai-fidelity-card" hidden>
+            <h2 class="lt-h2">形态贴合度（与真实开奖分布的距离）</h2>
+            <p class="lt-note">用当前策略与参数模拟 2000 注，与全部历史开奖的九项形态特征分布做总变差距离（TV）比较：<strong>数值越小越贴近真实开奖形态，0 为完全一致</strong>。有限样本本身存在波动，2000 注样本下纯随机基准通常约 0.03–0.04。该指标只衡量「号码长得像不像历史」，<strong>不代表中奖概率更高</strong>。</p>
+            <div id="lt-ai-fidelity"></div>
+          </div>
           <div class="card" id="lt-dantuo-card" hidden>
             <h2 class="lt-h2">胆拖参考（统计排序模板）</h2>
             <p class="lt-note">按所选范围的频率与遗漏排序生成的缩号「模板」，仅供快速参考，<strong>不构成推荐号码，也不改变任何真实中奖概率</strong>。</p>
@@ -143,10 +149,10 @@
 
         <!-- ===== Tab 4：回测验证 ===== -->
         <div class="lt-panel" role="tabpanel" id="panel-bt" aria-labelledby="tab-bt" tabindex="0" hidden>
-          <div class="lt-warn">⚠️ 回测以「用过去若干期训练、逐期推算下一期」的方式，把智能选号与纯随机机选放在同一条件下比较，并给出均值差与 95% 置信区间。结论以本次实测数据为准，不预设结果；<strong>开奖为独立随机事件，算法不能提高选中机会</strong>，此模块仅用于理解统计原理。</div>
+          <div class="lt-warn">⚠️ 回测以「用过去若干期训练、逐期推算下一期」的方式，把被检验策略与纯随机机选放在同一条件下比较，给出均值差与 95% 置信区间，并新增「形态贴合度 TV」衡量生成号码与真实开奖的形态距离。结论以本次实测数据为准，不预设结果；<strong>开奖为独立随机事件，算法不能提高选中机会，形态更像也不等于更容易中奖</strong>，此模块仅用于理解统计原理。</div>
           <form class="card" id="ltBtForm">
             <div class="field-grid">
-              <div class="form-group"><label class="form-label" for="lt-bt-strategy">被检验策略</label><select class="form-input" id="lt-bt-strategy"><option value="balanced" selected>均衡</option><option value="hot">热号偏好</option><option value="cold">冷号偏好</option><option value="prize">奖级概率加权</option></select></div>
+              <div class="form-group"><label class="form-label" for="lt-bt-strategy">被检验策略</label><select class="form-input" id="lt-bt-strategy"><option value="sim" selected>仿真贴合</option><option value="balanced">均衡</option><option value="hot">热号偏好</option><option value="cold">冷号偏好</option><option value="prize">奖级概率加权</option></select></div>
               <div class="form-group"><label class="form-label" for="lt-bt-window">训练窗期数</label><div class="input-with-unit"><input class="form-input" id="lt-bt-window" type="number" inputmode="numeric" min="30" max="1000" value="100"><span class="unit-tag">期</span></div></div>
               <div class="form-group"><label class="form-label" for="lt-bt-test">回溯测试期数</label><div class="input-with-unit"><input class="form-input" id="lt-bt-test" type="number" inputmode="numeric" min="50" max="1000" value="200"><span class="unit-tag">期</span></div></div>
               <div class="form-group"><label class="form-label" for="lt-bt-alpha">权重平滑 <span id="lt-bt-alpha-val">0.50</span></label><input class="form-range" id="lt-bt-alpha" type="range" min="0" max="100" value="50" aria-describedby="lt-bt-alpha-help"><small id="lt-bt-alpha-help" class="lt-note">与「智能选号」的权重平滑一致，确保回测检验的是当前实际使用的参数。</small></div>
@@ -295,6 +301,7 @@
         (function () {
           'use strict';
           var DATA_URL = '/data/ssq-draws.json';
+          var API_URL = 'https://api.xuyiheng.com/api/v1/front/lottery/ssq-draws';
           var STATE = { draws: null, ready: false, win: 100 };
 
           function pad(x) { x = Number(x); return (x < 10 ? '0' : '') + x; }
@@ -309,6 +316,38 @@
               .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(function (j) { if (timer) clearTimeout(timer); return j; })
               .catch(function (e) { if (timer) clearTimeout(timer); throw e; });
+          }
+          /* 静态快照随构建更新，可能比开奖日晚几天。首屏先用同源 JSON 立即渲染，
+             再静默补拉下发接口的最新 20 期；接口不可达时保持快照不变，绝不阻断页面。 */
+          function refreshDrawsFromApi(local) {
+            var latest = local.length ? local[0].code : '';
+            var ctrl = ('AbortController' in window) ? new AbortController() : null;
+            var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 3000) : null;
+            return fetch(API_URL + '?limit=20', ctrl ? { signal: ctrl.signal, cache: 'no-cache' } : { cache: 'no-cache' })
+              .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+              .then(function (j) {
+                if (timer) clearTimeout(timer);
+                var res = (j && j.data) ? j.data : j;
+                var fresh = sanitizeDraws((res && res.draws) || []);
+                if (!fresh.length || fresh[0].code <= latest) return null;
+                var map = {};
+                local.forEach(function (d) { map[d.code] = d; });
+                fresh.forEach(function (d) { map[d.code] = d; });
+                return Object.keys(map).map(function (k) { return map[k]; })
+                  .sort(function (a, b) { return b.code.localeCompare(a.code); });
+              })
+              .catch(function () { if (timer) clearTimeout(timer); return null; });
+          }
+          function staleDays() {
+            var d = STATE.draws && STATE.draws[0];
+            if (!d || !d.date) return -1;
+            var t = Date.parse(d.date + 'T00:00:00');
+            return isNaN(t) ? -1 : Math.max(0, Math.floor((Date.now() - t) / 86400000));
+          }
+          function freshnessText() {
+            var d = STATE.draws && STATE.draws[0], days = staleDays();
+            if (!d || days < 0) return '';
+            return '第 ' + d.code + ' 期 ' + d.date + ' · 距今 ' + days + ' 天' + (days > 7 ? '，数据可能滞后' : '');
           }
 
           /* 输入洁净化：逐条硬校验并按期号降序去重，脏记录不进入任何统计算子。
@@ -500,7 +539,7 @@
             renderOmit($('lt-blue-omit'), omissionOf(getBlue, 16, list), 16, 'blue');
             renderFeatures($('lt-features'));
             renderTrends();
-            $('lt-ana-src').textContent = '样本 ' + total + ' 期（最新 ' + (STATE.draws[0] ? STATE.draws[0].code : '') + '）';
+            $('lt-ana-src').textContent = '样本 ' + total + ' 期 · ' + freshnessText();
           }
 
           /* ---------- 走势图（逐期矩阵，与统计范围联动）---------- */
@@ -649,8 +688,14 @@
             return out;
           }
           function weightsFor(maxN, freqArr, omissArr, strategy, alpha, aff) {
-            var fN = normalize(freqArr, maxN), oN = normalize(omissArr, maxN), w = [];
-            for (var i = 1; i <= maxN; i++) {
+            var fN = normalize(freqArr, maxN), oN = normalize(omissArr, maxN), w = [], i;
+            // 仿真贴合：真实开奖对每个号码等概率，均匀权重才是「贴近真实分布」的唯一无偏解；
+            // 热号/冷号/奖级加权都会把边际分布推离真实，只作为娱乐偏好保留。
+            if (strategy === 'sim') {
+              for (i = 1; i <= maxN; i++) w[i] = 1;
+              return { w: w, fN: fN, oN: oN };
+            }
+            for (i = 1; i <= maxN; i++) {
               var raw;
               if (strategy === 'hot') raw = (1 - alpha) * fN[i] + alpha * 0.5;
               else if (strategy === 'cold') raw = (1 - alpha) * oN[i] + alpha * 0.5;
@@ -681,7 +726,32 @@
             for (var t = 0; t < k; t++) { var c = Math.min(pool.length - 1, Math.floor(rnd() * pool.length)); out.push(pool[c]); pool.splice(c, 1); }
             return out;
           }
+          // 统一票据采样器：智能选号、贴合度测量、回测三处共用同一算子，杜绝「回测检验的并非线上算法」。
+          // sim：纯均匀采样，不施加形态门槛（真实开奖本身就不存在人为的和值/奇偶限制）。
+          function pickTicket(P, rnd) {
+            if (P.strategy === 'sim') {
+              return { reds: uniformPick(33, 6, rnd), blue: 1 + Math.floor(rnd() * 16), shaped: true };
+            }
+            var reds = [], tries = 0, shaped = false;
+            do {
+              reds = weightedPick(P.wR, 33, 6, rnd).map(function (o) { return o.n; });
+              tries++; shaped = !P.gate || shapeOk(reds, P.gate);
+            } while (!shaped && tries < 24);
+            return { reds: reds, blue: weightedPick(P.wB, 16, 1, rnd)[0].n, shaped: shaped };
+          }
+          function buildPicker(list, strategy, alpha) {
+            var fr = freqOf(list), omR = omissionOf(getReds, 33, list), omB = omissionOf(getBlue, 16, list);
+            var affR = (strategy === 'prize') ? prizeAffinity(list, 33) : null;
+            var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
+            var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha, null);
+            return {
+              strategy: strategy, wR: wr.w, wB: wb.w, fN: wr.fN, oN: wr.oN,
+              omR: omR.cur, omB: omB.cur, affR: affR, win: list.length,
+              gate: (strategy === 'sim') ? null : computeShapeGate(list)
+            };
+          }
           function reasonLabel(n, fN, oN, curOmit, win, strategy, aff) {
+            if (strategy === 'sim') return pad(n) + '=均匀采样·贴合真实开奖过程';
             if (strategy === 'prize' && aff && aff[n] > 1.02) return pad(n) + '=奖级概率加权·高密度三区';
             if (fN[n] >= 0.85) return pad(n) + '=近' + win + '期高频';
             if (oN[n] >= 0.85) return pad(n) + '=遗漏' + curOmit + '期偏长';
@@ -695,35 +765,33 @@
             var alpha = (parseInt($('lt-ai-alpha').value, 10) || 0) / 100;
             var count = Math.floor((U && U.numInput && U.numInput($('lt-ai-count'))) || 1); if (count < 1) count = 1; if (count > 20) count = 20;
             var list = (STATE.draws.length > win) ? STATE.draws.slice(0, win) : STATE.draws;
-            var fr = freqOf(list);
-            var omR = omissionOf(getReds, 33, list), omB = omissionOf(getBlue, 16, list);
-            var affR = (strategy === 'prize') ? prizeAffinity(list, 33) : null;
-            var wr = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
-            var wb = weightsFor(16, fr.b, omB.cur, strategy, alpha, (strategy === 'prize') ? prizeAffinity(list, 16) : null);
-            var gate = computeShapeGate(list);
+            var P = buildPicker(list, strategy, alpha);
             var html = '', used = {}, picks = [];
             for (var t = 0; t < count; t++) {
-              var pickedR, pickedB, key, shapeFit = false, fresh = false, tries = 0;
+              var pickedR, pickedB, key, shaped = false, fresh = false, tries = 0;
               do {
-                pickedR = weightedPick(wr.w, 33, 6).map(function (o) { return o.n; }).sort(function (a, b) { return a - b; });
-                pickedB = weightedPick(wb.w, 16, 1)[0].n;
+                var ticket = pickTicket(P, Math.random);
+                pickedR = ticket.reds.slice().sort(function (a, b) { return a - b; });
+                pickedB = ticket.blue;
                 key = pickedR.join(',') + '|' + pickedB;
-                shapeFit = shapeOk(pickedR, gate);
+                shaped = ticket.shaped;
                 fresh = !used[key]; // 生成注去重，避免重复出票
                 tries++;
-              } while ((!shapeFit || !fresh) && tries < 24);
+              } while ((!shaped || !fresh) && tries < 24);
               used[key] = 1;
               var balls = pickedR.map(function (n) { return '<span class="ball ball-red">' + pad(n) + '</span>'; }).join('');
               balls += '<span class="ball ball-blue">' + pad(pickedB) + '</span>';
-              var reasons = pickedR.map(function (n) { return '<span class="reason">' + esc(reasonLabel(n, wr.fN, wr.oN, omR.cur[n], win, strategy, affR)) + '</span>'; }).join('');
-              reasons += '<span class="reason">' + esc(reasonLabel(pickedB, wb.fN, wb.oN, omB.cur[pickedB], win, strategy, null)) + ' (蓝)</span>';
-              reasons += '<span class="reason">' + (shapeFit && fresh ? '形态贴合历史分布' : '形态/去重放宽（多次重采未果）') + '</span>';
+              var reasons = pickedR.map(function (n) { return '<span class="reason">' + esc(reasonLabel(n, P.fN, P.oN, P.omR[n], win, strategy, P.affR)) + '</span>'; }).join('');
+              reasons += '<span class="reason">' + esc(reasonLabel(pickedB, P.fN, P.oN, P.omB[pickedB], win, strategy, null)) + ' (蓝)</span>';
+              reasons += '<span class="reason">' + (strategy === 'sim' ? '均匀分布·未施加形态偏置' : (shaped && fresh ? '形态贴合历史分布' : '形态/去重放宽（多次重采未果）')) + '</span>';
               html += '<div class="ticket"><span class="ticket-idx">第 ' + (t + 1) + ' 注</span>' + balls + '<div class="ticket-reasons">' + reasons + '</div></div>';
               picks.push({ reds: pickedR.slice(), blue: pickedB });
             }
             LAST_AI = picks;
             $('lt-ai-tickets').innerHTML = html;
             $('lt-ai-result').hidden = false;
+            renderFidelity(P);
+            $('lt-ai-fidelity-card').hidden = false;
             renderDanTuo($('lt-ai-dantuo'), list);
             $('lt-dantuo-card').hidden = false;
             if (U) U.track('calc_result', { tool: 'lotto-ai', strategy: strategy, count: count });
@@ -748,6 +816,72 @@
             if (s.odd === 0 || s.odd === 6) return false;
             if (s.zone.indexOf(6) !== -1) return false;
             return true;
+          }
+
+          /* ---------- 形态贴合度：9 项特征分布的总变差距离（TV）----------
+             只回答「生成号码长得像不像真实开奖」，与中奖概率无关。
+             TV = 0.5·Σ|pGen − pReal|，0 为分布完全一致；越小越贴近。 */
+          var FID_KEYS = [ 'odd', 'big', 'zone', 'road', 'consec', 'sumBin', 'spanBin', 'acBin', 'prime' ];
+          var FID_NAMES = { odd: '奇数个数', big: '大号个数', zone: '三区比', road: '012 路', consec: '连号', sumBin: '和值区间', spanBin: '跨度区间', acBin: 'AC 区间', prime: '质数个数' };
+          var PRIMES = { 2:1, 3:1, 5:1, 7:1, 11:1, 13:1, 17:1, 19:1, 23:1, 29:1, 31:1 };
+          function featureVec(nums) {
+            var sum = 0, odd = 0, big = 0, z = [ 0, 0, 0 ], road = [ 0, 0, 0 ], primeN = 0, i, n;
+            for (i = 0; i < nums.length; i++) {
+              n = +nums[i]; sum += n; if (n % 2) odd++; if (n >= 17) big++;
+              z[n <= 11 ? 0 : (n <= 22 ? 1 : 2)]++; road[n % 3]++; if (PRIMES[n]) primeN++;
+            }
+            var sorted = nums.slice().sort(function (a, b) { return a - b; });
+            var consec = 0;
+            for (i = 1; i < sorted.length; i++) if (sorted[i] - sorted[i - 1] === 1) { consec = 1; break; }
+            var diffs = {}, dc = 0, a, b, dv;
+            for (a = 0; a < sorted.length; a++) for (b = a + 1; b < sorted.length; b++) { dv = sorted[b] - sorted[a]; if (!diffs[dv]) { diffs[dv] = 1; dc++; } }
+            return {
+              odd: odd, big: big, zone: z.join(':'), road: road.join(':'), consec: consec,
+              sumBin: Math.floor((sum - 21) / 20), spanBin: Math.floor((sorted[sorted.length - 1] - sorted[0]) / 5),
+              acBin: Math.min(9, Math.floor((dc - 5) / 2)), prime: primeN
+            };
+          }
+          function blankFidModel() { var m = { n: 0 }; FID_KEYS.forEach(function (k) { m[k] = {}; }); return m; }
+          function addFidSample(model, nums) {
+            var v = featureVec(nums);
+            FID_KEYS.forEach(function (k) { model[k][v[k]] = (model[k][v[k]] || 0) + 1; });
+            model.n++;
+          }
+          function buildFidModel(list) {
+            var m = blankFidModel();
+            list.forEach(function (d) { addFidSample(m, d.reds); });
+            return m;
+          }
+          function tvOf(a, b, na, nb) {
+            if (!na || !nb) return 0;
+            var keys = {}, s = 0, k;
+            Object.keys(a).forEach(function (x) { keys[x] = 1; });
+            Object.keys(b).forEach(function (x) { keys[x] = 1; });
+            for (k in keys) s += Math.abs((a[k] || 0) / na - (b[k] || 0) / nb);
+            return s / 2;
+          }
+          function fidelityScore(gen, real) {
+            if (!gen || !real || !gen.n || !real.n) return null;
+            var out = {};
+            FID_KEYS.forEach(function (k) { out[k] = tvOf(gen[k], real[k], gen.n, real.n); });
+            out.avg = FID_KEYS.reduce(function (a, k) { return a + out[k]; }, 0) / FID_KEYS.length;
+            return out;
+          }
+          function renderFidelity(P) {
+            var el = $('lt-ai-fidelity');
+            if (!el || !STATE.draws || !STATE.draws.length) return;
+            var rnd = makeRng(hashSeed([ STATE.draws.length, STATE.draws[0].code, P.strategy, P.win ].join('|')));
+            var gen = blankFidModel(), i;
+            for (i = 0; i < 2000; i++) addFidSample(gen, pickTicket(P, rnd).reds);
+            var f = fidelityScore(gen, buildFidModel(STATE.draws));
+            if (!f) return;
+            function grade(v) { return v <= 0.035 ? '贴合' : (v <= 0.08 ? '轻微偏离' : '明显偏离'); }
+            var html = '<div class="lt-bt-row lt-bt-row4 lt-bt-head"><span>形态特征</span><span>TV 距离</span><span>基准</span><span>判定</span></div>';
+            FID_KEYS.forEach(function (k) {
+              html += '<div class="lt-bt-row lt-bt-row4"><span>' + FID_NAMES[k] + '</span><span>' + f[k].toFixed(4) + '</span><span>0 为完全一致</span><span>' + grade(f[k]) + '</span></div>';
+            });
+            html += '<div class="lt-bt-row lt-bt-row4 lt-cmp-theo"><span>综合（9 项均值）</span><span>' + f.avg.toFixed(4) + '</span><span>纯随机约 0.03–0.04</span><span>' + (f.avg <= 0.04 ? '贴近真实分布' : '已偏离真实分布（娱乐偏好）') + '</span></div>';
+            el.innerHTML = html;
           }
           function renderDanTuo(el, list) {
             if (!el) return;
@@ -795,6 +929,7 @@
               n: 0, aiSum: 0, rdSum: 0, aiSq: 0, rdSq: 0,
               aiDist: [ 0, 0, 0, 0, 0, 0, 0 ], rdDist: [ 0, 0, 0, 0, 0, 0, 0 ],
               aiBlue: 0, rdBlue: 0, aiHit: 0, rdHit: 0, aiHit5: 0, rdHit5: 0, aiAny: 0, rdAny: 0,
+              aiFid: blankFidModel(), rdFid: blankFidModel(), realFid: blankFidModel(),
               done: false, periods: 0
             };
           }
@@ -805,22 +940,12 @@
               var train = STATE.draws.slice(acc.i + 1, acc.i + 1 + acc.W);
               if (train.length < 20) { acc.done = true; break; }
               var target = STATE.draws[acc.i];
-              var fr = freqOf(train);
-              var omR = omissionOf(getReds, 33, train), omB = omissionOf(getBlue, 16, train);
-              var affR = (acc.strategy === 'prize') ? prizeAffinity(train, 33) : null;
-              var wR = weightsFor(33, fr.r, omR.cur, acc.strategy, acc.alpha, affR);
-              var wB = weightsFor(16, fr.b, omB.cur, acc.strategy, acc.alpha, null);
-              var gate = computeShapeGate(train);
+              var P = buildPicker(train, acc.strategy, acc.alpha); // 训练窗内建模，无未来数据泄漏
               var tSet = {}; target.reds.forEach(function (x) { tSet[+x] = 1; });
               var tB = +target.blue, k;
               for (k = 0; k < acc.R; k++) {
-                // 加权组：完整复现线上 ≤12 次形态约束重采
-                var ar, tries = 0;
-                do {
-                  ar = weightedPick(wR.w, 33, 6, acc.rndA).map(function (o) { return o.n; });
-                  tries++;
-                } while (!shapeOk(ar, gate) && tries < 12);
-                var ab = weightedPick(wB.w, 16, 1, acc.rndA)[0].n;
+                // 被检组：直接调用线上同一 pickTicket（含 ≤24 次形态重采），不再另写简化版
+                var tk = pickTicket(P, acc.rndA), ar = tk.reds, ab = tk.blue;
                 var ah = ar.filter(function (n) { return tSet[n]; }).length;
                 acc.aiSum += ah; acc.aiSq += ah * ah; acc.aiDist[ah]++; if (ab === tB) acc.aiBlue++;
                 if (ah >= 3) acc.aiHit++; if (ah >= 5) acc.aiHit5++;
@@ -832,6 +957,7 @@
                 acc.rdSum += rh; acc.rdSq += rh * rh; acc.rdDist[rh]++; if (rb === tB) acc.rdBlue++;
                 if (rh >= 3) acc.rdHit++; if (rh >= 5) acc.rdHit5++;
                 if (prizeTier(rh, rb === tB) > 0) acc.rdAny++;
+                addFidSample(acc.aiFid, ar); addFidSample(acc.rdFid, rr); addFidSample(acc.realFid, target.reds);
                 acc.n++;
               }
               acc.periods = acc.i + 1;
@@ -847,9 +973,10 @@
             var se = Math.sqrt((vA + vR) / N) || 0; // 两组独立样本均值差的标准误
             var diff = aiAvg - rdAvg, lo = diff - 1.96 * se, hi = diff + 1.96 * se;
             var theo = theoreticalRefs();
-            return { T: acc.periods, W: acc.W, n: N, seed: acc.seed, alpha: acc.alpha,
+            return { T: acc.periods, W: acc.W, n: N, seed: acc.seed, alpha: acc.alpha, strategy: acc.strategy,
               aiAvg: aiAvg, rdAvg: rdAvg, theoAvg: theo.avg, diff: diff, se: se, ciLo: lo, ciHi: hi,
               distinguishable: lo > 0 || hi < 0,
+              aiFid: fidelityScore(acc.aiFid, acc.realFid), rdFid: fidelityScore(acc.rdFid, acc.realFid),
               aiDist: acc.aiDist, rdDist: acc.rdDist, theoDist: theo.dist,
               aiBlue: acc.aiBlue / N, rdBlue: acc.rdBlue / N, theoBlue: theo.blue,
               aiHit: acc.aiHit / N, rdHit: acc.rdHit / N, aiHit5: acc.aiHit5 / N, rdHit5: acc.rdHit5 / N,
@@ -879,29 +1006,26 @@
           // 与正式回测共用 freqOf / omissionOf / weightsFor / computeShapeGate / shapeOk / weightedPick 等算子；
           // 区别仅为：此处是固定单次切分的快速示例，正式回测是逐期滑动训练窗 + 95% 置信区间。
           function backtestOneStrategy(train, test, strategy, alpha, reps, rnd) {
-            var fr = freqOf(train);
-            var omR = omissionOf(getReds, 33, train), omB = omissionOf(getBlue, 16, train);
-            var affR = (strategy === 'prize') ? prizeAffinity(train, 33) : null;
-            var wR = weightsFor(33, fr.r, omR.cur, strategy, alpha, affR);
-            var wB = weightsFor(16, fr.b, omB.cur, strategy, alpha, null);
-            var gate = computeShapeGate(train);
+            var P = buildPicker(train, strategy === 'random' ? 'sim' : strategy, alpha);
+            var genModel = blankFidModel(), realModel = blankFidModel();
             var sum = 0, hit = 0, hit5 = 0, any = 0, n = 0, i, k;
             for (i = 0; i < test.length; i++) {
               var target = test[i];
               var tSet = {}; target.reds.forEach(function (x) { tSet[+x] = 1; });
               var tB = +target.blue;
+              addFidSample(realModel, target.reds);
               for (k = 0; k < reps; k++) {
-                var ar, ab;
-                if (strategy === 'random') { ar = uniformPick(33, 6, rnd); ab = 1 + Math.floor(rnd() * 16); }
-                else { var tries = 0; do { ar = weightedPick(wR.w, 33, 6, rnd).map(function (o) { return o.n; }); tries++; } while (!shapeOk(ar, gate) && tries < 12); ab = weightedPick(wB.w, 16, 1, rnd)[0].n; }
+                var tk = pickTicket(P, rnd), ar = tk.reds, ab = tk.blue;
                 var ah = ar.filter(function (x) { return tSet[x]; }).length;
                 sum += ah; if (ah >= 3) hit++; if (ah >= 5) hit5++;
                 if (prizeTier(ah, ab === tB) > 0) any++;
+                addFidSample(genModel, ar);
                 n++;
               }
             }
             if (!n) return null;
-            return { avg: sum / n, hit: hit / n, hit5: hit5 / n, any: any / n, n: n };
+            return { avg: sum / n, hit: hit / n, hit5: hit5 / n, any: any / n, n: n,
+              fid: fidelityScore(genModel, realModel) };
           }
           function backtestCompare() {
             var box = $('lt-bt-compare-box'), el = $('lt-bt-compare');
@@ -916,23 +1040,27 @@
             if (train.length < 20) { el.innerHTML = '<p class="lt-note">训练窗数据不足，请减小「回溯测试期数」。</p>'; box.hidden = false; return; }
             var reps = 8; // 与正式回测每期注数一致
             var seed = hashSeed('compare|' + all.length + '|' + train.length + '|' + test.length + '|' + p.alpha);
-            var defs = [{ k: 'random', name: '纯随机' }, { k: 'balanced', name: '均衡（频率+遗漏）' }, { k: 'prize', name: '奖级概率加权' }];
+            var defs = [
+              { k: 'random', name: '纯随机（基准）' }, { k: 'sim', name: '仿真贴合（均匀）' },
+              { k: 'balanced', name: '均衡（频率+遗漏）' }, { k: 'cold', name: '冷号偏好' },
+              { k: 'prize', name: '奖级概率加权' }
+            ];
             var rows = defs.map(function (s) {
               var rnd = makeRng(seed ^ (s.k.length * 2654435761));
               return { name: s.name, r: backtestOneStrategy(train, test, s.k, p.alpha, reps, rnd) };
             });
             var theo = theoreticalRefs();
             var html = '<p class="lt-note">基于全部 <strong>' + all.length + '</strong> 期开奖：训练窗 <strong>' + train.length + '</strong> 期（较旧）、测试窗 <strong>' + test.length + '</strong> 期（较新），每期 ' + reps + ' 注、每策略共 <strong>' + (test.length * reps) + '</strong> 注；权重平滑 ' + p.alpha.toFixed(2) + '，随机种子固定可复现。参数取自本页表单，<strong>不受「统计范围」分段影响</strong>。</p>';
-            html += '<div style="overflow-x:auto"><table class="lt-cmp"><thead><tr><th>策略</th><th>平均命中红球</th><th>3+ 红命中率</th><th>5+ 红命中率</th><th>任一奖级中奖率</th><th>注数</th></tr></thead><tbody>';
+            html += '<div style="overflow-x:auto"><table class="lt-cmp"><thead><tr><th>策略</th><th>平均命中红球</th><th>3+ 红命中率</th><th>5+ 红命中率</th><th>任一奖级中奖率</th><th>形态贴合度 TV↓</th><th>注数</th></tr></thead><tbody>';
             rows.forEach(function (rw) {
               if (!rw.r) return;
-              html += '<tr><td>' + esc(rw.name) + '</td><td>' + rw.r.avg.toFixed(3) + '</td><td>' + (rw.r.hit * 100).toFixed(2) + '%</td><td>' + (rw.r.hit5 * 100).toFixed(2) + '%</td><td>' + (rw.r.any * 100).toFixed(2) + '%</td><td>' + rw.r.n + '</td></tr>';
+              html += '<tr><td>' + esc(rw.name) + '</td><td>' + rw.r.avg.toFixed(3) + '</td><td>' + (rw.r.hit * 100).toFixed(2) + '%</td><td>' + (rw.r.hit5 * 100).toFixed(2) + '%</td><td>' + (rw.r.any * 100).toFixed(2) + '%</td><td>' + (rw.r.fid ? rw.r.fid.avg.toFixed(4) : '—') + '</td><td>' + rw.r.n + '</td></tr>';
             });
-            html += '<tr class="lt-cmp-theo"><td>理论期望（组合数精确）</td><td>' + theo.avg.toFixed(3) + '</td><td>' + (theo.hit * 100).toFixed(2) + '%</td><td>' + (theo.hit5 * 100).toFixed(2) + '%</td><td>' + (theo.any * 100).toFixed(2) + '%</td><td>—</td></tr>';
+            html += '<tr class="lt-cmp-theo"><td>理论期望（组合数精确）</td><td>' + theo.avg.toFixed(3) + '</td><td>' + (theo.hit * 100).toFixed(2) + '%</td><td>' + (theo.hit5 * 100).toFixed(2) + '%</td><td>' + (theo.any * 100).toFixed(2) + '%</td><td>0（准绳）</td><td>—</td></tr>';
             html += '</tbody></table></div>';
             var avgs = rows.filter(function (x) { return x.r; }).map(function (x) { return x.r.avg; });
             var spread = avgs.length ? (Math.max.apply(null, avgs) - Math.min.apply(null, avgs)) : 0;
-            html += '<p class="lt-note">本次实测三策略「平均命中红球」最大相差 <strong>' + spread.toFixed(3) + '</strong> 个，均在理论期望 ' + theo.avg.toFixed(3) + ' 附近；任一奖级中奖率也接近理论 ' + (theo.any * 100).toFixed(2) + '%。' + (spread < 0.15 ? '本样本下三者无法区分。' : '该差异属有限样本的随机波动，可调整参数或扩大期数复验。') + '结论以本次实测数据为准，不预设结果。</p>';
+            html += '<p class="lt-note">本次实测各策略「平均命中红球」最大相差 <strong>' + spread.toFixed(3) + '</strong> 个，均在理论期望 ' + theo.avg.toFixed(3) + ' 附近；任一奖级中奖率也接近理论 ' + (theo.any * 100).toFixed(2) + '%。' + (spread < 0.15 ? '本样本下各策略无法区分。' : '该差异属有限样本的随机波动，可调整参数或扩大期数复验。') + '形态贴合度 TV 则能区分策略：<strong>仿真贴合与纯随机接近，热冷加权明显偏离真实开奖形态</strong>；但形态像不像与中奖机会无关。结论以本次实测数据为准，不预设结果。</p>';
             html += '<div class="lt-warn" style="margin-top:1em">⚠️ 本示例是<strong>单次固定切分</strong>的快速对照；「运行回测」采用逐期滑动训练窗并给出均值差与 95% 置信区间，完整结论以后者为准。<strong>开奖为独立随机事件，任何选号策略都不能提高真实中奖机会</strong>，历史统计只描述过去。</div>';
             el.innerHTML = html; box.hidden = false;
           }
@@ -969,14 +1097,16 @@
             function brow(label, a, b, t) {
               return '<div class="lt-bt-row lt-bt-row4w"><span>' + label + '</span><span>' + a + '</span><span>' + b + '</span><span>' + t + '</span></div>';
             }
+            var sname = { sim: '仿真贴合', balanced: '均衡', hot: '热号偏好', cold: '冷号偏好', prize: '奖级加权' }[bt.strategy] || bt.strategy;
             $('lt-bt-table').innerHTML =
-              '<div class="lt-bt-row lt-bt-row4w lt-bt-head"><span>指标</span><span>加权策略</span><span>纯随机</span><span>理论期望</span></div>' +
+              '<div class="lt-bt-row lt-bt-row4w lt-bt-head"><span>指标</span><span>' + sname + '</span><span>纯随机</span><span>理论期望</span></div>' +
               brow('红球平均命中（个）', bt.aiAvg.toFixed(3), bt.rdAvg.toFixed(3), theo.avg.toFixed(3)) +
               brow('3+ 红命中率', pct3(bt.aiHit), pct3(bt.rdHit), pct3(theo.hit)) +
               brow('5+ 红命中率', pct3(bt.aiHit5), pct3(bt.rdHit5), pct3(theo.hit5)) +
               brow('任一奖级中奖率', pct3(bt.aiAny), pct3(bt.rdAny), pct3(theo.any)) +
-              brow('蓝球命中率', pct3(bt.aiBlue), pct3(bt.rdBlue), pct3(theo.blue));
-            var distHtml = '<div class="lt-bt-row lt-bt-row4 lt-bt-head"><span>命中红球数</span><span>加权</span><span>随机</span><span>理论</span></div>';
+              brow('蓝球命中率', pct3(bt.aiBlue), pct3(bt.rdBlue), pct3(theo.blue)) +
+              brow('形态贴合度 TV（越小越像）', bt.aiFid ? bt.aiFid.avg.toFixed(4) : '—', bt.rdFid ? bt.rdFid.avg.toFixed(4) : '—', '0');
+            var distHtml = '<div class="lt-bt-row lt-bt-row4 lt-bt-head"><span>命中红球数</span><span>' + sname + '</span><span>随机</span><span>理论</span></div>';
             for (var i = 0; i <= 6; i++) {
               var pa = bt.aiDist[i] / bt.n * 100, pr = bt.rdDist[i] / bt.n * 100, pt = theo.dist[i] * 100;
               distHtml += '<div class="lt-bt-row lt-bt-row4"><span>' + i + ' 个</span><span>' + pa.toFixed(1) + '%</span><span>' + pr.toFixed(1) + '%</span><span>' + pt.toFixed(1) + '%</span></div>';
@@ -985,9 +1115,12 @@
             // 结论由实测数据驱动，不再无条件写死「无差异」。
             var judge = bt.distinguishable
               ? '本次样本中两组均值出现统计上的差异（95% 置信区间不含 0），但这只是单一历史样本内的波动，不构成可外推的预测能力；可调整参数或扩大回溯期数复验。'
-              : '两组均值差的 95% 置信区间覆盖 0，本次样本下无法把加权策略与机选区分开。';
-            $('lt-bt-conc').innerHTML = '回溯 ' + bt.T + ' 期、每期 8 注（共 ' + bt.n + ' 注，权重平滑 ' + bt.alpha.toFixed(2) + '，复现种子 ' + bt.seed + '）：加权平均命中 <strong>' + bt.aiAvg.toFixed(3) + '</strong> 个红球，纯随机 <strong>' + bt.rdAvg.toFixed(3) + '</strong> 个，理论期望 <strong>' + theo.avg.toFixed(3) + '</strong> 个；任一奖级中奖率 加权 <strong>' + pct3(bt.aiAny) + '</strong>、随机 <strong>' + pct3(bt.rdAny) + '</strong>、理论 <strong>' + pct3(theo.any) + '</strong>；均值差 <strong>' + bt.diff.toFixed(3) + '</strong>，95% 置信区间 [' + bt.ciLo.toFixed(3) + ', ' + bt.ciHi.toFixed(3) + ']。' + judge +
-              '「理论期望」列由组合数精确推导，与上方「奖级加权对照示例」及「奖级中奖概率」表同源，恒定不变、是准绳而非目标。<strong>开奖是独立随机事件，历史统计不改变下期任何一个号码的真实机会，任何算法都无法提高选中机会。</strong>';
+              : '两组均值差的 95% 置信区间覆盖 0，本次样本下无法把该策略与机选区分开。';
+            var fidText = (bt.aiFid && bt.rdFid)
+              ? '形态贴合度 TV：' + sname + ' <strong>' + bt.aiFid.avg.toFixed(4) + '</strong>、纯随机 <strong>' + bt.rdFid.avg.toFixed(4) + '</strong>（0 为完全一致）；它只衡量「号码像不像历史开奖」，与中奖机会无关。'
+              : '';
+            $('lt-bt-conc').innerHTML = '回溯 ' + bt.T + ' 期、每期 8 注（共 ' + bt.n + ' 注，权重平滑 ' + bt.alpha.toFixed(2) + '，复现种子 ' + bt.seed + '）：' + sname + '平均命中 <strong>' + bt.aiAvg.toFixed(3) + '</strong> 个红球，纯随机 <strong>' + bt.rdAvg.toFixed(3) + '</strong> 个，理论期望 <strong>' + theo.avg.toFixed(3) + '</strong> 个；任一奖级中奖率 ' + sname + ' <strong>' + pct3(bt.aiAny) + '</strong>、随机 <strong>' + pct3(bt.rdAny) + '</strong>、理论 <strong>' + pct3(theo.any) + '</strong>；均值差 <strong>' + bt.diff.toFixed(3) + '</strong>，95% 置信区间 [' + bt.ciLo.toFixed(3) + ', ' + bt.ciHi.toFixed(3) + ']。' + judge + fidText +
+              '「理论期望」列由组合数精确推导，与上方对照示例及「奖级中奖概率」表同源，恒定不变、是准绳而非目标。<strong>由于开奖对每个组合等概率，任意一注 6 红 + 1 蓝的期望命中都是 36/33 ≈ 1.091 个红球、1/16 = 6.25% 蓝球，与选哪些号码、用哪种策略无关；历史统计不改变下期任何一个号码的真实机会，任何算法都无法提高选中机会。</strong>';
             $('lt-bt-result').hidden = false;
           }
 
@@ -1022,7 +1155,8 @@
             var balls = (d.reds || []).map(function (n) { return '<span class="ball ball-red">' + pad(n) + '</span>'; }).join('');
             balls += '<span class="ball ball-blue">' + pad(d.blue) + '</span>';
             body.innerHTML = '<div class="lt-latest-balls">' + balls + '</div>' +
-              '<div class="lt-latest-meta">第 ' + esc(d.code) + ' 期' + (d.date ? ' · ' + esc(d.date) : '') + '</div>';
+              '<div class="lt-latest-meta">第 ' + esc(d.code) + ' 期' + (d.date ? ' · ' + esc(d.date) : '') +
+              ' · 距今 ' + staleDays() + ' 天' + (staleDays() > 7 ? '，数据可能滞后' : '') + '</div>';
             var box = $('lt-latest'); if (box) box.hidden = false;
           }
 
@@ -1148,6 +1282,12 @@
               renderPrizeOdds($('lt-prize'));             // 奖级概率（组合数精确，与范围无关）
               renderLatest();                            // 顶部「最新一期」横幅
               selectTab($('tab-ana'));                   // 数据就绪后默认展示走势分析（最近一期+走势摘要）
+              // 静态快照若滞后，静默补拉下发接口的最新期并重绘（接口不可达则保持快照）
+              refreshDrawsFromApi(STATE.draws).then(function (merged) {
+                if (!merged) return;
+                STATE.draws = merged;
+                renderAnalysis(); renderLatest();
+              });
             }).catch(function () { /* 无数据：分析/智能保持隐藏 */ $('lt-ana-unavailable').hidden = false; });
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
@@ -1156,7 +1296,7 @@
 
         <section class="tool-info">
           <h2>关于双色球走势分析与智能选号</h2>
-          <p>本工具提供三部分能力：按规则随机机选；基于近十年开奖历史的号码频率、遗漏与特征分布统计；以及以历史频率与遗漏为权重的智能选号（娱乐）。历史数据与计算均在浏览器本地完成，不上传任何数据。需要明确：开奖是每一期相互独立的随机事件，历史统计不改变任何一个号码在下期的真实机会，任何算法都不能提高选中机会或保证结果，本页面全部内容仅供娱乐参考。</p>
+          <p>本工具提供三部分能力：按规则随机机选；基于近十年开奖历史的号码频率、遗漏与特征分布统计；以及智能选号（娱乐）——默认「仿真贴合」按真实开奖的随机过程均匀采样，使号码形态贴近历史分布，另保留热号/冷号/均衡等奖号偏好策略。页面用「形态贴合度 TV」量化生成号码与真实开奖的形态差距，并用回测检验命中表现。历史数据与计算均在浏览器本地完成，不上传任何数据。需要明确：开奖是每一期相互独立的随机事件，形态再像也不代表中奖机会更高，任何算法都不能提高选中机会或保证结果，本页面全部内容仅供娱乐参考。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>这个工具能提前知道开奖号码吗？</summary>
@@ -1164,11 +1304,15 @@
           </details>
           <details>
             <summary>智能选号的算法是什么？</summary>
-            <p>智能选号依据所选范围内历史开奖的出现频率与遗漏期数做加权随机采样（两者使用同一统计范围、同一权重参数），并对生成注去重，属于统计娱乐玩法；它不会改变每一期各号码真实的随机机会，生成结果仅供娱乐。可选策略包括热号偏好、冷号偏好、均衡，以及「奖级概率加权」（按历史红球更密集的三区倾斜赋权）；回测验证模块可对包括该策略在内的各策略做同一条件下的对照检验。</p>
+            <p>默认「仿真贴合」策略按真实开奖的随机过程做均匀无放回采样，不施加频率/遗漏/形态偏置，使生成号码的和值、奇偶、三区比、连号、AC 等九项形态特征分布最接近历史开奖；面板中的「形态贴合度 TV」会给出量化距离。热号、冷号、均衡与「奖级概率加权」是保留的娱乐偏好策略，会改变号码偏好并偏离真实分布。所有策略都对生成注去重，且不会改变每一期各号码真实的随机机会，生成结果仅供娱乐；回测验证模块可在同一条件下对照检验各策略。</p>
+          </details>
+          <details>
+            <summary>为什么「仿真贴合」用均匀采样，而不是热号/冷号算法？</summary>
+            <p>因为开奖对每个号码等概率：长期看每个红球出现占比都是 6/33，蓝球是 1/16。用近 100 期的频率或遗漏去加权，等于把随机波动当成规律，反而会把号码分布推离真实开奖（形态贴合度 TV 明显变大）。均匀采样是让生成号码在统计意义上「长得像真号」的无偏解；它只改善形态相似度，不改善、也无法改善中奖机会。</p>
           </details>
           <details>
             <summary>「回测验证」是做什么的？</summary>
-            <p>回测用“以过去若干期训练、逐期推算下一期”的方式，把智能选号与纯随机机选放在同一条件下比较，给出平均命中个数的差值与 95% 置信区间。首次进入「回测验证」会自动展示一份「奖级加权对照示例」：在较旧数据训练、较新数据测试的固定切分下，横向对比纯随机、均衡与奖级概率加权三种策略，并列出组合数精确的理论期望作参照；点击「运行回测」才是逐期滑动训练窗的完整检验。结论由本次实测数据决定、不预设结果；开奖是独立随机事件，任何算法都不能提高选中机会，本模块仅用于理解统计原理。</p>
+            <p>回测用“以过去若干期训练、逐期推算下一期”的方式，把被检验策略与纯随机机选放在同一条件下比较，给出平均命中个数的差值与 95% 置信区间，并对比九项形态特征的贴合度 TV。首次进入「回测验证」会自动展示一份固定切分对照示例：在较旧数据训练、较新数据测试的切分下，横向对比纯随机、仿真贴合、均衡、冷号与奖级加权策略，并列出组合数精确的理论期望作参照；点击「运行回测」才是逐期滑动训练窗的完整检验。由于开奖对每个组合等概率，任意一注的期望命中都是 36/33 ≈ 1.091 个红球，与你选哪些号码无关；结论由本次实测数据决定、不预设结果，本模块仅用于理解统计原理。</p>
           </details>
           <details>
             <summary>「遗漏」「热度」是什么意思？</summary>
@@ -1176,7 +1320,7 @@
           </details>
           <details>
             <summary>数据来源与更新频率？</summary>
-            <p>历史开奖数据来自公开渠道，随静态站构建定期更新，可能存在约一周延迟，仅供分析展示，准确开奖信息以官方公告为准。</p>
+            <p>历史开奖数据来自公开渠道，随静态站构建更新；页面首屏使用同源数据快照，随后会静默补拉公开下发接口的最新期并自动重绘（接口不可达时保留快照），页面顶部会显示当前数据距今天数。数据仅供分析展示，准确开奖信息以官方公告为准。</p>
           </details>
           <details>
             <summary>双色球的选号规则是什么？</summary>
