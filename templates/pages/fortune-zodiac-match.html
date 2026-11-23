@@ -1,21 +1,22 @@
         <section class="page-heading">
           <h1>生肖配对 · 六合三合相冲速查</h1>
-          <p>输入双方出生年份，由中台换算生肖、干支纳音五行与传统六合三合相冲相害关系。测算结果在中台留痕，可在管理端查看；结果只是民俗关系展示，不代表任何匹配度结论。</p>
+          <p>点选双方生肖即可，年份自动取最近同名年份；无需手填。中台给出干支纳音、六合三合冲害关系、相处提示与近年同生肖年份，并留痕可复核。结果只是民俗关系展示，不代表匹配度结论。</p>
         </section>
 
         <form class="card" id="zmForm">
-          <div class="ft-form-grid">
-            <div class="form-group">
-              <label class="form-label" for="zm-a">第一方出生年份</label>
-              <input class="form-input" id="zm-a" type="number" min="1900" max="2050" value="1990" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="zm-b">第二方出生年份</label>
-              <input class="form-input" id="zm-b" type="number" min="1900" max="2050" value="1992" required>
-            </div>
+          <p class="text-sm text-muted mt-0">点选即可，年份自动填为最近的同名生肖年。</p>
+          <div class="form-group">
+            <label class="form-label">第一方生肖</label>
+            <div class="ft-quick-row" id="zmA"></div>
+            <input type="hidden" id="zm-a" value="1990">
+          </div>
+          <div class="form-group mt-3">
+            <label class="form-label">第二方生肖</label>
+            <div class="ft-quick-row" id="zmB"></div>
+            <input type="hidden" id="zm-b" value="1992">
           </div>
           <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"zodiac-match"}'>查看配对</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"zodiac-match"}'>一键配对</button>
           </div>
           <p class="ft-disclaimer">民俗娱乐内容，无科学依据，关系质量取决于具体的人与相处方式。提交即表示同意中台处理本次出生年份用于测算与留痕。</p>
         </form>
@@ -23,7 +24,12 @@
         <div class="result-box" id="zmResult" hidden>
           <div class="ft-match-pair" id="zmPair"></div>
           <div class="ft-match-score" id="zmScore"></div>
+          <div id="zmBar"></div>
           <p class="text-sm text-muted mt-3" id="zmDesc"></p>
+          <h3 class="ft-section-title">相处提示</h3>
+          <div class="ft-tip-list" id="zmTips"></div>
+          <h3 class="ft-section-title">近年同生肖年份</h3>
+          <div id="zmYears"></div>
         </div>
 
         <div class="card mt-4">
@@ -48,6 +54,27 @@
             var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function buildPicker(id, inputId, defaultYear) {
+              var box = $(id);
+              box.innerHTML = F.ANIMALS.map(function (a) {
+                return '<button type="button" class="ft-quick" data-animal="' + a + '">' + a + '</button>';
+              }).join('');
+              function sync() {
+                var picked = F.ANIMALS[(Number($(inputId).value) - 4) % 12];
+                Array.prototype.forEach.call(box.children, function (b) {
+                  b.className = 'ft-quick' + (b.getAttribute('data-animal') === picked ? ' is-active' : '');
+                });
+              }
+              box.addEventListener('click', function (e) {
+                var b = e.target.closest('[data-animal]'); if (!b) return;
+                $(inputId).value = F.recentYear(b.getAttribute('data-animal'));
+                sync();
+              });
+              $(inputId).value = defaultYear;
+              sync();
+            }
+            buildPicker('zmA', 'zm-a', 1990);
+            buildPicker('zmB', 'zm-b', 1992);
             $('zmForm').addEventListener('submit', function (e) {
               e.preventDefault();
               var a = Number($('zm-a').value), b = Number($('zm-b').value);
@@ -59,8 +86,15 @@
                   '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aGanzhi) + ' · ' + esc(r.elements.split(' / ')[0]) + '</span></div>' +
                   '<div class="ft-match-vs">×</div>' +
                   '<div class="ft-match-side"><span class="text-sm text-muted">' + b + '</span><strong>' + esc(r.b) + '</strong><span class="text-sm text-muted">' + esc(r.bGanzhi) + ' · ' + esc(r.elements.split(' / ')[1]) + '</span></div>';
-                $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.relation) + '</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
+                $('zmScore').innerHTML = '传统关系：<strong>' + esc(r.relation) + '（' + esc(r.scoreLabel) + '）</strong> · 参考分 <b>' + r.score + '</b> / 100 · ' + esc(r.wxRel);
+                $('zmBar').innerHTML = '<span class="ft-bar" style="display:block;max-width:420px"><i style="width:' + r.score + '%"></i></span>' +
+                  '<span class="text-sm text-muted">' + esc(r.elementNote) + '</span>';
                 $('zmDesc').textContent = r.desc + '（参考分只对应表中的合冲规则，不是匹配度测算。）';
+                $('zmTips').innerHTML = r.tips.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
+                $('zmYears').innerHTML = '<div><span class="text-sm text-muted">' + esc(r.a) + '：' +
+                  r.yearsA.map(function (y) { return '<span class="ft-chip">' + y + '</span>'; }).join(' ') + '</div>' +
+                  '<div class="mt-2"><span class="text-sm text-muted">' + esc(r.b) + '：' +
+                  r.yearsB.map(function (y) { return '<span class="ft-chip">' + y + '</span>'; }).join(' ') + '</div>';
                 $('zmResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'zodiac-match' });
               }).catch(function (err) { alert('配对失败：' + (err && err.message ? err.message : '请稍后重试')); });

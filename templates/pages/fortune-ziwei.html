@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>紫微斗数排盘 · 十二宫命盘</h1>
-          <p>输入公历出生日期与时辰，由中台换算农历并排出命宫、身宫、十二宫、十四主星、四化与可选流年。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐参考。</p>
+          <p>只选公历出生日期即可排盘，时辰已预填；流年可留空。中台换算农历并排出命身宫、十二宫、十四主星、四化，另附三方四正、主星关键词与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="zwForm">
@@ -27,13 +27,15 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="zw-flow">流年（可选，1900–2100）</label>
-              <input class="form-input" id="zw-flow" type="number" min="1900" max="2100" placeholder="留空则只排本命盘">
+              <label class="form-label" for="zw-flow">流年（可不填）</label>
+              <input class="form-input" id="zw-flow" type="number" min="1900" max="2100" placeholder="留空即只排本命盘">
+              <div class="ft-quick-row"><button type="button" class="ft-quick" data-flow="now">用今年</button><button type="button" class="ft-quick" data-flow="clear">不排流年</button></div>
             </div>
           </div>
           <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"ziwei"}'>排出命盘</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"ziwei"}'>一键排盘</button>
           </div>
+          <p class="text-sm text-muted mt-3">时辰已预填午时；不确定时辰可直接用默认值。</p>
           <p class="ft-disclaimer">紫微斗数属传统民俗文化，无科学依据，结果仅供娱乐参考。提交即表示同意中台处理本次出生信息用于测算与留痕。</p>
         </form>
 
@@ -42,6 +44,12 @@
           <div id="zwSihua" class="mt-3"></div>
           <div class="ft-palaces mt-3" id="zwPalaces"></div>
           <p class="text-sm text-muted mt-3">实线框为命宫，虚线框为身宫；蓝色星标为十四主星，橙色为文昌、文曲、左辅、右弼。</p>
+          <h3 class="ft-section-title">三方四正</h3>
+          <div id="zwCore"></div>
+          <h3 class="ft-section-title">主星关键词</h3>
+          <div class="ft-kv-grid" id="zwStarNotes"></div>
+          <h3 class="ft-section-title">排盘解读</h3>
+          <ul class="ft-note-list" id="zwReading"></ul>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>中台采用通行三合派口径：寅宫起正月顺数生月，命宫逆数时辰、身宫顺数时辰，十二宫自命宫逆行；五行局取命宫干支纳音，紫微按生日与局数补数定位，并给出四化与可选流年宫。未纳入煞曜与流曜，属简化排盘。</div></div>
@@ -52,11 +60,14 @@
             var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
             var dateInput = $('zw-date');
-            (function () {
-              var t = new Date();
-              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-            })();
+            F.fillToday(dateInput);
+            Array.prototype.forEach.call(document.querySelectorAll('#zwForm [data-flow]'), function (b) {
+              b.addEventListener('click', function () {
+                $('zw-flow').value = b.getAttribute('data-flow') === 'now' ? String(new Date().getFullYear()) : '';
+              });
+            });
             var MAJOR = { '紫微':1,'天机':1,'太阳':1,'武曲':1,'天同':1,'廉贞':1,'天府':1,'太阴':1,'贪狼':1,'巨门':1,'天相':1,'天梁':1,'七杀':1,'破军':1 };
             $('zwForm').addEventListener('submit', function (e) {
               e.preventDefault();
@@ -89,6 +100,13 @@
                   return '<div class="' + cls + '"><div class="ft-palace-head"><span class="ft-palace-name">' + esc(p.name) +
                     '</span><span class="ft-palace-gz">' + esc(p.ganzhi) + '</span></div><div class="ft-palace-stars">' + stars + '</div></div>';
                 }).join('');
+                $('zwCore').innerHTML = z.corePalaces.map(function (p) {
+                  return kv(p.palace, p.stars.filter(function (s) { return MAJOR[s]; }).join('、') || '辅星');
+                }).join('');
+                $('zwStarNotes').innerHTML = z.starNotes.slice(0, 12).map(function (n) {
+                  return kv(n.name + ' · ' + n.palace, n.note);
+                }).join('');
+                $('zwReading').innerHTML = z.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('zwResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'ziwei' });
               }).catch(function (err) { alert('排盘失败：' + (err && err.message ? err.message : '请稍后重试')); });

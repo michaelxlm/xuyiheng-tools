@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
-          <p>按出生时间、地点与时区，由中台计算十大行星的地心黄经、所在星座、整宫制宫位、相位与元素分布，并绘制星盘轮盘。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐参考。</p>
+          <p>只选日期、时间和城市即可，时区与经纬度会自动带出。中台计算十大行星黄经、星座宫位、相位与元素分布，并给出行星关键词、宫位表与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="ntForm">
@@ -14,45 +14,50 @@
               <input class="form-input" id="nt-time" type="time" value="12:00" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="nt-tz">时区</label>
-              <select class="form-select" id="nt-tz">
-                <option value="8" selected>UTC+8 中国</option>
-                <option value="9">UTC+9 日本</option>
-                <option value="7">UTC+7 东南亚</option>
-                <option value="5.5">UTC+5:30 印度</option>
-                <option value="0">UTC+0 伦敦</option>
-                <option value="-5">UTC-5 纽约</option>
-                <option value="-8">UTC-8 洛杉矶</option>
-                <option value="10">UTC+10 悉尼</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="nt-city">城市（可选）</label>
+              <label class="form-label" for="nt-city">出生城市</label>
               <select class="form-select" id="nt-city">
-                <option value="39.9,116.4" selected>北京</option>
-                <option value="31.2,121.5">上海</option>
-                <option value="23.1,113.3">广州</option>
-                <option value="22.5,114.1">深圳</option>
-                <option value="30.7,104.1">成都</option>
-                <option value="22.3,114.2">香港</option>
-                <option value="25.0,121.6">台北</option>
-                <option value="35.7,139.7">东京</option>
-                <option value="51.5,-0.1">伦敦</option>
-                <option value="40.7,-74.0">纽约</option>
+                <option value="39.9,116.4,8" selected>北京</option>
+                <option value="31.2,121.5,8">上海</option>
+                <option value="23.1,113.3,8">广州</option>
+                <option value="22.5,114.1,8">深圳</option>
+                <option value="30.7,104.1,8">成都</option>
+                <option value="22.3,114.2,8">香港</option>
+                <option value="25.0,121.6,8">台北</option>
+                <option value="35.7,139.7,9">东京</option>
+                <option value="51.5,-0.1,0">伦敦</option>
+                <option value="40.7,-74.0,-5">纽约</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="nt-lat">纬度（北正南负）</label>
-              <input class="form-input" id="nt-lat" type="number" step="0.1" min="-90" max="90" value="39.9">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="nt-lon">经度（东正西负）</label>
-              <input class="form-input" id="nt-lon" type="number" step="0.1" min="-180" max="180" value="116.4">
-            </div>
           </div>
+          <details class="ft-advanced"><summary>出生地不在列表？手动设置时区与经纬度</summary>
+            <div class="ft-form-grid">
+              <div class="form-group">
+                <label class="form-label" for="nt-tz">时区</label>
+                <select class="form-select" id="nt-tz">
+                  <option value="8" selected>UTC+8 中国</option>
+                  <option value="9">UTC+9 日本</option>
+                  <option value="7">UTC+7 东南亚</option>
+                  <option value="5.5">UTC+5:30 印度</option>
+                  <option value="0">UTC+0 伦敦</option>
+                  <option value="-5">UTC-5 纽约</option>
+                  <option value="-8">UTC-8 洛杉矶</option>
+                  <option value="10">UTC+10 悉尼</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="nt-lat">纬度（北正南负）</label>
+                <input class="form-input" id="nt-lat" type="number" step="0.1" min="-90" max="90" value="39.9">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="nt-lon">经度（东正西负）</label>
+                <input class="form-input" id="nt-lon" type="number" step="0.1" min="-180" max="180" value="116.4">
+              </div>
+            </div>
+          </details>
           <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>生成星盘</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>一键生成</button>
           </div>
+          <p class="text-sm text-muted mt-3">时间与城市已预填；选城市会自动带入时区与经纬度，不确定出生时间可保留默认 12:00。</p>
           <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。提交即表示同意中台处理本次出生资料用于测算与留痕。</p>
         </form>
 
@@ -69,7 +74,16 @@
               <p class="text-sm text-muted mt-3" id="ntNote"></p>
             </div>
           </div>
-          <div id="ntExtra" class="mt-3"></div>
+          <h3 class="ft-section-title">元素与模态分布</h3>
+          <div id="ntDist"></div>
+          <h3 class="ft-section-title">主要相位明细</h3>
+          <div id="ntAspects"></div>
+          <h3 class="ft-section-title">行星关键词</h3>
+          <div class="ft-kv-grid" id="ntNotes"></div>
+          <h3 class="ft-section-title">十二宫落星</h3>
+          <div id="ntHouses"></div>
+          <h3 class="ft-section-title">星盘解读</h3>
+          <ul class="ft-note-list" id="ntReading"></ul>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>中台行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由格林尼治恒星时推算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
@@ -80,14 +94,19 @@
             var F = window.FortuneAPI; if (!F) return;
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
+            function bars(o) {
+              var max = Math.max.apply(null, Object.values(o)) || 1;
+              return Object.keys(o).map(function (k) {
+                return '<div class="ft-wx-row"><span>' + esc(k) + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
+                  Math.round(o[k] / max * 100) + '%"></span></span><span class="ft-wx-num">' + o[k] + '</span></div>';
+              }).join('');
+            }
             var dateInput = $('nt-date');
-            (function () {
-              var t = new Date();
-              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-            })();
+            F.fillToday(dateInput);
             $('nt-city').addEventListener('change', function () {
               var p = this.value.split(',');
-              $('nt-lat').value = p[0]; $('nt-lon').value = p[1];
+              $('nt-lat').value = p[0]; $('nt-lon').value = p[1]; $('nt-tz').value = p[2];
             });
             function point(theta, r) {
               var a = theta * Math.PI / 180;
@@ -145,13 +164,23 @@
                   return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
                     '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td></tr>';
                 }).join('');
-                function pairText(o) { return Object.keys(o).map(function (k) { return k + ' ' + o[k]; }).join('、'); }
-                $('ntExtra').innerHTML = '<strong>主要相位：</strong>' +
-                  (n.aspects.length ? esc(n.aspects.slice(0, 8).map(function (a) {
-                    return a.a + '·' + a.b + ' ' + a.type;
-                  }).join('、')) : '无显著相位') +
-                  '<br><strong>元素分布：</strong>' + esc(pairText(n.elements)) +
-                  '<br><strong>模态分布：</strong>' + esc(pairText(n.modalities));
+                $('ntDist').innerHTML = '<strong>元素</strong>' + bars(n.elements) + '<div class="mt-3"><strong>模态</strong>' + bars(n.modalities) + '</div>';
+                $('ntAspects').innerHTML = n.aspectDetail.length
+                  ? '<table class="ft-ref-table"><thead><tr><th>星体</th><th>相位</th><th>容差</th><th>说明</th></tr></thead><tbody>' +
+                    n.aspectDetail.slice(0, 10).map(function (a) {
+                      return '<tr><td>' + esc(a.a + ' · ' + a.b) + '</td><td>' + esc(a.type) +
+                        '</td><td>' + a.orb + '°</td><td>' + esc(a.note) + '</td></tr>';
+                    }).join('') + '</tbody></table>'
+                  : '<p class="text-sm text-muted">前七颗星之间无显著相位。</p>';
+                $('ntNotes').innerHTML = n.planetNotes.map(function (p) {
+                  return kv(p.glyph + ' ' + p.name, p.sign + ' · 第' + p.house + '宫 · ' + p.note);
+                }).join('');
+                $('ntHouses').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>星座</th><th>落星</th></tr></thead><tbody>' +
+                  n.houses.map(function (h) {
+                    return '<tr><td>第 ' + h.house + ' 宫</td><td>' + esc(h.sign) + '</td><td>' +
+                      (h.planets.length ? esc(h.planets.join('、')) : '<span class="text-muted">空宫</span>') + '</td></tr>';
+                  }).join('') + '</tbody></table>';
+                $('ntReading').innerHTML = n.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
                 $('ntNote').textContent = '天顶落在' + n.midheaven + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';
                 $('ntResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'natal' });
@@ -167,7 +196,7 @@
           <p>星盘把出生时刻的天体位置投影到黄道十二星座与十二宫位。本页只呈现天文计算结果与通行符号，不提供性格论断或事件预测。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>为什么需要精确出生时间？</summary><p>上升星座约每两小时换一个，时间偏差会直接改变第一宫与行星宫位；不确定时可用整点近似，但结果仅作概览。</p></details>
-          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入大致经纬度；若出生地不在列表，可手动填写任意经纬度。</p></details>
+          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入时区与大致经纬度；若出生地不在列表，可展开「手动设置」填写任意值。</p></details>
           <details><summary>行星度数会随时间变化吗？</summary><p>会。月亮每天约行 13°，因此出生时间对月亮影响明显；外行星变化很慢，日期准确即可。</p></details>
           <details><summary>为什么显示「整宫制」？</summary><p>整宫制把每个星座整体作为一个宫位，上升所在星座即第一宫，规则简单、便于阅读；其他分宫制会给出不同宫位边界。</p></details>
         </section>

@@ -1,24 +1,22 @@
         <section class="page-heading">
           <h1>塔罗占卜 · 大阿尔卡那牌阵</h1>
-          <p>输入一个想问的问题，由中台抽取大阿尔卡那牌，支持「今日一张」与「过去 · 现在 · 未来」三张牌阵。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐与自我反思。</p>
+          <p>点选问题方向即可抽牌，无需输入文字。中台抽取大阿尔卡那牌，支持单张与三张牌阵，并给出关键词、行动提示和整体解读。结果留痕可复核；无科学依据，仅供娱乐与自我反思。</p>
         </section>
 
         <form class="card" id="trForm">
-          <div class="ft-form-grid">
-            <div class="form-group">
-              <label class="form-label" for="tr-question">想问的问题（作为洗牌种子）</label>
-              <input class="form-input" id="tr-question" type="text" maxlength="60" placeholder="例如：这周该把精力放在哪？" value="今日指引">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="tr-spread">牌阵</label>
-              <select class="form-select" id="tr-spread">
-                <option value="1">今日一张 · 给自己一个视角</option>
-                <option value="3" selected>三张牌 · 过去 / 现在 / 未来</option>
-              </select>
-            </div>
+          <p class="text-sm text-muted mt-0">点选一个问题方向即可抽牌，无需手填。</p>
+          <div class="ft-quick-row" id="trPresets"></div>
+          <div class="ft-quick-row mt-3" id="trSpreads">
+            <button type="button" class="ft-quick is-active" data-spread="1">今日一张</button>
+            <button type="button" class="ft-quick" data-spread="3">过去 · 现在 · 未来</button>
           </div>
+          <select id="tr-spread" hidden aria-hidden="true"><option value="1" selected>1</option><option value="3">3</option></select>
+          <input id="tr-question" type="hidden" value="今日指引">
+          <details class="ft-advanced"><summary>自定义问题（可选，会作为洗牌种子）</summary>
+            <div><input class="form-input" id="tr-question-custom" type="text" maxlength="60" placeholder="例如：这周该把精力放在哪？"></div>
+          </details>
           <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tarot"}'>抽牌</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tarot"}'>抽一张</button>
             <button class="btn btn-outline" type="button" id="tr-again">换一组</button>
           </div>
           <p class="ft-disclaimer">塔罗无科学依据，正逆位关键词仅供娱乐与自我反思，请勿据此做重大决定。提交即表示同意中台处理本次问题文字用于测算与留痕。</p>
@@ -27,6 +25,8 @@
         <div class="result-box" id="trResult" hidden>
           <p class="text-sm text-muted mt-0" id="trSeedNote"></p>
           <div class="ft-tarot-cards" id="trCards"></div>
+          <h3 class="ft-section-title">整体解读</h3>
+          <p class="text-sm" id="trReading"></p>
         </div>
 
         <div class="info-box mt-4"><span>ℹ️</span><div>牌组为 22 张大阿尔卡那，中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
@@ -38,11 +38,37 @@
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             var nonce = 0;
+            var presets = [ '今日指引', '工作方向', '人际关系', '学习状态' ];
+            function syncQuestion() {
+              var custom = ($('tr-question-custom').value || '').trim();
+              var active = $('trPresets').querySelector('.is-active');
+              $('tr-question').value = custom || (active ? active.getAttribute('data-q') : '今日指引');
+            }
+            $('trPresets').innerHTML = presets.map(function (q, i) {
+              return '<button type="button" class="ft-quick' + (i === 0 ? ' is-active' : '') + '" data-q="' + q + '">' + q + '</button>';
+            }).join('');
+            $('trPresets').addEventListener('click', function (e) {
+              var b = e.target.closest('[data-q]'); if (!b) return;
+              Array.prototype.forEach.call(this.children, function (x) { x.className = 'ft-quick'; });
+              b.className = 'ft-quick is-active';
+              $('tr-question-custom').value = '';
+              syncQuestion();
+              nonce++;
+              draw(b);
+            });
+            $('trSpreads').addEventListener('click', function (e) {
+              var b = e.target.closest('[data-spread]'); if (!b) return;
+              Array.prototype.forEach.call(this.children, function (x) { x.className = 'ft-quick'; });
+              b.className = 'ft-quick is-active';
+              $('tr-spread').value = b.getAttribute('data-spread');
+              $('trForm').querySelector('button[type=submit]').textContent = b.getAttribute('data-spread') === '1' ? '抽一张' : '抽三张';
+            });
+            $('tr-question-custom').addEventListener('input', syncQuestion);
             function draw(btn) {
+              syncQuestion();
               var q = ($('tr-question').value || '今日指引').trim();
               var count = Number($('tr-spread').value);
-              var t = new Date();
-              var dateKey = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+              var dateKey = F.today();
               F.run(btn, 'tarot', {
                 question: q,
                 spread: count,
@@ -55,8 +81,13 @@
                     '<span class="ft-tarot-num">' + esc(c.numeral) + '</span>' +
                     '<strong class="ft-tarot-name">' + esc(c.name) + '</strong>' +
                     '<span class="ft-tarot-orient">' + (c.reversed ? '逆位' : '正位') + '</span>' +
-                    '<span class="ft-tarot-meaning">' + esc(c.meaning) + '</span></div>';
+                    '<span class="ft-tarot-meaning">' + esc(c.meaning) + '</span>' +
+                    '<span class="ft-tarot-keywords">' + c.keywords.map(function (k) {
+                      return '<span class="ft-tag">' + esc(k) + '</span>';
+                    }).join(' ') + '</span>' +
+                    '<span class="ft-tarot-advice">' + esc(c.advice) + '</span></div>';
                 }).join('');
+                $('trReading').textContent = d.reading;
                 $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · ' + d.summary;
                 $('trResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'tarot' });
@@ -74,9 +105,9 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>塔罗牌是一种文化性的自我反思工具。本页把 22 张大阿尔卡那的正逆位关键词做成可复现的本地抽牌，不对任何具体问题给出答案。</p>
+          <p>塔罗牌是一种文化性的自我反思工具。本页由中台对 22 张大阿尔卡那做可复现抽牌，给出关键词与行动提示，不对任何具体问题给出答案。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
-          <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与本地洗牌种子；写得更具体，得到的提示也更容易对应到当下情境。</p></details>
+          <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与中台洗牌种子；不想填写时直接点选问题方向即可。</p></details>
           <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>
           <details><summary>为什么每次抽牌不一样？</summary><p>每次抽牌都会加入新的刷新种子，因此结果会变化；这正好说明它不构成稳定预测。</p></details>
           <details><summary>会保存我输入的问题吗？</summary><p>问题文字会随本次请求提交到中台，作为洗牌种子并留痕以便复核；页面不写入本地存储。请勿填写姓名、联系方式等与占卜无关的敏感信息。</p></details>

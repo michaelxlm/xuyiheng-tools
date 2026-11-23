@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>八字排盘 · 四柱干支与五行</h1>
-          <p>输入公历出生日期与时辰，由中台排定年、月、日、时四柱干支，附藏干十神、纳音、旬空、大运与五行分布。测算结果在中台留痕，可在管理端查看；无科学依据，仅供娱乐参考。</p>
+          <p>只选公历出生日期即可排盘——时辰与性别已预填，不确定时辰可直接用默认值。中台排定四柱干支，并给出十神结构、当前大运、流年与逐条解读，结果留痕可复核；无科学依据，仅供娱乐参考。</p>
         </section>
 
         <form class="card" id="bzForm">
@@ -35,8 +35,9 @@
             </div>
           </div>
           <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>开始排盘</button>
+            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>一键排盘</button>
           </div>
+          <p class="text-sm text-muted mt-3">时辰、性别均已预填；不确定时辰时直接用默认值午时即可，性别只影响大运顺逆。</p>
           <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。提交即表示同意中台处理本次出生信息用于测算与留痕。</p>
         </form>
 
@@ -45,7 +46,15 @@
           <dl class="result-detail mt-3" id="bzDetail"></dl>
           <h3 class="mt-4">五行分布（四柱天干 + 地支本气）</h3>
           <div id="bzWuxing"></div>
-          <div class="mt-3" id="bzDayun"></div>
+          <h3 class="ft-section-title">十神结构</h3>
+          <div class="ft-kv-grid" id="bzGods"></div>
+          <h3 class="ft-section-title">当前大运与流年</h3>
+          <div class="ft-kv-grid" id="bzNow"></div>
+          <h3 class="ft-section-title">排盘解读</h3>
+          <ul class="ft-note-list" id="bzReading"></ul>
+          <div class="mt-3" id="bzPref"></div>
+          <h3 class="ft-section-title">大运一览（每十年一运）</h3>
+          <div id="bzDayun"></div>
           <p class="text-sm text-muted mt-3" id="bzNote"></p>
         </div>
 
@@ -58,11 +67,9 @@
             var $ = function (id) { return document.getElementById(id); };
             function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
             function row(k, v) { return '<div class="result-detail-row"><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; }
+            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
             var dateInput = $('bz-date');
-            (function () {
-              var t = new Date();
-              dateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-            })();
+            F.fillToday(dateInput);
             $('bzForm').addEventListener('submit', function (e) {
               e.preventDefault();
               var p = (dateInput.value || '').split('-');
@@ -95,11 +102,21 @@
                   return '<div class="ft-wx-row"><span>' + w + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
                     Math.round(b.count[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.count[i] + '</span></div>';
                 }).join('');
-                $('bzDayun').innerHTML = '<strong>大运：</strong>' + esc(b.dayun.direction) + ' · 约 ' + b.dayun.startAge +
-                  ' 岁起运 · ' + b.dayun.items.map(function (d) {
-                    return esc(d.ganzhi) + '（' + d.age + '岁）';
-                  }).join('、');
-                $('bzNote').textContent = '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断；十神与大运由中台按统一规则推算。';
+                $('bzGods').innerHTML = Object.keys(b.gods).sort(function (x, y) { return b.gods[y] - b.gods[x]; })
+                  .map(function (k) { return kv(k + ' × ' + b.gods[k], b.godBriefs[k] || ''); }).join('');
+                $('bzNow').innerHTML = kv('当前大运', b.dayun.current.ganzhi + '（' + b.dayun.current.god + ' · ' + b.dayun.current.age + '岁）') +
+                  kv('流年 ' + b.liuNian.year, b.liuNian.ganzhi + ' · ' + b.liuNian.god) +
+                  kv('起运', b.dayun.direction + ' · 约 ' + b.dayun.startAge + ' 岁');
+                $('bzReading').innerHTML = b.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
+                $('bzPref').innerHTML = [ '倾向 ' + b.preferences.trait, '色系 ' + b.preferences.color,
+                  '方位 ' + b.preferences.direction, '参考领域 ' + b.preferences.fields ]
+                  .map(function (s) { return '<span class="ft-chip">' + esc(s) + '</span>'; }).join('');
+                $('bzDayun').innerHTML = '<table class="ft-ref-table"><thead><tr><th>运次</th><th>干支</th><th>十神</th><th>起岁</th><th>约年</th></tr></thead><tbody>' +
+                  b.dayun.items.map(function (d, i) {
+                    return '<tr' + (d.ganzhi === b.dayun.current.ganzhi ? ' class="is-active"' : '') + '><td>' + (i + 1) +
+                      '</td><td>' + esc(d.ganzhi) + '</td><td>' + esc(d.god) + '</td><td>' + d.age + ' 岁</td><td>' + d.year + '</td></tr>';
+                  }).join('') + '</tbody></table>';
+                $('bzNote').textContent = b.tendencyText + '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断。';
                 $('bzResult').hidden = false;
                 if (window.U && U.track) U.track('calc_result', { tool: 'bazi' });
               }).catch(function (err) { alert('排盘失败：' + (err && err.message ? err.message : '请稍后重试')); });

@@ -15,6 +15,29 @@
   var ZHI = [ '子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥' ];
   var WUXING = [ '金', '木', '水', '火', '土' ];
   var SIGNS = [ '白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼' ];
+  var ANIMALS = [ '鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪' ];
+
+  /** 今日日期 YYYY-MM-DD（仅用于表单预填，不参与命理计算） */
+  function today() {
+    var t = new Date();
+    return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  }
+
+  /** 把日期输入框预填为今天 */
+  function fillToday(input) { if (input) input.value = today(); }
+
+  /**
+   * 生肖快捷选择对应的最近年份（仅做公历年份映射，命理关系仍由中台计算）。
+   * @param {String} animal - 十二生肖中文名
+   * @return {Number} 不晚于今年的最近同名生肖年份
+   */
+  function recentYear(animal) {
+    var idx = ANIMALS.indexOf(animal);
+    if (idx < 0) return new Date().getFullYear();
+    var y = new Date().getFullYear();
+    while ((((y - 4) % 12) + 12) % 12 !== idx) y--;
+    return Math.max(1900, y);
+  }
 
   /**
    * 调用中台测算。
@@ -64,6 +87,10 @@
     ZHI: ZHI,
     WUXING: WUXING,
     SIGNS: SIGNS,
+    ANIMALS: ANIMALS,
+    today: today,
+    fillToday: fillToday,
+    recentYear: recentYear,
     bazi: function (input) { return calculate('bazi', input); },
     ziwei: function (input) { return calculate('ziwei', input); },
     natal: function (input) { return calculate('natal', input); },
