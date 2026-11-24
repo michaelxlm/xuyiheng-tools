@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>八字排盘 · 四柱干支与五行</h1>
-          <p>只选公历出生日期即可排盘——时辰与性别已预填，不确定时辰可直接用默认值。中台排定四柱干支，并给出十神结构、当前大运、流年与逐条解读，结果留痕可复核；无科学依据，仅供娱乐参考。</p>
+          <p>不懂八字也能看：填写出生日期后，先读结果顶部的“白话导读”，再查看四柱与专业明细。我们会用日常语言解释日主、格局、五行和当前阶段，并说明常见误区；时辰与性别已预填，不确定时可保留默认值。传统命理无科学依据，仅供文化娱乐与自我观察。</p>
         </section>
 
         <form class="card" id="bzForm">
@@ -42,6 +42,7 @@
         </form>
 
         <div class="result-box" id="bzResult" hidden>
+          <div id="bzPlain" aria-live="polite"></div>
           <div class="ft-pillars" id="bzPillars"></div>
           <dl class="result-detail mt-3" id="bzDetail"></dl>
           <h3 class="mt-4" id="bzWuxingTitle">五行分布（藏干加权：本气60／中气30／余气10）</h3>
@@ -71,7 +72,7 @@
           <p class="text-sm text-muted mt-3" id="bzNote"></p>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>年柱以立春（约 2 月 4 日）换年，月柱按各月节气的常用近似日期换月，日柱按儒略日推算，时柱按「日上起时」口诀；五行按地支藏干本气 60／中气 30／余气 10 加权统计；格局取月令透干本气，用神按扶抑为主、调候为辅；大运按阳年男／阴年女顺行、反之逆行，起运岁数按到节气边界的天数近似。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看日主与整体倾向，再看格局、用神，最后看大运、流年和神煞。下面的藏干权重、节气换柱等是计算口径，供专业用户复核，第一次阅读可以跳过。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
 
         <script>
         (function () {
@@ -93,6 +94,7 @@
                 hour: Number($('bz-hour').value),
                 gender: $('bz-gender').value
               }).then(function (b) {
+                F.renderPlainGuide($('bzPlain'), b.plainGuide);
                 var html = '';
                 b.pillars.forEach(function (d, i) {
                   html += '<div class="ft-pillar' + (i === 2 ? ' is-day' : '') + '">' +
@@ -174,10 +176,13 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>八字排盘以出生的年月日时配成四柱干支，再按五行生克观察结构。本页只做可复现的规则计算与展示，不对性格、运势或人生走向作任何预测。</p>
+          <p>八字排盘把出生的年月日时配成四组干支，再用传统五行关系整理成一张观察地图。本页先给白话导读，再保留四柱、十神、用神、大运等完整数据，方便你按自己的节奏阅读或复核。它不定义你的性格，也不预测人生走向。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>年柱为什么按立春而不是春节？</summary><p>命理排盘通常以立春作为一年起点，与民俗中以农历正月初一换年的口径不同，立春前后出生者两种口径会不一致。</p></details>
           <details><summary>藏干和十神是什么意思？</summary><p>藏干是地支中暗含的天干，十神是相对日主与其他天干的生克关系名称，用来描述结构，不代表吉凶结论。</p></details>
           <details><summary>23 点出生算哪一天？</summary><p>本工具把 23:00–01:00 作为子时，归入当日的时柱。部分流派主张晚子时换日，请以你采用的口径复核。</p></details>
+          <details><summary>第一次看结果，要从哪里开始？</summary><p>先看结果顶部的白话导读，按“盘心—整体倾向—格局—当前阶段”的顺序读。下面的表格是计算明细，不需要一次全部看懂。</p></details>
+          <details><summary>五行缺什么就要补什么吗？</summary><p>不是。五行数量只是传统结构统计，用神也不是“缺什么补什么”的生活清单。不要据此购买物品、选择颜色或安排重大事项。</p></details>
+          <details><summary>偏弱、偏旺或相冲代表运气不好吗？</summary><p>不代表。它们只是不同传统规则的标签，没有绝对好坏，也不能据此判断健康、财富、感情或人生结果。</p></details>
           <details><summary>隐私如何保障？</summary><p>出生日期、时辰与性别仅用于本次中台测算并在服务端留痕，便于审计与复核；浏览器端不再保存这些输入，页面也不写入本地存储。请勿在输入框填写与测算无关的敏感信息。</p></details>
         </section>

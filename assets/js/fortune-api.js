@@ -2,7 +2,7 @@
    fortune-api.js · 命理测算中台适配层（浏览器端零计算逻辑）
    --------------------------------------------------------------------------
    六款命理工具的计算内核统一放在 main-api：app/lib/fortune-engine.js。
-   本文件只做三件事：提供展示用静态字表、发请求、管理按钮 loading 态。
+   本文件只做四件事：提供展示用静态字表、发请求、管理按钮 loading 态、排版白话导读。
    每次测算都会在中台 fortune_readings 留痕，可在管理端「命理测算记录」查看。
 
    依赖：http-api.min.js（window.API），由 prerender 先行注入。
@@ -80,8 +80,55 @@
     });
   }
 
+  /**
+   * 渲染中台返回的白话导读；只负责安全排版，不生成或改写命理结论。
+   * @param {HTMLElement} el - 页面结果区中的导读容器
+   * @param {Object} guide - result.plainGuide
+   */
+  function renderPlainGuide(el, guide) {
+    if (!el) return;
+    if (!guide || !guide.title || !guide.intro) {
+      el.innerHTML = '';
+      el.hidden = true;
+      return;
+    }
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    var highlights = Array.isArray(guide.highlights) ? guide.highlights : [];
+    var terms = Array.isArray(guide.terms) ? guide.terms : [];
+    var readingOrder = Array.isArray(guide.readingOrder) ? guide.readingOrder : [];
+    var reminders = Array.isArray(guide.reminders) ? guide.reminders : [];
+    var html = '<section class="ft-plain-guide" aria-label="白话结果导读">' +
+      '<div class="ft-plain-head"><span class="ft-tag">先看这里</span><h2>' + esc(guide.title) + '</h2><p>' + esc(guide.intro) + '</p></div>';
+    if (highlights.length) {
+      html += '<div class="ft-plain-highlights">' + highlights.map(function (item) {
+        return '<article class="ft-plain-card"><h3>' + esc(item.label) + '</h3><p>' + esc(item.text) + '</p></article>';
+      }).join('') + '</div>';
+    }
+    if (readingOrder.length) {
+      html += '<div class="ft-plain-block"><h3>建议阅读顺序</h3><ol class="ft-plain-steps">' + readingOrder.map(function (item) {
+        return '<li>' + esc(item) + '</li>';
+      }).join('') + '</ol></div>';
+    }
+    if (terms.length) {
+      html += '<div class="ft-plain-block"><h3>术语不用背，看懂就行</h3><dl class="ft-plain-terms">' + terms.map(function (item) {
+        return '<div><dt>' + esc(item.term) + '</dt><dd>' + esc(item.text) + '</dd></div>';
+      }).join('') + '</dl></div>';
+    }
+    if (reminders.length) {
+      html += '<aside class="ft-plain-reminders"><strong>读之前记住</strong><ul>' + reminders.map(function (item) {
+        return '<li>' + esc(item) + '</li>';
+      }).join('') + '</ul></aside>';
+    }
+    html += '</section>';
+    el.innerHTML = html;
+    el.hidden = false;
+  }
+
   global.FortuneAPI = {
     calculate: calculate,
+    renderPlainGuide: renderPlainGuide,
     run: run,
     GAN: GAN,
     ZHI: ZHI,

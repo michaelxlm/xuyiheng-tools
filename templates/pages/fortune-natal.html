@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
-          <p>只选日期、时间和城市即可，时区与经纬度会自动带出。中台计算十大行星黄经、星座宫位、相位与元素分布，并给出行星关键词、宫位表与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
+          <p>不懂占星也能看：填写出生日期、时间与城市后，先读结果顶部的白话导读。我们会把太阳、月亮、上升和相位翻译成日常语言，再保留星盘、行星与宫位明细；时区和经纬度会自动带出。占星无科学依据，仅供文化娱乐与自我观察。</p>
         </section>
 
         <form class="card" id="ntForm">
@@ -57,11 +57,12 @@
           <div class="btn-row mt-3">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>一键生成</button>
           </div>
-          <p class="text-sm text-muted mt-3">时间与城市已预填；选城市会自动带入时区与经纬度，不确定出生时间可保留默认 12:00。</p>
+          <p class="text-sm text-muted mt-3">时间与城市已预填；选城市会自动带入时区与经纬度。时间越准确，上升和月亮位置越可靠；若完全不确定，可先用默认 12:00 看概览。</p>
           <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。提交即表示同意中台处理本次出生资料用于测算与留痕。</p>
         </form>
 
         <div class="result-box" id="ntResult" hidden>
+          <div id="ntPlain" aria-live="polite"></div>
           <div class="ft-trio" id="ntTrio"></div>
           <div class="ft-natal-grid mt-4">
             <div id="ntWheel"></div>
@@ -92,7 +93,7 @@
           <ul class="ft-note-list" id="ntReading"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台行星位置采用 JPL 近似轨道根数（1800–2050 年有效），月亮采用低精度天文级数，上升与天顶由格林尼治恒星时推算；逆行由相邻时刻黄经差（日速度为负）判定，月相按日月黄经差计算。宫位为整宫制：上升所在星座即第一宫。出生时间误差 15 分钟约影响上升 1°。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先核对出生时间，再从太阳、月亮、上升建立整体印象，接着看行星落在哪些宫位，最后读相位与空宫。下面的 JPL 轨道、恒星时和整宫制是计算口径，供专业用户复核，不需要背。出生时间误差 15 分钟约影响上升 1°。</div></div>
 
         <script>
         (function () {
@@ -162,6 +163,7 @@
                 lat: lat,
                 lon: lon
               }).then(function (n) {
+                F.renderPlainGuide($('ntPlain'), n.plainGuide);
                 $('ntTrio').innerHTML = [
                   ['☉ 太阳', n.sun], ['☽ 月亮', n.moon], ['MC 天顶', n.midheaven], ['ASC 上升', n.rising]
                 ].map(function (x) { return '<div class="ft-trio-item"><span>' + x[0] + '</span><strong>' + esc(x[1]) + '</strong></div>'; }).join('');
@@ -217,10 +219,12 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>星盘把出生时刻的天体位置投影到黄道十二星座与十二宫位。本页只呈现天文计算结果与通行符号，不提供性格论断或事件预测。</p>
+          <p>星盘把出生时刻的天体位置画成一张象征地图：行星代表不同主题，宫位代表生活领域，相位代表主题之间的互动。本页先给通俗解读，再保留天文位置与完整表格，帮助你理解符号，而不是给自己或别人贴标签。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>为什么需要精确出生时间？</summary><p>上升星座约每两小时换一个，时间偏差会直接改变第一宫与行星宫位；不确定时可用整点近似，但结果仅作概览。</p></details>
-          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入时区与大致经纬度；若出生地不在列表，可展开「手动设置」填写任意值。</p></details>
+          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入时区与大致经纬度；若出生地不在列表，可展开「手动设置」填写当地经纬度与时区。</p></details>
           <details><summary>行星度数会随时间变化吗？</summary><p>会。月亮每天约行 13°，因此出生时间对月亮影响明显；外行星变化很慢，日期准确即可。</p></details>
+          <details><summary>第一次看星盘，要先看什么？</summary><p>先看白话导读中的太阳、月亮、上升，再看落星较多的宫位，最后看相位。不要只用一个太阳星座定义自己，也不需要一次记住所有术语。</p></details>
+          <details><summary>刑、冲、逆行和空宫代表坏运气吗？</summary><p>不代表。刑冲描述主题之间的张力，逆行是视运动现象，空宫只是没有行星直接落入。它们都不是吉凶判定，也不能预测具体事件。</p></details>
           <details><summary>为什么显示「整宫制」？</summary><p>整宫制把每个星座整体作为一个宫位，上升所在星座即第一宫，规则简单、便于阅读；其他分宫制会给出不同宫位边界。</p></details>
         </section>

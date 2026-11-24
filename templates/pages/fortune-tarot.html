@@ -1,10 +1,10 @@
         <section class="page-heading">
           <h1>塔罗占卜 · 完整 78 张牌阵</h1>
-          <p>点选问题方向即可抽牌，无需输入文字。中台从完整 78 张牌（22 大阿尔卡那＋56 小阿尔卡那四花色）中抽牌，支持单张与三张牌阵，每张牌附元素、星象对应、核心牌义与行动提示。结果留痕可复核；无科学依据，仅供娱乐与自我反思。</p>
+          <p>点选问题方向即可抽牌，无需输入文字。结果顶部会先把每张牌翻译成日常语言，说明正逆位怎么理解、整组牌如何连起来看，以及今天可以尝试的小动作。塔罗不是未来答案，而是一种整理思绪的文化工具；无科学依据，仅供娱乐与自我反思。</p>
         </section>
 
         <form class="card" id="trForm">
-          <p class="text-sm text-muted mt-0">点选一个问题方向即可抽牌，无需手填。</p>
+          <p class="text-sm text-muted mt-0">点选一个问题方向即可抽牌，无需手填。问题越具体，越容易把牌面转成行动，例如“这周先推进哪件事”比“我未来会怎样”更适合阅读。</p>
           <div class="ft-quick-row" id="trPresets"></div>
           <div class="ft-quick-row mt-3" id="trSpreads">
             <button type="button" class="ft-quick is-active" data-spread="1">今日一张</button>
@@ -23,6 +23,7 @@
         </form>
 
         <div class="result-box" id="trResult" hidden>
+          <div id="trPlain" aria-live="polite"></div>
           <p class="text-sm text-muted mt-0" id="trSeedNote"></p>
           <div class="ft-tarot-cards" id="trCards"></div>
           <h3 class="ft-section-title">整体解读</h3>
@@ -34,7 +35,7 @@
           <ul class="ft-note-list" id="trGuide"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>牌组为完整 78 张：22 张大阿尔卡那＋56 张小阿尔卡那（权杖／圣杯／宝剑／星币各 14 张），每张牌附金色黎明体系的行星与星座对应。中台用问题文字、日期与刷新种子确定性洗牌；每次「换一组」都会加入新种子，因此同一问题可能得到不同牌面。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看问题是否具体，再逐张理解牌位，最后寻找共同关键词并选一个小动作。单张牌只看一个角度，三张牌要连起来读。下面的 78 张牌池、元素与星象对应是规则明细，供专业用户复核，不需要背诵。</div></div>
 
         <script>
         (function () {
@@ -80,6 +81,7 @@
                 date: dateKey,
                 seed: String(nonce)
               }).then(function (d) {
+                F.renderPlainGuide($('trPlain'), d.plainGuide);
                 $('trCards').innerHTML = d.cards.map(function (c) {
                   return '<div class="ft-tarot-card' + (c.reversed ? ' is-reversed' : '') + '">' +
                     '<span class="ft-tarot-pos">' + esc(c.position) + '</span>' +
@@ -115,10 +117,12 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>塔罗牌是一种文化性的自我反思工具。本页由中台对完整 78 张塔罗牌做可复现抽牌，附元素、星象对应与行动提示，不对任何具体问题给出答案。</p>
+          <p>塔罗牌是一种文化性的自我反思工具。本页从完整 78 张牌中抽牌，先用白话解释每张牌在当前问题里的含义，再提供行动提示和专业牌义。它不读取别人的想法，不保证未来结果，也不能替你做重大决定。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与中台洗牌种子；不想填写时直接点选问题方向即可。</p></details>
           <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>
+          <details><summary>第一次抽牌，应该怎么读？</summary><p>先看白话导读中的问题与逐张解释，再读整体解读，最后选一条行动建议。不要只凭一张牌或一个关键词给自己下结论。</p></details>
+          <details><summary>问题怎样问更容易理解？</summary><p>把范围缩小到当下能行动的层面，例如“我今天怎样沟通”“这周先做哪一步”。避免要求牌面保证某个人喜欢你、某件事必然成功或替你决定重大事项。</p></details>
           <details><summary>为什么每次抽牌不一样？</summary><p>每次抽牌都会加入新的刷新种子，因此结果会变化；这正好说明它不构成稳定预测。</p></details>
           <details><summary>会保存我输入的问题吗？</summary><p>问题文字会随本次请求提交到中台，作为洗牌种子并留痕以便复核；页面不写入本地存储。请勿填写姓名、联系方式等与占卜无关的敏感信息。</p></details>
         </section>

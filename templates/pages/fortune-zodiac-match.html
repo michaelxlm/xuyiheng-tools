@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>生肖配对 · 六合三合相冲速查</h1>
-          <p>点选双方生肖即可，年份自动取最近同名年份；无需手填。中台按地支六合三合冲刑害破、天干合冲、纳音生克给出关系明细、爱情／朋友／合作多维分、当年太岁关系与民俗性格注解，并留痕可复核。结果只是民俗关系展示，不代表匹配度结论。</p>
+          <p>点选双方生肖即可，年份自动取最近同名年份，无需手填。结果顶部会先用白话解释你们在传统民俗中的关系标签，再把分数翻译成爱情、朋友、合作三个相处角度和具体沟通建议。分数不是匹配度检测，真正决定关系的是日常相处。</p>
         </section>
 
         <form class="card" id="zmForm">
@@ -22,6 +22,7 @@
         </form>
 
         <div class="result-box" id="zmResult" hidden>
+          <div id="zmPlain" aria-live="polite"></div>
           <div class="ft-match-pair" id="zmPair"></div>
           <div class="ft-match-score" id="zmScore"></div>
           <div id="zmBar"></div>
@@ -42,6 +43,7 @@
 
         <div class="card mt-4">
           <h3 class="mt-0">传统关系速查</h3>
+          <p class="text-sm text-muted">六合、三合是传统说法里较强调合拍或共同方向的组合；相冲、相刑、相害只是差异与磨合的标签。它们都不是关系好坏的结论，更不适合用来决定分手、结婚或是否合作。</p>
           <table class="ft-ref-table">
             <thead><tr><th>关系</th><th>组合</th></tr></thead>
             <tbody>
@@ -54,7 +56,7 @@
           </table>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台按农历年地支取生肖，关系判定覆盖六合、三合、相冲、三刑（含无恩/恃势/无礼/自刑分类）、相害、相破，另参天干五合相冲与纳音五行生克；多维分是在同一关系底分上按不同领域的权重微调得出，当年太岁关系按流年地支查询。分数与年份自动取最近同名生肖年，未细化到立春当天。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看白话导读里的关系标签，再看爱情、朋友、合作三个角度，最后把相处建议变成具体行动。下面的天干、纳音和权重是计算口径，供专业用户复核。年份按最近同名生肖年简化映射，未细化到立春当天。</div></div>
 
         <script>
         (function () {
@@ -90,6 +92,7 @@
               F.run($('zmForm').querySelector('button[type=submit]'), 'zodiacMatch', {
                 yearA: a, yearB: b
               }).then(function (r) {
+                F.renderPlainGuide($('zmPlain'), r.plainGuide);
                 $('zmPair').innerHTML =
                   '<div class="ft-match-side"><span class="text-sm text-muted">' + a + '</span><strong>' + esc(r.a) + '</strong><span class="text-sm text-muted">' + esc(r.aGanzhi) + ' · ' + esc(r.elements.split(' / ')[0]) + '</span></div>' +
                   '<div class="ft-match-vs">×</div>' +
@@ -127,10 +130,13 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>生肖配对以十二地支之间的六合、三合、相冲、相害关系为依据，配合年份纳音五行作展示。它属于民俗文化，不用于判断关系好坏。</p>
+          <p>生肖配对用出生年份对应的传统生肖符号做趣味比较。本页先解释关系标签与相处方式，再展示规则分数和明细。它不知道你们的性格、价值观与沟通经历，因此只能当聊天话题，不能判断关系好坏或预测未来。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>过完生日才算新生肖吗？</summary><p>生肖按农历年而非公历生日切换；立春或春节前后出生者，请以当年农历日期确认。</p></details>
           <details><summary>六合和三合哪个更好？</summary><p>传统上两者都被视为和合关系，没有高下之分；本页分数只是展示规则强弱，不含价值判断。</p></details>
           <details><summary>生肖相同怎么办？</summary><p>同生肖按地支相同处理，其中辰、午、酉、亥四个地支在同生肖时归为自刑。</p></details>
+          <details><summary>第一次看配对结果，要怎么看？</summary><p>先看白话导读中的关系标签和沟通建议，再看三个场景的参考分。不要只盯着综合分，选一条今天就能做到的相处建议更有用。</p></details>
+          <details><summary>分数高就一定合适，分数低就一定不合适吗？</summary><p>不是。分数只是传统合冲规则的量化展示，高分组同样需要沟通，低分组也可能相处得很好。感情与合作都不能靠生肖预测。</p></details>
+          <details><summary>太岁标签意味着今年会发生什么事吗？</summary><p>不意味着。太岁只是每年对应的民俗干支符号，本页不据“值、冲、害、刑”推测任何具体事件，也不需要采取所谓的化解措施。</p></details>
           <details><summary>能用来判断婚恋吗？</summary><p>不能。相处方式、价值观与沟通能力远比生肖组合重要。</p></details>
         </section>

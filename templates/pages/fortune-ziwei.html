@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>紫微斗数排盘 · 十二宫命盘</h1>
-          <p>只选公历出生日期即可排盘，时辰与性别已预填；流年可留空。中台换算农历并排出命身宫、十二宫、十四主星与辅煞曜、庙旺亮度、生年与宫干四化、长生博士十二神、大限与格局线索，另附三方四正与逐条解读。结果留痕可复核；无科学依据，仅供娱乐参考。</p>
+          <p>不懂紫微也能看：填写出生日期后，结果顶部会先用日常语言解释命宫主星、当前大限与四化。你可以把它理解成十二格的人生地图，先看你当下最关心的一格，再展开完整星曜与宫位明细；流年可留空。传统命理无科学依据，仅供文化娱乐与自我观察。</p>
         </section>
 
         <form class="card" id="zwForm">
@@ -47,6 +47,7 @@
         </form>
 
        <div class="result-box" id="zwResult" hidden>
+          <div id="zwPlain" aria-live="polite"></div>
           <div class="ft-ziwei-summary" id="zwSummary"></div>
           <div id="zwSihua" class="mt-3"></div>
           <div class="ft-palaces mt-3" id="zwPalaces"></div>
@@ -67,7 +68,7 @@
           <ul class="ft-note-list" id="zwReading"></ul>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>中台采用通行三合派口径：寅宫起正月顺数生月，命宫逆数时辰、身宫顺数时辰，十二宫自命宫逆行；五行局取命宫干支纳音，紫微依生日除局数补数进退定位，天府关于寅申轴镜像。全盘安十四主星＋昌曲辅弼四辅＋禄存羊陀火铃地空地劫六煞＋鸾喜马刑姚解台辅封诰，并排生年与宫干四化、长生博士十二神与大限；未排天魁钺与流曜，属可复核的规则化简化。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看命宫主星，再看命宫、财帛、官禄、迁移组成的三方四正，接着看当前大限与四化，最后展开十二宫。下面的安星诀、庙旺和博士十二神是计算口径，供专业用户复核，第一次阅读可以跳过。本页未排天魁钺与流曜，属可复核的简化盘。</div></div>
 
         <script>
         (function () {
@@ -91,6 +92,7 @@
               var input = { date: dateInput.value, hour: Number($('zw-hour').value), gender: $('zw-gender').value };
               if ($('zw-flow').value) input.flowYear = Number($('zw-flow').value);
               F.run($('zwForm').querySelector('button[type=submit]'), 'ziwei', input).then(function (z) {
+                F.renderPlainGuide($('zwPlain'), z.plainGuide);
                 var chips = [
                   '农历 ' + z.lunar, z.lunarYear + '年', z.juName,
                   '命宫 ' + z.ming.ganzhi, '身宫 ' + z.shen.ganzhi,
@@ -163,10 +165,13 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>紫微斗数把出生时刻映射到十二个宫位，再按规则安放主星。本页展示的是一套可复现的排盘规则，不包含任何结果解释或命运判断。</p>
+          <p>紫微斗数把出生时刻映射到十二宫，再按传统规则安放星曜。本页先用白话解释命宫、四化和当前阶段，再保留完整星曜表供复核。星曜像角色、宫位像场景，任何一颗星都不能单独定义你，也不预测命运。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>农历闰月怎么处理？</summary><p>本地农历表会标出闰月，排盘按实际农历月序进行；极少数闰月生日的流派口径不同，请以你采用的资料复核。</p></details>
           <details><summary>为什么命宫和身宫有时在同一格？</summary><p>命宫逆数时辰、身宫顺数时辰，子时或特定月令下可能重合，属正常情况。</p></details>
           <details><summary>煞曜也排吗？</summary><p>本页排十四主星＋昌曲辅弼四辅＋禄存羊陀火铃地空地劫六煞及鸾喜马刑等杂曜，并标庙旺亮度与大限；未排天魁钺与流曜、大小限，属可复核的简化盘。</p></details>
+          <details><summary>第一次看紫微盘，要先看什么？</summary><p>先看白话导读里的命宫主星和当前大限，再看三方四正。十二宫不用一次看完，可以先找事业、感情或家庭等当下最关心的一格。</p></details>
+          <details><summary>庙旺、煞曜和化忌是什么意思？</summary><p>庙旺是星曜的位置状态，不是分数；煞曜是需要留意的变量，不等于坏运气；化忌表示特别在意或容易牵挂的地方，也不等于倒霉。</p></details>
+          <details><summary>大限是十年就会发生一件事吗？</summary><p>不是。大限大约十年一个阶段，只用来整理生活重心的变化主题，不是事件时间表，也不能用来锁定婚姻、工作或健康结果。</p></details>
           <details><summary>隐私如何保障？</summary><p>生日、时辰与可选流年仅用于本次中台测算并在服务端留痕，便于审计与复核；浏览器端不再保存这些输入，页面也不写入本地存储。</p></details>
         </section>

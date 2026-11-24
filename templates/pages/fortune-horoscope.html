@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>星座运势 · 十二星座每日参考</h1>
-          <p>点选星座即可，日期已预填为今天。中台用当日真实行星黄经与你太阳星座的相位推导五维星级、分维度建议、宜忌标签与幸运色、数字、方位，并附行运明细表；同一天同一星座结果稳定、每个星级可回溯到具体相位。纯娱乐内容，无科学依据。</p>
+          <p>点选星座即可，日期已预填为今天。结果顶部会先用日常语言告诉你今天的节奏、适合投入的领域和需要注意的地方，再展示爱情、事业、财运、健康等星级与行运明细。星级是相对状态，不是好运概率；纯娱乐内容，无科学依据。</p>
         </section>
 
         <form class="card" id="hoForm">
@@ -17,9 +17,10 @@
         </form>
 
         <div class="result-box" id="hoResult" hidden>
+          <div id="hoPlain" aria-live="polite"></div>
           <div class="ft-horo-head"><h3 id="hoTitle" style="margin:0"></h3><span class="ft-chip" id="hoDateChip"></span><span class="ft-chip" id="hoMood"></span></div>
           <div id="hoScores"></div>
-          <div class="mt-3"><span class="text-sm text-muted">综合指数 </span><span id="hoPct"></span></div>
+          <div class="mt-3"><span class="text-sm text-muted">综合星级进度（仅用于展示，不是概率） </span><span id="hoPct"></span></div>
           <div class="ft-lucky" id="hoLucky"></div>
           <h3 class="ft-section-title">当日行运行星明细</h3>
           <div id="hoTransits"></div>
@@ -37,7 +38,7 @@
           <p class="text-sm text-muted mt-2" id="hoAdvice"></p>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>本页不用随机数：星级由当日十星真实黄经与你太阳星座 15° 中点的相位（合／六合／刑／拱／冲）按固定权重表合计推导，幸运色与方位按相位行星所在星座元素、幸运数字按当日月亮度数推导，均可人工复核。它描述的是天体几何关系，与真实事件没有因果关系，不是对未来的预测。</div></div>
+        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看白话导读里的总体节奏，再找相对突出或需要放缓的领域，最后从“宜、忌”中选一件具体小事。下面的过境角度和权重是计算口径，供专业用户复核；幸运色、数字与方位只是轻松标签，不改变现实。</div></div>
 
         <script>
         (function () {
@@ -59,6 +60,7 @@
               var sign = signSel.value, key = dateInput.value;
               if (!key) { alert('请选择日期'); return; }
               F.run(btn, 'horoscope', { sign: sign, date: key }).then(function (h) {
+                F.renderPlainGuide($('hoPlain'), h.plainGuide);
                 $('hoTitle').textContent = h.sign + '座 · 今日运势';
                 $('hoDateChip').textContent = h.date;
                 $('hoScores').innerHTML = [
@@ -119,10 +121,12 @@
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>星座运势由当日真实行星过境与你太阳星座的相位在中台推导，用于轻松阅读，不涉及任何真实预测；仅提交星座与日期，不采集个人身份信息。</p>
+          <p>星座运势由当日行星过境与太阳星座的传统相位规则推导。本页先把结果翻译成“今天怎么安排”的日常提示，再保留过境表供复核。它不预测真实事件，也不能代替你对工作、关系、健康或财务的判断。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details><summary>结果每天都会变吗？</summary><p>会。星级由当日真实行星过境相位推导，月亮每天移动约 13°，因此换日期通常会变；同一天同一星座全网一致、可复核。</p></details>
           <details><summary>为什么不同网站运势不一样？</summary><p>各站规则不同：本页公开相位容限与权重口径（见「星级怎么来的」与行运明细表），不用随机生成，也不声称准确。</p></details>
+          <details><summary>星级和百分比是什么意思？</summary><p>星级把传统规则结果压缩成 1–5 星，百分比只是星级的可视化进度。它们都不是好运概率，也不能换算成某件事发生的可能性。</p></details>
+          <details><summary>第一次看运势，要怎么看？</summary><p>先看白话导读，再找相对突出和需要放缓的领域，最后选一条具体建议执行。不要因为低星级推迟必要工作、沟通或就医。</p></details>
           <details><summary>十二星座按什么日期划分？</summary><p>日常星座按阳历出生日期的黄道区间划分，本页选项卡直接对应这十二个星座名称。</p></details>
           <details><summary>会收集我的星座或日期吗？</summary><p>点击查询后会向中台提交所选星座与日期用于生成结果并留痕；页面不写入本地存储，也不采集姓名、联系方式等身份信息。</p></details>
         </section>
