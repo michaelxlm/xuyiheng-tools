@@ -1,0 +1,27 @@
+{
+  "id": "social-insurance",
+  "title": "社会保险与住房公积金计算口径",
+  "jurisdiction": "中国内地",
+  "policyYear": 2026,
+  "version": "2026.11",
+  "effectiveDate": "2011-07-01",
+  "mode": "custom-rates-required",
+  "defaultCustomRatesPercent": {
+    "personal": { "pension": 8, "medical": 2, "unemployment": 0.5, "fund": 12 },
+    "company": { "pension": 16, "medical": 9, "unemployment": 0.5, "injury": 0.4, "maternity": 0.8, "fund": 12 }
+  },
+  "baseLimits": null,
+  "taxPolicyId": "individual-income-tax",
+  "sources": [
+    {
+      "title": "中华人民共和国社会保险法",
+      "url": "https://www.gov.cn/xinwen/2018-12/29/content_5354387.htm"
+    }
+  ],
+  "limitations": [
+    "各地缴费比例、基数上下限与公积金比例按年度和统筹区公布，本站不提供未核实的全国统一城市档位",
+    "默认费率仅是可编辑的计算示例，不代表任何城市当前核定费率",
+    "税前工资、社保基数与公积金基数必须分别填写，缴费基数不得代替税前工资",
+    "实际缴费与个税以当地经办机构、税务机关和单位申报为准"
+  ]
+}

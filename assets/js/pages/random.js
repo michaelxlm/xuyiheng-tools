@@ -1,0 +1,88 @@
+/* random.js · 随机数生成器薄控制器 */
+(function () {
+  'use strict';
+
+  function boot() {
+    var U = window.U;
+    var Tools = window.Tools || {};
+    var RV = window.ToolCore && window.ToolCore.ResultView;
+    var form = document.getElementById('rndForm');
+    if (!form || !U || !Tools.random || !RV) return;
+    var $ = function (id) { return document.getElementById(id); };
+    var last = [];
+
+    function showError(message) {
+      var host = $('rnd-error');
+      host.textContent = message || '';
+      host.hidden = !message;
+    }
+
+    function syncUnique() {
+      var float = $('rnd-type').value === 'float';
+      $('rnd-unique').disabled = float;
+      if (float) $('rnd-unique').value = 'allow';
+      ['rnd-min', 'rnd-max'].forEach(function (id) {
+        $(id).step = float ? 'any' : '1';
+        $(id).inputMode = float ? 'decimal' : 'numeric';
+      });
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      showError('');
+      var type = $('rnd-type').value;
+      var unique = type === 'int' && $('rnd-unique').value === 'norep';
+      var result = Tools.random.calculate({
+        min: $('rnd-min').value,
+        max: $('rnd-max').value,
+        count: $('rnd-count').value,
+        type: type,
+        unique: unique,
+      });
+      RV.renderError($('rnd-error'), result);
+      if (result.status !== 'success') {
+        $('rnd-result').hidden = true;
+        return;
+      }
+      last = result.metrics.values.slice();
+      $('rnd-out').textContent = last.join(', ');
+      RV.renderDetails($('rnd-detail'), result.details);
+      RV.renderExplanation($('rnd-explain'), result);
+      $('rnd-result').hidden = false;
+      U.track('calc_result', { tool: 'random', count: last.length, unique: unique });
+    });
+
+    $('rnd-type').addEventListener('change', syncUnique);
+    syncUnique();
+
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return false; });
+      }
+      return new Promise(function (resolve) {
+        var input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(input);
+        resolve(ok);
+      });
+    }
+
+    $('rnd-copy').addEventListener('click', function () {
+      if (!last.length) return;
+      copyText(last.join(', ')).then(function (ok) {
+        $('rnd-copy').textContent = ok ? '已复制' : '复制失败，请手动选择';
+        setTimeout(function () { $('rnd-copy').textContent = '复制结果'; }, 1800);
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();

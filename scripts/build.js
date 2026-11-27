@@ -9,9 +9,9 @@
      3. fingerprint → 生成 assets/manifest.json（资源版本 token）
      4. prerender → 逐路由渲染静态 HTML，写入 ROOT/<output>（根级 index.html + 显式 .html 页）
      5. build-sitemap → sitemap.xml
-     6. inject-scripts（守卫）+ check-links（死链）；任一失败 exit 1
+     6. apply-site-shell + inject-scripts（守卫）+ 注册表/源产物/死链/WCAG 门禁
    产物即部署内容：仓库根目录 = 站点根（deploy 同步 . → /www/wwwroot/uni-web/）。
-   用法：node scripts/build.js  |  node scripts/build.js --no-check
+   用法：node scripts/build.js（发布路径始终执行完整门禁，不支持跳过）
    ========================================================================== */
 
 const fs = require('fs');
@@ -59,8 +59,11 @@ function cleanLegacyOutputs(routes) {
 
 async function main() {
   const t0 = Date.now();
-  const skipCheck = process.argv.indexOf('--no-check') !== -1;
+  if (process.argv.slice(2).length) throw new Error('build.js 不接受跳过参数；诊断请单独运行对应 check 脚本');
   console.log('== xuyiheng-tools build ==');
+
+  const sourceRegistryErrors = require('./check-tool-registry').run({ phase: 'source' });
+  if (sourceRegistryErrors.length) throw new Error('源文件注册表门禁失败，已停止构建');
 
   const site = readJson('data/site.json');
   const data = readJson('data/pages.json');
@@ -96,12 +99,17 @@ async function main() {
 
   buildSitemap.run();
   buildLlms.run();
+  require('./apply-site-shell').run();
 
-  if (!skipCheck) {
-    require('@xuyiheng/static-build-kit/inject-scripts').run(); // WO-164 ④ 私有包化
-    require('@xuyiheng/static-build-kit/check-links').run(); // WO-164 ④ 私有包化
-    require('./check-tools-sync').run(); // 工具清单一致性门禁（pages.json 工具全集 ↔ site.json 侧栏）
-  }
+  require('@xuyiheng/static-build-kit/inject-scripts').run(); // WO-164 ④ 私有包化
+  const artifactRegistryErrors = require('./check-tool-registry').run({ phase: 'artifacts' });
+  if (artifactRegistryErrors.length) throw new Error('构建产物注册表门禁失败，已停止后续检查');
+  const artifactErrors = require('./check-build-artifacts').run();
+  if (artifactErrors.length) throw new Error('构建产物门禁失败，已停止后续检查');
+  require('@xuyiheng/static-build-kit/check-links').run(); // WO-164 ④ 私有包化
+  require('./check-tools-sync').run();
+  const wcagProblems = require('./check-wcag')();
+  if (wcagProblems.length) throw new Error('WCAG 门禁失败：' + wcagProblems.join('；'));
 
   console.log('== 完成，用时 ' + ((Date.now() - t0) / 1000).toFixed(2) + 's ==');
 }

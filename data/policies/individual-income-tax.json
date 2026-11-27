@@ -1,0 +1,59 @@
+{
+  "id": "individual-income-tax",
+  "title": "个人所得税综合所得与全年一次性奖金参数",
+  "jurisdiction": "中国内地",
+  "policyYear": 2026,
+  "version": "2026.11",
+  "effectiveDate": "2019-01-01",
+  "basicDeductionMonthly": 5000,
+  "monthlyBrackets": [
+    { "limit": 3000, "rate": 0.03, "quickDeduction": 0 },
+    { "limit": 12000, "rate": 0.1, "quickDeduction": 210 },
+    { "limit": 25000, "rate": 0.2, "quickDeduction": 1410 },
+    { "limit": 35000, "rate": 0.25, "quickDeduction": 2660 },
+    { "limit": 55000, "rate": 0.3, "quickDeduction": 4410 },
+    { "limit": 80000, "rate": 0.35, "quickDeduction": 7160 },
+    { "limit": null, "rate": 0.45, "quickDeduction": 15160 }
+  ],
+  "specialDeductionsMonthly": {
+    "childEducation": { "default": 2000, "limit": 2000, "unit": "元/月/子女" },
+    "infantCare": { "default": 2000, "limit": 2000, "unit": "元/月/婴幼儿" },
+    "continuingEducation": { "default": 400, "limit": 400, "unit": "元/月（学历教育）" },
+    "mortgageInterest": { "default": 1000, "limit": 1000, "unit": "元/月，最长 240 个月" },
+    "housingRent": { "default": 1500, "limit": 1500, "unit": "元/月，按城市条件分 1500/1100/800 元" },
+    "elderlySupport": { "default": 3000, "limit": 3000, "unit": "元/月；非独生子女每人不超过 1500 元" }
+  },
+  "specialDeductionsAnnual": {
+    "vocationalEducation": { "default": 3600, "limit": 3600, "unit": "元/年（职业资格继续教育）" }
+  },
+  "housingDeductionsMutuallyExclusive": ["mortgageInterest", "housingRent"],
+  "medicalDeduction": {
+    "basis": "医保目录范围内个人自付累计超过 15000 元的部分",
+    "thresholdAnnual": 15000,
+    "limitAnnual": 80000,
+    "monthlyEstimateDivisor": 12
+  },
+  "annualBonusSeparate": {
+    "validThrough": "2027-12-31",
+    "method": "奖金除以 12 查月度税率表，再以奖金全额乘以适用税率减速算扣除数"
+  },
+  "sources": [
+    {
+      "title": "国家税务总局：专项附加扣除政策",
+      "url": "https://www.chinatax.gov.cn/chinatax/n810219/n810724/c5211373/content.html"
+    },
+    {
+      "title": "国家税务总局：大病医疗专项附加扣除",
+      "url": "https://www.chinatax.gov.cn/n810219/n810744/n4016641/n4016661/c4260111/content.html"
+    },
+    {
+      "title": "上海市税务局：3 岁以下婴幼儿照护等专项附加扣除标准",
+      "url": "https://shanghai.chinatax.gov.cn/zcfw/zcfgk/grsds/202308/t468460.html"
+    }
+  ],
+  "limitations": [
+    "单月结果仅为静态估算，不是累计预扣或年度汇算申报结果",
+    "扣除资格、适用期间与分摊方式以税务机关核定为准",
+    "2028 年起不预设全年一次性奖金单独计税政策延续"
+  ]
+}

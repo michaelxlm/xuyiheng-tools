@@ -1,0 +1,83 @@
+/* ==========================================================================
+   secret-message.js · Web Crypto AES-GCM 认证加密与 fragment 编解码
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) module.exports = factory(globalThis);
+  else {
+    root.Tools = root.Tools || {};
+    root.Tools.secretMessage = factory(root);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (global) {
+  'use strict';
+
+  function cryptoImpl(override) {
+    var c = override || global.crypto;
+    if (!c || !c.subtle) throw new Error('当前环境不支持 Web Crypto AES-GCM');
+    return c;
+  }
+
+  function bytesToBase64Url(bytes) {
+    var binary = '';
+    for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    if (typeof btoa === 'function') return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return Buffer.from(bytes).toString('base64url');
+  }
+
+  function base64UrlToBytes(value) {
+    var s = String(value || '').replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    if (typeof atob === 'function') {
+      var binary = atob(s);
+      var out = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+      return out;
+    }
+    return new Uint8Array(Buffer.from(s, 'base64'));
+  }
+
+  function encode(payload) {
+    return bytesToBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
+  }
+
+  function decode(value) {
+    var text = new TextDecoder().decode(base64UrlToBytes(value));
+    return JSON.parse(text);
+  }
+
+  function fromHash(hash) {
+    try {
+      var m = String(hash || '').match(/(?:^#|[&])msg=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : null;
+    } catch (error) { return null; }
+  }
+
+  async function encrypt(text, cryptoOverride) {
+    var c = cryptoImpl(cryptoOverride);
+    var plaintext = String(text == null ? '' : text);
+    if (!plaintext) throw new Error('密语内容不能为空');
+    var key = await c.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+    var rawKey = new Uint8Array(await c.subtle.exportKey('raw', key));
+    var iv = new Uint8Array(12);
+    c.getRandomValues(iv);
+    var ciphertext = new Uint8Array(await c.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(plaintext)));
+    return encode({ v: 1, k: bytesToBase64Url(rawKey), iv: bytesToBase64Url(iv), ct: bytesToBase64Url(ciphertext) });
+  }
+
+  async function decrypt(value, cryptoOverride) {
+    var c = cryptoImpl(cryptoOverride);
+    var payload = typeof value === 'string' ? decode(value) : value;
+    if (!payload || payload.v !== 1 || typeof payload.k !== 'string' || typeof payload.iv !== 'string' || typeof payload.ct !== 'string') {
+      throw new Error('密语格式不受支持');
+    }
+    var rawKey = base64UrlToBytes(payload.k);
+    var iv = base64UrlToBytes(payload.iv);
+    var ciphertext = base64UrlToBytes(payload.ct);
+    if (rawKey.length !== 32 || iv.length !== 12 || !ciphertext.length) throw new Error('密语内容不完整');
+    var key = await c.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+    var plaintext = await c.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
+    return new TextDecoder().decode(plaintext);
+  }
+
+  return { encrypt: encrypt, decrypt: decrypt, encode: encode, decode: decode, fromHash: fromHash };
+});

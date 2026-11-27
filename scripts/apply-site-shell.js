@@ -452,4 +452,5 @@ function main() {
     ' · 资源版本 ' + v);
 }
 
-main();
+if (require.main === module) main();
+module.exports = { run: main };

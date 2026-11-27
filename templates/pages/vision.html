@@ -1,23 +1,24 @@
         <section class="page-heading">
-          <h1>在线视力自测</h1>
-          <p>用标准 E 字视标进行简易视力自测：按提示说出屏幕上「E」的开口方向，视标会随你的表现自动变大变小，快速估算你的视力水平。请置于建议距离观看。</p>
+          <h1>屏幕辨向测试</h1>
+          <p>通过不同大小的 E 字视标测试本次屏幕辨向表现。请先校准屏幕，再选择固定观看距离；结果受设备、亮度、距离与环境影响，不是医学视力诊断。</p>
         </section>
 
         <form class="card" id="vsSetup">
           <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="vs-dist">观看距离</label><select class="form-select" id="vs-dist"><option value="0.5">约 50 cm（手机）</option><option value="1">约 1 m</option><option value="2">约 2 m</option><option value="3">约 3 m（推荐）</option></select></div>
+            <div class="form-group"><label class="form-label" for="vs-dist">观看距离</label><select class="form-select" id="vs-dist"><option value="0.5">约 50 cm（手机）</option><option value="1">约 1 m</option><option value="2">约 2 m</option><option value="3">约 3 m</option><option value="5" selected>约 5 m（标准距离）</option></select></div>
             <div class="form-group"><label class="form-label" for="vs-eye">测试眼</label><select class="form-select" id="vs-eye"><option value="both">双眼</option><option value="left">左眼</option><option value="right">右眼</option></select></div>
           </div>
-          <p style="margin:var(--space-2) 0 0;color:var(--color-muted);font-size:var(--text-sm)">屏幕显示大小因设备而异，可先用尺量取下方校准条，输入其真实长度以精确标定。</p>
+          <p style="margin:var(--space-2) 0 0;color:var(--color-muted);font-size:var(--text-sm)">屏幕显示大小因设备而异。请用直尺测量下方校准条的实际宽度，再输入实测长度；未完成校准不能开始。</p>
           <div class="calib" id="vs-calib"><span>← 校准尺 100 mm →</span></div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label" for="vs-real">校准尺实测长度(mm)</label><div class="input-with-unit"><input class="form-input" id="vs-real" type="number" inputmode="decimal" placeholder="用尺量上面的长度"></div></div>
-            <div class="form-group" style="display:flex;align-items:flex-end"><button class="btn btn-secondary" type="button" id="vs-apply" style="width:100%">应用标定</button></div>
+            <div class="form-group"><label class="form-label" for="vs-real">校准尺实测长度（mm）</label><div class="input-with-unit"><input class="form-input" id="vs-real" type="number" inputmode="decimal" min="20" max="300" step="any" placeholder="用尺量上面的宽度" required></div></div>
+            <div class="form-group" style="display:flex;align-items:flex-end"><button class="btn btn-secondary" type="button" id="vs-apply" style="width:100%">应用标定并开始</button></div>
           </div>
+          <p id="vs-error" class="form-error" role="alert" hidden></p>
         </form>
 
-        <div class="card" id="vsStage" hidden>
-          <div class="vs-opto-wrap"><div class="vs-e" id="vs-e">E</div></div>
+        <div class="card" id="vs-stage" hidden>
+          <div class="vs-opto-wrap"><svg class="vs-e" id="vs-e" viewBox="0 0 100 100" role="img" aria-label="E 字视标" width="100" height="100"><path d="M0 0H100V20H20V40H85V60H20V80H100V100H0Z" fill="currentColor"/></svg></div>
           <div class="vs-level">当前视标：<b id="vs-level-txt">--</b></div>
           <p style="text-align:center;color:var(--color-muted);margin:0 0 var(--space-2)">这个 E 的开口朝向哪个方向？</p>
           <div class="btn-row vs-dir">
@@ -26,124 +27,44 @@
             <button class="btn btn-secondary" type="button" data-dir="left">← 左</button>
             <button class="btn btn-secondary" type="button" data-dir="right">→ 右</button>
           </div>
-          <div class="result-box" id="vs-result" hidden>
-            <div class="result-row"><div><div class="result-label">估算视力</div><div class="result-value" id="vs-score">--</div></div></div>
+          <div class="result-box" id="vs-result" hidden aria-live="polite">
+            <div class="result-row"><div><div class="result-label">本次屏幕辨向测试表现</div><div class="result-value" id="vs-score">--</div></div></div>
             <dl class="result-detail" id="vs-detail"></dl>
+            <div id="vs-explain" class="mt-4"></div>
             <div class="btn-row"><button class="btn btn-primary" type="button" id="vs-restart">重新测试</button></div>
           </div>
         </div>
 
-        <div class="info-box mt-4"><span>👁️</span><div>本自测为粗略筛查，受屏幕尺寸、亮度、环境光线影响，<b>不能替代专业验光</b>。如结果异常或视物模糊，请到正规眼科或眼镜店检查。</div></div>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>每个等级连续两次正确才记录通过。5 米距离下 1.0 等级视标的几何高度约 7.27 mm。本测试仅反映本次屏幕辨向表现，<b>不能替代专业验光或医学诊断</b>；如视物模糊、眼痛或视力骤降，请及时就医。</div></div>
 
         <style>
-        .calib { width: 100mm; border: 1px solid var(--color-border); border-radius: var(--radius-sm); margin: var(--space-3) 0; padding: var(--space-2); text-align: center; font-size: var(--text-sm); background: var(--color-surface-2); }
+        .calib { width: 100mm; max-width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-sm); margin: var(--space-3) 0; padding: var(--space-2); text-align: center; font-size: var(--text-sm); background: var(--color-surface-2); }
         .vs-opto-wrap { min-height: 220px; display: grid; place-items: center; }
-        .vs-e { font-weight: 800; line-height: 1; font-family: Arial, sans-serif; color: #000; }
+        .vs-e { display: block; color: #000; transform-origin: center; }
         :root[data-theme="dark"] .vs-e { color: #fff; }
         .vs-level { text-align: center; color: var(--color-muted); font-size: var(--text-sm); }
         .vs-dir { justify-content: center; }
-        .vs-dir .btn { min-width: 84px; }
+        .vs-dir .btn { min-width: 84px; min-height: 44px; }
         </style>
 
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            // 标准：5m 处 1.0 视力对应 E 高 43.7mm（1角分笔画×5）。按 acuity A、距离 d，E 物理高(mm)= 2*d*tan( (5/A 角分)/2 )
-            function mmForAcuity(A, dMeters) {
-              var angleDeg = (5 / A) / 60;              // E 整体张角（度）
-              var mm = 2 * (dMeters * 1000) * Math.tan(angleDeg * Math.PI / 180 / 2);
-              return mm;
-            }
-            var pxPerMm = 96 / 25.4;                     // CSS 名义像素密度
-            var LEVELS = [0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5, 2.0];
-            var DIRS = ['up', 'down', 'left', 'right'], ROT = { up: 0, right: 90, down: 180, left: 270 };
-            var state = { li: 0, dir: 'up', streak: 0, step: 1, maxPass: 0, tested: false };
-
-            $('vs-apply').addEventListener('click', function () {
-              var real = U.numInput($('vs-real'));
-              // 校准条名义宽 100mm；用户量得实际 real mm，则真实 px/mm = 屏幕像素宽 / 实测毫米
-              if (real > 0) pxPerMm = $('vs-calib').offsetWidth / real;
-              U.track('vision_calibrate', { pxPerMm: Math.round(pxPerMm * 10) / 10 });
-              startTest();
-            });
-            $('vsSetup').addEventListener('submit', function (e) { e.preventDefault(); startTest(); });
-            // 无显式提交按钮：选择后随时可点“应用标定”开始；也支持回车
-            function renderOpto() {
-              var d = parseFloat($('vs-dist').value);
-              var A = LEVELS[state.li];
-              var mm = mmForAcuity(A, d);
-              var px = Math.max(12, Math.round(mm * pxPerMm));
-              var el = $('vs-e');
-              el.style.fontSize = px + 'px';
-              el.style.transform = 'rotate(' + ROT[state.dir] + 'deg)';
-              $('vs-level-txt').textContent = A.toFixed(1) + '（约 ' + px + 'px）';
-            }
-            function startTest() {
-              state.li = Math.max(0, LEVELS.indexOf(0.5)); // 从中等难度 0.5 起步（index 5）
-              if (LEVELS[state.li] !== 0.5) state.li = 5;
-              state.streak = 0; state.step = 1; state.maxPass = 0; state.tested = true;
-              nextDir(); renderOpto();
-              $('vsStage').hidden = false; $('vs-result').hidden = true;
-              $('vsSetup').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-            function nextDir() { state.dir = DIRS[Math.floor(Math.random() * 4)]; }
-            U.qsa('.vs-dir .btn').forEach(function (b) {
-              b.addEventListener('click', function () {
-                if (!state.tested) return;
-                var ok = b.getAttribute('data-dir') === state.dir;
-                if (ok) {
-                  state.streak++;
-                  if (state.streak >= 2 && state.li < LEVELS.length - 1) { state.li++; state.streak = 0; }
-                  state.maxPass = Math.max(state.maxPass, LEVELS[state.li]);
-                } else {
-                  state.streak = 0;
-                  if (state.li > 0) state.li--;
-                  else { finish(); return; }
-                }
-                nextDir(); renderOpto();
-              });
-            });
-            function finish() {
-              state.tested = false;
-              var A = LEVELS[state.li];
-              var score = state.maxPass;
-              var cat = score >= 1.0 ? '正常（≥1.0）' : score >= 0.5 ? '轻度偏低' : '明显偏低，建议尽快检查';
-              $('vs-score').textContent = score ? score.toFixed(1) : '＜0.1';
-              $('vs-detail').innerHTML =
-                row('测试眼', ({ both: '双眼', left: '左眼', right: '右眼' })[$('vs-eye').value]) +
-                row('观看距离', $('vs-dist').selectedOptions[0].textContent.replace('约 ', '')) +
-                row('结论', cat) +
-                row('提示', '如需准确数值请以专业验光为准');
-              $('vs-result').hidden = false;
-              U.track('calc_result', { tool: 'vision', acuity: score });
-            }
-            $('vs-restart').addEventListener('click', startTest);
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
-
-<section class="tool-info">
-          <h2>关于在线视力测试</h2>
-          <p>在线视力测试通过屏幕上的视标辅助你粗略评估辨向与分辨能力，属参考性自测，不能替代专业验光或医学诊断。测试结果受屏幕尺寸、像素密度、亮度与观看距离影响，仅供了解大致视力变化趋势。</p>
+        <section class="tool-info">
+          <h2>关于屏幕辨向测试</h2>
+          <p>本工具根据视角公式和你的屏幕校准结果调整视标大小，记录连续两次答对的等级。它用于了解屏幕辨向表现，不等同于标准视力表，也不能给出眼镜度数或医学结论。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>这个视力测试准确吗？</summary>
-            <p>仅供参考。在线测试受屏幕像素密度、尺寸、亮度与观看距离影响，无法等同于标准视力表；如需准确度数请到正规机构验光。</p>
+            <summary>这个测试准确吗？</summary>
+            <p>只能作为低置信度参考。屏幕像素密度、缩放、亮度、观看距离和环境均会影响结果；准确视力与屈光状态请以专业验光为准。</p>
           </details>
           <details>
             <summary>应该保持多远距离？</summary>
-            <p>建议在屏幕前约一臂到两臂的固定距离，并在正常光线下进行；距离与光线变化都会影响结果。</p>
+            <p>请选择能够实际保持的固定距离并如实测量。5 米是标准视力测试距离，但普通屏幕与室内空间未必能满足，不要为了凑距离估算结果。</p>
           </details>
           <details>
-            <summary>多久该检查一次视力？</summary>
-            <p>一般成人可每年自测并定期专业检查；长时间用眼者、青少年与 40 岁以上人群建议更频繁，出现视力骤降、眼痛等应立即就医。</p>
+            <summary>为什么必须先校准？</summary>
+            <p>CSS 像素对应的物理长度会随屏幕、浏览器缩放和操作系统设置变化。校准用于把视标几何尺寸转换为当前屏幕像素。</p>
           </details>
           <details>
             <summary>儿童可以做吗？</summary>
-            <p>可做粗略参考，但儿童配合度与表达能力有限，建议以专业眼科检查为准。</p>
+            <p>可作粗略参考，但儿童配合度与表达能力有限，建议以专业眼科检查为准。</p>
           </details>
         </section>

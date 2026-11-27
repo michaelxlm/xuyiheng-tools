@@ -64,22 +64,22 @@ jobs:
           [ -x "$NODE" ] || NODE=node
           $NODE scripts/check-wcag.js
 
+      - name: Unit tests
+        shell: bash
+        run: |
+          NODE=/www/server/nodejs/v20.18.3/bin/node
+          [ -x "$NODE" ] || NODE=node
+          $NODE --test tests/unit/*.test.js
+
       - name: Build
         shell: bash
         run: |
           NODE=/www/server/nodejs/v20.18.3/bin/node
           [ -x "$NODE" ] || NODE=node
+          # build.js 已串联展示层注入、注册表、源产物、死链、工具同步与 WCAG 门禁
           $NODE scripts/build.js
-          $NODE scripts/check-links.js
 
-      - name: Apply unified site shell (footer / about / ads / cross-links)
-        shell: bash
-        run: |
-          # 展示层统一规范：build.js（含 prerender/fingerprint/check-links）之后的最后一步
-          NODE=/www/server/nodejs/v20.18.3/bin/node
-          [ -x "$NODE" ] || NODE=node
-          $NODE scripts/apply-site-shell.js
-          $NODE scripts/apply-site-shell.js --check
+
       - name: Sync to /www/wwwroot/uni-web
         shell: bash
         run: |

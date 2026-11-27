@@ -746,6 +746,18 @@ input.form-input[type="search"]::-webkit-search-decoration { -webkit-appearance:
 .result-detail-row { display: flex; justify-content: space-between; gap: var(--space-4); font-size: var(--text-sm); }
 .result-detail-row dt { color: var(--color-muted); }
 .result-detail-row dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.form-status, .form-error { margin-top: var(--space-3); font-size: var(--text-sm); line-height: 1.6; color: var(--color-muted); }
+.form-error, .is-error { color: #b42318; }
+[data-theme="dark"] .form-error, [data-theme="dark"] .is-error { color: #fca5a5; }
+.result-explain { border-top: 1px solid var(--color-border); padding: var(--space-3) 0; font-size: var(--text-sm); }
+.result-explain summary { cursor: pointer; font-weight: 650; color: var(--color-text); }
+.result-explain > div { margin-top: var(--space-2); color: var(--color-muted); line-height: 1.7; overflow-wrap: anywhere; }
+.result-explain ul { margin: 0; padding-left: 1.25em; }
+.result-explain li + li { margin-top: var(--space-1); }
+@media (max-width: 767px) {
+  .result-box { padding: var(--space-4); }
+  .result-detail-row { align-items: flex-start; }
+}
 
 /* 快捷标签 */
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }

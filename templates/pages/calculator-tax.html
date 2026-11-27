@@ -1,103 +1,91 @@
         <section class="page-heading">
           <h1>个税计算器</h1>
-          <p>输入工资与专项附加扣除，按 2019 年起施行的月度累进税率，精准计算个人所得税与税后收入，支持年终奖「单独计税 / 并入当月工资」两种方式。</p>
+          <p>按单月静态口径估算工资薪金个税与税后收入，支持专项附加扣除，并比较年终奖“单独计税 / 并入当月工资”两种方式。结果不是累计预扣或年度汇算申报结果。</p>
         </section>
 
         <form class="card" id="taxForm">
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="tax-salary">税前月收入</label>
-              <div class="input-with-unit">
-                <input class="form-input" id="tax-salary" type="number" inputmode="decimal" min="0" placeholder="请输入税前月收入" required>
-                <span class="unit-tag">元</span>
-              </div>
+              <div class="input-with-unit"><input class="form-input" id="tax-salary" type="number" inputmode="decimal" min="0" step="any" placeholder="请输入税前月收入" required><span class="unit-tag">元</span></div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="tax-insurance">五险一金</label>
-              <div class="input-with-unit">
-                <input class="form-input" id="tax-insurance" type="number" inputmode="decimal" min="0" placeholder="请输入五险一金">
-                <span class="unit-tag">元</span>
-              </div>
+              <label class="form-label" for="tax-insurance">个人五险一金</label>
+              <div class="input-with-unit"><input class="form-input" id="tax-insurance" type="number" inputmode="decimal" min="0" step="any" placeholder="请输入个人缴费"><span class="unit-tag">元</span></div>
             </div>
           </div>
 
           <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="tax-d1">子女教育</label><input class="form-input" id="tax-d1" data-deduct type="number" min="0" placeholder="0"></div>
-            <div class="form-group"><label class="form-label" for="tax-d2">继续教育</label><input class="form-input" id="tax-d2" data-deduct type="number" min="0" placeholder="0"></div>
-            <div class="form-group"><label class="form-label" for="tax-d3">住房贷款利息</label><input class="form-input" id="tax-d3" data-deduct type="number" min="0" placeholder="0"></div>
-            <div class="form-group"><label class="form-label" for="tax-d4">住房租金</label><input class="form-input" id="tax-d4" data-deduct type="number" min="0" placeholder="0"></div>
-            <div class="form-group"><label class="form-label" for="tax-d5">赡养老人</label><input class="form-input" id="tax-d5" data-deduct type="number" min="0" placeholder="0"></div>
-            <div class="form-group"><label class="form-label" for="tax-d6">大病医疗</label><input class="form-input" id="tax-d6" data-deduct type="number" min="0" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-childEducation">子女教育（合计）</label><input class="form-input" id="tax-childEducation" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-infantCare">3 岁以下婴幼儿照护（合计）</label><input class="form-input" id="tax-infantCare" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-continuingEducation">学历继续教育</label><input class="form-input" id="tax-continuingEducation" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-vocationalEducationAnnual">职业资格继续教育（年度）</label><input class="form-input" id="tax-vocationalEducationAnnual" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-mortgageInterest">住房贷款利息</label><input class="form-input" id="tax-mortgageInterest" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-housingRent">住房租金</label><input class="form-input" id="tax-housingRent" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-elderlySupport">赡养老人（合计）</label><input class="form-input" id="tax-elderlySupport" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+            <div class="form-group"><label class="form-label" for="tax-medicalAnnualExpense">大病医疗年度自付金额</label><input class="form-input" id="tax-medicalAnnualExpense" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
           </div>
+          <p class="form-status">子女教育、婴幼儿照护与赡养老人请填写符合条件后的合计；房贷利息与房租不能同时扣除。大病医疗按年度超过 15000 元的部分、最高 80000 元计算；职业资格继续教育按年度不超过 3600 元填写，均折算为月均扣除。</p>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="tax-threshold">起征点</label>
-              <div class="input-with-unit">
-                <input class="form-input" id="tax-threshold" type="number" min="0" value="5000">
-                <span class="unit-tag">元</span>
-              </div>
+              <label class="form-label" for="tax-threshold">基本减除费用</label>
+              <div class="input-with-unit"><input class="form-input" id="tax-threshold" type="number" inputmode="decimal" min="0" step="any" value="5000"><span class="unit-tag">元/月</span></div>
             </div>
             <div class="form-group">
               <label class="form-label" for="tax-bonus">年终奖</label>
-              <div class="input-with-unit">
-                <input class="form-input" id="tax-bonus" type="number" min="0" value="0">
-                <span class="unit-tag">元</span>
-              </div>
+              <div class="input-with-unit"><input class="form-input" id="tax-bonus" type="number" inputmode="decimal" min="0" step="any" value="0"><span class="unit-tag">元</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tax-policyYear">政策快照年度</label>
+              <input class="form-input" id="tax-policyYear" type="number" min="2019" max="2027" step="1" value="2026" readonly aria-readonly="true">
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="tax-bonusMode">年终奖计税方式</label>
-            <select class="form-select" id="tax-bonusMode">
-              <option value="0">单独计税（全年一次性奖金）</option>
-              <option value="1">并入当月工资</option>
-            </select>
+            <select class="form-select" id="tax-bonusMode"><option value="separate">单独计税（全年一次性奖金）</option><option value="combined">并入当月工资</option></select>
           </div>
 
+          <p id="tax-error" class="form-error" role="alert" hidden></p>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tax"}'>算个税</button>
             <button class="btn btn-secondary" type="button" id="tax-clear">清空</button>
           </div>
         </form>
 
-        <div class="result-box" id="tax-result" hidden>
+        <div class="result-box" id="tax-result" hidden aria-live="polite">
           <div class="result-row">
-            <div>
-              <div class="result-label">税后收入</div>
-              <div class="result-value" id="tax-afterTax">--</div>
-            </div>
-            <div>
-              <div class="result-label">应纳税额</div>
-              <div class="result-value" id="tax-tax">--</div>
-            </div>
+            <div><div class="result-label">税后收入（含年终奖）</div><div class="result-value" id="tax-afterTax">--</div></div>
+            <div><div class="result-label">合计应纳税额</div><div class="result-value" id="tax-tax">--</div></div>
           </div>
           <dl class="result-detail" id="tax-detail"></dl>
+          <div id="tax-explain" class="mt-4"></div>
         </div>
 
         <div class="info-box">
-          <span aria-hidden="true">ℹ️</span>
-          <span>依据《个人所得税法》2019 年施行的综合所得月度税率表；全年一次性奖金单独计税优惠延续至 2027-12-31（财税〔2018〕164 号）。结果仅供参考。</span>
+          <span aria-hidden="true">i</span>
+          <span>依据《个人所得税法》综合所得月度税率表与 2026 年政策快照；全年一次性奖金单独计税政策当前快照核验至 2027-12-31。结果仅供理解口径，实际扣除资格、适用期间与申报方式以税务机关核定为准。</span>
         </div>
 
-<section class="tool-info">
+        <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>个税计算器按工资收入估算应纳税额与税后收入，并支持填写专项附加扣除；采用常见的累计预扣口径，实际以税务机关汇算清缴结果为准。</p>
+          <p>个税计算器按工资收入估算应纳税额与税后收入，并支持专项附加扣除和年终奖两种计税方式。它采用单月静态估算，不模拟累计预扣，也不替代年度汇算清缴。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>计算方式是什么？</summary>
-            <p>按应税收入减除基本减除费用、社保公积金与专项附加扣除后，套用税率估算税额。</p>
+            <p>应税收入减除个人五险一金、基本减除费用与专项附加扣除后，套用适用税率并减去速算扣除数。</p>
           </details>
           <details>
-            <summary>专项附加扣除要自己填吗？</summary>
-            <p>是的，请据实填写子女教育、房贷、赡养老人等扣除项，它们会直接影响结果。</p>
+            <summary>为什么房贷与房租不能同时填？</summary>
+            <p>住房贷款利息和住房租金专项附加扣除互斥，同时填写会阻止计算并显示行内错误。</p>
+          </details>
+          <details>
+            <summary>大病医疗怎么处理？</summary>
+            <p>按医保目录范围内个人自付累计超过 15000 元的部分扣除，年度限额 80000 元；页面折算为月均仅用于单月静态估算。</p>
           </details>
           <details>
             <summary>结果准确吗？</summary>
-            <p>为基于预扣模型的估算，年度汇算清缴后以税务机关核定为准。</p>
-          </details>
-          <details>
-            <summary>含年终奖单独计税吗？</summary>
-            <p>视页面选项而定，如未涵盖请以实际政策与申报为准。</p>
+            <p>结果为基于当前快照和填写参数的估算。累计预扣、年度汇算、扣除期间与分摊方式以税务机关结果为准。</p>
           </details>
         </section>

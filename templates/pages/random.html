@@ -1,96 +1,49 @@
         <section class="page-heading">
           <h1>随机数生成器</h1>
-          <p>生成指定范围的随机整数或小数，支持一次生成多个、去重、不走回头路。可用于抽签、分组、抽奖、取样、密码随机数等场景。</p>
+          <p>在浏览器本地生成指定范围的随机整数或小数，支持一次生成多个与整数不重复。整数使用 Web Crypto 无偏采样，不依赖服务端，也不会上传输入。</p>
         </section>
 
         <form class="card" id="rndForm">
           <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="rnd-min">最小值</label><div class="input-with-unit"><input class="form-input" id="rnd-min" type="number" inputmode="numeric" value="1"></div></div>
-            <div class="form-group"><label class="form-label" for="rnd-max">最大值</label><div class="input-with-unit"><input class="form-input" id="rnd-max" type="number" inputmode="numeric" value="100"></div></div>
-            <div class="form-group"><label class="form-label" for="rnd-count">生成个数</label><div class="input-with-unit"><input class="form-input" id="rnd-count" type="number" inputmode="numeric" min="1" max="1000" value="1"><span class="unit-tag">个</span></div></div>
+            <div class="form-group"><label class="form-label" for="rnd-min">最小值</label><div class="input-with-unit"><input class="form-input" id="rnd-min" type="number" inputmode="numeric" step="1" value="1" required></div></div>
+            <div class="form-group"><label class="form-label" for="rnd-max">最大值</label><div class="input-with-unit"><input class="form-input" id="rnd-max" type="number" inputmode="numeric" step="1" value="100" required></div></div>
+            <div class="form-group"><label class="form-label" for="rnd-count">生成个数</label><div class="input-with-unit"><input class="form-input" id="rnd-count" type="number" inputmode="numeric" min="1" max="1000" step="1" value="1" required><span class="unit-tag">个</span></div></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label class="form-label" for="rnd-type">数值类型</label><select class="form-select" id="rnd-type"><option value="int">整数</option><option value="float">小数（2 位）</option></select></div>
             <div class="form-group"><label class="form-label" for="rnd-unique">重复设置</label><select class="form-select" id="rnd-unique"><option value="allow">允许重复</option><option value="norep">整数不重复</option></select></div>
           </div>
+          <p id="rnd-error" class="form-error" role="alert" hidden></p>
           <div class="btn-row"><button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"random"}'>生成随机数</button></div>
         </form>
 
-        <div class="result-box" id="rnd-result" hidden>
+        <div class="result-box" id="rnd-result" hidden aria-live="polite">
           <div class="result-row"><div><div class="result-label">生成结果</div><div class="result-value" id="rnd-out" style="font-size:var(--text-xl);word-break:break-all">--</div></div></div>
           <dl class="result-detail" id="rnd-detail"></dl>
+          <div id="rnd-explain" class="mt-4"></div>
           <div class="btn-row"><button class="btn btn-secondary" type="button" id="rnd-copy">复制结果</button></div>
         </div>
 
-        <div class="info-box mt-4"><span>🎲</span><div>结果由浏览器加密级随机源 crypto.getRandomValues（不可用时退回 Math.random）生成。「整数不重复」时，取值范围需 ≥ 生成个数。</div></div>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>结果由浏览器加密级随机源 <code>crypto.getRandomValues</code> 生成；环境不支持安全随机源时会明确报错，不会静默退回 <code>Math.random</code>。整数端点必须在安全整数范围内，不重复个数不能超过取值范围。</div></div>
 
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function randInt(min, max) {
-              if (window.crypto && crypto.getRandomValues) {
-                var span = max - min + 1, buf = new Uint32Array(1);
-                var limit = Math.floor(4294967296 / span) * span;
-                do { crypto.getRandomValues(buf); } while (buf[0] >= limit);
-                return min + (buf[0] % span);
-              }
-              return Math.floor(Math.random() * (max - min + 1)) + min;
-            }
-            var last = [];
-            $('rndForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var min = Math.floor(U.numInput($('rnd-min'))), max = Math.floor(U.numInput($('rnd-max'))), count = Math.floor(U.numInput($('rnd-count')) || 1);
-              var type = $('rnd-type').value, norep = $('rnd-unique').value === 'norep';
-              if (!Number.isFinite(min) || !Number.isFinite(max)) { alert('请填写最小值与最大值'); return; }
-              if (min > max) { var t = min; min = max; max = t; }
-              if (count < 1) count = 1; if (count > 1000) count = 1000;
-              var range = max - min + 1;
-              if (type === 'int' && norep && count > range) { alert('不重复个数超过取值范围（范围共 ' + range + ' 个），请减少个数'); return; }
-              var out = [], guard = 0;
-              if (type === 'float') {
-                for (var i = 0; i < count; i++) out.push(U.round(min + Math.random() * (max - min), 2));
-              } else if (norep) {
-                var pool = []; for (var v = min; v <= max; v++) pool.push(v);
-                for (var j = 0; j < count; j++) { var idx = randInt(0, pool.length - 1); out.push(pool[idx]); pool.splice(idx, 1); }
-              } else {
-                while (out.length < count && guard++ < 100000) out.push(randInt(min, max));
-              }
-              last = out;
-              $('rnd-out').textContent = out.join(', ');
-              $('rnd-detail').innerHTML = row('范围', min + ' ~ ' + max) + row('个数', out.length) + row('类型', type === 'float' ? '小数' : (norep ? '整数·不重复' : '整数·可重复'));
-              $('rnd-result').hidden = false;
-              U.track('calc_result', { tool: 'random', count: out.length });
-            });
-            $('rnd-copy').addEventListener('click', function () {
-              if (!last.length || !navigator.clipboard) return;
-              navigator.clipboard.writeText(last.join(', ')).then(function () { U.track('random_copy', {}); });
-            });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
-
-<section class="tool-info">
+        <section class="tool-info">
           <h2>关于随机数生成器</h2>
-          <p>随机数生成器在浏览器本地按你设定的范围与个数生成随机数，可用于抽签、点名、抽奖、生成测试数据等场景，不上传任何数据。适用于日常随机需求；高安全场景（密码、密钥）请使用专业密码学随机源。</p>
+          <p>随机数生成器在浏览器本地按你设定的范围与个数生成结果，可用于抽签、点名、抽奖和生成测试数据。整数采用无偏拒绝采样，大区间不重复采用局部 Fisher–Yates 变体，不会创建整个连续区间数组。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>生成的是真随机数吗？</summary>
-            <p>不是。浏览器用的是伪随机算法（周期极长），足以应付抽签、测试等日常场景；用于密码、密钥等高安全用途请使用专业的密码学随机源。</p>
+            <p>浏览器提供的是加密安全伪随机数，适合抽签和一般随机用途；不应把一次生成结果当作抽样代表性或公平性的唯一证明。</p>
           </details>
           <details>
             <summary>可以设定哪些参数？</summary>
-            <p>一般可设定最小值、最大值与生成个数，工具在闭区间内随机取值（是否允许重复以页面选项为准）。</p>
+            <p>可设置最小值、最大值、生成个数以及整数是否允许重复。最小值与最大值会按数值大小自动排序。</p>
           </details>
           <details>
             <summary>输入的数据会被上传吗？</summary>
-            <p>不会。范围与结果都在本地计算，不上传、不记录。</p>
+            <p>不会。范围与结果都在本地计算，不上传，分析事件也不记录具体数值。</p>
           </details>
           <details>
-            <summary>生成的数字会重复吗？</summary>
-            <p>取决于设置：允许重复时可出现相同值；要求不重复时数量不能超过区间可选值个数。</p>
+            <summary>小数为什么保留两位？</summary>
+            <p>小数模式按两位小数显示和复制，不补足固定尾零；需要更高精度时请使用专业计算或密码学工具。</p>
           </details>
         </section>

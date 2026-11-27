@@ -1,43 +1,77 @@
         <style>
-        #si-compare-wrap [hidden]{display:none}
-        .si-ded{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:var(--space-3)}
-        .si-ded label{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-sm);color:var(--color-text)}
+        .si-rates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4)}
+        .si-rate-group{border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:var(--space-4)}
+        .si-rate-group h3{margin:0 0 var(--space-3);font-size:var(--text-base)}
         .si-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
         .si-table th,.si-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
         .si-table th{color:var(--color-muted);font-weight:600}
-        .si-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        .si-del{min-height:44px;padding:8px 12px;font-size:var(--text-xs)}
+        @media(max-width:767px){.si-rates{grid-template-columns:1fr}.si-rate-group{padding:var(--space-3)}}
         </style>
 
         <section class="page-heading">
           <h1>五险一金计算器 · 到手工资测算</h1>
-          <p>选择城市档位，自动套用该地示例费率与缴费基数上下限；可勾选专项附加扣除，一次看到个人 / 单位逐月缴费、公积金入账、个税与到手工资，并保存多组方案对比。</p>
+          <p>分别填写税前工资、社保缴费基数和公积金缴费基数，再按当地当期费率估算个人与单位缴费、个税和到手工资。默认费率仅为可编辑示例，不代表任何城市当前核定口径。</p>
         </section>
 
-        <form class="card" id="siForm">
+        <form class="card" id="siForm" novalidate>
           <div class="form-row">
-            <div class="form-group"><label class="form-label" for="si-city">城市档位</label><select class="form-select" id="si-city"></select></div>
-            <div class="form-group"><label class="form-label" for="si-base">缴费基数</label><div class="input-with-unit"><input class="form-input" id="si-base" type="number" inputmode="decimal" step="any" min="0" placeholder="如 10000"><span class="unit-tag">元/月</span></div></div>
+            <div class="form-group"><label class="form-label" for="si-salary">税前月工资</label><div class="input-with-unit"><input class="form-input" id="si-salary" type="number" inputmode="decimal" step="any" min="0" placeholder="如 20000" required><span class="unit-tag">元/月</span></div></div>
+            <div class="form-group"><label class="form-label" for="si-socialBase">社保缴费基数</label><div class="input-with-unit"><input class="form-input" id="si-socialBase" type="number" inputmode="decimal" step="any" min="0" placeholder="如 10000" required><span class="unit-tag">元/月</span></div></div>
+            <div class="form-group"><label class="form-label" for="si-fundBase">公积金缴费基数</label><div class="input-with-unit"><input class="form-input" id="si-fundBase" type="number" inputmode="decimal" step="any" min="0" placeholder="如 10000" required><span class="unit-tag">元/月</span></div></div>
+            <div class="form-group"><label class="form-label" for="si-policyYear">政策快照年度</label><input class="form-input" id="si-policyYear" type="number" min="2019" max="2027" step="1" value="2026" readonly aria-readonly="true"></div>
           </div>
-          <div class="form-group"><label class="form-label" for="si-fund">住房公积金比例（个人与单位同比例）</label><div class="input-with-unit"><input class="form-input" id="si-fund" type="number" inputmode="decimal" step="any" min="5" max="12" value="12"><span class="unit-tag">%</span></div></div>
-          <details>
-            <summary>专项附加扣除（选填，勾选自动合计）</summary>
-            <div class="si-ded">
-              <label><input type="checkbox" class="si-item" data-amt="2000">子女教育 2000</label>
-              <label><input type="checkbox" class="si-item" data-amt="2000">3 岁以下婴幼儿照护 2000</label>
-              <label><input type="checkbox" class="si-item" data-amt="400">继续教育 400</label>
-              <label><input type="checkbox" class="si-item" data-amt="1000">住房贷款利息 1000</label>
-              <label><input type="checkbox" class="si-item" data-amt="1500">住房租金 1500</label>
-              <label><input type="checkbox" class="si-item" data-amt="3000">赡养老人 3000</label>
+          <p class="form-status">缴费基数用于计算五险一金，不等于税前工资。到手工资以实际工资减个人缴费和个税计算。</p>
+
+          <details class="mt-4">
+            <summary>缴费基数上下限（选填，按当地当期公布口径填写）</summary>
+            <div class="form-row mt-4">
+              <div class="form-group"><label class="form-label" for="si-socialMin">社保基数下限</label><div class="input-with-unit"><input class="form-input" id="si-socialMin" type="number" inputmode="decimal" step="any" min="0" placeholder="不限制"><span class="unit-tag">元</span></div></div>
+              <div class="form-group"><label class="form-label" for="si-socialMax">社保基数上限</label><div class="input-with-unit"><input class="form-input" id="si-socialMax" type="number" inputmode="decimal" step="any" min="0" placeholder="不限制"><span class="unit-tag">元</span></div></div>
+              <div class="form-group"><label class="form-label" for="si-fundMin">公积金基数下限</label><div class="input-with-unit"><input class="form-input" id="si-fundMin" type="number" inputmode="decimal" step="any" min="0" placeholder="不限制"><span class="unit-tag">元</span></div></div>
+              <div class="form-group"><label class="form-label" for="si-fundMax">公积金基数上限</label><div class="input-with-unit"><input class="form-input" id="si-fundMax" type="number" inputmode="decimal" step="any" min="0" placeholder="不限制"><span class="unit-tag">元</span></div></div>
             </div>
           </details>
-          <div class="form-group mt-4"><label class="form-label" for="si-special">每月专项附加扣除合计</label><div class="input-with-unit"><input class="form-input" id="si-special" type="number" inputmode="decimal" step="any" min="0" value="0"><span class="unit-tag">元</span></div></div>
+
+          <details class="mt-4" open>
+            <summary>个人与单位缴费费率（%）</summary>
+            <div class="si-rates mt-4">
+              <fieldset class="si-rate-group">
+                <legend>个人缴费</legend>
+                <div class="field-grid">
+                  <div class="form-group"><label class="form-label" for="si-pr-pension">养老</label><input class="form-input" id="si-pr-pension" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-pr-medical">医疗</label><input class="form-input" id="si-pr-medical" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-pr-unemployment">失业</label><input class="form-input" id="si-pr-unemployment" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-pr-fund">公积金</label><input class="form-input" id="si-pr-fund" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                </div>
+              </fieldset>
+              <fieldset class="si-rate-group">
+                <legend>单位缴费</legend>
+                <div class="field-grid">
+                  <div class="form-group"><label class="form-label" for="si-co-pension">养老</label><input class="form-input" id="si-co-pension" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-co-medical">医疗</label><input class="form-input" id="si-co-medical" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-co-unemployment">失业</label><input class="form-input" id="si-co-unemployment" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-co-injury">工伤</label><input class="form-input" id="si-co-injury" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-co-maternity">生育</label><input class="form-input" id="si-co-maternity" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                  <div class="form-group"><label class="form-label" for="si-co-fund">公积金</label><input class="form-input" id="si-co-fund" type="number" inputmode="decimal" step="any" min="0" max="100"></div>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+
+          <div class="form-group mt-4"><label class="form-label" for="si-special">每月专项附加扣除合计</label><div class="input-with-unit"><input class="form-input" id="si-special" type="number" inputmode="decimal" step="any" min="0" value="0"><span class="unit-tag">元/月</span></div></div>
+          <p class="form-status">此处填写符合税务条件的月度合计；房贷利息与房租互斥，大病医疗按年度规则折算。</p>
+
+          <p id="si-error" class="form-error" role="alert" hidden></p>
+          <p id="si-status" class="form-status" role="status" aria-live="polite" hidden></p>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"social-insurance"}'>计算明细</button>
             <button class="btn btn-secondary" type="button" id="si-save">保存此方案</button>
+            <button class="btn btn-secondary" type="button" id="si-reset">恢复示例参数</button>
           </div>
         </form>
 
-        <div class="result-box" id="si-result" hidden>
+        <div class="result-box" id="si-result" hidden aria-live="polite">
           <div class="result-row">
             <div><div class="result-label">个人月缴合计</div><div class="result-value" id="si-personal">--</div></div>
             <div><div class="result-label">单位月缴合计</div><div class="result-value" id="si-company">--</div></div>
@@ -45,13 +79,14 @@
             <div><div class="result-label">预计到手工资</div><div class="result-value" id="si-net">--</div></div>
           </div>
           <dl class="result-detail" id="si-detail"></dl>
+          <div id="si-explain" class="mt-4"></div>
         </div>
 
         <section class="card mt-4" id="si-compare-wrap" hidden>
           <h2 class="card-title">已保存方案对比</h2>
           <div class="table-wrap">
             <table class="si-table">
-              <thead><tr><th scope="col">城市</th><th scope="col">基数</th><th scope="col">公积金</th><th scope="col">个人月缴</th><th scope="col">单位月缴</th><th scope="col">个税</th><th scope="col">到手</th><th scope="col">操作</th></tr></thead>
+              <thead><tr><th scope="col">税前工资</th><th scope="col">社保基数</th><th scope="col">公积金基数</th><th scope="col">个人月缴</th><th scope="col">单位月缴</th><th scope="col">个税</th><th scope="col">到手</th><th scope="col">操作</th></tr></thead>
               <tbody id="si-tbody"></tbody>
             </table>
           </div>
@@ -61,129 +96,26 @@
           </div>
         </section>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>城市费率为常见档位的参考示例，基数上下限按示例值夹取；个税按「基数 − 个人五险一金 − 5000 − 专项附加扣除」的月度口径估算，未计年终奖与其他扣除。实际以当地当年政策与单位申报为准。</div></div>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>本工具采用自定义费率模式，不预设全国统一城市档位。个税为单月静态估算，不模拟单位累计预扣或年度汇算；实际缴费、扣除资格与申报结果以当地社保、公积金经办机构及税务机关为准。</div></div>
 
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U, C = window.Core; if (!U || !C) return;
-            var $ = function (id) { return document.getElementById(id); };
-            var KEY = 'social-insurance';
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-            var last = null;
-
-            Object.keys(C.social.CITIES).forEach(function (key) {
-              var o = document.createElement('option');
-              o.value = key; o.textContent = C.social.CITIES[key].name;
-              $('si-city').appendChild(o);
-            });
-
-            function sumDeductions() {
-              var sum = 0;
-              U.qsa('.si-item').forEach(function (el) { if (el.checked) sum += +el.getAttribute('data-amt'); });
-              $('si-special').value = sum;
-            }
-            U.qsa('.si-item').forEach(function (el) { el.addEventListener('change', sumDeductions); });
-
-            function calc() {
-              var base = U.numInput($('si-base'));
-              if (!(base > 0)) { alert('请输入有效缴费基数'); return null; }
-              var fund = U.numInput($('si-fund')); if (!Number.isFinite(fund)) fund = 12;
-              var special = U.numInput($('si-special')); if (!Number.isFinite(special) || special < 0) special = 0;
-              return C.social.calc(base, $('si-city').value, fund, special);
-            }
-
-            function show(r) {
-              last = r;
-              $('si-personal').textContent = U.money(r.personalTotal);
-              $('si-company').textContent = U.money(r.companyTotal);
-              $('si-account').textContent = U.money(r.account);
-              $('si-net').textContent = U.money(r.net);
-              var t = r.rates;
-              var detail = row('城市 / 基数', r.cityName + ' · ' + U.money(r.base) + '（个人 ' + t.pension[0] + '% / 单位 ' + t.pension[1] + '% 养老）');
-              if (r.clamped) detail += row('基数已夹取', '输入 ' + U.money(r.rawBase) + ' → 当地区间 ' + U.money(r.min || 0) + ' ~ ' + (r.max ? U.money(r.max) : '不限'));
-              detail +=
-                row('养老保险（个 ' + t.pension[0] + '% / 单 ' + t.pension[1] + '%）', U.money(r.personal.pension) + ' / ' + U.money(r.company.pension)) +
-                row('医疗保险（个 ' + t.medical[0] + '% / 单 ' + t.medical[1] + '%）', U.money(r.personal.medical) + ' / ' + U.money(r.company.medical)) +
-                row('失业保险（个 ' + t.unemploy[0] + '% / 单 ' + t.unemploy[1] + '%）', U.money(r.personal.unemploy) + ' / ' + U.money(r.company.unemploy)) +
-                row('工伤保险（单 ' + t.injury + '%）', '— / ' + U.money(r.company.injury)) +
-                row('生育保险（单 ' + t.maternity + '%）', '— / ' + U.money(r.company.maternity)) +
-                row('住房公积金（' + r.fundPct + '%）', U.money(r.personal.fund) + ' / ' + U.money(r.company.fund)) +
-                row('专项附加扣除', U.money(Number($('si-special').value) || 0)) +
-                row('应纳税所得额', U.money(r.taxable)) +
-                row('预计月个税', U.money(r.tax)) +
-                row('到手工资（估算）', U.money(r.net));
-              $('si-detail').innerHTML = detail;
-              $('si-result').hidden = false;
-            }
-
-            function list() { return C.history.list(KEY); }
-            function renderCompare() {
-              var rows = list();
-              $('si-compare-wrap').hidden = rows.length === 0;
-              if (!rows.length) return;
-              $('si-tbody').innerHTML = rows.map(function (r, i) {
-                return '<tr><td>' + esc(r.cityName) + '</td><td>' + U.money(r.base) + '</td><td>' + r.fundPct + '%</td><td>' + U.money(r.personalTotal) + '</td><td>' + U.money(r.companyTotal) + '</td><td>' + U.money(r.tax) + '</td><td>' + U.money(r.net) + '</td><td><button type="button" class="btn btn-secondary si-del" data-idx="' + i + '" aria-label="删除方案">删除</button></td></tr>';
-              }).join('');
-            }
-
-            $('siForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var r = calc(); if (!r) return;
-              show(r);
-              U.track('calc_result', { tool: 'social-insurance', city: $('si-city').value });
-            });
-            $('si-save').addEventListener('click', function () {
-              var r = calc(); if (!r) return;
-              show(r);
-              C.history.add(KEY, {
-                cityName: r.cityName, cityKey: $('si-city').value, base: r.base, fundPct: r.fundPct,
-                personalTotal: r.personalTotal, companyTotal: r.companyTotal, tax: r.tax, net: r.net, special: Number($('si-special').value) || 0
-              }, 20);
-              renderCompare();
-              U.track('save_result', { tool: 'social-insurance' });
-            });
-            $('si-tbody').addEventListener('click', function (e) {
-              var btn = e.target.closest('.si-del'); if (!btn) return;
-              var rows = list(), i = +btn.getAttribute('data-idx');
-              if (!isFinite(i) || !rows[i]) return;
-              rows.splice(i, 1);
-              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
-              renderCompare();
-            });
-            $('si-export').addEventListener('click', function () {
-              C.csv.download('五险一金方案.csv', list().map(function (r) { return [r.cityName, r.base, r.fundPct, r.special, U.round(r.personalTotal, 2), U.round(r.companyTotal, 2), U.round(r.tax, 2), U.round(r.net, 2)]; }), ['城市', '缴费基数', '公积金比例(%)', '专项扣除', '个人月缴', '单位月缴', '个税', '到手工资']);
-              U.track('export_result', { tool: 'social-insurance' });
-            });
-            $('si-clear').addEventListener('click', function () {
-              if (!confirm('确定清空本机全部已存方案？')) return;
-              C.history.clear(KEY); renderCompare();
-            });
-            renderCompare();
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
-
-<section class="tool-info">
+        <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>五险一金计算器按城市示例费率与基数上下限估算个人 / 单位缴费、公积金入账、个税与到手工资，支持专项附加扣除和多方案本地对比；实际以当地政策与单位申报为准。</p>
+          <p>五险一金计算器将税前工资、社保基数和公积金基数分开计算，支持用户填写当地费率、基数上下限和专项附加扣除，并保存多组方案进行本地对比。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>城市档位的数据准吗？</summary>
-            <p>费率与基数为常见档位的参考示例，各地每年都会调整，请以当地社保、公积金经办机构公布的最新口径为准。</p>
+            <summary>为什么默认费率不能直接当作当地标准？</summary>
+            <p>各地费率、基数上下限和公积金比例按统筹区与年度调整。默认值仅用于演示计算，请按当地最新公布数据修改。</p>
           </details>
           <details>
             <summary>到手工资怎么估的？</summary>
-            <p>按「缴费基数 − 个人五险一金 − 5000 起征点 − 专项附加扣除」得到应纳税所得额，套用月度税率表估算个税，再减去个人缴费。</p>
+            <p>先用税前工资减个人五险一金、基本减除费用和专项附加扣除得到月度应纳税所得额，再套用个税政策税率表。到手工资为税前工资减个人缴费和个税。</p>
           </details>
           <details>
-            <summary>专项附加扣除能填多少？</summary>
-            <p>勾选常用项目会自动合计，也可以手动修改。实际扣除额度有资格与上限限制，请以税务部门的核定为准。</p>
+            <summary>缴费基数与工资可以不同吗？</summary>
+            <p>可以，且经常不同。社保基数、公积金基数分别受当地上下限约束；本工具不会用缴费基数替代税前工资。</p>
           </details>
           <details>
             <summary>方案存在哪里？</summary>
-            <p>只存在当前浏览器本地，可导出 CSV；清空浏览器数据会一并删除。</p>
+            <p>只保存在当前浏览器本地，可导出 CSV；清空浏览器数据会一并删除。浏览器禁用本地存储时会显示保存失败。</p>
           </details>
         </section>

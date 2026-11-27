@@ -95,8 +95,13 @@
     prepay: function (principal, annualRatePct, months, paidMonths, amount, keepPayment) {
       var r = (Number(annualRatePct) || 0) / 100 / 12;
       var n = Math.floor(Number(months) || 0);
-      var remain = Math.max(0, loan.balanceAfter(principal, annualRatePct, n, paidMonths) - (Number(amount) || 0));
+      var balance = Math.max(0, loan.balanceAfter(principal, annualRatePct, n, paidMonths));
+      var prepaid = Math.max(0, Number(amount) || 0);
+      var remain = Math.max(0, balance - prepaid);
       var pay = loan.annuity(principal, annualRatePct, n);
+      if (remain <= 0) {
+        return { mode: 'payoff', months: paidMonths, newPayment: 0, remainingBalance: 0, overpayment: Math.max(0, prepaid - balance) };
+      }
       if (keepPayment) {
         var k = 0;
         while (remain > 0 && k < 1200) {
@@ -106,7 +111,7 @@
         }
         return { mode: 'shorten', months: paidMonths + k, newPayment: pay };
       }
-      return { mode: 'reduce', months: n - paidMonths, newPayment: loan.annuity(remain, annualRatePct * 100, n - paidMonths) };
+      return { mode: 'reduce', months: n - paidMonths, newPayment: loan.annuity(remain, annualRatePct, n - paidMonths), remainingBalance: remain };
     }
   };
 
@@ -319,44 +324,62 @@
       }
       return 0;
     },
+    /** 按传入政策税率表计算，避免社保模块另存一份个税参数。 */
+    taxFromBrackets: function (taxable, brackets) {
+      var t = Math.max(0, Number(taxable) || 0);
+      if (!Array.isArray(brackets)) return social.monthlyTax(t);
+      for (var i = 0; i < brackets.length; i++) {
+        var b = brackets[i];
+        if (b.limit == null || t <= Number(b.limit)) return Math.max(0, t * Number(b.rate) - Number(b.quickDeduction));
+      }
+      return 0;
+    },
     /**
-     * 计算五险一金明细 + 到手工资。
-     * @param base 申报基数（会被城市上下限夹取）
-     * @param cityKey CITIES 键
-     * @param fundPct 公积金个人比例（单位同比例）
-     * @param specialMonthly 每月专项附加扣除合计（元）
+     * 计算五险一金明细 + 到手工资。工资、社保基数、公积金基数必须分离。
+     * @param input {salary, socialBase, fundBase, rates, limits, specialMonthly}
      */
-    calc: function (base, cityKey, fundPct, specialMonthly) {
-      var city = social.CITIES[cityKey] || social.CITIES.national;
-      var raw = Number(base) || 0;
-      var b = clamp(raw, city.min || 0, city.max || Infinity);
-      var f = clamp(Number(fundPct) || 0, 0, 30);
+    calc: function (input) {
+      var o = input || {};
+      var salary = Number(o.salary);
+      var rawSocial = Number(o.socialBase);
+      var rawFund = Number(o.fundBase);
+      if (!(salary >= 0 && rawSocial >= 0 && rawFund >= 0) || !isFinite(salary) || !isFinite(rawSocial) || !isFinite(rawFund)) return null;
+      var rates = o.rates || {};
+      var pr = rates.personal || {};
+      var cr = rates.company || {};
+      var limits = o.limits || {};
+      var b = clamp(rawSocial, Number(limits.socialMin) || 0, Number(limits.socialMax) || Infinity);
+      var fb = clamp(rawFund, Number(limits.fundMin) || 0, Number(limits.fundMax) || Infinity);
       var p = {
-        pension: b * city.pension[0] / 100,
-        medical: b * city.medical[0] / 100,
-        unemploy: b * city.unemploy[0] / 100,
-        fund: b * f / 100
+        pension: b * (Number(pr.pension) || 0) / 100,
+        medical: b * (Number(pr.medical) || 0) / 100,
+        unemploy: b * (Number(pr.unemployment) || 0) / 100,
+        fund: fb * (Number(pr.fund) || 0) / 100
       };
       var c = {
-        pension: b * city.pension[1] / 100,
-        medical: b * city.medical[1] / 100,
-        unemploy: b * city.unemploy[1] / 100,
-        injury: b * city.injury / 100,
-        maternity: b * city.maternity / 100,
-        fund: b * f / 100
+        pension: b * (Number(cr.pension) || 0) / 100,
+        medical: b * (Number(cr.medical) || 0) / 100,
+        unemploy: b * (Number(cr.unemployment) || 0) / 100,
+        injury: b * (Number(cr.injury) || 0) / 100,
+        maternity: b * (Number(cr.maternity) || 0) / 100,
+        fund: fb * (Number(cr.fund) || 0) / 100
       };
       var pTotal = p.pension + p.medical + p.unemploy + p.fund;
       var cTotal = c.pension + c.medical + c.unemploy + c.injury + c.maternity + c.fund;
-      var special = Math.max(0, Number(specialMonthly) || 0);
-      var taxable = Math.max(0, b - pTotal - 5000 - special);
-      var tax = social.monthlyTax(taxable);
+      var special = Math.max(0, Number(o.specialMonthly) || 0);
+      var basicDeduction = o.basicDeduction == null ? 5000 : Number(o.basicDeduction);
+      if (!isFinite(basicDeduction) || basicDeduction < 0) return null;
+      var taxable = Math.max(0, salary - pTotal - basicDeduction - special);
+      var tax = social.taxFromBrackets(taxable, o.taxBrackets);
       return {
-        cityName: city.name, base: b, rawBase: raw, clamped: Math.abs(b - raw) > 0.01,
-        min: city.min, max: city.max, fundPct: f,
+        salary: salary, base: b, fundBase: fb, rawBase: rawSocial, rawFundBase: rawFund,
+        clamped: Math.abs(b - rawSocial) > 0.01 || Math.abs(fb - rawFund) > 0.01,
+        min: limits.socialMin == null ? null : limits.socialMin,
+        max: limits.socialMax == null ? null : limits.socialMax,
         personal: p, company: c, personalTotal: pTotal, companyTotal: cTotal,
         account: p.fund + c.fund, taxable: taxable, tax: tax,
-        net: Math.max(0, b - pTotal - tax),
-        rates: city
+        net: Math.max(0, salary - pTotal - tax),
+        rates: rates
       };
     }
   };
@@ -690,6 +713,15 @@
         return e;
       } catch (e) { return null; }
     },
+    remove: function (k, index) {
+      try {
+        var a = history.list(k), i = Number(index);
+        if (!Number.isInteger(i) || i < 0 || i >= a.length) return false;
+        a.splice(i, 1);
+        global.localStorage.setItem(history.key(k), JSON.stringify(a));
+        return true;
+      } catch (e) { return false; }
+    },
     clear: function (k) {
       try { global.localStorage.removeItem(history.key(k)); return true; } catch (e) { return false; }
     }
@@ -722,4 +754,6 @@
     color: color, date: date, timezone: timezone,
     bridge: bridge, csv: csv, history: history
   };
-})(window);
+})(typeof window !== 'undefined' ? window : globalThis);
+
+if (typeof module === 'object' && module.exports) module.exports = globalThis.Core;

@@ -1,0 +1,972 @@
+{
+  "version": "2026.11",
+  "generatedBy": "scripts/generate-tool-registry.js",
+  "tools": [
+    {
+      "id": "tax",
+      "name": "个税计算器",
+      "route": "calculator/tax",
+      "url": "/calculator/tax.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-tax.html",
+      "entryScript": "assets/js/pages/calculator-tax.js",
+      "module": "tax",
+      "computationMode": "local",
+      "sensitiveFields": [
+        "salary",
+        "insurance",
+        "deductions"
+      ],
+      "policyDependencies": [
+        "individual-income-tax"
+      ],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "unit",
+      "name": "单位换算",
+      "route": "calculator/unit",
+      "url": "/calculator/unit.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-unit.html",
+      "entryScript": "assets/js/pages/calculator-unit.js",
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "pension",
+      "name": "养老金计算器",
+      "route": "calculator/pension",
+      "url": "/calculator/pension.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-pension.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "timezone",
+      "name": "时区转换",
+      "route": "calculator/timezone",
+      "url": "/calculator/timezone.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-timezone.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "datetime"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "decoration",
+      "name": "装修预算",
+      "route": "calculator/decoration",
+      "url": "/calculator/decoration.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-decoration.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "baby-name",
+      "name": "宝宝取名",
+      "route": "calculator/baby-name",
+      "url": "/calculator/baby-name.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-baby-name.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "surname",
+        "birthDate",
+        "name"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "secret-message",
+      "name": "密语",
+      "route": "calculator/secret-message",
+      "url": "/calculator/secret-message.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-secret-message.html",
+      "entryScript": "assets/js/pages/calculator-secret-message.js",
+      "module": "secret-message",
+      "computationMode": "local",
+      "sensitiveFields": [
+        "message"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "success"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "size",
+      "name": "衣服尺码",
+      "route": "calculator/size",
+      "url": "/calculator/size.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-size.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "body-fat",
+      "name": "基础代谢体脂",
+      "route": "calculator/body-fat",
+      "url": "/calculator/body-fat.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-body-fat.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "weight",
+        "height",
+        "circumferences"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "scientific",
+      "name": "科学计算器",
+      "route": "calculator/scientific",
+      "url": "/calculator/scientific.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-scientific.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "discount",
+      "name": "折扣计算",
+      "route": "calculator/discount",
+      "url": "/calculator/discount.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-discount.html",
+      "entryScript": "assets/js/pages/calculator-discount.js",
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "date-calc",
+      "name": "日期计算",
+      "route": "calculator/date-calc",
+      "url": "/calculator/date-calc.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-date-calc.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "prepay",
+      "name": "房贷提前还款",
+      "route": "calculator/prepay",
+      "url": "/calculator/prepay.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-prepay.html",
+      "entryScript": "assets/js/pages/calculator-prepay.js",
+      "module": "prepay",
+      "computationMode": "local",
+      "sensitiveFields": [
+        "principal",
+        "annualRatePct",
+        "paidMonths",
+        "prepayAmount",
+        "income",
+        "expense"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "method",
+        "mode",
+        "success"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "social-insurance",
+      "name": "五险一金",
+      "route": "calculator/social-insurance",
+      "url": "/calculator/social-insurance.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-social-insurance.html",
+      "entryScript": "assets/js/pages/calculator-social-insurance.js",
+      "module": "social-insurance",
+      "computationMode": "local",
+      "sensitiveFields": [
+        "salary",
+        "contributionBase",
+        "deductions"
+      ],
+      "policyDependencies": [
+        "individual-income-tax",
+        "social-insurance"
+      ],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "due-date",
+      "name": "预产期",
+      "route": "calculator/due-date",
+      "url": "/calculator/due-date.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-due-date.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "pace",
+      "name": "跑步配速",
+      "route": "calculator/pace",
+      "url": "/calculator/pace.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-pace.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "pet-age",
+      "name": "宠物年龄",
+      "route": "calculator/pet-age",
+      "url": "/calculator/pet-age.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-pet-age.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "percentage",
+      "name": "百分比",
+      "route": "calculator/percentage",
+      "url": "/calculator/percentage.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-percentage.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "overtime",
+      "name": "加班费",
+      "route": "calculator/overtime",
+      "url": "/calculator/overtime.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-overtime.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "height-predict",
+      "name": "儿童身高预测",
+      "route": "calculator/height-predict",
+      "url": "/calculator/height-predict.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-height-predict.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "fuel-cost",
+      "name": "油耗计算",
+      "route": "calculator/fuel-cost",
+      "url": "/calculator/fuel-cost.html",
+      "category": "calculator",
+      "template": "templates/pages/calculator-fuel-cost.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "solar-term",
+      "name": "二十四节气",
+      "route": "calendar/solar-term",
+      "url": "/calendar/solar-term.html",
+      "category": "calendar",
+      "template": "templates/pages/calendar-solar-term.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "calendar",
+      "name": "万年历·老黄历",
+      "route": "calendar",
+      "url": "/calendar.html",
+      "category": "calendar",
+      "template": "templates/pages/calendar.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "daily-guide",
+      "name": "今日指南",
+      "route": "calendar/daily-guide",
+      "url": "/calendar/daily-guide.html",
+      "category": "calendar",
+      "template": "templates/pages/calendar-daily-guide.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "countdown",
+      "name": "倒计时·纪念日",
+      "route": "calendar/countdown",
+      "url": "/calendar/countdown.html",
+      "category": "calendar",
+      "template": "templates/pages/calendar-countdown.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "buy-house",
+      "name": "买房全攻略",
+      "route": "combo/buy-house",
+      "url": "/combo/buy-house.html",
+      "category": "combo",
+      "template": "templates/pages/combo-buy-house.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "buy-car",
+      "name": "买车全攻略",
+      "route": "combo/buy-car",
+      "url": "/combo/buy-car.html",
+      "category": "combo",
+      "template": "templates/pages/combo-buy-car.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "health-check",
+      "name": "健康体检站",
+      "route": "combo/health-check",
+      "url": "/combo/health-check.html",
+      "category": "combo",
+      "template": "templates/pages/combo-health-check.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [
+        "height",
+        "weight",
+        "age"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "fun-test",
+      "name": "趣味测试",
+      "route": "combo/fun-test",
+      "url": "/combo/fun-test.html",
+      "category": "combo",
+      "template": "templates/pages/combo-fun-test.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [
+        "birthDate",
+        "answers"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "finance-toolkit",
+      "name": "理财百宝箱",
+      "route": "combo/finance-toolkit",
+      "url": "/combo/finance-toolkit.html",
+      "category": "combo",
+      "template": "templates/pages/combo-finance-toolkit.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [
+        "assets",
+        "income"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "life-plan",
+      "name": "人生规划",
+      "route": "combo/life-plan",
+      "url": "/combo/life-plan.html",
+      "category": "combo",
+      "template": "templates/pages/combo-life-plan.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [
+        "income",
+        "expense",
+        "assets"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "color-lab",
+      "name": "色彩研究所",
+      "route": "combo/color-lab",
+      "url": "/combo/color-lab.html",
+      "category": "combo",
+      "template": "templates/pages/combo-color-lab.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "hybrid",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "probability",
+      "name": "概率计算器",
+      "route": "probability",
+      "url": "/probability.html",
+      "category": "tools",
+      "template": "templates/pages/probability.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "random",
+      "name": "随机数生成",
+      "route": "random",
+      "url": "/random.html",
+      "category": "tools",
+      "template": "templates/pages/random.html",
+      "entryScript": "assets/js/pages/random.js",
+      "module": "random",
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "type",
+        "unique",
+        "count",
+        "success"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "vision",
+      "name": "视力测试",
+      "route": "vision",
+      "url": "/vision.html",
+      "category": "tools",
+      "template": "templates/pages/vision.html",
+      "entryScript": "assets/js/pages/vision.js",
+      "module": "vision",
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "eye",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "air-quality",
+      "name": "空气质量",
+      "route": "tool/air-quality",
+      "url": "/tool/air-quality.html",
+      "category": "tools",
+      "template": "templates/pages/tool-air-quality.html",
+      "entryScript": "assets/js/pages/tool-air-quality.js",
+      "module": "air-quality",
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [
+        "aqi"
+      ],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "success",
+        "cached",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "idiom",
+      "name": "成语词典",
+      "route": "tool/idiom",
+      "url": "/tool/idiom.html",
+      "category": "tools",
+      "template": "templates/pages/tool-idiom.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "polyphone",
+      "name": "多音字查询",
+      "route": "tool/polyphone",
+      "url": "/tool/polyphone.html",
+      "category": "tools",
+      "template": "templates/pages/tool-polyphone.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "lotto",
+      "name": "双色球",
+      "route": "lotto",
+      "url": "/lotto.html",
+      "category": "tools",
+      "template": "templates/pages/lotto.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "local",
+      "sensitiveFields": [],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "scroll-table"
+    },
+    {
+      "id": "bazi",
+      "name": "八字排盘",
+      "route": "fortune/bazi",
+      "url": "/fortune/bazi.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-bazi.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "birthDate",
+        "birthTime",
+        "gender"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "scroll-table"
+    },
+    {
+      "id": "ziwei",
+      "name": "紫微斗数",
+      "route": "fortune/ziwei",
+      "url": "/fortune/ziwei.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-ziwei.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "birthDate",
+        "birthTime",
+        "gender"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "scroll-table"
+    },
+    {
+      "id": "natal",
+      "name": "本命星盘",
+      "route": "fortune/natal",
+      "url": "/fortune/natal.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-natal.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "birthDate",
+        "birthTime",
+        "birthPlace"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "scroll-table"
+    },
+    {
+      "id": "horoscope",
+      "name": "星座运势",
+      "route": "fortune/horoscope",
+      "url": "/fortune/horoscope.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-horoscope.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "zodiac",
+        "date"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    },
+    {
+      "id": "zodiac-match",
+      "name": "生肖配对",
+      "route": "fortune/zodiac-match",
+      "url": "/fortune/zodiac-match.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-zodiac-match.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "birthDate",
+        "zodiac"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "scroll-table"
+    },
+    {
+      "id": "tarot",
+      "name": "塔罗占卜",
+      "route": "fortune/tarot",
+      "url": "/fortune/tarot.html",
+      "category": "fortune",
+      "template": "templates/pages/fortune-tarot.html",
+      "entryScript": null,
+      "module": null,
+      "computationMode": "api",
+      "sensitiveFields": [
+        "question"
+      ],
+      "policyDependencies": [],
+      "resultVersion": "2026.11",
+      "analyticsAllowlist": [
+        "mode",
+        "success",
+        "resultType"
+      ],
+      "mobileLayout": "stacked-cards"
+    }
+  ]
+}

@@ -23,7 +23,11 @@
   var SENSITIVE = {
     'calculator-secret-message': 1,
     'calculator-ip-query': 1,
-    'calculator-baby-name': 1
+    'calculator-baby-name': 1,
+    'calculator-tax': 1,
+    'calculator-social-insurance': 1,
+    'calculator-prepay': 1,
+    'vision': 1
   };
 
   function pageSlug() { return (doc.body && doc.body.getAttribute('data-page')) || ''; }

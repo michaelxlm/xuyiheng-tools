@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const P = require('./shared-partials');
 const I = require('./icons');
 
@@ -49,6 +50,14 @@ function assetUrl(rel, manifest) {
   const href = '/' + clean;
   const token = manifest && manifest['/' + clean];
   return token ? href + '?v=' + token : href;
+}
+
+/** 模板内遗留的带版本资源引用统一按当前 manifest 重写，避免手写 token 过期。 */
+function versionTemplateAssets(html, manifest) {
+  return String(html || '').replace(
+    /((?:src|href)=(["'])(\/assets\/[^"'?]+))\?v=[^"']*\2/gi,
+    (match, prefix, quote, pathname) => prefix.replace(pathname, assetUrl(pathname, manifest)) + quote
+  );
 }
 
 /* ---------------------------- JSON-LD ---------------------------- */
@@ -421,6 +430,40 @@ function buildToolsRegistryScript(site) {
     + ';window.__NEXT_QUOTA__=' + JSON.stringify(nextQuota()) + ';</script>';
 }
 
+/* 源产物指纹：模板、路由元数据、注册表与公共脚本变化都会要求重新构建。 */
+function sourceDigest(site, route) {
+  const h = crypto.createHash('sha256');
+  h.update(JSON.stringify(site));
+  h.update(JSON.stringify(route));
+  const registry = path.join(ROOT, 'data/tool-registry.json');
+  if (fs.existsSync(registry)) h.update(fs.readFileSync(registry));
+  const slug = slugOf(route);
+  const template = route.path === 'index' ? null : path.join(TPL_DIR, slug + '.html');
+  if (template && fs.existsSync(template)) h.update(fs.readFileSync(template));
+  for (const rel of ['assets/js/tool-core.js', 'assets/js/utils.js', 'assets/js/pages/' + slug + '.js']) {
+    const file = path.join(ROOT, rel);
+    if (fs.existsSync(file)) h.update(rel).update(fs.readFileSync(file));
+  }
+  const registryData = fs.existsSync(registry) ? JSON.parse(fs.readFileSync(registry, 'utf8')) : { tools: [] };
+  const tool = (registryData.tools || []).find((t) => t.route === route.path);
+  if (tool && tool.module) {
+    for (const rel of [
+      'assets/js/core/result.js',
+      'assets/js/core/result-view.js',
+      'assets/js/tools/' + tool.module + '.js',
+    ]) {
+      const file = path.join(ROOT, rel);
+      if (fs.existsSync(file)) h.update(rel).update(fs.readFileSync(file));
+    }
+    for (const policy of tool.policyDependencies || []) {
+      const rel = 'data/policies/' + policy + '.json';
+      const file = path.join(ROOT, rel);
+      if (fs.existsSync(file)) h.update(rel).update(fs.readFileSync(file));
+    }
+  }
+  return h.digest('hex').slice(0, 16);
+}
+
 /* ---------------------------- 主渲染 ---------------------------- */
 function renderRoute(site, route, ctx) {
   ctx = ctx || {};
@@ -445,6 +488,8 @@ function renderRoute(site, route, ctx) {
     cssLinks.push('    <link rel="stylesheet" href="' + assetUrl('assets/css/fortune.min.css', manifest) + '">');
   }
 
+  const registryData = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
+  const tool = (registryData.tools || []).find((t) => t.route === route.path);
   const scriptTags = [
     // AdSlotsConfig.site 仍复用 main-tool 分片 key（见 README）；ad-slots.js 默认 site 为 aiweb，必须显式声明，
     // 否则会取错分片。本地兜底用绝对路径（深层路由 /calculator/xxx/ 下相对路径会 404）。
@@ -461,9 +506,24 @@ function renderRoute(site, route, ctx) {
     '    <script src="' + assetUrl('assets/js/http-api.min.js', manifest) + '" defer></script>',
     '    <script src="' + assetUrl('assets/js/layout.min.js', manifest) + '" defer></script>',
   ];
+  if (tool && tool.module) {
+    scriptTags.push('    <script src="' + assetUrl('assets/js/core/result.min.js', manifest) + '" defer></script>');
+    scriptTags.push('    <script src="' + assetUrl('assets/js/core/result-view.min.js', manifest) + '" defer></script>');
+    const policies = {};
+    for (const policy of tool.policyDependencies || []) {
+      const file = path.join(ROOT, 'data/policies', policy + '.json');
+      if (!fs.existsSync(file)) throw new Error('工具 ' + tool.id + ' 缺少政策快照：' + policy);
+      policies[policy] = JSON.parse(fs.readFileSync(file, 'utf8'));
+    }
+    const policyJson = JSON.stringify(policies).replace(/</g, '\\u003c');
+    scriptTags.push('    <script>window.__TOOL_POLICIES__=' + policyJson + ';</script>');
+  }
   if (isFortune) {
     // 命理计算已上移中台（main-api/app/lib/fortune-engine.js），站内只注入请求适配层。
     scriptTags.push('    <script src="' + assetUrl('assets/js/fortune-api.min.js', manifest) + '" defer></script>');
+  }
+  if (tool && tool.module) {
+    scriptTags.push('    <script src="' + assetUrl('assets/js/tools/' + tool.module + '.min.js', manifest) + '" defer></script>');
   }
   if (hasPageAsset('js', slug, 'js')) {
     scriptTags.push('    <script src="' + assetUrl('assets/js/pages/' + slug + '.min.js', manifest) + '" defer></script>');
@@ -498,6 +558,7 @@ function renderRoute(site, route, ctx) {
     '  <title>' + P.escapeHtml(route.title) + '</title>',
     '  <meta name="description" content="' + P.escapeHtml(route.description || '') + '">',
     '  <meta name="author" content="Michaelxlm">',
+    '  <meta name="xuyiheng-source-digest" content="' + sourceDigest(site, route) + '">',
     route.keywords ? '  <meta name="keywords" content="' + P.escapeHtml(route.keywords) + '">' : '',
     '  <link rel="canonical" href="' + P.escapeHtml(canonical) + '">',
     '  <meta name="robots" content="' + robots + '">',
@@ -530,7 +591,7 @@ function renderRoute(site, route, ctx) {
   ].filter(Boolean).join('\n');
 
   // body 内容
-  const content = loadContent(route, site);
+  const content = versionTemplateAssets(loadContent(route, site), manifest);
   const header = P.renderHeader(site, route);
   const bottomNav = P.renderBottomNav(site, route);
   const footer = P.renderFooter(site);
@@ -568,4 +629,4 @@ function renderRoute(site, route, ctx) {
   return '<!doctype html>\n<html lang="' + (site.lang || 'zh-CN') + '">\n<head>\n' + head + '\n</head>\n' + body + '\n';
 }
 
-module.exports = { renderRoute, slugOf, urlPathOf, assetUrl };
+module.exports = { renderRoute, slugOf, urlPathOf, assetUrl, versionTemplateAssets, sourceDigest };

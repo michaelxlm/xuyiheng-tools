@@ -1,0 +1,148 @@
+/* calculator-prepay.js · 提前还款与剩余计划薄控制器 */
+(function () {
+  'use strict';
+
+  function boot() {
+    var U = window.U;
+    var Tools = window.Tools || {};
+    var Result = window.ToolCore && window.ToolCore.Result;
+    var RV = window.ToolCore && window.ToolCore.ResultView;
+    var Core = window.Core;
+    var form = document.getElementById('ppForm');
+    if (!form || !U || !Tools.prepay || !Result || !RV || !Core) return;
+    var $ = function (id) { return document.getElementById(id); };
+    var lastResult = null;
+
+    function status(message, isError) {
+      $('pp-status').textContent = message || '';
+      $('pp-status').hidden = !message;
+      $('pp-status').classList.toggle('is-error', !!isError);
+    }
+
+    function readInput() {
+      return {
+        principal: $('pp-loan').value,
+        annualRatePct: $('pp-rate').value,
+        months: Math.round(U.numInput($('pp-term')) * 12),
+        paidMonths: $('pp-paid').value,
+        amount: $('pp-prepay').value || 0,
+        method: $('pp-method').value,
+        mode: $('pp-mode').value,
+      };
+    }
+
+    function cell(value) {
+      var td = document.createElement('td');
+      td.textContent = value;
+      return td;
+    }
+
+    function roundedDetails(details) {
+      return (details || []).map(function (item) {
+        return Object.assign({}, item, { value: typeof item.value === 'number' ? U.round(item.value, 2) : item.value });
+      });
+    }
+
+    function renderSchedule(rows) {
+      RV.clear($('pp-schedule-body'));
+      if (!rows.length) {
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.colSpan = 5;
+        td.textContent = '已结清，无后续还款计划。';
+        tr.appendChild(td);
+        $('pp-schedule-body').appendChild(tr);
+        return;
+      }
+      rows.forEach(function (row) {
+        var tr = document.createElement('tr');
+        [row.period, U.money(row.payment), U.money(row.principal), U.money(row.interest), U.money(row.balance)].forEach(function (value) {
+          tr.appendChild(cell(value));
+        });
+        $('pp-schedule-body').appendChild(tr);
+      });
+    }
+
+    function bridgeValues() {
+      var values = {
+        'lp-debt': U.round(lastResult.metrics.newPayment, 2),
+        'lp-source': 'prepay',
+        'lp-bridgeVersion': '1',
+      };
+      ['pp-income', 'pp-expense'].forEach(function (id, index) {
+        if ($(id).value.trim() === '') return;
+        var n = U.numInput($(id));
+        if (isFinite(n) && n >= 0) values[index === 0 ? 'lp-income' : 'lp-expense'] = U.round(n, 2);
+      });
+      return values;
+    }
+
+    function show(result) {
+      RV.renderError($('pp-error'), result);
+      if (result.status !== 'success') {
+        $('pp-result').hidden = true;
+        $('pp-explain').hidden = true;
+        status(result.errors.join('；'), true);
+        return null;
+      }
+      lastResult = result;
+      var m = result.metrics;
+      $('pp-p1label').textContent = m.method === 'principal' ? '首月月供' : '月供';
+      $('pp-p1').textContent = U.money(m.monthlyPayment);
+      $('pp-bal').textContent = U.money(m.remainingBalance);
+      RV.renderDetails($('pp-detail'), roundedDetails(result.details));
+      RV.renderExplanation($('pp-explain'), result);
+      $('pp-explain').hidden = false;
+      $('pp-prepay-box').hidden = !(m.prepayAmount > 0);
+      if (m.prepayAmount > 0) {
+        RV.renderDetails($('pp-prepay-detail'), roundedDetails([
+          Result.detail('当前方案', m.mode === 'shorten' ? '缩短年限' : (m.mode === 'payoff' ? '提前结清' : '减少月供')),
+          Result.detail('提前还款后首期月供', m.newPayment, '元'),
+          Result.detail('剩余期数', m.remainingMonthsAfterPrepay, '期'),
+          Result.detail('剩余利息', m.interestAfterPrepay, '元'),
+          Result.detail('节省利息', m.interestSaved, '元'),
+        ]));
+      } else RV.clear($('pp-prepay-detail'));
+      renderSchedule(result.schedule || []);
+      $('pp-result').hidden = false;
+      $('pp-schedule-wrap').hidden = true;
+      $('pp-schedule-actions').hidden = true;
+      $('pp-to-life').href = Core.bridge.link('/combo/life-plan.html', bridgeValues());
+      status(m.status === 'payoff' ? '已按提前结清计算，后续利息为 0。' : '计算完成。');
+      U.track('calc_result', { tool: 'prepay', method: m.method, mode: m.mode, success: true });
+      return result;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      show(Tools.prepay.calculate(readInput()));
+    });
+
+    $('pp-mode').addEventListener('change', function () {
+      if (lastResult) show(Tools.prepay.calculate(readInput()));
+    });
+
+    $('pp-schedule').addEventListener('click', function () {
+      if (!lastResult) return;
+      $('pp-schedule-wrap').hidden = false;
+      $('pp-schedule-actions').hidden = false;
+      status('已显示当前方案从下一期开始的剩余还款计划。');
+      U.track('calc_result', { tool: 'prepay', mode: 'schedule' });
+    });
+
+    $('pp-export').addEventListener('click', function () {
+      if (!lastResult || !lastResult.schedule || !lastResult.schedule.length) {
+        status('当前方案没有可导出的后续计划。', true);
+        return;
+      }
+      Core.csv.download('提前还款后剩余计划.csv', lastResult.schedule.map(function (row) {
+        return [row.period, U.round(row.payment, 2), U.round(row.principal, 2), U.round(row.interest, 2), U.round(row.balance, 2)];
+      }), ['期数', '月供', '本金', '利息', '剩余本金']);
+      status('已导出当前方案的剩余还款计划。');
+      U.track('export_result', { tool: 'prepay' });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();

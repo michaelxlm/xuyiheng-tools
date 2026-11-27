@@ -1,0 +1,121 @@
+/* calculator-secret-message.js · AES-GCM 密语薄控制器 */
+(function () {
+  'use strict';
+
+  function boot() {
+    var U = window.U;
+    var Tools = window.Tools || {};
+    if (!U || !Tools.secretMessage) return;
+    var $ = function (id) { return document.getElementById(id); };
+    var templates = [
+      ['❤️', '表白', '我喜欢你，很久了。'],
+      ['🙏', '感谢', '谢谢你一直以来的陪伴和帮助，真的很感激！'],
+      ['🎂', '祝福', '祝你生日快乐，天天开心，万事如意！'],
+      ['💪', '鼓励', '加油！你是最棒的，相信自己一定能做到！'],
+      ['🤫', '秘密', '告诉你一个秘密，千万不要告诉别人哦…'],
+    ];
+
+    function status(message, isError) {
+      $('sm-status').textContent = message || '';
+      $('sm-status').hidden = !message;
+      $('sm-status').classList.toggle('is-error', !!isError);
+    }
+
+    templates.forEach(function (item) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'chip';
+      button.textContent = item[0] + ' ' + item[1];
+      button.addEventListener('click', function () { $('sm-text').value = item[2]; });
+      $('sm-tpls').appendChild(button);
+    });
+
+    function clearFragment() {
+      var url = location.pathname + location.search;
+      try { history.replaceState(history.state, '', url); } catch (error) { /* 历史 API 不可用时使用 fragment 兜底 */ }
+      if (/(?:^#|[&])msg=/.test(location.hash)) {
+        try { location.hash = ''; } catch (error) { /* 当前浏览器禁止修改 fragment */ }
+      }
+    }
+
+    function enterView(encoded) {
+      clearFragment();
+      status('正在解密…');
+      $('sm-view').hidden = false;
+      $('sm-create').hidden = true;
+      Tools.secretMessage.decrypt(encoded).then(function (plaintext) {
+        $('sm-decoded').textContent = plaintext || '（密语内容为空）';
+        status('已打开。链接不是一次性链接，无法阻止他人截图或复制。');
+        window.scrollTo(0, 0);
+      }).catch(function () {
+        $('sm-decoded').textContent = '（密语认证失败，链接可能已损坏或被篡改）';
+        status('无法解密这条密语。', true);
+      });
+    }
+
+    $('sm-gen').addEventListener('click', function () {
+      var plaintext = $('sm-text').value.trim();
+      if (!plaintext) {
+        status('请输入密语内容。', true);
+        $('sm-text').focus();
+        return;
+      }
+      $('sm-gen').disabled = true;
+      status('正在生成加密链接…');
+      Tools.secretMessage.encrypt(plaintext).then(function (encoded) {
+        var url = location.origin + location.pathname + location.search + '#msg=' + encodeURIComponent(encoded);
+        $('sm-link').value = url;
+        $('sm-preview-text').textContent = plaintext;
+        $('sm-result').hidden = false;
+        status('已生成 AES-GCM 认证加密链接；密钥仅存在于 # 片段中。');
+        U.track('calc_result', { tool: 'secret-message', success: true });
+      }).catch(function (error) {
+        status(error.message || '生成失败，请检查浏览器是否支持 Web Crypto。', true);
+      }).finally(function () {
+        $('sm-gen').disabled = false;
+      });
+    });
+
+    function copyText(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return false; });
+      }
+      return new Promise(function (resolve) {
+        var input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+        document.body.removeChild(input);
+        resolve(ok);
+      });
+    }
+
+    $('sm-copy').addEventListener('click', function () {
+      copyText($('sm-link').value).then(function (ok) {
+        $('sm-copy').textContent = ok ? '已复制' : '复制失败';
+        status(ok ? '链接已复制。' : '复制失败，请手动选择链接。', !ok);
+        setTimeout(function () { $('sm-copy').textContent = '复制'; }, 1800);
+      });
+    });
+
+    $('sm-back').addEventListener('click', function () {
+      clearFragment();
+      $('sm-view').hidden = true;
+      $('sm-create').hidden = false;
+      status('');
+    });
+
+    var hash = window.__SECRET_MESSAGE_FRAGMENT__ || location.hash;
+    delete window.__SECRET_MESSAGE_FRAGMENT__;
+    var encoded = Tools.secretMessage.fromHash(hash);
+    if (encoded || /(?:^#|[&])msg=/.test(hash)) enterView(encoded || '');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();

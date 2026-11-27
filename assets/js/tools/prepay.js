@@ -1,0 +1,185 @@
+/* ==========================================================================
+   prepay.js · 等额本息 / 等额本金提前还款纯计算模块
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(globalThis, require('../tool-core'), require('../core/result'));
+  } else {
+    root.Tools = root.Tools || {};
+    root.Tools.prepay = factory(root, root.Core, root.ToolCore.Result);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (global, Core, Result) {
+  'use strict';
+  var D = Result.detail;
+
+  function number(value, fallback) {
+    var n = Number(value);
+    return isFinite(n) ? n : fallback;
+  }
+
+  function amortize(balance, annualRatePct, periods, fixedPayment, method) {
+    var r = annualRatePct / 100 / 12;
+    var principalPart = method === 'principal' ? fixedPayment : 0;
+    var rows = [];
+    var totalInterest = 0;
+    for (var i = 1; i <= periods && balance > 0.0000001; i++) {
+      var interest = balance * r;
+      var paidPrincipal = method === 'principal' ? Math.min(balance, principalPart) : Math.min(balance, fixedPayment - interest);
+      var payment = paidPrincipal + interest;
+      balance = Math.max(0, balance - paidPrincipal);
+      totalInterest += interest;
+      rows.push({ period: i, payment: payment, principal: paidPrincipal, interest: interest, balance: balance });
+    }
+    return { rows: rows, totalInterest: totalInterest };
+  }
+
+  function shortenPrincipal(balance, annualRatePct, originalPrincipal, originalMonths) {
+    var fixed = originalPrincipal / originalMonths;
+    var periods = Math.max(1, Math.ceil(balance / fixed - 1e-12));
+    var plan = amortize(balance, annualRatePct, periods, fixed, 'principal');
+    return {
+      mode: 'shorten', months: periods, newPayment: fixed + balance * (annualRatePct / 100 / 12),
+      fixedPrincipal: fixed, decrement: fixed * (annualRatePct / 100 / 12),
+      remainingBalance: 0, interest: plan.totalInterest, schedule: plan.rows,
+    };
+  }
+
+  function calculate(input) {
+    var o = input || {};
+    var principal = number(o.principal, NaN);
+    var annualRatePct = number(o.annualRatePct, NaN);
+    var months = Math.floor(number(o.months, NaN));
+    var paidMonths = Math.floor(number(o.paidMonths, 0));
+    var amount = number(o.amount, 0);
+    var method = o.method === 'principal' ? 'principal' : 'equal';
+    var requestedMode = ['reduce', 'shorten'].indexOf(o.mode) >= 0 ? o.mode : 'reduce';
+    var source = { name: '等额本息与等额本金摊销公式', version: '2026.11' };
+    if (!(principal > 0 && annualRatePct >= 0 && annualRatePct <= 100 && months > 0 && months <= 600 && paidMonths >= 0 && paidMonths < months) || !isFinite(amount) || amount < 0) {
+      return Result.invalid('prepay', '本金、利率、期限、已还期数或提前还款金额不合法', source);
+    }
+
+    var monthly = Core.loan.annuity(principal, annualRatePct, months);
+    var firstPayment = Core.loan.principalFirst(principal, annualRatePct, months);
+    var decrement = Core.loan.principalDecrement(principal, annualRatePct, months);
+    var balance = method === 'principal' ? principal * (1 - paidMonths / months) : Core.loan.balanceAfter(principal, annualRatePct, months, paidMonths);
+    balance = Math.max(0, balance);
+    var remainingMonths = months - paidMonths;
+    var originalPlan = Core.loan.schedule(principal, annualRatePct, months, method);
+    var originalRemainingInterest = method === 'principal'
+      ? balance * (annualRatePct / 100 / 12) * (remainingMonths + 1) / 2
+      : Math.max(0, monthly * remainingMonths - balance);
+    var mode = amount > 0 ? requestedMode : 'original';
+    var schedule = originalPlan.rows.slice(paidMonths).map(function (row) { return Object.assign({}, row); });
+    var details = [
+      D('还款方式', method === 'principal' ? '等额本金' : '等额本息'),
+      D(method === 'principal' ? '首月月供' : '月供', method === 'principal' ? firstPayment : monthly, '元'),
+      D('已还期数后剩余本金', balance, '元'),
+      D('剩余期数', remainingMonths, '期'),
+      D('原剩余期限利息', originalRemainingInterest, '元'),
+    ];
+    var metrics = {
+      principal: principal,
+      annualRatePct: annualRatePct,
+      months: months,
+      paidMonths: paidMonths,
+      method: method,
+      mode: mode,
+      monthlyPayment: method === 'principal' ? firstPayment : monthly,
+      remainingBalance: balance,
+      remainingMonths: remainingMonths,
+      originalRemainingInterest: originalRemainingInterest,
+      prepayAmount: amount,
+      newPayment: method === 'principal' ? firstPayment : monthly,
+      remainingMonthsAfterPrepay: remainingMonths,
+      interestAfterPrepay: originalRemainingInterest,
+      interestSaved: 0,
+      status: amount > 0 ? 'partial' : 'original',
+    };
+
+    if (method === 'principal') {
+      details.splice(2, 0, D('每月固定本金', principal / months, '元'), D('每月月供递减', decrement, '元'));
+      metrics.fixedPrincipal = principal / months;
+      metrics.decrement = decrement;
+    }
+
+    if (amount > 0) {
+      var newBalance = Math.max(0, balance - amount);
+      var reduce;
+      var shorten;
+      if (method === 'equal') {
+        reduce = Core.loan.prepay(principal, annualRatePct, months, paidMonths, amount, false);
+        shorten = Core.loan.prepay(principal, annualRatePct, months, paidMonths, amount, true);
+        if (newBalance > 0) {
+          var equalReducePlan = amortize(newBalance, annualRatePct, remainingMonths, reduce.newPayment, 'equal');
+          var equalShortenPlan = amortize(newBalance, annualRatePct, shorten.months - paidMonths, shorten.newPayment, 'equal');
+          reduce.interest = equalReducePlan.totalInterest;
+          reduce.schedule = equalReducePlan.rows;
+          shorten.interest = equalShortenPlan.totalInterest;
+          shorten.schedule = equalShortenPlan.rows;
+        }
+      } else {
+        var reduceFirst = remainingMonths > 0 ? newBalance / remainingMonths + newBalance * (annualRatePct / 100 / 12) : 0;
+        var reducePlan = amortize(newBalance, annualRatePct, remainingMonths, newBalance / remainingMonths, 'principal');
+        reduce = {
+          mode: newBalance <= 0 ? 'payoff' : 'reduce', months: months,
+          newPayment: reduceFirst, fixedPrincipal: newBalance / remainingMonths,
+          decrement: newBalance / remainingMonths * (annualRatePct / 100 / 12),
+          remainingBalance: newBalance, interest: reducePlan.totalInterest, schedule: reducePlan.rows,
+        };
+        shorten = newBalance <= 0
+          ? { mode: 'payoff', months: paidMonths, newPayment: 0, interest: 0, schedule: [] }
+          : shortenPrincipal(newBalance, annualRatePct, principal, months);
+      }
+      var selected = mode === 'shorten' ? shorten : reduce;
+      var afterMonths = selected.mode === 'payoff' ? 0 : (mode === 'shorten' ? (method === 'equal' ? selected.months - paidMonths : selected.months) : remainingMonths);
+      var afterInterest = selected.mode === 'payoff' ? 0 : selected.interest;
+      metrics.newBalance = newBalance;
+      metrics.overpayment = Math.max(0, amount - balance);
+      metrics.regularPayment = selected.newPayment;
+      metrics.newPayment = selected.mode === 'payoff'
+        ? 0
+        : (selected.schedule && selected.schedule.length ? selected.schedule[0].payment : selected.newPayment);
+      metrics.remainingMonthsAfterPrepay = afterMonths;
+      metrics.interestAfterPrepay = afterInterest;
+      metrics.interestSaved = Math.max(0, originalRemainingInterest - afterInterest);
+      metrics.status = selected.mode;
+      if (selected.mode === 'payoff') {
+        schedule = [];
+        details.push(D('提前还款', '已结清', '后续利息为 0'));
+        if (metrics.overpayment > 0) details.push(D('超出应还本金', metrics.overpayment, '元，实际结算以银行为准'));
+      } else {
+        details.push(
+          D('提前还款金额', amount, '元'),
+          D('提前还款后剩余本金', newBalance, '元'),
+          D('减少月供方案新月供', reduce.newPayment, method === 'principal' ? '元，首期' : '元/月'),
+          D('减少月供方案剩余期数', remainingMonths, '期'),
+          D('减少月供方案剩余利息', reduce.interest, '元'),
+          D('缩短年限方案常规月供', shorten.newPayment, method === 'principal' ? '元，首期；固定本金不变' : '元/月'),
+          D('缩短年限方案剩余期数', mode === 'shorten' ? afterMonths : (method === 'equal' ? shorten.months - paidMonths : shorten.months), '期'),
+          D('缩短年限方案剩余利息', shorten.interest, '元'),
+          D('当前方案节省利息', metrics.interestSaved, '元')
+        );
+        schedule = selected.schedule.map(function (row, index) {
+          return Object.assign({}, row, { period: paidMonths + index + 1 });
+        });
+      }
+    }
+
+    var result = Result.create('prepay', {
+      metrics: metrics,
+      details: details,
+      formula: method === 'principal'
+        ? '每月本金 = 贷款本金 ÷ 总期数；每期利息 = 期初剩余本金 × 月利率；提前还款后以新剩余本金重算'
+        : '月供 = 本金 × 月利率 × (1+月利率)^期数 / ((1+月利率)^期数−1)；提前还款后按剩余本金重算',
+      assumptions: ['年利率输入为百分数', '利率在剩余期限内不变', '提前还款在期初完成', method === 'principal' ? '缩期保持原每月固定本金，末期据实结算' : '缩期保持原月供，末期据实结算'],
+      source: source,
+      precision: { money: 2, months: 0 },
+      limitations: ['未计违约金、提前还款手续费与重定价', '银行实际结算日期与合同规则可能不同', '还款计划为静态测算'],
+    });
+    result.schedule = schedule;
+    return result;
+  }
+
+  return { calculate: calculate };
+});
