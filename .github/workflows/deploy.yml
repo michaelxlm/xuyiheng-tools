@@ -73,7 +73,7 @@ jobs:
           TOP="$(dirname "$GITHUB_WORKSPACE")"
           rm -rf "$TOP/main-api"
           mkdir -p /tmp/xuyiheng-main-api-key && chmod 700 /tmp/xuyiheng-main-api-key
-          printf '%s\n' "$MAIN_API_DEPLOY_KEY" > /tmp/xuyiheng-main-api-key/id_ed25519
+          printf '%s' "$MAIN_API_DEPLOY_KEY" | base64 -d > /tmp/xuyiheng-main-api-key/id_ed25519
           chmod 600 /tmp/xuyiheng-main-api-key/id_ed25519
           export GIT_SSH_COMMAND='ssh -i /tmp/xuyiheng-main-api-key/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new'
           git clone --depth 1 git@github.com:michaelxlm/main-api.git "$TOP/main-api"
