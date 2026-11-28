@@ -1,0 +1,347 @@
+/* ==========================================================================
+   life-plan.js · 现金流、债务释放与资产目标纯计算模块
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('../core/result'));
+  } else {
+    root.Tools = root.Tools || {};
+    root.Tools.lifePlan = factory(root.ToolCore.Result);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (Result) {
+  'use strict';
+  var D = Result.detail;
+  var MAX_MONEY = 1e15;
+  var MAX_TARGET_MONTHS = 12000;
+  var SOURCE = {
+    name: '资金时间价值与退休提取假设',
+    standard: '普通年金/期初年金终值；有效年利率转月利率；费雪实际收益率',
+    version: '2026.11',
+    verifiedAt: '2026-11-28',
+    sources: [
+      { title: 'CAUL 开放教材：Present and Future Values with Applications', url: 'https://oercollective.caul.edu.au/fundamental-finance/chapter/chapter-3-present-and-future-values-with-applications/' },
+      { title: 'CFI：Effective Annual Interest Rate', url: 'https://corporatefinanceinstitute.com/resources/commercial-lending/effective-annual-interest-rate-ear/' },
+      { title: 'The 4% Rule: A Historical Perspective', url: 'https://www.finra.org/investors/insights/retirement-withdrawal-strategies' },
+    ],
+  };
+
+  function numeric(value, fallback, required, errors, label, min, max) {
+    if (value == null || String(value).trim() === '') {
+      if (required) errors.push(label + '不能为空');
+      return fallback;
+    }
+    var n = Number(value);
+    if (!isFinite(n)) {
+      errors.push(label + '必须是有限数');
+      return fallback;
+    }
+    if (min != null && n < min) errors.push(label + '不能小于 ' + min);
+    if (max != null && n > max) errors.push(label + '不能大于 ' + max);
+    return n;
+  }
+
+  function monthlyRate(annualRatePct) {
+    return Math.expm1(Math.log1p(annualRatePct / 100) / 12);
+  }
+
+  function annuityFactor(rate, months) {
+    if (months <= 0) return 0;
+    if (Math.abs(rate) < 1e-10) return months;
+    return Math.expm1(months * Math.log1p(rate)) / rate;
+  }
+
+  function futureValue(principal, monthly, annualRatePct, months, timing) {
+    var i = monthlyRate(annualRatePct);
+    var factor = Math.exp(months * Math.log1p(i));
+    var due = timing === 'begin' ? 1 + i : 1;
+    return principal * factor + monthly * due * annuityFactor(i, months);
+  }
+
+  function requiredMonthly(principal, target, annualRatePct, months, timing) {
+    if (principal >= target || months <= 0) return 0;
+    var i = monthlyRate(annualRatePct);
+    var fvPrincipal = futureValue(principal, 0, annualRatePct, months, timing);
+    var due = timing === 'begin' ? 1 + i : 1;
+    return Math.max(0, (target - fvPrincipal) / (due * annuityFactor(i, months)));
+  }
+
+  function annuityPayment(principal, annualRatePct, months) {
+    if (!(principal > 0)) return 0;
+    var i = monthlyRate(annualRatePct);
+    if (Math.abs(i) < 1e-10) return principal / months;
+    return principal * i / -Math.expm1(-months * Math.log1p(i));
+  }
+
+  function debtPayoffMonth(principal, payment, annualRatePct) {
+    if (!(principal > 0)) return 0;
+    var i = monthlyRate(annualRatePct);
+    if (Math.abs(i) < 1e-10) {
+      if (!(payment > 0)) return null;
+      return Math.ceil(principal / payment - 1e-10);
+    }
+    if (!(payment > principal * i)) return null;
+    var months = -Math.log1p(-principal * i / payment) / Math.log1p(i);
+    return isFinite(months) ? Math.ceil(months - 1e-10) : null;
+  }
+
+  function requiredMonthlyWithRelease(principal, target, beforePayoff, afterPayoff, annualRatePct, months, timing, payoffMonth) {
+    if (principal >= target) return 0;
+    var fixed = requiredMonthly(principal, target, annualRatePct, months, timing);
+    if (!(payoffMonth > 0) || payoffMonth >= months || fixed === 0) return fixed;
+    function projected(required) {
+      return simulateAssetPath(principal, required, required + afterPayoff - beforePayoff, annualRatePct, months, timing, payoffMonth).balance;
+    }
+    if (projected(0) >= target) return 0;
+    var low = 0;
+    var high = Math.max(1, fixed);
+    while (projected(high) < target && high < 1e18) {
+      low = high;
+      high *= 2;
+    }
+    if (!(projected(high) >= target)) return null;
+    for (var step = 0; step < 80; step += 1) {
+      var middle = (low + high) / 2;
+      if (projected(middle) >= target) high = middle;
+      else low = middle;
+    }
+    return high;
+  }
+
+  function timeToTarget(principal, target, monthly, annualRatePct, timing) {
+    if (principal >= target) return { status: 'reached', months: 0 };
+    if (!(target > principal) || !isFinite(principal) || !isFinite(target)) return { status: 'unreachable', months: null };
+    var i = monthlyRate(annualRatePct);
+    var logQ = Math.log1p(i);
+    if (Math.abs(i) < 1e-10) {
+      if (!(monthly > 0)) return { status: 'unreachable', months: null };
+      return finiteTime((target - principal) / monthly);
+    }
+    var k = monthly * (timing === 'begin' ? 1 + i : 1) / i;
+    var a = principal + k;
+    var ratio = (target + k) / a;
+    if (!(a !== 0) || !(ratio > 0) || !isFinite(ratio)) return { status: 'unreachable', months: null };
+    var months = Math.log(ratio) / logQ;
+    if (!(months > 0) || !isFinite(months)) return { status: 'unreachable', months: null };
+    return finiteTime(months);
+  }
+
+  function finiteTime(months) {
+    if (!isFinite(months)) return { status: 'overflow', months: null };
+    if (months > MAX_TARGET_MONTHS) return { status: 'beyond_range', months: null };
+    return { status: 'reached', months: Math.ceil(months - 1e-10) };
+  }
+
+  function simulateAssetPath(principal, beforePayoff, afterPayoff, annualRatePct, months, timing, payoffMonth, target) {
+    var i = monthlyRate(annualRatePct);
+    var balance = principal;
+    var fundingGap = 0;
+    var depletedAt = null;
+    var targetMonth = null;
+    for (var m = 1; m <= months; m += 1) {
+      var contribution = payoffMonth > 0 && m > payoffMonth ? afterPayoff : beforePayoff;
+      if (timing === 'begin') balance += contribution;
+      else balance *= 1 + i;
+      if (timing !== 'begin') balance += contribution;
+      if (balance < 0) {
+        if (depletedAt == null) depletedAt = m;
+        fundingGap -= balance;
+        balance = 0;
+      }
+      if (timing === 'begin') balance *= 1 + i;
+      if (target > 0 && targetMonth == null && balance >= target) targetMonth = m;
+    }
+    return { balance: balance, fundingGap: fundingGap, depletedAt: depletedAt, targetMonth: targetMonth };
+  }
+
+  function targetTime(principal, target, beforePayoff, afterPayoff, annualRatePct, timing, payoffMonth) {
+    if (principal >= target) return { status: 'reached', months: 0 };
+    var path = simulateAssetPath(principal, beforePayoff, afterPayoff, annualRatePct, MAX_TARGET_MONTHS, timing, payoffMonth, target);
+    if (!isFinite(path.balance) || !isFinite(path.fundingGap)) return { status: 'overflow', months: null };
+    if (path.targetMonth != null) return { status: 'reached', months: path.targetMonth };
+    var remaining = timeToTarget(path.balance, target, afterPayoff, annualRatePct, timing);
+    if (remaining.status === 'unreachable' || remaining.status === 'overflow') return remaining;
+    return { status: 'beyond_range', months: null };
+  }
+
+  function targetText(state) {
+    if (state.status === 'reached') return state.months === 0 ? '当前已达成' : '约 ' + state.months + ' 个月';
+    if (state.status === 'beyond_range') return '超过 1000 年，未作有限时间承诺';
+    if (state.status === 'overflow') return '目标时间超出可计算范围';
+    return '按当前现金流无法有限达成';
+  }
+
+  function calculate(input) {
+    var o = input || {};
+    var errors = [];
+    var income = numeric(o.income, null, true, errors, '税后月收入', 0.01, MAX_MONEY);
+    var expense = numeric(o.expense, 0, false, errors, '日常支出', 0, MAX_MONEY);
+    var assets = numeric(o.assets, 0, false, errors, '可投资资产', 0, MAX_MONEY);
+    var annualRatePct = numeric(o.annualRatePct, null, true, errors, '基准有效年收益率', -99.99, 1000);
+    var years = numeric(o.years, 10, false, errors, '规划年限', 1, 60);
+    if (Math.floor(years) !== years) errors.push('规划年限必须按整年填写');
+    var months = Math.round(years * 12);
+    var inflationPct = numeric(o.inflationPct, 0, false, errors, '年通胀率', 0, 100);
+    var withdrawalRatePct = numeric(o.withdrawalRatePct, 4, false, errors, '年提取率假设', 0.1, 20);
+    var goalAnnualExpense = numeric(o.goalAnnualExpense, 0, false, errors, '财务自由目标年支出', 0, MAX_MONEY);
+    var timing = o.timing === 'begin' ? 'begin' : 'end';
+    if (o.timing != null && ['begin', 'end'].indexOf(o.timing) < 0) errors.push('供款时点必须是期末或期初');
+    var lowRatePct = numeric(o.lowRatePct, annualRatePct == null ? -2 : Math.max(-99.99, annualRatePct - 2), false, errors, '保守情景收益率', -99.99, 1000);
+    var highRatePct = numeric(o.highRatePct, annualRatePct == null ? 2 : Math.min(1000, annualRatePct + 2), false, errors, '乐观情景收益率', -99.99, 1000);
+    if (lowRatePct > annualRatePct || highRatePct < annualRatePct) errors.push('三情景收益率必须满足保守不高于基准、乐观不低于基准');
+
+    var debtPayment = numeric(o.debtPayment, 0, false, errors, '当前月供负债', 0, MAX_MONEY);
+    var hasDebtSchedule = o.debtPrincipal != null && String(o.debtPrincipal).trim() !== ''
+      && o.debtAnnualRatePct != null && String(o.debtAnnualRatePct).trim() !== ''
+      && o.debtRemainingMonths != null && String(o.debtRemainingMonths).trim() !== '';
+    var partialDebtSchedule = [o.debtPrincipal, o.debtAnnualRatePct, o.debtRemainingMonths].some(function (v) {
+      return v != null && String(v).trim() !== '';
+    });
+    var debtPrincipal = numeric(o.debtPrincipal, null, false, errors, '负债余额', 0, MAX_MONEY);
+    var debtRatePct = numeric(o.debtAnnualRatePct, null, false, errors, '负债年利率', 0, 1000);
+    var debtMonths = numeric(o.debtRemainingMonths, null, false, errors, '负债剩余月数', 1, 1200);
+    if (partialDebtSchedule && !hasDebtSchedule) errors.push('负债余额、年利率和剩余月数需全部填写，或全部留空');
+    if (debtMonths != null && Math.floor(debtMonths) !== debtMonths) errors.push('负债剩余月数必须按整数填写');
+    var estimatedDebtPayment = hasDebtSchedule ? annuityPayment(debtPrincipal, debtRatePct, debtMonths) : null;
+    var actualDebtPayment = debtPayment > 0 ? debtPayment : (estimatedDebtPayment || 0);
+    if (debtPayment > 0 && !hasDebtSchedule) partialDebtSchedule = false;
+    if (errors.length) return Result.invalid('life-plan', errors.join('；'), SOURCE);
+
+    var payoffMonth = null;
+    if (hasDebtSchedule) {
+      payoffMonth = debtPayment > 0
+        ? debtPayoffMonth(debtPrincipal, actualDebtPayment, debtRatePct)
+        : (debtPrincipal > 0 ? debtMonths : 0);
+    }
+    if (hasDebtSchedule && payoffMonth == null) {
+      return Result.invalid('life-plan', '手填月供不足以覆盖负债利息，无法据此确定还清月份；请提高月供或核对负债参数', SOURCE);
+    }
+    if (payoffMonth != null && payoffMonth > 1200) {
+      return Result.invalid('life-plan', '按实际月供预计超过 1200 个月才能还清，请核对月供、余额、利率或剩余月数', SOURCE);
+    }
+    var baseSurplus = income - expense;
+    var currentSurplus = baseSurplus - actualDebtPayment;
+    var afterPayoffSurplus = baseSurplus;
+    var assetPath = simulateAssetPath(assets, currentSurplus, afterPayoffSurplus, annualRatePct, months, timing, payoffMonth);
+    var projection = assetPath.balance;
+    var fundingGap = assetPath.fundingGap;
+    var contributionBefore = currentSurplus * (payoffMonth > 0 ? Math.min(payoffMonth, months) : months);
+    var contributionAfter = payoffMonth > 0 ? afterPayoffSurplus * Math.max(0, months - payoffMonth) : 0;
+    var invested = assets + contributionBefore + contributionAfter;
+    var depletedAt = assetPath.depletedAt;
+    var values = [projection, fundingGap, invested, projection - invested, contributionBefore, contributionAfter, estimatedDebtPayment || 0];
+    if (values.some(function (v) { return !isFinite(v) || Math.abs(v) > Number.MAX_VALUE; })) {
+      return Result.invalid('life-plan', '资产预测超出可表示范围，请降低收益率或规划年限', SOURCE);
+    }
+
+    var realRatePct = ((1 + annualRatePct / 100) / (1 + inflationPct / 100) - 1) * 100;
+    var realTarget = goalAnnualExpense > 0 ? goalAnnualExpense / (withdrawalRatePct / 100) : 0;
+    var required = realTarget > 0 ? requiredMonthlyWithRelease(assets, realTarget, currentSurplus, afterPayoffSurplus, realRatePct, months, timing, payoffMonth) : null;
+    var goalState = realTarget > 0 ? targetTime(assets, realTarget, currentSurplus, afterPayoffSurplus, realRatePct, timing, payoffMonth) : { status: 'not_set', months: null };
+    var currentProgress = realTarget > 0 ? assets / realTarget * 100 : null;
+    var savingsRate = currentSurplus / income * 100;
+    var scenarios = [
+      { key: 'low', label: '保守', annualRatePct: lowRatePct },
+      { key: 'base', label: '基准', annualRatePct: annualRatePct },
+      { key: 'high', label: '乐观', annualRatePct: highRatePct },
+    ].map(function (scenario) {
+      var scenarioPath = simulateAssetPath(assets, currentSurplus, afterPayoffSurplus, scenario.annualRatePct, months, timing, payoffMonth);
+      return {
+        key: scenario.key, label: scenario.label, annualRatePct: scenario.annualRatePct,
+        total: scenarioPath.balance, fundingGap: scenarioPath.fundingGap,
+        depletedAt: scenarioPath.depletedAt, gain: scenarioPath.depletedAt == null ? scenarioPath.balance - invested : null,
+      };
+    });
+    if (scenarios.some(function (scenario) { return !isFinite(scenario.total) || !isFinite(scenario.fundingGap) || !isFinite(scenario.gain); })) {
+      return Result.invalid('life-plan', '情景资产预测超出可表示范围，请降低收益率或规划年限', SOURCE);
+    }
+
+    var details = [
+      D('月度结余（当前）', currentSurplus, '元/月，收入 − 日常支出 − 当前月供'),
+      D('月度现金流状态', currentSurplus < 0 ? '赤字' : (currentSurplus === 0 ? '收支相抵' : '正结余'), currentSurplus < 0 ? '需要动用储蓄或减少支出，不是新增投资能力' : ''),
+      D('储蓄率（当前）', savingsRate, '%，以当前月供扣除后的结余计算'),
+      D('年度可投资额（当前）', currentSurplus * 12, '元/年，未考虑债务还清后的释放'),
+      D('累计投入本金', invested, '元，含初始资产与规划期内净投入'),
+      D('投资收益', depletedAt == null ? projection - invested : '不适用', depletedAt == null ? '元，名义值' : '资产已耗尽，不再展示负账户作为可投资资产'),
+      D('期末资产（名义）', projection, '元，最低为 0'),
+      D('规划期末资金缺口', fundingGap, '元，按耗尽月现金缺口累计，不按投资收益率放大'),
+      D('期末资产（今天购买力）', projection / Math.pow(1 + inflationPct / 100, years), '元，按输入通胀率折算'),
+      D('实际年收益率', realRatePct, '%，(1 + 名义收益率) ÷ (1 + 通胀率) − 1'),
+      D('资产耗尽提示', depletedAt == null ? '规划期内未耗尽' : '约第 ' + depletedAt + ' 个月耗尽', depletedAt == null ? '恒定收益假设下的路径检查' : '此后负余额不构成可投资资产'),
+    ];
+    if (hasDebtSchedule) {
+      details.push(
+        D('负债预计月供', estimatedDebtPayment, '元/月，按余额、利率与剩余月数估算'),
+        D('现金流采用的月供', actualDebtPayment, '元/月，手填月供优先，否则用预计月供'),
+        D('按实际月供预计还清', payoffMonth, '个月后；用于现金流释放，可能与填写期限不同'),
+        D('还清后月度结余', afterPayoffSurplus, '元/月，释放当前月供'),
+        D('规划期内释放现金流', payoffMonth > 0 ? Math.max(0, months - payoffMonth) * actualDebtPayment : 0, payoffMonth > 0 ? '元，仅还清落在规划期内时计入' : '元，零余额或未确定还清月份时不释放现金流')
+      );
+    } else {
+      details.push(D('债务还清安排', '未填写完整负债期限', '当前月供在规划期内持续，未提前释放现金流'));
+    }
+    scenarios.forEach(function (scenario) {
+      details.push(D(scenario.label + '情景期末资产', scenario.total, '元，有效年收益率 ' + scenario.annualRatePct + '%'));
+    });
+    if (realTarget > 0) {
+      details.push(
+        D('财务自由目标资产（今天购买力）', realTarget, '元，目标年支出 ÷ 提取率假设'),
+        D('财务自由进度', currentProgress, '%，可超过 100%'),
+        D('预计达成', targetText(goalState), goalState.status === 'reached' ? '按实际收益率与债务释放后的现金流测算' : '不是规划年限内的达标承诺'),
+        D('规划期内所需月储蓄', Math.ceil(required * 100) / 100, '元/月，向上取整到分；已计入债务还清后的现金流变化'),
+        D('当前月结余与所需月储蓄差额', currentSurplus - required, '元/月，负数表示当前缺口；还清后结余会增加')
+      );
+    } else {
+      details.push(D('财务自由目标', '未设置', '填写目标年支出并确认提取率假设后计算'));
+    }
+
+    return Result.create('life-plan', {
+      metrics: {
+        income: income, expense: expense, assets: assets, annualRatePct: annualRatePct,
+        years: years, months: months, inflationPct: inflationPct, withdrawalRatePct: withdrawalRatePct,
+        timing: timing, goalAnnualExpense: goalAnnualExpense,
+        lowRatePct: lowRatePct, highRatePct: highRatePct,
+        debtPayment: actualDebtPayment, debtPrincipal: hasDebtSchedule ? debtPrincipal : null,
+        debtAnnualRatePct: hasDebtSchedule ? debtRatePct : null,
+        debtRemainingMonths: hasDebtSchedule ? debtMonths : null,
+        payoffMonth: payoffMonth, estimatedDebtPayment: estimatedDebtPayment,
+        currentSurplus: currentSurplus, afterPayoffSurplus: afterPayoffSurplus,
+        savingsRatePct: savingsRate, projection: projection, fundingGap: fundingGap, invested: invested,
+        gain: depletedAt == null ? projection - invested : null, realRatePct: realRatePct,
+        realProjection: projection / Math.pow(1 + inflationPct / 100, years),
+        depletedAt: depletedAt, goalTarget: realTarget, progressPct: currentProgress,
+        goalTime: goalState, requiredMonthly: required,
+        scenarios: scenarios,
+      },
+      details: details,
+      formula: '有效月利率 i=(1+有效年收益率)^(1/12)−1；期末供款终值 FV=P(1+i)^n+C[((1+i)^n−1)/i]，期初供款再乘 (1+i)。实际收益率=(1+名义收益率)/(1+通胀率)−1。财务自由目标资产=今天购买力目标年支出÷可配置提取率；反推月储蓄按同一实际收益率模型与债务释放路径求解并向上取整到分。债务按实际月供计算还清月份。资产路径逐月检查，首次耗尽即截断负账户，后续正结余从零重新累积，资金缺口按现金口径单独累计。',
+      assumptions: [
+        '收益率与通胀率恒定，收益按月复利；输入为有效年收益率，不是名义年利率。',
+        '期末供款在每月末投入，期初供款在每月初投入；所有金额以人民币元计。',
+        '财务自由目标与所需月储蓄均按今天购买力口径，使用实际收益率；期末资产同时展示名义值和今天购买力。',
+        '保守、基准、乐观是用户设定的确定性情景，不是概率区间或收益保证。',
+        '填写完整负债期限时先估算等额本息月供；手填月供优先，并按余额、利率与实际月供重新计算还清月份，从实际还清后的第一个月起释放现金流；未填写期限则不释放。',
+      ],
+      source: SOURCE,
+      precision: { money: 2, ratePct: 4, months: 0 },
+      limitations: [
+        '提取率只是可修改的规划假设，不是保证终身可提取的比例；未模拟退休期市场波动与收益顺序风险。',
+        '未计入税费、投资费用、收入变化、突发支出、供款中断与债务违约金；实际结果可能显著不同。',
+        '资产首次耗尽后，负余额不会继续按投资收益率增长；后续正结余从零重新累积，历史资金缺口仍单独保留。',
+        '本工具提供确定性情景演算，不构成投资、税务或法律建议。',
+      ],
+    });
+  }
+
+  return {
+    calculate: calculate,
+    monthlyRate: monthlyRate,
+    futureValue: futureValue,
+    requiredMonthly: requiredMonthly,
+    timeToTarget: timeToTarget,
+    annuityPayment: annuityPayment,
+    debtPayoffMonth: debtPayoffMonth,
+    requiredMonthlyWithRelease: requiredMonthlyWithRelease,
+    simulateAssetPath: simulateAssetPath,
+  };
+});

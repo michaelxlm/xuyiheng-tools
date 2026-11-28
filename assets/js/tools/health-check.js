@@ -176,8 +176,8 @@
     var target = daily;
     if (adult && goal === 'cut') target = Math.max(0, daily - 400);
     if (adult && goal === 'gain') target = daily + 250;
-    if (!isFinite(bmiValue) || (adult && !isFinite(target))) {
-      return Result.invalid('health-check', '部分指标无法形成有限结果，请检查身高、体重和围度', SOURCE);
+    if (!isFinite(bmiValue) || (adult && (!(base > 0) || !(daily > 0) || !(target > 0)))) {
+      return Result.invalid('health-check', '部分指标无法形成有限正数结果，请检查年龄、身高、体重和目标设置', SOURCE);
     }
 
     var completeCircumferences = neck != null && waist != null && (sex !== 'female' || hip != null);
@@ -274,11 +274,12 @@
 
   function normalizeHistory(records) {
     if (!Array.isArray(records)) return [];
+    var today = localDate();
     return records.map(function (record, index) {
       return { record: record, index: index };
     }).filter(function (entry) {
       var r = entry.record;
-      return r && validDate(r.date) && isFinite(Number(r.w)) && Number(r.w) > 0 && isFinite(Number(r.h)) && Number(r.h) > 0;
+      return r && validDate(r.date) && r.date <= today && isFinite(Number(r.w)) && Number(r.w) > 0 && isFinite(Number(r.h)) && Number(r.h) > 0;
     }).sort(function (a, b) {
       if (a.record.date !== b.record.date) return a.record.date < b.record.date ? 1 : -1;
       var at = isFinite(Number(a.record.t)) ? Number(a.record.t) : 0;

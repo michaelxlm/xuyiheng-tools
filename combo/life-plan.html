@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>人生规划计算器 - 财务全景报告</title>
-  <meta name="description" content="人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。">
+  <meta name="description" content="本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。">
   <meta name="author" content="Michaelxlm">
-  <meta name="xuyiheng-source-digest" content="8c06ab661af8a402">
+  <meta name="xuyiheng-source-digest" content="db49a1d3d83ff506">
   <meta name="keywords" content="人生规划,财务规划,理财规划,人生目标,一珩成长笔记">
   <link rel="canonical" href="https://xuyiheng.com/combo/life-plan.html">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:title" content="人生规划计算器 - 财务全景报告">
-  <meta property="og:description" content="人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。">
+  <meta property="og:description" content="本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。">
   <meta property="og:url" content="https://xuyiheng.com/combo/life-plan.html">
   <meta property="og:site_name" content="一珩成长笔记">
   <meta property="og:locale" content="zh_CN">
@@ -22,7 +22,7 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="人生规划计算器 - 财务全景报告">
-  <meta name="twitter:description" content="人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。">
+  <meta name="twitter:description" content="本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。">
   <meta name="twitter:image" content="https://xuyiheng.com/og-cover.png">
   <meta name="theme-color" content="#2563eb" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
@@ -32,10 +32,10 @@
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%2796%27%20fill%3D%27%232563eb%27%2F%3E%3Crect%20x%3D%27120%27%20y%3D%27120%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23fff%27%2F%3E%3Crect%20x%3D%27280%27%20y%3D%27120%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23bcd0ff%27%2F%3E%3Crect%20x%3D%27120%27%20y%3D%27280%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23bcd0ff%27%2F%3E%3Crect%20x%3D%27280%27%20y%3D%27280%27%20width%3D%27112%27%20height%3D%27112%27%20rx%3D%2724%27%20fill%3D%27%23fff%27%2F%3E%3C%2Fsvg%3E">
   <link rel="manifest" href="/site.webmanifest">
   <script>(function(){var t=localStorage.getItem("theme");if(!t)t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;})();</script>
-<script>window.__TOOLS__=[{"url":"/calculator/tax.html","label":"个税计算器","icon":"file-text","cat":"计算器","key":"calc","desc":"在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。"},{"url":"/calculator/unit.html","label":"单位换算","icon":"repeat","cat":"计算器","key":"calc","desc":"在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。"},{"url":"/calculator/prepay.html","label":"房贷提前还款","icon":"home","cat":"计算器","key":"calc","desc":"在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。"},{"url":"/calculator/pension.html","label":"养老金计算器","icon":"dollar-sign","cat":"计算器","key":"calc","desc":"在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。"},{"url":"/calculator/social-insurance.html","label":"五险一金","icon":"shield","cat":"计算器","key":"calc","desc":"在线五险一金计算器，输入缴费基数与公积金比例，一键算出个人与单位月缴费明细。"},{"url":"/calculator/discount.html","label":"折扣计算","icon":"tag","cat":"计算器","key":"calc","desc":"在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。"},{"url":"/calculator/percentage.html","label":"百分比","icon":"percent","cat":"计算器","key":"calc","desc":"百分比计算器支持占比、增长率、百分比值、原值还原，以及百分点与相对变化双口径比较；除零和 -100% 还原奇点会明确提示"},{"url":"/calculator/overtime.html","label":"加班费","icon":"clock","cat":"计算器","key":"calc","desc":"在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。"},{"url":"/calculator/body-fat.html","label":"基础代谢体脂","icon":"heart","cat":"计算器","key":"calc","desc":"在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂"},{"url":"/calculator/pace.html","label":"跑步配速","icon":"activity","cat":"计算器","key":"calc","desc":"在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。"},{"url":"/calculator/date-calc.html","label":"日期计算","icon":"calendar","cat":"计算器","key":"calc","desc":"在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。"},{"url":"/calculator/timezone.html","label":"时区转换","icon":"globe","cat":"计算器","key":"calc","desc":"基于 IANA 时区数据库的跨时区转换与会议规划工具，自动处理夏令时跳空和重复时间，支持分钟级工作重叠窗口、CSV 与 "},{"url":"/calculator/size.html","label":"衣服尺码","icon":"shirt","cat":"计算器","key":"calc","desc":"国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。"},{"url":"/calculator/decoration.html","label":"装修预算","icon":"edit-3","cat":"计算器","key":"calc","desc":"在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。"},{"url":"/calculator/due-date.html","label":"预产期","icon":"gift","cat":"计算器","key":"calc","desc":"在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。"},{"url":"/calculator/height-predict.html","label":"儿童身高预测","icon":"trending-up","cat":"计算器","key":"calc","desc":"在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。"},{"url":"/calculator/pet-age.html","label":"宠物年龄","icon":"paw","cat":"计算器","key":"calc","desc":"在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。"},{"url":"/calculator/scientific.html","label":"科学计算器","icon":"hash","cat":"计算器","key":"calc","desc":"本地科学计算器，支持阶乘、平方根、三角函数、对数、指数与取整；明确区分 DEG/RAD，并对未定义、非法输入和溢出给出内"},{"url":"/calculator/fuel-cost.html","label":"油耗计算","icon":"droplet","cat":"计算器","key":"calc","desc":"在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。"},{"url":"/calculator/baby-name.html","label":"宝宝取名","icon":"star","cat":"计算器","key":"calc","desc":"宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。"},{"url":"/calculator/secret-message.html","label":"密语","icon":"lock","cat":"计算器","key":"calc","desc":"密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。"},{"url":"/calendar.html","label":"万年历·老黄历","icon":"calendar","cat":"日历工具","key":"cal","desc":"在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。"},{"url":"/calendar/solar-term.html","label":"二十四节气","icon":"leaf","cat":"日历工具","key":"cal","desc":"按年份查询二十四节气的公历日期、农历对照与干支生肖，附节气由来、时节诗句与全年一览，数据来自天行数据接口。"},{"url":"/calendar/daily-guide.html","label":"今日指南","icon":"sun","cat":"日历工具","key":"cal","desc":"每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。"},{"url":"/calendar/countdown.html","label":"倒计时·纪念日","icon":"clock","cat":"日历工具","key":"cal","desc":"在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。"},{"url":"/combo/buy-house.html","label":"买房全攻略","icon":"home","cat":"场景组合","key":"combo","desc":"本地计算商业贷款、公积金贷款、契税、签约前现金需求与购房总成本，支持首套二套140㎡分档、第三套自定义税率和现金流压力测"},{"url":"/combo/buy-car.html","label":"买车全攻略","icon":"car","cat":"场景组合","key":"combo","desc":"本地计算车辆购置税、新能源减税限额、车贷月供、签约现金、落地价格与持有期用车成本，支持 PC 和 H5。"},{"url":"/combo/health-check.html","label":"健康体检站","icon":"heart","cat":"场景组合","key":"combo","desc":"在线健康体检工具，18 岁及以上估算 BMI 分级、健康体重、基础代谢与每日消耗；5–17 岁仅记录 BMI 数值。测量"},{"url":"/combo/fun-test.html","label":"趣味测试","icon":"smile","cat":"场景组合","key":"combo","desc":"趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。"},{"url":"/combo/finance-toolkit.html","label":"理财百宝箱","icon":"bar-chart-2","cat":"场景组合","key":"combo","desc":"理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。"},{"url":"/combo/life-plan.html","label":"人生规划","icon":"compass","cat":"场景组合","key":"combo","desc":"人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。"},{"url":"/combo/color-lab.html","label":"色彩研究所","icon":"droplet","cat":"场景组合","key":"combo","desc":"凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。"},{"url":"/combo/index.html","label":"场景组合总览","icon":"grid","cat":"场景组合","key":"combo","desc":"一珩成长笔记的场景组合工具合集：买房全攻略、买车全攻略、健康体检站、趣味测试、理财百宝箱、人生规划、色彩研究所，把多个计"},{"url":"/probability.html","label":"概率计算器","icon":"target","cat":"其他工具","key":"other","desc":"在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。"},{"url":"/random.html","label":"随机数生成","icon":"shuffle","cat":"其他工具","key":"other","desc":"在线随机数生成器，快速生成指定范围的随机数字，实用小工具。"},{"url":"/vision.html","label":"视力测试","icon":"eye","cat":"其他工具","key":"other","desc":"免费在线视力测试，快速检测视力水平，支持动态视力检测。"},{"url":"/lotto.html","label":"双色球","icon":"star","cat":"其他工具","key":"other","desc":"双色球工具：随机机选、走势分析、贴近真实开奖形态的仿真选号（娱乐）。历史统计不能提高选中机会。"},{"url":"/tool/air-quality.html","label":"空气质量","icon":"wind","cat":"其他工具","key":"other","desc":"按城市查询实时空气质量指数 AQI、等级、首要污染物及 PM2.5、PM10 等分项浓度，数据来自天行数据接口。"},{"url":"/tool/idiom.html","label":"成语词典","icon":"book-open","cat":"其他工具","key":"other","desc":"按名称查询成语的拼音、释义、典故出处与例句，语文学习与写作参考工具，词库来自天行数据接口。"},{"url":"/tool/polyphone.html","label":"多音字查询","icon":"type","cat":"其他工具","key":"other","desc":"输入汉字查询其在不同词语中的读音示例，辨析多音字、纠正朗读发音，数据来自天行数据接口。"},{"url":"/fortune/bazi.html","label":"八字排盘","icon":"taiji","cat":"命理星盘","key":"fortune","desc":"不懂八字也能看：填写出生日期后，先用白话读懂日主、格局、五行和当前阶段，再查看四柱、十神、用神、大运等完整明细。附阅读顺"},{"url":"/fortune/ziwei.html","label":"紫微斗数","icon":"star","cat":"命理星盘","key":"fortune","desc":"在线紫微斗数排盘，先用日常语言解释命宫主星、当前大限与四化，把十二宫讲成容易理解的人生地图；同时保留十四主星、辅煞曜、庙"},{"url":"/fortune/natal.html","label":"本命星盘","icon":"compass","cat":"命理星盘","key":"fortune","desc":"填写出生日期、时间与城市生成星盘，先用白话读懂太阳、月亮、上升、宫位与相位，再查看十星位置、月相和完整明细。附术语解释、"},{"url":"/fortune/horoscope.html","label":"星座运势","icon":"sun","cat":"命理星盘","key":"fortune","desc":"点选星座查看每日白话建议：先了解今天总体节奏，再看爱情、事业、财运与健康的相对状态，最后选一件可执行的小事。星级不是好运"},{"url":"/fortune/zodiac-match.html","label":"生肖配对","icon":"heart","cat":"命理星盘","key":"fortune","desc":"点选双方生肖即可配对，用白话解释传统关系标签、爱情朋友合作三个相处角度和具体沟通建议，再展示规则分数与明细。分数不是匹配"},{"url":"/fortune/tarot.html","label":"塔罗占卜","icon":"cards","cat":"命理星盘","key":"fortune","desc":"点选问题方向即可抽牌，逐张读懂正逆位关键词，再把单张或三张牌连成日常建议与可执行的小动作。附术语解释、阅读顺序与常见误区"}];window.__ENT__=["/combo/fun-test.html","/combo/color-lab.html","/fortune/bazi.html","/fortune/ziwei.html","/fortune/natal.html","/fortune/horoscope.html","/fortune/zodiac-match.html","/fortune/tarot.html"];window.__AFFILIATE_INVENTORY__=[{"scene":"buy-house","label":"房贷提前还款","desc":"算清剩余本金、利息与提前还款能省多少","url":"/calculator/prepay.html"},{"scene":"buy-house","label":"装修预算","desc":"按面积估算主材与人工用量","url":"/calculator/decoration.html"},{"scene":"buy-house","label":"个税计算器","desc":"购房前后算清税后收入","url":"/calculator/tax.html"},{"scene":"buy-car","label":"油耗计算","desc":"按里程与油价估算每月用车成本","url":"/calculator/fuel-cost.html"},{"scene":"buy-car","label":"折扣计算","desc":"落地价里的裸车优惠、满减叠加算清楚","url":"/calculator/discount.html"},{"scene":"buy-car","label":"百分比","desc":"首付比例、利率与费率快速换算","url":"/calculator/percentage.html"},{"scene":"health-check","label":"基础代谢体脂","desc":"BMI、BMR 与体脂率一站式评估","url":"/calculator/body-fat.html"},{"scene":"health-check","label":"跑步配速","desc":"按距离与时间算配速，制定运动计划","url":"/calculator/pace.html"},{"scene":"health-check","label":"儿童身高预测","desc":"结合父母身高估算孩子成年身高","url":"/calculator/height-predict.html"},{"scene":"finance-toolkit","label":"个税计算器","desc":"税后收入是理财的起点","url":"/calculator/tax.html"},{"scene":"finance-toolkit","label":"养老金计算器","desc":"估算退休后每月可领养老金","url":"/calculator/pension.html"},{"scene":"finance-toolkit","label":"五险一金","desc":"算清每月个人与单位缴费明细","url":"/calculator/social-insurance.html"},{"scene":"life-plan","label":"养老金计算器","desc":"把养老目标纳入人生财务全景","url":"/calculator/pension.html"},{"scene":"life-plan","label":"房贷提前还款","desc":"规划提前还款对长期现金流的影响","url":"/calculator/prepay.html"},{"scene":"life-plan","label":"倒计时·纪念日","desc":"为人生关键节点设定日期与提醒","url":"/calendar/countdown.html"},{"scene":"fun-test","label":"色彩研究所","desc":"凭直觉选颜色，看看性格倾向（趣味）","url":"/combo/color-lab.html"},{"scene":"fun-test","label":"随机数生成","desc":"抽签、分组、小游戏都用得上","url":"/random.html"},{"scene":"fun-test","label":"概率计算器","desc":"趣味结果背后的概率直观算一算","url":"/probability.html"},{"scene":"color-lab","label":"趣味测试合集","desc":"星座速配与生命灵数，换个玩法继续逛","url":"/combo/fun-test.html"},{"scene":"color-lab","label":"随机数生成","desc":"随机抽一个颜色或号码","url":"/random.html"},{"scene":"color-lab","label":"视力测试","desc":"换个轻松的自测小工具","url":"/vision.html"},{"scene":"buy-house","label":"京东家居日用","desc":"家装家具、日用好物，通过本站链接下单","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocDQABXFRORjNVKy5sLUd2EwgDaiBXSzlUUhluJmdqFghRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBGsLGlMSXAQyU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2e44DE4WAWxgGQwVA0Z_FigA1sanEh14G18SWRcyZG5t","type":"affiliate"},{"scene":"buy-car","label":"京东数码车品","desc":"行车记录仪、车机数码等用车好物","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMIJK1olXDYDZBoCUBVIMzZNXhpXVhgcFgcZVBsIWDoXSQVJQzZqPEQ5fQhyXA1_TwQTXXBrDwALSzNRD2M4GVoUXAAKXVtUAXsXAm4IGFwUXAEHZG5dCXtcbW44GVoUXgEDU1tdAHsXBWoBEl0VXA4HVV1fOEwXCl_fqe_CwrAKUF9UOHsnAF8PG1IBW3RDBkpbensnAl8LK2sXXAcGXW5t1sandBhKcwEdAnR8Mh8WDjBeWbGFq0pnLQYAVl5MOHsnMw","type":"affiliate"},{"scene":"health-check","label":"天猫国际健研馆","desc":"健康器械与保健好物，入会领券","url":"https://s.click.taobao.com/t?union_lens=lensId%3APUB%401753971446%4021312f31_1cb3_19860d85200_3d38%4001%40eyJmbG9vcklkIjozODg1Miiwiic3BtQiiI6Il9wb3J0YWxfdjJfcGFnZXNfYWN0aXZpdHlfb2ZmaWNpYWxfaW5kZXhfaHRtIn0ie%3BeventPageId%3A20150318020008733&e=m%3D2%26s%3Dd%2BRZlnmfC90cQipKwQzePCperVdZeJviU%2F9%2F0taeK29yINtkUhsv0P3Kf0EWYLbqFd6tt5qxD5Ue7HM2QJc131cvUGbbeXh73apronxEECKzALVhifQ9%2BP1xjwA8EAOnQ%2BNeRhkrKyfCg%2Fx6BHtN2amAOqUjIVeCy0DxCSzwFgFd1le1%2FF%2FLHXyKwiqD2WK0Bmf7LSR66ag4aIh%2BwnIONST8IooNW8SzO5CcJgHDOBKFzyYjawoqwGqFT2L8zA8AenRgoMDA9RxaStlqWXQNCYyLB7gwfSfcbA724fELe4f8zFlMerWS1VQJD6WTFB%2BjPM6TBJOKLOENxtKElQIb6oY7q73JSNeHX8FN6lsSTYkbRsmFvkxI73SW4rOI823VUK6mtJKzTIFdrZwc4PO9PQ5VhUgdwo6QWVuGINZhiLflx1XQzb07I8YMXU3NNCg%2F","type":"affiliate"},{"scene":"fun-test","label":"京东玩具乐器","desc":"趣味玩具与乐器，好玩不贵","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocEQAVSlRORjNVKwR8XXNnUgUCajZfZzRzUlhhCQIELwhRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBW4MGFsQWw8yU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2so_ei5WdW5tWzlOKQJ8Dig71sWDEh14G18SWRcyZG5t","type":"affiliate"},{"scene":"color-lab","label":"京东艺术品","desc":"艺术品与文创周边，正品低价","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMAJK1olXDYDZBoCUBVIMzZNXhpXVhgcBB0YFxBCHD1WR0UlGlAFCUQcCBF0cxUPGQBOKnMDESwDaEcbM20JGloTVQ8HXVdtCEoWA2wPGloSWDYyVF9tQyUWM20JGlgSXAEHVFZtCE0SCmYOGlMSWwYKVm5aCEIn1N28zMSjVQIDXW5tOEgnBG8BD11nHFQWUixtOEonAF84GVoUWQ8yZIDTnDcUfg5dGiR2W3NXCiUBSB7JjfsZaSsVXw4ARW5tOHs","type":"affiliate"}];window.__NEXT_QUOTA__=1;</script>
+<script>window.__TOOLS__=[{"url":"/calculator/tax.html","label":"个税计算器","icon":"file-text","cat":"计算器","key":"calc","desc":"在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。"},{"url":"/calculator/unit.html","label":"单位换算","icon":"repeat","cat":"计算器","key":"calc","desc":"在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。"},{"url":"/calculator/prepay.html","label":"房贷提前还款","icon":"home","cat":"计算器","key":"calc","desc":"在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。"},{"url":"/calculator/pension.html","label":"养老金计算器","icon":"dollar-sign","cat":"计算器","key":"calc","desc":"在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。"},{"url":"/calculator/social-insurance.html","label":"五险一金","icon":"shield","cat":"计算器","key":"calc","desc":"在线五险一金计算器，输入缴费基数与公积金比例，一键算出个人与单位月缴费明细。"},{"url":"/calculator/discount.html","label":"折扣计算","icon":"tag","cat":"计算器","key":"calc","desc":"在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。"},{"url":"/calculator/percentage.html","label":"百分比","icon":"percent","cat":"计算器","key":"calc","desc":"百分比计算器支持占比、增长率、百分比值、原值还原，以及百分点与相对变化双口径比较；除零和 -100% 还原奇点会明确提示"},{"url":"/calculator/overtime.html","label":"加班费","icon":"clock","cat":"计算器","key":"calc","desc":"在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。"},{"url":"/calculator/body-fat.html","label":"基础代谢体脂","icon":"heart","cat":"计算器","key":"calc","desc":"在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂"},{"url":"/calculator/pace.html","label":"跑步配速","icon":"activity","cat":"计算器","key":"calc","desc":"在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。"},{"url":"/calculator/date-calc.html","label":"日期计算","icon":"calendar","cat":"计算器","key":"calc","desc":"在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。"},{"url":"/calculator/timezone.html","label":"时区转换","icon":"globe","cat":"计算器","key":"calc","desc":"基于 IANA 时区数据库的跨时区转换与会议规划工具，自动处理夏令时跳空和重复时间，支持分钟级工作重叠窗口、CSV 与 "},{"url":"/calculator/size.html","label":"衣服尺码","icon":"shirt","cat":"计算器","key":"calc","desc":"国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。"},{"url":"/calculator/decoration.html","label":"装修预算","icon":"edit-3","cat":"计算器","key":"calc","desc":"在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。"},{"url":"/calculator/due-date.html","label":"预产期","icon":"gift","cat":"计算器","key":"calc","desc":"在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。"},{"url":"/calculator/height-predict.html","label":"儿童身高预测","icon":"trending-up","cat":"计算器","key":"calc","desc":"在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。"},{"url":"/calculator/pet-age.html","label":"宠物年龄","icon":"paw","cat":"计算器","key":"calc","desc":"在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。"},{"url":"/calculator/scientific.html","label":"科学计算器","icon":"hash","cat":"计算器","key":"calc","desc":"本地科学计算器，支持阶乘、平方根、三角函数、对数、指数与取整；明确区分 DEG/RAD，并对未定义、非法输入和溢出给出内"},{"url":"/calculator/fuel-cost.html","label":"油耗计算","icon":"droplet","cat":"计算器","key":"calc","desc":"在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。"},{"url":"/calculator/baby-name.html","label":"宝宝取名","icon":"star","cat":"计算器","key":"calc","desc":"宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。"},{"url":"/calculator/secret-message.html","label":"密语","icon":"lock","cat":"计算器","key":"calc","desc":"密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。"},{"url":"/calendar.html","label":"万年历·老黄历","icon":"calendar","cat":"日历工具","key":"cal","desc":"在线万年历日历与传统老黄历查询，支持公历农历转换、宜忌查询、神煞方位、节气节日查看。"},{"url":"/calendar/solar-term.html","label":"二十四节气","icon":"leaf","cat":"日历工具","key":"cal","desc":"按年份查询二十四节气的公历日期、农历对照与干支生肖，附节气由来、时节诗句与全年一览，数据来自天行数据接口。"},{"url":"/calendar/daily-guide.html","label":"今日指南","icon":"sun","cat":"日历工具","key":"cal","desc":"每日生活指南，整合老黄历宜忌、星座运势、午餐推荐，开启美好一天。"},{"url":"/calendar/countdown.html","label":"倒计时·纪念日","icon":"clock","cat":"日历工具","key":"cal","desc":"在线重要日子计算器，支持考试倒计时、纪念日、生日、旅行计划、年龄计算、工作日计算等多种类型。"},{"url":"/combo/buy-house.html","label":"买房全攻略","icon":"home","cat":"场景组合","key":"combo","desc":"本地计算商业贷款、公积金贷款、契税、签约前现金需求与购房总成本，支持首套二套140㎡分档、第三套自定义税率和现金流压力测"},{"url":"/combo/buy-car.html","label":"买车全攻略","icon":"car","cat":"场景组合","key":"combo","desc":"本地计算车辆购置税、新能源减税限额、车贷月供、签约现金、落地价格与持有期用车成本，支持 PC 和 H5。"},{"url":"/combo/health-check.html","label":"健康体检站","icon":"heart","cat":"场景组合","key":"combo","desc":"在线健康体检工具，18 岁及以上估算 BMI 分级、健康体重、基础代谢与每日消耗；5–17 岁仅记录 BMI 数值。测量"},{"url":"/combo/fun-test.html","label":"趣味测试","icon":"smile","cat":"场景组合","key":"combo","desc":"趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。"},{"url":"/combo/finance-toolkit.html","label":"理财百宝箱","icon":"bar-chart-2","cat":"场景组合","key":"combo","desc":"理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。"},{"url":"/combo/life-plan.html","label":"人生规划","icon":"compass","cat":"场景组合","key":"combo","desc":"本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。"},{"url":"/combo/color-lab.html","label":"色彩研究所","icon":"droplet","cat":"场景组合","key":"combo","desc":"凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。"},{"url":"/combo/index.html","label":"场景组合总览","icon":"grid","cat":"场景组合","key":"combo","desc":"一珩成长笔记的场景组合工具合集：买房全攻略、买车全攻略、健康体检站、趣味测试、理财百宝箱、人生规划、色彩研究所，把多个计"},{"url":"/probability.html","label":"概率计算器","icon":"target","cat":"其他工具","key":"other","desc":"在线概率计算器，计算各种事件发生的概率，辅助数学学习和决策分析。"},{"url":"/random.html","label":"随机数生成","icon":"shuffle","cat":"其他工具","key":"other","desc":"在线随机数生成器，快速生成指定范围的随机数字，实用小工具。"},{"url":"/vision.html","label":"视力测试","icon":"eye","cat":"其他工具","key":"other","desc":"免费在线视力测试，快速检测视力水平，支持动态视力检测。"},{"url":"/lotto.html","label":"双色球","icon":"star","cat":"其他工具","key":"other","desc":"双色球工具：随机机选、走势分析、贴近真实开奖形态的仿真选号（娱乐）。历史统计不能提高选中机会。"},{"url":"/tool/air-quality.html","label":"空气质量","icon":"wind","cat":"其他工具","key":"other","desc":"按城市查询实时空气质量指数 AQI、等级、首要污染物及 PM2.5、PM10 等分项浓度，数据来自天行数据接口。"},{"url":"/tool/idiom.html","label":"成语词典","icon":"book-open","cat":"其他工具","key":"other","desc":"按名称查询成语的拼音、释义、典故出处与例句，语文学习与写作参考工具，词库来自天行数据接口。"},{"url":"/tool/polyphone.html","label":"多音字查询","icon":"type","cat":"其他工具","key":"other","desc":"输入汉字查询其在不同词语中的读音示例，辨析多音字、纠正朗读发音，数据来自天行数据接口。"},{"url":"/fortune/bazi.html","label":"八字排盘","icon":"taiji","cat":"命理星盘","key":"fortune","desc":"不懂八字也能看：填写出生日期后，先用白话读懂日主、格局、五行和当前阶段，再查看四柱、十神、用神、大运等完整明细。附阅读顺"},{"url":"/fortune/ziwei.html","label":"紫微斗数","icon":"star","cat":"命理星盘","key":"fortune","desc":"在线紫微斗数排盘，先用日常语言解释命宫主星、当前大限与四化，把十二宫讲成容易理解的人生地图；同时保留十四主星、辅煞曜、庙"},{"url":"/fortune/natal.html","label":"本命星盘","icon":"compass","cat":"命理星盘","key":"fortune","desc":"填写出生日期、时间与城市生成星盘，先用白话读懂太阳、月亮、上升、宫位与相位，再查看十星位置、月相和完整明细。附术语解释、"},{"url":"/fortune/horoscope.html","label":"星座运势","icon":"sun","cat":"命理星盘","key":"fortune","desc":"点选星座查看每日白话建议：先了解今天总体节奏，再看爱情、事业、财运与健康的相对状态，最后选一件可执行的小事。星级不是好运"},{"url":"/fortune/zodiac-match.html","label":"生肖配对","icon":"heart","cat":"命理星盘","key":"fortune","desc":"点选双方生肖即可配对，用白话解释传统关系标签、爱情朋友合作三个相处角度和具体沟通建议，再展示规则分数与明细。分数不是匹配"},{"url":"/fortune/tarot.html","label":"塔罗占卜","icon":"cards","cat":"命理星盘","key":"fortune","desc":"点选问题方向即可抽牌，逐张读懂正逆位关键词，再把单张或三张牌连成日常建议与可执行的小动作。附术语解释、阅读顺序与常见误区"}];window.__ENT__=["/combo/fun-test.html","/combo/color-lab.html","/fortune/bazi.html","/fortune/ziwei.html","/fortune/natal.html","/fortune/horoscope.html","/fortune/zodiac-match.html","/fortune/tarot.html"];window.__AFFILIATE_INVENTORY__=[{"scene":"buy-house","label":"房贷提前还款","desc":"算清剩余本金、利息与提前还款能省多少","url":"/calculator/prepay.html"},{"scene":"buy-house","label":"装修预算","desc":"按面积估算主材与人工用量","url":"/calculator/decoration.html"},{"scene":"buy-house","label":"个税计算器","desc":"购房前后算清税后收入","url":"/calculator/tax.html"},{"scene":"buy-car","label":"油耗计算","desc":"按里程与油价估算每月用车成本","url":"/calculator/fuel-cost.html"},{"scene":"buy-car","label":"折扣计算","desc":"落地价里的裸车优惠、满减叠加算清楚","url":"/calculator/discount.html"},{"scene":"buy-car","label":"百分比","desc":"首付比例、利率与费率快速换算","url":"/calculator/percentage.html"},{"scene":"health-check","label":"基础代谢体脂","desc":"BMI、BMR 与体脂率一站式评估","url":"/calculator/body-fat.html"},{"scene":"health-check","label":"跑步配速","desc":"按距离与时间算配速，制定运动计划","url":"/calculator/pace.html"},{"scene":"health-check","label":"儿童身高预测","desc":"结合父母身高估算孩子成年身高","url":"/calculator/height-predict.html"},{"scene":"finance-toolkit","label":"个税计算器","desc":"税后收入是理财的起点","url":"/calculator/tax.html"},{"scene":"finance-toolkit","label":"养老金计算器","desc":"估算退休后每月可领养老金","url":"/calculator/pension.html"},{"scene":"finance-toolkit","label":"五险一金","desc":"算清每月个人与单位缴费明细","url":"/calculator/social-insurance.html"},{"scene":"life-plan","label":"养老金计算器","desc":"把养老目标纳入人生财务全景","url":"/calculator/pension.html"},{"scene":"life-plan","label":"房贷提前还款","desc":"规划提前还款对长期现金流的影响","url":"/calculator/prepay.html"},{"scene":"life-plan","label":"倒计时·纪念日","desc":"为人生关键节点设定日期与提醒","url":"/calendar/countdown.html"},{"scene":"fun-test","label":"色彩研究所","desc":"凭直觉选颜色，看看性格倾向（趣味）","url":"/combo/color-lab.html"},{"scene":"fun-test","label":"随机数生成","desc":"抽签、分组、小游戏都用得上","url":"/random.html"},{"scene":"fun-test","label":"概率计算器","desc":"趣味结果背后的概率直观算一算","url":"/probability.html"},{"scene":"color-lab","label":"趣味测试合集","desc":"星座速配与生命灵数，换个玩法继续逛","url":"/combo/fun-test.html"},{"scene":"color-lab","label":"随机数生成","desc":"随机抽一个颜色或号码","url":"/random.html"},{"scene":"color-lab","label":"视力测试","desc":"换个轻松的自测小工具","url":"/vision.html"},{"scene":"buy-house","label":"京东家居日用","desc":"家装家具、日用好物，通过本站链接下单","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocDQABXFRORjNVKy5sLUd2EwgDaiBXSzlUUhluJmdqFghRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBGsLGlMSXAQyU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2e44DE4WAWxgGQwVA0Z_FigA1sanEh14G18SWRcyZG5t","type":"affiliate"},{"scene":"buy-car","label":"京东数码车品","desc":"行车记录仪、车机数码等用车好物","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMIJK1olXDYDZBoCUBVIMzZNXhpXVhgcFgcZVBsIWDoXSQVJQzZqPEQ5fQhyXA1_TwQTXXBrDwALSzNRD2M4GVoUXAAKXVtUAXsXAm4IGFwUXAEHZG5dCXtcbW44GVoUXgEDU1tdAHsXBWoBEl0VXA4HVV1fOEwXCl_fqe_CwrAKUF9UOHsnAF8PG1IBW3RDBkpbensnAl8LK2sXXAcGXW5t1sandBhKcwEdAnR8Mh8WDjBeWbGFq0pnLQYAVl5MOHsnMw","type":"affiliate"},{"scene":"health-check","label":"天猫国际健研馆","desc":"健康器械与保健好物，入会领券","url":"https://s.click.taobao.com/t?union_lens=lensId%3APUB%401753971446%4021312f31_1cb3_19860d85200_3d38%4001%40eyJmbG9vcklkIjozODg1Miiwiic3BtQiiI6Il9wb3J0YWxfdjJfcGFnZXNfYWN0aXZpdHlfb2ZmaWNpYWxfaW5kZXhfaHRtIn0ie%3BeventPageId%3A20150318020008733&e=m%3D2%26s%3Dd%2BRZlnmfC90cQipKwQzePCperVdZeJviU%2F9%2F0taeK29yINtkUhsv0P3Kf0EWYLbqFd6tt5qxD5Ue7HM2QJc131cvUGbbeXh73apronxEECKzALVhifQ9%2BP1xjwA8EAOnQ%2BNeRhkrKyfCg%2Fx6BHtN2amAOqUjIVeCy0DxCSzwFgFd1le1%2FF%2FLHXyKwiqD2WK0Bmf7LSR66ag4aIh%2BwnIONST8IooNW8SzO5CcJgHDOBKFzyYjawoqwGqFT2L8zA8AenRgoMDA9RxaStlqWXQNCYyLB7gwfSfcbA724fELe4f8zFlMerWS1VQJD6WTFB%2BjPM6TBJOKLOENxtKElQIb6oY7q73JSNeHX8FN6lsSTYkbRsmFvkxI73SW4rOI823VUK6mtJKzTIFdrZwc4PO9PQ5VhUgdwo6QWVuGINZhiLflx1XQzb07I8YMXU3NNCg%2F","type":"affiliate"},{"scene":"fun-test","label":"京东玩具乐器","desc":"趣味玩具与乐器，好玩不贵","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAM0JK1olXDYDZBoCUBVIMzZNXhpXVhgcBgcNVxRDXnBTTkRHA1ocEQAVSlRORjNVKwR8XXNnUgUCajZfZzRzUlhhCQIELwhRBHsVAm4JHVMcWA8LZF5cCUsUBG4JHF4lbQYDZBUzCXsVAm4LHFoSWAYKZF5bDUIeBW4MGFsQWw8yU15UOJylt7iXrVMRXA8yZG5eOEwXCnsOaRpHSQBwZG5cOEgnM20JGl8cbTbc2so_ei5WdW5tWzlOKQJ8Dig71sWDEh14G18SWRcyZG5t","type":"affiliate"},{"scene":"color-lab","label":"京东艺术品","desc":"艺术品与文创周边，正品低价","url":"https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BAMAJK1olXDYDZBoCUBVIMzZNXhpXVhgcBB0YFxBCHD1WR0UlGlAFCUQcCBF0cxUPGQBOKnMDESwDaEcbM20JGloTVQ8HXVdtCEoWA2wPGloSWDYyVF9tQyUWM20JGlgSXAEHVFZtCE0SCmYOGlMSWwYKVm5aCEIn1N28zMSjVQIDXW5tOEgnBG8BD11nHFQWUixtOEonAF84GVoUWQ8yZIDTnDcUfg5dGiR2W3NXCiUBSB7JjfsZaSsVXw4ARW5tOHs","type":"affiliate"}];window.__NEXT_QUOTA__=1;</script>
     <link rel="stylesheet" href="/assets/css/tokens.min.css?v=d6bc9597a1">
     <link rel="stylesheet" href="/assets/css/theme.min.css?v=ffd746ec5f">
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"人生规划计算器 - 财务全景报告","url":"https://xuyiheng.com/combo/life-plan.html","description":"人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"人生规划计算器","item":"https://xuyiheng.com/combo/life-plan.html"}]},{"@type":"FAQPage","inLanguage":"zh-CN","mainEntity":[{"@type":"Question","name":"综合了哪些方面？","acceptedAnswer":{"@type":"Answer","text":"通常涵盖房贷、车贷、养老储备与投资等模块的汇总。"}},{"@type":"Question","name":"数字准吗？","acceptedAnswer":{"@type":"Answer","text":"全部基于你输入的假设，未来收入、利率与支出变化会显著影响结果。"}},{"@type":"Question","name":"能替代理财规划师吗？","acceptedAnswer":{"@type":"Answer","text":"不能，仅提供概览，重大规划请咨询专业人士。"}},{"@type":"Question","name":"需要输入很多数据吗？","acceptedAnswer":{"@type":"Answer","text":"是的，输入越贴近实际，概览越有参考价值。"}}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"人生规划计算器 - 财务全景报告","url":"https://xuyiheng.com/combo/life-plan.html","description":"本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","inLanguage":"zh-CN","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://xuyiheng.com/"},{"@type":"ListItem","position":2,"name":"人生规划计算器","item":"https://xuyiheng.com/combo/life-plan.html"}]},{"@type":"FAQPage","inLanguage":"zh-CN","mainEntity":[{"@type":"Question","name":"资产预测和达成时间使用同一口径吗？","acceptedAnswer":{"@type":"Answer","text":"是。两者均使用有效年利率、按月复利和用户选择的期初或月末投入；达成时间向上取整到完整月。"}},{"@type":"Question","name":"负结余会显示达标吗？","acceptedAnswer":{"@type":"Answer","text":"负结余会显示现金流赤字和资产耗尽提示；只有资产增长或债务释放后的现金流确实能支撑目标时，才显示有限达成时间。"}},{"@type":"Question","name":"4% 提取率是保证吗？","acceptedAnswer":{"@type":"Answer","text":"不是。它只是可修改的规划假设，受退休年限、资产配置、费用、通胀与市场顺序影响。"}},{"@type":"Question","name":"财务数据会上传吗？","acceptedAnswer":{"@type":"Answer","text":"纯计算在本机完成，方案仅保存在本机浏览器；用户主动跨工具桥接时，仅目标白名单数值会短暂进入带来源标记的链接，可核对并清除。"}},{"@type":"Question","name":"能替代理财规划师吗？","acceptedAnswer":{"@type":"Answer","text":"不能，结果仅为确定性情景，不构成投资、税务或法律建议。"}}]}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://xuyiheng.com/about.html#author","name":"Michaelxlm","url":"https://xuyiheng.com/about.html","jobTitle":"独立开发者","description":"Michaelxlm，独立开发者，主理明先生日常、cs调色盘、访客小站、小满券仓、小满美图、实测手记、年表拾遗、一珩成长笔记等多个站点，倡导隐私优先、开放标准与免费可达的 Web 体验。","sameAs":["https://2002cs.com/about.html#author","https://xuliming.com/#author","https://antucao.com"]}</script>
 <!-- SITE-SHELL:CSS:START -->
 <link rel="stylesheet" href="/assets/css/site-shell.css?v=fd06aea34c" data-site-shell="css">
@@ -99,212 +99,120 @@
     <div class="main-inner">
 <nav class="cat-bar" aria-label="分类导航"><a href="/#cat-calc" data-cat="calc">计算器</a><a href="/#cat-cal" data-cat="cal">日历工具</a><a href="/#cat-combo" data-cat="combo">场景组合</a><a href="/#cat-other" data-cat="other">其他工具</a><a href="/#cat-fortune" data-cat="fortune">命理星盘</a><a href="/tools.html" class="cat-bar-all">全部工具</a></nav>
 <style>
-        .progress { height: 10px; background: var(--color-surface-2); border-radius: 999px; overflow: hidden; margin: var(--space-3) 0; }
-        .progress-bar { height: 100%; width: 0; background: var(--color-primary); border-radius: 999px; transition: width var(--dur-base) var(--ease); }
-        .lp-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .lp-table{width:100%;min-width:760px;border-collapse:collapse;font-size:var(--text-sm);margin-top:var(--space-3)}
+        .lp-table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
         .lp-table th,.lp-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--color-border);white-space:nowrap}
         .lp-table th{color:var(--color-muted);font-weight:600}
-        .lp-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
+        .lp-del{min-height:44px;padding:4px 10px;font-size:var(--text-xs)}
+        .lp-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3)}
+        .lp-metric{min-width:0;padding:var(--space-3);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2)}
+        .lp-metric strong{display:block;margin-top:var(--space-1);font-size:var(--text-lg);overflow-wrap:anywhere}
+        .lp-negative{color:var(--color-danger)}
+        @media (max-width:640px){.lp-metrics{grid-template-columns:1fr}.lp-table{min-width:680px}}
         </style>
 
         <section class="page-heading">
           <h1>人生规划 · 财务全景</h1>
-          <p>从现金流出发测算储蓄率、财务自由进度与达成时间，同时给出保守 / 基准 / 乐观三情景资产预测，并可反推「想在 N 年后达到目标需要每月存多少」。</p>
+          <p>从税后现金流出发，统一测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标。所有计算均在本地完成，收入与资产不会进入通用分享链接或统计载荷。</p>
         </section>
 
-        <form class="card" id="lpForm">
-          <h3 class="card-title">现金流（每月）</h3>
+        <form class="card" id="lpForm" novalidate>
+          <h2 class="card-title">每月现金流</h2>
           <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="lp-income">税后月收入</label><div class="input-with-unit"><input class="form-input" id="lp-income" type="number" inputmode="decimal" placeholder="元"></div></div>
-            <div class="form-group"><label class="form-label" for="lp-expense">日常支出</label><div class="input-with-unit"><input class="form-input" id="lp-expense" type="number" inputmode="decimal" placeholder="元"></div></div>
-            <div class="form-group"><label class="form-label" for="lp-debt">月供负债</label><div class="input-with-unit"><input class="form-input" id="lp-debt" type="number" inputmode="decimal" placeholder="元"></div></div>
+            <div class="form-group"><label class="form-label" for="lp-income">税后月收入</label><div class="input-with-unit"><input class="form-input" id="lp-income" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="元" required></div></div>
+            <div class="form-group"><label class="form-label" for="lp-expense">日常支出</label><div class="input-with-unit"><input class="form-input" id="lp-expense" type="number" inputmode="decimal" min="0" step="0.01" placeholder="元，不含债务月供"></div></div>
+            <div class="form-group"><label class="form-label" for="lp-debt">当前月供负债</label><div class="input-with-unit"><input class="form-input" id="lp-debt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="元/月"></div></div>
           </div>
-          <h3 class="card-title mt-4">资产与目标</h3>
+          <p class="form-help">月结余 = 税后月收入 − 日常支出 − 当前月供。负结余表示现金流赤字，不会被当作新增投资能力。</p>
+
+          <details class="mt-4">
+            <summary>债务还清与现金流释放（可选）</summary>
+            <p class="form-help">三项都填写后，按余额、利率和剩余月数估算等额本息月供。手填月供优先用于现金流，并按实际月供重新计算还清月份；月供不足以覆盖利息时阻止计算。还清后的第一个月起释放现金流。</p>
+            <div class="field-grid">
+              <div class="form-group"><label class="form-label" for="lp-debt-principal">负债余额</label><div class="input-with-unit"><input class="form-input" id="lp-debt-principal" type="number" inputmode="decimal" min="0" step="0.01" placeholder="元"></div></div>
+              <div class="form-group"><label class="form-label" for="lp-debt-rate">负债年利率</label><div class="input-with-unit"><input class="form-input" id="lp-debt-rate" type="number" inputmode="decimal" min="0" step="0.01" placeholder="%"><span class="unit-tag">%</span></div></div>
+              <div class="form-group"><label class="form-label" for="lp-debt-months">预计剩余月数</label><div class="input-with-unit"><input class="form-input" id="lp-debt-months" type="number" inputmode="numeric" min="1" max="1200" step="1" placeholder="月"></div></div>
+            </div>
+          </details>
+
+          <h2 class="card-title mt-4">资产与规划假设</h2>
           <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="lp-assets">现有净资产</label><div class="input-with-unit"><input class="form-input" id="lp-assets" type="number" inputmode="decimal" placeholder="元"></div></div>
-            <div class="form-group"><label class="form-label" for="lp-return">预期年化收益</label><div class="input-with-unit"><input class="form-input" id="lp-return" type="number" inputmode="decimal" step="0.1" value="5"><span class="unit-tag">%</span></div></div>
-            <div class="form-group"><label class="form-label" for="lp-goal">财务自由目标年支出</label><div class="input-with-unit"><input class="form-input" id="lp-goal" type="number" inputmode="decimal" placeholder="元/年"></div></div>
-            <div class="form-group"><label class="form-label" for="lp-years">规划年限</label><div class="input-with-unit"><input class="form-input" id="lp-years" type="number" inputmode="decimal" value="10" min="1" max="60"><span class="unit-tag">年</span></div></div>
+            <div class="form-group"><label class="form-label" for="lp-assets">可投资资产</label><div class="input-with-unit"><input class="form-input" id="lp-assets" type="number" inputmode="decimal" min="0" step="0.01" placeholder="元，不含自住房"></div></div>
+            <div class="form-group"><label class="form-label" for="lp-years">规划年限</label><div class="input-with-unit"><input class="form-input" id="lp-years" type="number" inputmode="numeric" min="1" max="60" step="1" value="10" required><span class="unit-tag">年</span></div></div>
+            <div class="form-group"><label class="form-label" for="lp-timing">每月投入时点</label><select class="form-input" id="lp-timing"><option value="end">月末投入</option><option value="begin">月初投入</option></select></div>
+            <div class="form-group"><label class="form-label" for="lp-inflation">年通胀率假设</label><div class="input-with-unit"><input class="form-input" id="lp-inflation" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="0"><span class="unit-tag">%</span></div></div>
           </div>
-          <div class="btn-row">
+
+          <h3 class="card-title mt-4">绝对收益率情景</h3>
+          <p class="form-help">直接填写有效年收益率，不按基准比例缩放，因此负收益率下也不会出现情景顺序颠倒。有效年收益率已包含复利频率，不要再填名义年利率。</p>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="lp-low-rate">保守情景</label><div class="input-with-unit"><input class="form-input" id="lp-low-rate" type="number" inputmode="decimal" min="-99.99" step="0.1" value="3"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="lp-return">基准情景</label><div class="input-with-unit"><input class="form-input" id="lp-return" type="number" inputmode="decimal" min="-99.99" step="0.1" value="5" required><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="lp-high-rate">乐观情景</label><div class="input-with-unit"><input class="form-input" id="lp-high-rate" type="number" inputmode="decimal" min="-99.99" step="0.1" value="7"><span class="unit-tag">%</span></div></div>
+          </div>
+
+          <h3 class="card-title mt-4">财务自由目标（可选）</h3>
+          <div class="field-grid">
+            <div class="form-group"><label class="form-label" for="lp-goal">目标年支出</label><div class="input-with-unit"><input class="form-input" id="lp-goal" type="number" inputmode="decimal" min="0" step="0.01" placeholder="元/年，今天购买力"></div></div>
+            <div class="form-group"><label class="form-label" for="lp-withdrawal">年提取率假设</label><div class="input-with-unit"><input class="form-input" id="lp-withdrawal" type="number" inputmode="decimal" min="0.1" max="20" step="0.1" value="4"><span class="unit-tag">%</span></div></div>
+          </div>
+          <p class="form-help">目标资产 = 今天购买力的目标年支出 ÷ 提取率假设。4% 只是可修改的经验假设，不是保证终身可提取的比例。</p>
+          <div class="btn-row mt-4">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"life-plan"}'>生成财务全景</button>
             <button class="btn btn-secondary" type="button" id="lp-save">保存此方案</button>
           </div>
+          <p class="form-help" id="lp-status" role="status" aria-live="polite" hidden></p>
         </form>
 
         <div class="result-box" id="lp-result" hidden>
-          <div class="result-row">
-            <div><div class="result-label">储蓄率</div><div class="result-value" id="lp-rate">--</div></div>
-            <div><div class="result-label" id="lp-future-label">10 年后资产</div><div class="result-value" id="lp-future">--</div></div>
-            <div><div class="result-label">财务自由进度</div><div class="result-value" id="lp-progress">--</div></div>
+          <div class="lp-metrics">
+            <div class="lp-metric"><div class="result-label">当前月结余</div><strong id="lp-rate">--</strong></div>
+            <div class="lp-metric"><div class="result-label" id="lp-future-label">10 年后资产</div><strong id="lp-future">--</strong></div>
+            <div class="lp-metric"><div class="result-label">财务自由进度</div><strong id="lp-progress">--</strong></div>
           </div>
-          <div class="progress" id="lp-bar-wrap"><div class="progress-bar" id="lp-bar"></div></div>
+          <p class="form-help" id="lp-cashflow-note"></p>
+          <div class="error-box" id="lp-error" role="alert" hidden></div>
+          <h2 class="card-title mt-4">现金流、收益与目标</h2>
           <dl class="result-detail" id="lp-detail"></dl>
-          <h3 class="card-title mt-4">三情景资产预测</h3>
-          <dl class="result-detail" id="lp-scenarios"></dl>
-          <h3 class="card-title mt-4">目标反推</h3>
+          <h2 class="card-title mt-4">目标反推</h2>
           <dl class="result-detail" id="lp-required"></dl>
+          <div id="lp-explain" class="mt-4"></div>
           <div class="btn-row mt-4">
-            <a class="btn btn-secondary" href="#" id="lp-to-finance">月结余带入理财复利 →</a>
+            <button class="btn btn-secondary" type="button" id="lp-copy">复制结果摘要</button>
+            <button class="btn btn-secondary" type="button" id="lp-export">导出当前 CSV</button>
+            <a class="btn btn-secondary" href="/combo/finance-toolkit.html" id="lp-to-finance">带入理财复利</a>
           </div>
         </div>
 
         <section class="card mt-4" id="lp-compare-wrap" hidden>
           <h2 class="card-title">已保存方案</h2>
-          <div class="table-wrap">
+          <p class="form-help" id="lp-storage-status" role="status" aria-live="polite"></p>
+          <div class="table-wrap lp-table-wrap" tabindex="0" aria-label="已保存方案表格，可横向滚动">
             <table class="lp-table">
-              <thead><tr><th scope="col">月收入</th><th scope="col">月结余</th><th scope="col">储蓄率</th><th scope="col">年化</th><th scope="col">规划年限</th><th scope="col">期末资产</th><th scope="col">操作</th></tr></thead>
+              <thead><tr><th scope="col">保存时间</th><th scope="col">月收入</th><th scope="col">当前月结余</th><th scope="col">储蓄率</th><th scope="col">基准年化</th><th scope="col">规划年限</th><th scope="col">期末资产</th><th scope="col">资金缺口</th><th scope="col">操作</th></tr></thead>
               <tbody id="lp-tbody"></tbody>
             </table>
           </div>
-          <div class="btn-row">
-            <button class="btn btn-secondary" type="button" id="lp-export">导出 CSV</button>
+          <div class="btn-row mt-4">
+            <button class="btn btn-secondary" type="button" id="lp-export-all">导出全部方案</button>
             <button class="btn btn-secondary" type="button" id="lp-clear">清空方案</button>
           </div>
         </section>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>财务自由线按「目标年支出 ÷ 4%（安全提取率）」估算；资产预测使用共享复利内核的期初本金 + 月末定投模型，三情景按基准收益率的 60% / 100% / 150% 取值。假设结余全部投资、收益恒定，实际会波动。</div></div>
-
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U, C = window.Core; if (!U || !C) return;
-            var $ = function (id) { return document.getElementById(id); };
-            var F = C.finance, KEY = 'life-plan';
-            var last = null;
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-            function read() {
-              var income = U.numInput($('lp-income'));
-              if (!(income > 0)) { alert('请输入税后月收入'); return null; }
-              var exp = U.numInput($('lp-expense')) || 0, debt = U.numInput($('lp-debt')) || 0;
-              var assets = U.numInput($('lp-assets')) || 0, rate = U.numInput($('lp-return'));
-              if (!Number.isFinite(rate)) rate = 5;
-              var goal = U.numInput($('lp-goal')) || 0;
-              var years = U.numInput($('lp-years')) || 10;
-              years = C.clamp(years, 1, 60);
-              return { income: income, exp: exp, debt: debt, assets: assets, rate: rate, goal: goal, years: years, save: income - exp - debt };
-            }
-
-            function show(r) {
-              last = r;
-              var rate = r.save / r.income * 100;
-              var proj = F.withMonthly(r.assets, r.save, r.rate, r.years);
-              var freedomNeed = r.goal > 0 ? r.goal / 0.04 : 0;
-              var progress = freedomNeed > 0 ? C.clamp(r.assets / freedomNeed * 100, 0, 100) : 0;
-              $('lp-rate').textContent = U.round(rate, 1) + '%';
-              $('lp-future-label').textContent = r.years + ' 年后资产';
-              $('lp-future').textContent = U.money(proj.total);
-              $('lp-progress').textContent = freedomNeed > 0 ? U.round(progress, 1) + '%' : '未设目标';
-              $('lp-bar').style.width = progress + '%';
-              var yrs = null;
-              if (freedomNeed > 0) {
-                if (r.assets >= freedomNeed) yrs = 0;
-                else if (r.save > 0) {
-                  var n = 0, bal = r.assets;
-                  while (bal < freedomNeed && n < 100) { bal = bal * (1 + r.rate / 100) + r.save * 12; n++; }
-                  yrs = n;
-                }
-              }
-              $('lp-detail').innerHTML =
-                row('月度结余', U.money(r.save)) +
-                row('年度可投资额', U.money(r.save * 12)) +
-                row('累计投入本金', U.money(proj.invested)) +
-                row('投资收益', U.money(proj.interest)) +
-                (freedomNeed > 0 ? row('财务自由所需资产', U.money(freedomNeed)) + row('预计达成', yrs === 0 ? '已达成' : (yrs ? '约 ' + yrs + ' 年' : '结余不足，暂无法达成')) : '') +
-                row('储蓄率评估', rate >= 30 ? '健康（≥30%）' : rate >= 10 ? '尚可，可优化支出' : '结余偏低，建议控制支出');
-
-              $('lp-scenarios').innerHTML = [
-                { name: '保守（收益 ×0.6）', rate: r.rate * 0.6 },
-                { name: '基准（你的输入）', rate: r.rate },
-                { name: '乐观（收益 ×1.5）', rate: r.rate * 1.5 }
-              ].map(function (s) {
-                var p = F.withMonthly(r.assets, r.save, s.rate, r.years);
-                return row(s.name, U.money(p.total) + '（收益 ' + U.money(p.interest) + '）');
-              }).join('');
-
-              if (freedomNeed > 0) {
-                var req = F.requiredMonthly(r.assets, freedomNeed, r.rate, r.years);
-                $('lp-required').innerHTML =
-                  row('目标资产', U.money(freedomNeed)) +
-                  row(r.years + ' 年达成所需月投', U.money(req)) +
-                  row('当前月结余', U.money(r.save)) +
-                  row('缺口', req > r.save ? '每月还需多存 ' + U.money(req - r.save) : '当前结余已足够');
-              } else {
-                $('lp-required').innerHTML = row('提示', '填写目标年支出后可反推所需月储蓄');
-              }
-              $('lp-result').hidden = false;
-              $('lp-to-finance').href = C.bridge.link('/combo/finance-toolkit.html', { 'ci-p': U.round(r.assets, 2), 'ci-m': U.round(Math.max(0, r.save) * 12, 2), 'ci-r': r.rate, 'ci-y': r.years });
-              U.track('calc_result', { tool: 'life-plan' });
-            }
-
-            function list() { return C.history.list(KEY); }
-            function renderCompare() {
-              var rows = list();
-              $('lp-compare-wrap').hidden = rows.length === 0;
-              if (!rows.length) return;
-              $('lp-tbody').innerHTML = rows.map(function (r, i) {
-                return '<tr><td>' + U.money(r.income) + '</td><td>' + U.money(r.save) + '</td><td>' + U.round(r.rate, 1) + '%</td><td>' + r.annual + '%</td><td>' + r.years + ' 年</td><td>' + U.money(r.future) + '</td><td><button type="button" class="btn btn-secondary lp-del" data-idx="' + i + '" aria-label="删除方案">删除</button></td></tr>';
-              }).join('');
-            }
-
-            $('lpForm').addEventListener('submit', function (e) { e.preventDefault(); var r = read(); if (r) show(r); });
-            $('lp-save').addEventListener('click', function () {
-              var r = read(); if (!r) return;
-              show(r);
-              var p = F.withMonthly(r.assets, r.save, r.rate, r.years);
-              C.history.add(KEY, {
-                income: r.income, save: r.save, rate: r.save / r.income * 100,
-                annual: r.rate, years: r.years, future: p.total
-              }, 20);
-              renderCompare();
-              U.track('save_result', { tool: 'life-plan' });
-            });
-            $('lp-tbody').addEventListener('click', function (e) {
-              var btn = e.target.closest('.lp-del'); if (!btn) return;
-              var rows = list(), i = +btn.getAttribute('data-idx');
-              if (!isFinite(i) || !rows[i]) return;
-              rows.splice(i, 1);
-              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
-              renderCompare();
-            });
-            $('lp-export').addEventListener('click', function () {
-              C.csv.download('人生规划方案.csv', list().map(function (r) { return [r.income, r.save, U.round(r.rate, 1), r.annual, r.years, U.round(r.future, 2)]; }), ['月收入', '月结余', '储蓄率(%)', '年化(%)', '规划年限', '期末资产']);
-              U.track('export_result', { tool: 'life-plan' });
-            });
-            $('lp-clear').addEventListener('click', function () {
-              if (!confirm('确定清空本机全部已存方案？')) return;
-              C.history.clear(KEY); renderCompare();
-            });
-            renderCompare();
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+        <div class="info-box mt-4"><span>i</span><div>本工具使用有效年利率转月利率，资产预测、目标反推与达成时间采用相同投入时点及债务释放路径。资产首次耗尽后截断负账户，后续正结余从零重新累积，并单独披露累计资金缺口。期末资产同时给出今天购买力；结果是确定性情景，不是市场预测或投资建议。</div></div>
 
         <div class="ad-slot" data-ad-slot="next"></div>
 
-<section class="tool-info">
+        <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>人生规划计算器用共享复利内核给出储蓄率、财务自由进度、三情景资产预测与目标所需月储蓄反推，支持多方案本地对比；结果基于假设，不构成投资建议。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details>
-            <summary>财务自由线怎么算？</summary>
-            <p>按 4% 安全提取率：所需资产 = 目标年支出 ÷ 4%。这是通用经验值，实际需结合年龄与风险偏好。</p>
-          </details>
-          <details>
-            <summary>三情景是怎么设定的？</summary>
-            <p>按你输入年化收益的 60% / 100% / 150% 分别计算，展示不同市场表现下的资产区间。</p>
-          </details>
-          <details>
-            <summary>反推的月储蓄靠谱吗？</summary>
-            <p>按恒定收益与月末定投模型求解，没考虑收入增长、通胀与税费，请作为起点参考。</p>
-          </details>
-          <details>
-            <summary>能替代理财规划师吗？</summary>
-            <p>不能，仅提供概览，重大规划请咨询专业人士。</p>
-          </details>
+          <p>人生规划计算器将每月现金流、债务释放、可投资资产、绝对收益率情景与可配置提取率假设放在同一套时间价值模型中。方案仅保存在本机浏览器，可导出和删除；不会自动重算或把财务字段写入普通分享链接。</p>
+          <h2>常见问题</h2>
+          <details><summary>为什么达成时间与旧版不同？</summary><p>旧版资产预测按月复利，达成时间却按年循环。现在两者都使用同一有效月利率和期初/月末供款口径，达成时间向上取整到完整月。</p></details>
+          <details><summary>负结余还能显示达标吗？</summary><p>负结余会明确显示现金流赤字和资产耗尽月份。耗尽后截断负账户，不把负余额当作可投资资产；后续正结余从零重新累积，历史资金缺口仍单独显示。只有资产增长或债务还清后释放的现金流确实能支撑目标时，才显示有限达成时间。</p></details>
+          <details><summary>手填月供与剩余月数不一致怎么办？</summary><p>剩余月数用于估算等额本息月供；手填月供优先，系统再按余额、利率和实际月供计算还清月份。月供不足以覆盖利息时无法确定还清时间，必须修正输入。</p></details>
+          <details><summary>三情景如何设定？</summary><p>保守、基准、乐观分别使用你填写的绝对有效年收益率，不再按基准收益乘以比例，避免负收益率时排序颠倒。它们不是置信区间。</p></details>
+          <details><summary>4% 提取率是保证吗？</summary><p>不是。它只是历史研究中的经验参考，受退休年限、资产配置、费用、通胀和市场顺序影响，可自行修改。</p></details>
+          <details><summary>数据会上传吗？</summary><p>纯计算在本机完成。仅用户点击跨工具桥接时，目标工具允许的数值会短暂进入带来源标记的链接；目标页要求核对、不自动计算，并可清除恢复。</p></details>
         </section>
         <section class="home-section" id="related" aria-label="相关工具">
           <h2 class="section-title"><span class="dot" aria-hidden="true"></span>相关工具</h2>
@@ -381,6 +289,11 @@
     <script src="/assets/js/tool-core.min.js?v=ad51a822f6" defer></script>
     <script src="/assets/js/http-api.min.js?v=ca7ae76c59" defer></script>
     <script src="/assets/js/layout.min.js?v=a2a0701b4d" defer></script>
+    <script src="/assets/js/core/result.min.js?v=88accc47bc" defer></script>
+    <script src="/assets/js/core/result-view.min.js?v=a07e4fb158" defer></script>
+    <script>window.__TOOL_POLICIES__={};</script>
+    <script src="/assets/js/tools/life-plan.min.js?v=516cc1fcfb" defer></script>
+    <script src="/assets/js/pages/combo-life-plan.min.js?v=bb2c018a36" defer></script>
     <script src="/assets/js/tool-state.min.js?v=15d61bdb82" defer></script>
     <script src="/assets/js/combo-popularity.js?v=be0f004a85" defer></script>
     <script src="https://api.xuyiheng.com/public/ai-widget.js" data-site="xuyihengTools" defer onerror="this.remove()"></script>

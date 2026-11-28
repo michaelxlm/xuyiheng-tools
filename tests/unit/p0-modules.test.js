@@ -26,6 +26,7 @@ const timezone = require('../../assets/js/tools/timezone');
 const buyHouse = require('../../assets/js/tools/buy-house');
 const buyCar = require('../../assets/js/tools/buy-car');
 const healthCheck = require('../../assets/js/tools/health-check');
+const lifePlan = require('../../assets/js/tools/life-plan');
 const taxPolicy = require('../../data/policies/individual-income-tax.json');
 const socialPolicy = require('../../data/policies/social-insurance.json');
 const aqiPolicy = require('../../data/policies/aqi.json');
@@ -860,6 +861,9 @@ test('健康年龄缺失与非法测量日期返回明确错误', () => {
     assert.equal(result.status, 'invalid');
     assert.match(result.errors.join('；'), /测量日期/);
   }
+  const extreme = healthCheck.calculate(healthInput({ age: 120, height: 50, weight: 2 }));
+  assert.equal(extreme.status, 'invalid');
+  assert.match(extreme.errors.join('；'), /正数结果/);
 });
 
 test('健康 Navy 围度法处理男女公式、缺失围度和非法差值', () => {
@@ -873,6 +877,7 @@ test('健康 Navy 围度法处理男女公式、缺失围度和非法差值', ()
 });
 
 test('健康记录按测量日期和保存时间稳定排序并支持按索引删除', () => {
+  const future = healthCheck.localDate(new Date(Date.now() + 86400000));
   const rows = [
     { date: '2026-11-25', w: 70, h: 170, age: 30, t: 1 },
     { date: '2026-11-28', w: 69, h: 170, age: 30, t: 2 },
@@ -880,6 +885,7 @@ test('健康记录按测量日期和保存时间稳定排序并支持按索引�
     { date: '2026-11-28', w: 68.5, h: 170, age: 30, t: 4 },
     { date: '2026-11-28', w: 68, h: 170, age: 30, t: 4 },
     { date: '2026-02-31', w: 60, h: 170, age: 30, t: 9 },
+    { date: future, w: 99, h: 170, age: 30, t: 10 },
   ];
   const normalized = healthCheck.normalizeHistory(rows);
   assert.deepEqual(normalized.map((row) => row.w), [68.5, 68, 69, 71, 70]);
@@ -903,11 +909,175 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   ]);
 });
 
- test('注册表包含 45 个独立工具与十三个 P0 本地模块', () => {
+ function lifeInput(overrides) {
+   return Object.assign({
+     income: 10000, expense: 8000, debtPayment: 0, assets: 0,
+     annualRatePct: 5, lowRatePct: 3, highRatePct: 7, years: 10,
+     inflationPct: 0, withdrawalRatePct: 4, goalAnnualExpense: 48000, timing: 'end',
+     debtPrincipal: '', debtAnnualRatePct: '', debtRemainingMonths: '',
+   }, overrides || {});
+ }
+
+ test('人生规划使用有效年利率并区分期初与期末供款', () => {
+   close(lifePlan.monthlyRate(6), Math.pow(1.06, 1 / 12) - 1, 1e-12);
+   close(lifePlan.futureValue(10000, 1000, 6, 120, 'end'), 180381.92, 0.02);
+   close(lifePlan.futureValue(10000, 1000, 6, 120, 'begin'), 181172.77, 0.02);
+   close(lifePlan.futureValue(10000, 1000, 0, 120, 'end'), 130000);
+   const result = lifePlan.calculate(lifeInput());
+   assert.equal(result.status, 'success');
+   close(result.metrics.projection, 308726.3226029319, 0.02);
+   close(result.metrics.requiredMonthly, 7773.88, 0.02);
+   assert.ok(result.source.sources.length >= 2);
+ });
+
+ test('人生规划统一预测与达成时间，且两投入时点相差小于一个月', () => {
+   const end = lifePlan.timeToTarget(0, 1200000, 1000, 5, 'end');
+   const begin = lifePlan.timeToTarget(0, 1200000, 1000, 5, 'begin');
+   assert.deepEqual(end, { status: 'reached', months: 437 });
+   assert.deepEqual(begin, { status: 'reached', months: 436 });
+   const continuous = (timing) => {
+     const i = lifePlan.monthlyRate(5);
+     const k = 1000 * (timing === 'begin' ? 1 + i : 1) / i;
+     return Math.log(1 + 1200000 / k) / Math.log1p(i);
+   };
+   assert.ok(Math.abs(continuous('end') - continuous('begin')) < 1);
+   assert.deepEqual(lifePlan.timeToTarget(200000, 200000, 0, 5, 'end'), { status: 'reached', months: 0 });
+   assert.deepEqual(lifePlan.timeToTarget(100000, 200000, 1000, -6, 'end'), { status: 'unreachable', months: null });
+   assert.equal(lifePlan.timeToTarget(0, 100000, 1000, -6, 'end').status, 'reached');
+   assert.deepEqual(lifePlan.timeToTarget(10000, 200000, 1000, 0, 'end'), { status: 'reached', months: 190 });
+   assert.equal(lifePlan.timeToTarget(10000, 1000000, 1, 0, 'end').status, 'beyond_range');
+ });
+
+ test('人生规划负结余显示赤字与耗尽，不产生虚假正收益达标', () => {
+   const deficit = lifePlan.calculate(lifeInput({ income: 10000, expense: 12000 }));
+   assert.equal(deficit.status, 'success');
+   assert.equal(deficit.metrics.currentSurplus, -2000);
+   assert.equal(deficit.metrics.projection, 0);
+   assert.ok(deficit.metrics.fundingGap > 0);
+   assert.equal(deficit.metrics.gain, null);
+   assert.equal(deficit.metrics.scenarios[1].total, 0);
+   assert.equal(deficit.metrics.depletedAt, 1);
+   assert.equal(deficit.metrics.goalTime.status, 'unreachable');
+   assert.ok(deficit.metrics.scenarios.every((item) => item.fundingGap > 0));
+   assert.ok(deficit.details.some((item) => item.label === '月度现金流状态' && item.value === '赤字'));
+   assert.ok(deficit.details.some((item) => item.label === '资产耗尽提示'));
+ });
+
+ test('人生规划债务还清后释放现金流并统一目标时间口径', () => {
+   const result = lifePlan.calculate(lifeInput({
+     income: 15000, expense: 7000, debtPayment: 3000, assets: 100000,
+     debtPrincipal: 100000, debtAnnualRatePct: 6, debtRemainingMonths: 36,
+   }));
+   assert.equal(result.status, 'success');
+   assert.equal(result.metrics.currentSurplus, 5000);
+   assert.equal(result.metrics.afterPayoffSurplus, 8000);
+   close(result.metrics.estimatedDebtPayment, 3034.9973845817053, 0.02);
+   const debtMonthlyRate = lifePlan.monthlyRate(6);
+   close(result.metrics.estimatedDebtPayment, 100000 * debtMonthlyRate / (1 - Math.pow(1 + debtMonthlyRate, -36)), 1e-8);
+   const automatic = lifePlan.calculate(lifeInput({
+     income: 15000, expense: 7000, debtPayment: 0, assets: 100000,
+     debtPrincipal: 100000, debtAnnualRatePct: 6, debtRemainingMonths: 36,
+   }));
+   assert.equal(automatic.status, 'success');
+   assert.equal(automatic.metrics.payoffMonth, 36);
+   for (const term of [936, 1200]) {
+     const longTerm = lifePlan.calculate(lifeInput({
+       debtPayment: 0, debtPrincipal: 100000, debtAnnualRatePct: 30, debtRemainingMonths: term,
+     }));
+     assert.equal(longTerm.status, 'success');
+     assert.equal(longTerm.metrics.payoffMonth, term);
+   }
+   const zeroBalance = lifePlan.calculate(lifeInput({
+     debtPayment: 3000, debtPrincipal: 0, debtAnnualRatePct: 0, debtRemainingMonths: 12,
+   }));
+   assert.equal(zeroBalance.status, 'success');
+   assert.equal(zeroBalance.details.find((item) => item.label === '规划期内释放现金流').value, 0);
+   assert.equal(result.metrics.debtRemainingMonths, 36);
+   assert.equal(result.metrics.payoffMonth, 37);
+   close(result.metrics.invested, 100000 + 5000 * 37 + 8000 * 83);
+   assert.ok(result.details.some((item) => item.label === '规划期内释放现金流' && Math.abs(item.value - 249000) < 0.01));
+   const requiredPath = lifePlan.futureValue(
+     lifePlan.futureValue(100000, result.metrics.requiredMonthly, 5, 37, 'end'),
+     result.metrics.requiredMonthly + 3000, 5, 83, 'end'
+   );
+   close(requiredPath, result.metrics.goalTarget, 0.02);
+   assert.ok(result.metrics.requiredMonthly < lifePlan.requiredMonthly(100000, result.metrics.goalTarget, 5, 120, 'end'));
+   assert.ok(result.metrics.goalTime.months <= 120);
+   assert.equal(lifePlan.calculate(lifeInput({ debtPrincipal: 100000, debtAnnualRatePct: 6, debtRemainingMonths: 36, debtPayment: 400 })).status, 'invalid');
+   const withoutSchedule = lifePlan.calculate(lifeInput({ income: 15000, expense: 7000, debtPayment: 3000 }));
+   assert.equal(withoutSchedule.metrics.debtRemainingMonths, null);
+   assert.equal(withoutSchedule.metrics.afterPayoffSurplus, 8000);
+   close(withoutSchedule.metrics.invested, 600000);
+ });
+
+ test('人生规划耗尽后截断负账户并从零重启，所需储蓄不为负', () => {
+   const restarted = lifePlan.calculate(lifeInput({
+     income: 15000, expense: 14000, debtPayment: 3000, assets: 0,
+     debtPrincipal: 3000, debtAnnualRatePct: 0, debtRemainingMonths: 1,
+   }));
+   assert.equal(restarted.status, 'success');
+   assert.equal(restarted.metrics.depletedAt, 1);
+   close(restarted.metrics.fundingGap, 2000);
+   close(restarted.metrics.projection, lifePlan.futureValue(0, 1000, 5, 119, 'end'), 0.02);
+   assert.ok(restarted.metrics.scenarios.every((item) => item.depletedAt === 1 && item.fundingGap === 2000));
+   const requiredPath = lifePlan.simulateAssetPath(0, restarted.metrics.requiredMonthly,
+     restarted.metrics.requiredMonthly + 3000, 5, 120, 'end', 1);
+   assert.ok(requiredPath.balance >= restarted.metrics.goalTarget - 0.02);
+
+   const compoundOnly = lifePlan.calculate(lifeInput({ assets: 800000 }));
+   assert.equal(compoundOnly.metrics.requiredMonthly, 0);
+   assert.equal(compoundOnly.metrics.goalTime.status, 'reached');
+   assert.equal(lifePlan.requiredMonthly(800000, 1200000, 5, 120, 'end'), 0);
+ });
+
+ test('人生规划三情景使用绝对收益率且负收益情景不颠倒', () => {
+   const result = lifePlan.calculate(lifeInput({ annualRatePct: -2, lowRatePct: -5, highRatePct: 1 }));
+   assert.equal(result.status, 'success');
+   const totals = result.metrics.scenarios.map((item) => item.total);
+   assert.ok(totals[0] < totals[1] && totals[1] < totals[2]);
+   assert.deepEqual(result.metrics.scenarios.map((item) => item.annualRatePct), [-5, -2, 1]);
+   assert.equal(lifePlan.calculate(lifeInput({ annualRatePct: -2, lowRatePct: -1, highRatePct: 1 })).status, 'invalid');
+ });
+
+ test('人生规划按今天购买力解释目标并使用费雪实际收益率', () => {
+   const result = lifePlan.calculate(lifeInput({ assets: 100000, annualRatePct: 3, inflationPct: 4, withdrawalRatePct: 3.5 }));
+   assert.equal(result.status, 'success');
+   close(result.metrics.realRatePct, -0.96153846, 1e-8);
+   close(result.metrics.goalTarget, 48000 / 0.035);
+   close(result.metrics.realProjection, result.metrics.projection / Math.pow(1.04, 10));
+   assert.ok(result.details.some((item) => item.label === '财务自由目标资产（今天购买力）'));
+   assert.ok(result.details.some((item) => item.label === '实际年收益率'));
+ });
+
+ test('人生规划校验金额、期限、提取率、债务与极值边界', () => {
+   for (const overrides of [
+     { income: '' }, { income: 0 }, { expense: -1 }, { assets: -1 }, { annualRatePct: -100 },
+     { years: 1.5 }, { years: 61 }, { withdrawalRatePct: 0 }, { inflationPct: -1 },
+     { timing: 'middle' }, { debtPrincipal: 1000 },
+     { debtPrincipal: 1000, debtAnnualRatePct: 5, debtRemainingMonths: 1.5 },
+   ]) assert.equal(lifePlan.calculate(lifeInput(overrides)).status, 'invalid');
+  const largeFinite = lifePlan.calculate(lifeInput({ annualRatePct: 1000, lowRatePct: 998, highRatePct: 1000, years: 60 }));
+  assert.equal(largeFinite.status, 'success');
+  assert.ok(isFinite(largeFinite.metrics.projection));
+  const highScenario = lifePlan.calculate(lifeInput({ annualRatePct: 5, highRatePct: 1000, years: 60 }));
+  assert.equal(highScenario.status, 'success');
+  assert.ok(highScenario.metrics.scenarios.every((item) => isFinite(item.total) && isFinite(item.fundingGap)));
+ });
+
+ test('人生规划显式桥接仅携带目标白名单数值', () => {
+   const href = Core.bridge.link('/combo/finance-toolkit.html', {
+     'ci-p': 100000, 'ci-m': 24000, 'ci-r': 5, 'ci-y': 10, 'lp-income': 10000,
+   }, { source: 'life-plan' });
+   const payload = JSON.parse(decodeURIComponent(href.split('#s=')[1]));
+   assert.deepEqual(Object.keys(payload).sort(), ['__bridge', 'ci-m', 'ci-p', 'ci-r', 'ci-y']);
+   assert.equal(payload.__bridge.source, 'life-plan');
+ });
+
+ test('注册表包含 45 个独立工具与十四个 P0 本地模块', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
   assert.equal(registry.tools.length, 45);
   const byId = new Map(registry.tools.map((tool) => [tool.id, tool]));
-  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay', 'scientific', 'percentage', 'timezone', 'buy-house', 'buy-car', 'health-check']) {
+  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay', 'scientific', 'percentage', 'timezone', 'buy-house', 'buy-car', 'health-check', 'life-plan']) {
     const tool = byId.get(id);
     assert.ok(tool, `缺少 ${id}`);
     assert.equal(tool.module, id);
@@ -923,12 +1093,17 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   assert.ok(byId.get('prepay').sensitiveFields.includes('income'));
   assert.deepEqual(byId.get('health-check').policyDependencies, []);
   assert.deepEqual(byId.get('health-check').analyticsAllowlist, ['success', 'resultType']);
+  assert.deepEqual(byId.get('life-plan').policyDependencies, []);
+  assert.deepEqual(byId.get('life-plan').analyticsAllowlist, ['success', 'resultType']);
+  for (const field of ['income', 'expense', 'debtPayment', 'assets', 'goalAnnualExpense', 'debtPrincipal']) {
+    assert.ok(byId.get('life-plan').sensitiveFields.includes(field));
+  }
   for (const field of ['sex', 'age', 'height', 'weight', 'neck', 'waist', 'hip', 'date']) {
     assert.ok(byId.get('health-check').sensitiveFields.includes(field));
   }
 });
 
-test('十三个 P0 控制器引用的 DOM ID 均存在于模板', () => {
+test('十四个 P0 控制器引用的 DOM ID 均存在于模板', () => {
   const pairs = [
     ['random', 'random'],
     ['vision', 'vision'],
@@ -943,6 +1118,7 @@ test('十三个 P0 控制器引用的 DOM ID 均存在于模板', () => {
     ['combo-buy-house', 'combo-buy-house'],
     ['combo-buy-car', 'combo-buy-car'],
     ['combo-health-check', 'combo-health-check'],
+    ['combo-life-plan', 'combo-life-plan'],
   ];
   for (const [controller, template] of pairs) {
     const js = fs.readFileSync(path.join(ROOT, 'assets/js/pages', controller + '.js'), 'utf8');
@@ -968,6 +1144,8 @@ test('P0 模板保留关键隐私与安全边界', () => {
   const carController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/combo-buy-car.js'), 'utf8');
   const healthHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/combo-health-check.html'), 'utf8');
   const healthController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/combo-health-check.js'), 'utf8');
+  const lifeHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/combo-life-plan.html'), 'utf8');
+  const lifeController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/combo-life-plan.js'), 'utf8');
   const randomController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/random.js'), 'utf8');
   assert.doesNotMatch(randomController, /Math\.random/);
   assert.doesNotMatch(visionHtml, /maxPass\s*=\s*1\.0/);
@@ -991,6 +1169,12 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.doesNotMatch(healthController, /innerHTML|age\s*=\s*30/);
   assert.match(healthHtml, /id="hc-empty"/);
   assert.match(healthHtml, /id="hc-storage-status"/);
+  assert.doesNotMatch(lifeHtml, /<script>|innerHTML|安全提取率/);
+  assert.doesNotMatch(lifeController, /innerHTML|20000|8000/);
+  assert.match(lifeHtml, /id="lp-withdrawal"/);
+  assert.match(lifeHtml, /id="lp-debt-principal"/);
+  assert.match(lifeHtml, /id="lp-timing"/);
+  assert.match(lifeHtml, /有效年收益率/);
 
   assert.match(randomController, /\.step = float \? 'any' : '1'/);
   const aqiController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/tool-air-quality.js'), 'utf8');
@@ -1001,6 +1185,7 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(toolState, /'combo-buy-house': 1/);
   assert.match(toolState, /'combo-buy-car': 1/);
   assert.match(toolState, /'combo-health-check': 1/);
+  assert.match(toolState, /'combo-life-plan': 1/);
   assert.match(toolState, /'buy-car': '买车全攻略'/);
   assert.match(toolState, /Core\.bridge\.allowed/);
 });

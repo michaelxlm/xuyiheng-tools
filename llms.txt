@@ -50,7 +50,7 @@
 - [健康体检站](https://xuyiheng.com/combo/health-check.html): 在线健康体检工具，18 岁及以上估算 BMI 分级、健康体重、基础代谢与每日消耗；5–17 岁仅记录 BMI 数值。测量记录只保存在本机浏览器，按日期查看趋势。
 - [趣味测试合集](https://xuyiheng.com/combo/fun-test.html): 趣味测试合集，包含缘分测试、星座运势、生日密码、颜色搭配等趣味小游戏。
 - [理财百宝箱](https://xuyiheng.com/combo/finance-toolkit.html): 理财百宝箱整合复利计算、定期存款、通胀分析、汇率换算、贷款方案对比。
-- [人生规划计算器](https://xuyiheng.com/combo/life-plan.html): 人生规划计算器，综合分析房贷、车贷、养老、投资等财务数据，生成人生财务全景报告。
+- [人生规划计算器](https://xuyiheng.com/combo/life-plan.html): 本地测算储蓄率、债务还清后的现金流释放、三情景资产路径与财务自由目标，支持有效年利率、期初/月末投入和通胀调整。
 - [颜色性格测试](https://xuyiheng.com/combo/color-lab.html): 凭直觉选一个最吸引你的颜色，测出你的性格倾向（趣味测试）。一键配色方案与中国传统色彩已归并至兄弟站「cs 调色盘」。
 - [场景组合工具](https://xuyiheng.com/combo/index.html): 一珩成长笔记的场景组合工具合集：买房全攻略、买车全攻略、健康体检站、趣味测试、理财百宝箱、人生规划、色彩研究所，把多个计算器组合成完整的决策流。
 
