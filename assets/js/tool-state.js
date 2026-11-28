@@ -33,6 +33,9 @@
     'combo-buy-car': 1,
     'combo-life-plan': 1,
     'fortune-bazi': 1,
+    'fortune-horoscope': 1,
+    'fortune-natal': 1,
+    'fortune-tarot': 1,
     'combo-finance-toolkit': 1,
     'vision': 1
   };
@@ -90,6 +93,7 @@
 
   function restoreState() {
     var h = String(global.location.hash || '');
+    if (isSensitive()) { if (h.indexOf('#s=') === 0) clearHash(); return; }
     if (h.indexOf('#s=') !== 0) return;
     var obj;
     try { obj = JSON.parse(decodeURIComponent(h.slice(3))); } catch (e) { if (isSensitive()) clearHash(); return; }

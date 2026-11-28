@@ -27,6 +27,7 @@
     noticeList: P + '/notice/list',
     fortuneCalculate: '/api/v1/front/fortune/calculate', // 命理测算：默认不留痕
     fortuneDelete: '/api/v1/front/fortune/delete',     // 凭本次删除令牌物理删除留痕
+    fortuneSharedTarot: '/api/v1/front/fortune/shared/', // 仅读取已存分享快照
     couponPaging: '/api/v1/front/coupon/jd/paging',
     couponHotwords: '/api/v1/front/coupon/jd/hotwords'
   };

@@ -28,6 +28,7 @@ const buyCar = require('../../assets/js/tools/buy-car');
 const healthCheck = require('../../assets/js/tools/health-check');
 const lifePlan = require('../../assets/js/tools/life-plan');
 const bazi = require('../../assets/js/tools/bazi');
+const horoscope = require('../../assets/js/tools/horoscope');
 const taxPolicy = require('../../data/policies/individual-income-tax.json');
 const socialPolicy = require('../../data/policies/social-insurance.json');
 const aqiPolicy = require('../../data/policies/aqi.json');
@@ -1157,6 +1158,52 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
    }
  });
 
+ test('星座运势请求默认不留痕并拒绝非法日期', () => {
+   const body = horoscope.requestBody({ sign: '白羊', date: '2026-11-23' });
+   assert.equal(body.ok, true);
+   assert.deepEqual(body.value, { tool: 'horoscope', input: { sign: '白羊', date: '2026-11-23' }, retain: false });
+   for (const input of [
+     { sign: '不存在', date: '2026-11-23' },
+     { sign: '白羊', date: '2026-02-30' },
+     { sign: '白羊', date: '2025-02-29' },
+     { sign: '白羊', date: '1899-12-31' },
+     { sign: '白羊', date: '2051-01-01' },
+   ]) assert.equal(horoscope.requestBody(input).ok, false);
+ });
+
+ test('星座运势真实后端结果可包装，角距与相位误差分开展示', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   const payload = engine.compute('horoscope', { sign: '白羊', date: '2026-11-23' });
+   assert.equal(horoscope.completeResult(payload.result), true);
+   const wrapped = horoscope.wrapResult(payload);
+   assert.equal(wrapped.status, 'success');
+   assert.equal(wrapped.metrics.retained, false);
+   assert.ok(wrapped.details.some(item => item.value === '2026-11-23T12:00:00+08:00'));
+   assert.ok(wrapped.formula.includes('separation') && wrapped.formula.includes('orb'));
+   assert.ok(wrapped.limitations.some(item => item.includes('不是高精度星历')));
+   assert.ok(payload.result.transits.every(item => item.aspect === '无'
+     ? item.orb === null
+     : Math.abs(item.orb - Math.abs(item.separation - item.aspectAngle)) <= 0.11));
+   const incomplete = JSON.parse(JSON.stringify(payload));
+   delete incomplete.result.calculation;
+   assert.equal(horoscope.wrapResult(incomplete).status, 'error');
+ });
+
+ test('星座运势内存缓存按星座与日期隔离并在 30 分钟后失效', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   const payload = engine.compute('horoscope', { sign: '白羊', date: '2026-11-23' });
+   payload.generatedAt = '2026-11-23T04:00:00.000Z';
+   const cache = new Map();
+   const key = horoscope.cacheKey('白羊', '2026-11-23');
+   assert.equal(horoscope.readCache(cache, key, 1000), null);
+   assert.equal(horoscope.writeCache(cache, key, payload, 1000), 1000);
+   assert.equal(horoscope.readCache(cache, key, 1000 + horoscope.ttlMs).cached, true);
+   assert.equal(horoscope.readCache(cache, key, 1001 + horoscope.ttlMs), null);
+   assert.equal(horoscope.readCache(cache, key, 1001 + horoscope.ttlMs, true).stale, true);
+   assert.equal(horoscope.readCache(cache, horoscope.cacheKey('金牛', '2026-11-23'), 1000), null);
+   assert.equal(horoscope.readCache(cache, horoscope.cacheKey('白羊', '2026-11-24'), 1000), null);
+ });
+
  test('注册表包含 45 个独立工具与十五个 P0 工具模块', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
   assert.equal(registry.tools.length, 45);
@@ -1180,6 +1227,9 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   assert.deepEqual(byId.get('life-plan').policyDependencies, []);
   assert.deepEqual(byId.get('life-plan').analyticsAllowlist, ['success', 'resultType']);
   assert.deepEqual(byId.get('bazi').analyticsAllowlist, ['success', 'certainty', 'retained']);
+  assert.equal(byId.get('horoscope').module, 'horoscope');
+  assert.equal(byId.get('horoscope').entryScript, 'assets/js/pages/fortune-horoscope.js');
+  assert.deepEqual(byId.get('horoscope').analyticsAllowlist, ['success', 'cached']);
   for (const field of ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate']) {
     assert.ok(byId.get('bazi').sensitiveFields.includes(field));
   }
@@ -1191,7 +1241,7 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   }
 });
 
-test('十五个 P0 控制器引用的 DOM ID 均存在于模板', () => {
+test('P0/P1 控制器引用的 DOM ID 均存在于模板', () => {
   const pairs = [
     ['random', 'random'],
     ['vision', 'vision'],
@@ -1208,6 +1258,7 @@ test('十五个 P0 控制器引用的 DOM ID 均存在于模板', () => {
     ['combo-health-check', 'combo-health-check'],
     ['combo-life-plan', 'combo-life-plan'],
     ['fortune-bazi', 'fortune-bazi'],
+    ['fortune-horoscope', 'fortune-horoscope'],
   ];
   for (const [controller, template] of pairs) {
     const js = fs.readFileSync(path.join(ROOT, 'assets/js/pages', controller + '.js'), 'utf8');
@@ -1284,6 +1335,7 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(toolState, /'combo-health-check': 1/);
   assert.match(toolState, /'combo-life-plan': 1/);
   assert.match(toolState, /'fortune-bazi': 1/);
+  assert.match(toolState, /'fortune-horoscope': 1/);
   assert.match(toolState, /'buy-car': '买车全攻略'/);
   assert.match(toolState, /Core\.bridge\.allowed/);
 });

@@ -1,132 +1,59 @@
-        <section class="page-heading">
-          <h1>星座运势 · 十二星座每日参考</h1>
-          <p>点选星座即可，日期已预填为今天。结果顶部会先用日常语言告诉你今天的节奏、适合投入的领域和需要注意的地方，再展示爱情、事业、财运、健康等星级与行运明细。星级是相对状态，不是好运概率；纯娱乐内容，无科学依据。</p>
-        </section>
+<section class="page-heading">
+  <h1>星座运势 · 十二星座每日参考</h1>
+  <p>选择星座与运势日期后主动查询。结果先用日常语言说明所选日期的节奏，再展示爱情、事业、财运、健康星级与行运明细。星级是传统规则的相对状态，不是好运概率；纯娱乐内容，无科学依据。</p>
+</section>
 
-        <form class="card" id="hoForm">
-          <p class="text-sm text-muted mt-0">点选星座即可查看，日期默认为今天。</p>
-          <div class="ft-quick-row" id="hoTabs"></div>
-          <select id="ho-sign" hidden aria-hidden="true"></select>
-          <details class="ft-advanced"><summary>查看其他日期</summary>
-            <div><input class="form-input" id="ho-date" type="date"></div>
-          </details>
-          <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"horoscope"}'>查今日运势</button>
-          </div>
-          <p class="ft-disclaimer">纯娱乐内容，与真实事件没有因果关系，请勿据此做重要决定。</p>
-        </form>
+<form class="card" id="hoForm" novalidate>
+  <p class="text-sm text-muted mt-0">点选星座即可查询；查看其他日期时，结果标题与口径始终跟随所选日期。</p>
+  <div class="ft-quick-row" id="hoTabs" role="group" aria-label="选择星座"></div>
+  <div class="form-group mt-3">
+    <label class="form-label" for="ho-date">运势日期</label>
+    <input class="form-input" id="ho-date" type="date" min="1900-01-01" max="2050-12-31" required>
+  </div>
+  <div class="btn-row mt-3">
+    <button class="btn btn-primary" id="ho-submit" type="submit" data-track="calc_click" data-track-props='{"tool":"horoscope"}'>查询运势</button>
+  </div>
+  <p class="text-sm text-muted mt-3">默认不留痕：仅提交所选星座与日期用于本次计算，不写入 URL、浏览器存储或分析事件。页面内存缓存最多保留 30 分钟，刷新即清空。</p>
+  <p class="ft-disclaimer">纯娱乐内容，与真实事件没有因果关系，请勿据此做重要决定。</p>
+  <p class="form-error" id="ho-error" role="alert" hidden></p>
+  <p class="text-sm mt-2" id="ho-status" role="status" aria-live="polite" hidden></p>
+</form>
 
-        <div class="result-box" id="hoResult" hidden>
-          <div id="hoPlain" aria-live="polite"></div>
-          <div class="ft-horo-head"><h3 id="hoTitle" style="margin:0"></h3><span class="ft-chip" id="hoDateChip"></span><span class="ft-chip" id="hoMood"></span></div>
-          <div id="hoScores"></div>
-          <div class="mt-3"><span class="text-sm text-muted">综合星级进度（仅用于展示，不是概率） </span><span id="hoPct"></span></div>
-          <div class="ft-lucky" id="hoLucky"></div>
-          <h3 class="ft-section-title">当日行运行星明细</h3>
-          <div id="hoTransits"></div>
-          <h3 class="ft-section-title">星级怎么来的</h3>
-          <div class="ft-kv-grid" id="hoScoreNotes"></div>
-          <h3 class="ft-section-title">分维度提示</h3>
-          <div class="ft-kv-grid" id="hoDetails"></div>
-          <h3 class="ft-section-title">幸运元素说明</h3>
-          <div class="ft-kv-grid" id="hoLuckyNotes"></div>
-          <h3 class="ft-section-title">今日宜忌</h3>
-          <div id="hoDoAvoid"></div>
-          <h3 class="ft-section-title">今日解读</h3>
-          <ul class="ft-note-list" id="hoReading"></ul>
-          <p class="text-sm mt-3" id="hoMethod"></p>
-          <p class="text-sm text-muted mt-2" id="hoAdvice"></p>
-        </div>
+<div class="result-box" id="ho-result" hidden>
+  <div id="hoPlain" aria-live="polite"></div>
+  <div class="ft-horo-head"><h3 id="hoTitle" style="margin:0"></h3><span class="ft-chip" id="hoDateChip"></span><span class="ft-chip" id="hoMood"></span></div>
+  <div id="hoScores"></div>
+  <div class="mt-3"><span class="text-sm text-muted">综合星级进度（仅用于展示，不是概率） </span><span id="hoPct"></span></div>
+  <div class="ft-lucky" id="hoLucky"></div>
+  <h3 class="ft-section-title">当日行运行星明细</h3>
+  <div id="hoTransits"></div>
+  <h3 class="ft-section-title">星级怎么来的</h3>
+  <div class="ft-kv-grid" id="hoScoreNotes"></div>
+  <h3 class="ft-section-title">分维度提示</h3>
+  <div class="ft-kv-grid" id="hoDetails"></div>
+  <h3 class="ft-section-title">幸运元素说明</h3>
+  <div class="ft-kv-grid" id="hoLuckyNotes"></div>
+  <h3 class="ft-section-title">当日宜忌</h3>
+  <div id="hoDoAvoid"></div>
+  <h3 class="ft-section-title">当日解读</h3>
+  <ul class="ft-note-list" id="hoReading"></ul>
+  <h3 class="ft-section-title">计算口径与限制</h3>
+  <div id="hoExplain"></div>
+  <p class="text-sm mt-3" id="hoMethod"></p>
+  <p class="text-sm text-muted mt-2" id="hoAdvice"></p>
+</div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看白话导读里的总体节奏，再找相对突出或需要放缓的领域，最后从“宜、忌”中选一件具体小事。下面的过境角度和权重是计算口径，供专业用户复核；幸运色、数字与方位只是轻松标签，不改变现实。</div></div>
-
-        <script>
-        (function () {
-          function boot() {
-            var F = window.FortuneAPI; if (!F) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
-            var dateInput = $('ho-date'), signSel = $('ho-sign');
-            signSel.innerHTML = F.SIGNS.map(function (s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
-            $('hoTabs').innerHTML = F.SIGNS.map(function (s) { return '<button type="button" class="ft-sign-tab" data-sign="' + s + '">' + s + '</button>'; }).join('');
-            F.fillToday(dateInput);
-            function stars(n) {
-              var s = '';
-              for (var i = 1; i <= 5; i++) s += i <= n ? '★' : '<span class="off">☆</span>';
-              return '<span class="ft-stars">' + s + '</span>';
-            }
-            function render(btn) {
-              var sign = signSel.value, key = dateInput.value;
-              if (!key) { alert('请选择日期'); return; }
-              F.run(btn, 'horoscope', { sign: sign, date: key }).then(function (h) {
-                F.renderPlainGuide($('hoPlain'), h.plainGuide);
-                $('hoTitle').textContent = h.sign + '座 · 今日运势';
-                $('hoDateChip').textContent = h.date;
-                $('hoScores').innerHTML = [
-                  ['综合', h.scores.overall], ['爱情', h.scores.love], ['事业', h.scores.career],
-                  ['财运', h.scores.money], ['健康', h.scores.health]
-                ].map(function (x) { return '<div class="ft-score-row"><span>' + x[0] + '</span>' + stars(x[1]) + '</div>'; }).join('');
-                $('hoMood').textContent = '状态 ' + h.mood;
-                $('hoPct').innerHTML = '<span class="ft-bar" style="display:inline-block;width:120px;vertical-align:middle"><i style="width:' +
-                  h.percent + '%"></i></span> <strong>' + h.percent + '%</strong>';
-                $('hoLucky').innerHTML = ['<span class="ft-color-dot" style="background:' + esc(h.colorHex) + '"></span>幸运色 ' + h.color,
-                  '幸运数字 ' + h.number, '幸运方位 ' + h.direction,
-                  '今日月亮在' + esc(h.moonSign) + ' · ' + esc(h.moonPhase)]
-                  .map(function (s) { return '<span class="ft-chip">' + s + '</span>'; }).join('');
-                $('hoTransits').innerHTML = '<table class="ft-ref-table"><thead><tr><th>行星</th><th>所在星座</th><th>与你星座中点</th><th>角度误差</th><th>性质</th></tr></thead><tbody>' +
-                  h.transits.map(function (t) {
-                    return '<tr' + (t.aspect !== '无' && (t.nature === '和谐' || t.nature === '张力') ? ' class="is-active"' : '') + '>' +
-                      '<td>' + esc(t.glyph + ' ' + t.planet) + '</td><td>' + esc(t.sign + ' ' + t.degree + '°') + '</td><td>' +
-                      (t.aspect === '无' ? '<span class="text-muted">无主要相位</span>' : '<strong>' + esc(t.aspect) + '</strong>') +
-                      '</td><td>' + t.orb + '°</td><td>' + esc(t.nature) + '</td></tr>';
-                  }).join('') + '</tbody></table>' +
-                  '<p class="text-sm text-muted mt-2">高亮行为当前成相的行星；相位容限：合 ≤15°、六合 45–75°、刑 75–105°、拱 105–135°、冲 165–180°。</p>';
-                $('hoScoreNotes').innerHTML = Object.keys(h.scoreNotes).map(function (k) {
-                  var label = { overall: '综合', love: '爱情', career: '事业', money: '财运', health: '健康' }[k];
-                  return kv(label + ' ' + h.scores[k] + ' 星', h.scoreNotes[k]);
-                }).join('');
-                $('hoDetails').innerHTML = [ [ '爱情', h.details.love ], [ '事业', h.details.career ],
-                  [ '财运', h.details.money ], [ '健康', h.details.health ] ]
-                  .map(function (x) { return kv(x[0], x[1]); }).join('');
-                $('hoLuckyNotes').innerHTML = [ [ '幸运色', h.colorMeaning ], [ '幸运数字', h.numberMeaning ], [ '幸运方位', h.directionMeaning ] ]
-                  .map(function (x) { return kv(x[0], x[1]); }).join('');
-                $('hoReading').innerHTML = h.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('hoDoAvoid').innerHTML = '<div><strong>宜</strong> ' + h.doList.map(function (s) {
-                  return '<span class="ft-tag">' + esc(s) + '</span>';
-                }).join(' ') + '</div><div class="mt-2"><strong>忌</strong> ' + h.avoidList.map(function (s) {
-                  return '<span class="ft-tag">' + esc(s) + '</span>';
-                }).join(' ') + '</div>';
-                $('hoAdvice').textContent = '今日提示：' + h.advice + ' ' + h.highlight;
-                $('hoMethod').textContent = h.methodNote;
-                $('hoResult').hidden = false;
-                Array.prototype.forEach.call($('hoTabs').children, function (b) {
-                  b.className = 'ft-sign-tab' + (b.getAttribute('data-sign') === h.sign ? ' is-active' : '');
-                });
-                if (window.U && U.track) U.track('calc_result', { tool: 'horoscope' });
-              }).catch(function (err) { alert('获取运势失败：' + (err && err.message ? err.message : '请稍后重试')); });
-            }
-            $('hoForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              render($('hoForm').querySelector('button[type=submit]'));
-            });
-            $('hoTabs').addEventListener('click', function (e) {
-              var b = e.target.closest('.ft-sign-tab'); if (!b) return;
-              signSel.value = b.getAttribute('data-sign'); render(null);
-            });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+<div class="info-box mt-4"><span>说明：</span><div><strong>怎么读：</strong>先看白话导读里的总体节奏，再找相对突出或需要放缓的领域，最后从“宜、忌”中选一件具体小事。实际角距 separation 是行星与星座中点的夹角；相位标准角 aspectAngle 与允许误差 allowedOrb 用于判断是否成相，实际误差 orb 是两者之差。幸运色、数字与方位只是轻松标签，不改变现实。</div></div>
 
 <section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>星座运势由当日行星过境与太阳星座的传统相位规则推导。本页先把结果翻译成“今天怎么安排”的日常提示，再保留过境表供复核。它不预测真实事件，也不能代替你对工作、关系、健康或财务的判断。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details><summary>结果每天都会变吗？</summary><p>会。星级由当日真实行星过境相位推导，月亮每天移动约 13°，因此换日期通常会变；同一天同一星座全网一致、可复核。</p></details>
-          <details><summary>为什么不同网站运势不一样？</summary><p>各站规则不同：本页公开相位容限与权重口径（见「星级怎么来的」与行运明细表），不用随机生成，也不声称准确。</p></details>
-          <details><summary>星级和百分比是什么意思？</summary><p>星级把传统规则结果压缩成 1–5 星，百分比只是星级的可视化进度。它们都不是好运概率，也不能换算成某件事发生的可能性。</p></details>
-          <details><summary>第一次看运势，要怎么看？</summary><p>先看白话导读，再找相对突出和需要放缓的领域，最后选一条具体建议执行。不要因为低星级推迟必要工作、沟通或就医。</p></details>
-          <details><summary>十二星座按什么日期划分？</summary><p>日常星座按阳历出生日期的黄道区间划分，本页选项卡直接对应这十二个星座名称。</p></details>
-          <details><summary>会收集我的星座或日期吗？</summary><p>点击查询后会向中台提交所选星座与日期用于生成结果并留痕；页面不写入本地存储，也不采集姓名、联系方式等身份信息。</p></details>
-        </section>
+  <h2>关于本工具</h2>
+  <p>星座运势由所选日期 12:00（UTC+8）的近似行星黄经与太阳星座中点的传统相位规则推导。本页先把结果翻译成“这一天怎么安排”的日常提示，再保留过境表供复核。它不预测真实事件，也不能代替你对工作、关系、健康或财务的判断。</p>
+  <h2 style="margin-top:1.5em">常见问题</h2>
+  <details><summary>结果每天都会变吗？</summary><p>会。星级由所选日期的行星过境相位推导，月亮每天移动约 13°，因此换日期通常会变；同一天同一星座按同一规则可复核。页面标题会明确区分“今日运势”和其他日期运势。</p></details>
+  <details><summary>为什么不同网站运势不一样？</summary><p>各站规则不同：本页公开相位容限与权重口径（见「星级怎么来的」与行运明细表），不用随机生成，也不声称准确。</p></details>
+  <details><summary>星级和百分比是什么意思？</summary><p>星级把传统规则结果压缩成 1–5 星，百分比只是星级的可视化进度。它们都不是好运概率，也不能换算成某件事发生的可能性。</p></details>
+  <details><summary>实际角距、相位标准角和允许误差有什么区别？</summary><p>实际角距是行星黄经与太阳星座中点的夹角；相位标准角是合、六合、刑、拱、冲的理论角度；允许误差是判定成相的范围；实际误差是实际角距偏离理论角度的距离。四者分开展示，避免把“离你有多远”误读成“离标准相位有多远”。</p></details>
+  <details><summary>第一次看运势，要怎么看？</summary><p>先看白话导读，再找相对突出和需要放缓的领域，最后选一条具体建议执行。不要因为低星级推迟必要工作、沟通或就医。</p></details>
+  <details><summary>十二星座按什么日期划分？</summary><p>日常星座按阳历出生日期的黄道区间划分，本页选项卡直接对应这十二个星座名称。</p></details>
+  <details><summary>会收集我的星座或日期吗？</summary><p>查询时会向中台提交所选星座与日期用于生成结果，默认不留痕。页面不写入 URL、localStorage 或分析事件；内存缓存只保留在当前页面，刷新即清空。</p></details>
+</section>

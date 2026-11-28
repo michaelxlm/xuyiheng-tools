@@ -18,8 +18,8 @@ const SENSITIVE = {
   'buy-house': ['price', 'area', 'houseCount', 'policyDate', 'deedBasis', 'customDeedRatePct', 'downPct', 'years', 'commercialSharePct', 'commercialRatePct', 'fundRatePct', 'agentRatePct', 'buyerSharePct', 'otherCosts', 'monthlyIncome', 'otherMonthlyExpense', 'availableCash', 'emergencyMonths', 'incomeShockPct', 'rateShockPct'],
   'buy-car': ['guidePrice', 'invoicePrice', 'invoicePriceExVat', 'purchaseDate', 'taxReductionEligible', 'downPct', 'annualRatePct', 'years', 'purchaseFees', 'insurance', 'annualKm', 'energyUsePer100', 'energyPrice', 'monthlyIncome', 'otherMonthlyExpense'],
   bazi: ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate'], ziwei: ['birthDate', 'birthTime', 'gender'],
-  natal: ['birthDate', 'birthTime', 'birthPlace'], horoscope: ['zodiac', 'date'],
-  'zodiac-match': ['birthDate', 'zodiac'], tarot: ['question'],
+  natal: ['date', 'time', 'timePrecision', 'timezone', 'lat', 'lon', 'occurrence'], horoscope: ['zodiac', 'date'],
+  'zodiac-match': ['birthDate', 'zodiac'], tarot: ['question', 'seed'],
 };
 const POLICIES = {
   tax: ['individual-income-tax'], 'social-insurance': ['individual-income-tax', 'social-insurance'],
@@ -29,7 +29,7 @@ const MODULES = {
   tax: 'tax', random: 'random', vision: 'vision', 'secret-message': 'secret-message',
   'air-quality': 'air-quality', 'social-insurance': 'social-insurance', prepay: 'prepay',
   scientific: 'scientific', percentage: 'percentage', timezone: 'timezone', 'buy-house': 'buy-house', 'buy-car': 'buy-car',
-  'health-check': 'health-check', 'life-plan': 'life-plan', bazi: 'bazi',
+  'health-check': 'health-check', 'life-plan': 'life-plan', bazi: 'bazi', natal: 'natal', horoscope: 'horoscope', tarot: 'tarot',
 };
 const EVENTS = {
   tax: ['mode', 'success', 'resultType'], random: ['type', 'unique', 'count', 'success'],
@@ -40,6 +40,7 @@ const EVENTS = {
   timezone: ['success', 'mode'], 'buy-house': ['success', 'resultType'],
   'buy-car': ['success', 'resultType', 'energy'], 'health-check': ['success', 'resultType'],
   'life-plan': ['success', 'resultType'], bazi: ['success', 'certainty', 'retained'],
+  natal: ['success', 'timePrecision', 'retained'], horoscope: ['success', 'cached'], tarot: ['success', 'spread', 'retained'],
 };
 
 function slugOf(route) {

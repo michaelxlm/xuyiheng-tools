@@ -944,19 +944,23 @@
       "category": "fortune",
       "template": "templates/pages/fortune-natal.html",
       "entryScript": null,
-      "module": null,
+      "module": "natal",
       "computationMode": "api",
       "sensitiveFields": [
-        "birthDate",
-        "birthTime",
-        "birthPlace"
+        "date",
+        "time",
+        "timePrecision",
+        "timezone",
+        "lat",
+        "lon",
+        "occurrence"
       ],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
         "success",
-        "resultType"
+        "timePrecision",
+        "retained"
       ],
       "mobileLayout": "scroll-table"
     },
@@ -967,8 +971,8 @@
       "url": "/fortune/horoscope.html",
       "category": "fortune",
       "template": "templates/pages/fortune-horoscope.html",
-      "entryScript": null,
-      "module": null,
+      "entryScript": "assets/js/pages/fortune-horoscope.js",
+      "module": "horoscope",
       "computationMode": "api",
       "sensitiveFields": [
         "zodiac",
@@ -977,9 +981,8 @@
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
         "success",
-        "resultType"
+        "cached"
       ],
       "mobileLayout": "stacked-cards"
     },
@@ -1014,17 +1017,18 @@
       "category": "fortune",
       "template": "templates/pages/fortune-tarot.html",
       "entryScript": null,
-      "module": null,
+      "module": "tarot",
       "computationMode": "api",
       "sensitiveFields": [
-        "question"
+        "question",
+        "seed"
       ],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
         "success",
-        "resultType"
+        "spread",
+        "retained"
       ],
       "mobileLayout": "stacked-cards"
     }
