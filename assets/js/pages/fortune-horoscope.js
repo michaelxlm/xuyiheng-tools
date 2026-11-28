@@ -80,29 +80,33 @@
       head.appendChild(node('h2', '', guide.title));
       head.appendChild(node('p', '', guide.intro));
       section.appendChild(head);
-      if (guide.highlights && guide.highlights.length) {
+      var highlights = Array.isArray(guide.highlights) ? guide.highlights : [];
+      if (highlights.length) {
         var cards = node('div', 'ft-plain-highlights');
-        guide.highlights.forEach(function (item) {
+        highlights.forEach(function (item) {
+          if (!item || typeof item !== 'object') return;
           var card = node('article', 'ft-plain-card');
           card.appendChild(node('h3', '', item.label));
           card.appendChild(node('p', '', item.text));
           cards.appendChild(card);
         });
-        section.appendChild(cards);
+        if (cards.children.length) section.appendChild(cards);
       }
-      if (guide.readingOrder && guide.readingOrder.length) {
+      var readingOrder = Array.isArray(guide.readingOrder) ? guide.readingOrder : [];
+      if (readingOrder.length) {
         var order = node('div', 'ft-plain-block');
         order.appendChild(node('h3', '', '建议阅读顺序'));
         var ol = node('ol', 'ft-plain-steps');
-        guide.readingOrder.forEach(function (text) { ol.appendChild(node('li', '', text)); });
+        readingOrder.forEach(function (text) { ol.appendChild(node('li', '', text)); });
         order.appendChild(ol);
         section.appendChild(order);
       }
-      if (guide.reminders && guide.reminders.length) {
+      var remindersList = Array.isArray(guide.reminders) ? guide.reminders : [];
+      if (remindersList.length) {
         var reminders = node('aside', 'ft-plain-reminders');
         reminders.appendChild(node('strong', '', '读之前记住'));
         var ul = node('ul');
-        guide.reminders.forEach(function (text) { ul.appendChild(node('li', '', text)); });
+        remindersList.forEach(function (text) { ul.appendChild(node('li', '', text)); });
         reminders.appendChild(ul);
         section.appendChild(reminders);
       }
@@ -113,6 +117,7 @@
       var text = '';
       for (var i = 1; i <= 5; i++) text += i <= value ? '★' : '☆';
       var el = node('span', 'ft-stars', text);
+      el.setAttribute('role', 'img');
       el.setAttribute('aria-label', value + ' 星');
       return el;
     }
@@ -132,10 +137,16 @@
     function renderTransits(host, transits) {
       clear(host);
       var wrap = node('div', 'ft-table-wrap');
+      wrap.setAttribute('tabindex', '0');
+      wrap.setAttribute('aria-label', '当日行运行星明细表，可横向滚动');
       var table = node('table', 'ft-ref-table');
       var thead = node('thead');
       var headRow = node('tr');
-      [ '行星', '所在星座', '实际角距', '相位', '标准角', '允许误差', '实际误差', '性质' ].forEach(function (label) { headRow.appendChild(node('th', '', label)); });
+      [ '行星', '所在星座', '实际角距', '相位', '标准角', '允许误差', '实际误差', '性质' ].forEach(function (label) {
+        var th = node('th', '', label);
+        th.setAttribute('scope', 'col');
+        headRow.appendChild(th);
+      });
       thead.appendChild(headRow);
       table.appendChild(thead);
       var tbody = node('tbody');
@@ -161,13 +172,25 @@
       host.appendChild(node('p', 'text-sm text-muted mt-2', '实际角距是行星与星座中点的夹角；实际误差是实际角距偏离相位标准角的距离。高亮行为当前成相行星。'));
     }
 
+    function shanghaiDateKey(date) {
+      try {
+        var parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+        }).formatToParts(date);
+        var map = {};
+        parts.forEach(function (part) { map[part.type] = part.value; });
+        return map.year + '-' + map.month + '-' + map.day;
+      } catch (error) {
+        return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+      }
+    }
+
     function render(data, payload, cacheInfo) {
       var wrapped = Tools.horoscope.wrapResult(payload);
       if (wrapped.status === 'error') { showError(wrapped.errors.join('；')); return; }
       clearResult();
       renderGuide($('hoPlain'), data.plainGuide);
-      var today = new Date();
-      var todayKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      var todayKey = shanghaiDateKey(new Date());
       $('hoTitle').textContent = data.sign + '座 · ' + (data.date === todayKey ? '今日运势' : data.date + ' 运势');
       $('hoDateChip').textContent = data.date;
       $('hoMood').textContent = '状态 ' + data.mood;
@@ -232,15 +255,23 @@
       } else {
         status('查询完成，本次未留痕。');
       }
-      if (window.U && window.U.track) window.U.track('calc_result', { tool: 'horoscope', cached: !!(cacheInfo && cacheInfo.cached) });
+      if (window.U && window.U.track) window.U.track('calc_result', { tool: 'horoscope', success: true, cached: !!(cacheInfo && cacheInfo.cached) });
     }
 
     function fallbackStale(sign, date, key, current) {
       var stale = Tools.horoscope.readCache(cache, key, Date.now(), true);
       if (!stale || current !== sequence) return false;
-      render(stale.result, { result: stale.result, generatedAt: stale.generatedAt, retained: false }, stale);
+      try {
+        render(stale.result, { result: stale.result, generatedAt: stale.generatedAt, retained: false }, stale);
+      } catch (error) {
+        return false;
+      }
       status('网络不可用，当前展示超过 30 分钟的页面内存缓存，非实时结果。', true);
       return true;
+    }
+
+    function networkFailure(error) {
+      return !error || error.name === 'AbortError' || error.name === 'TypeError' || /^HTTP 5\d\d$/.test(error.message || '');
     }
 
     function query() {
@@ -255,34 +286,47 @@
         currentController = null;
         $('ho-submit').disabled = false;
         $('ho-submit').textContent = '查询运势';
-        render(cached.result, { result: cached.result, generatedAt: cached.generatedAt, retained: false }, cached);
+        try {
+          render(cached.result, { result: cached.result, generatedAt: cached.generatedAt, retained: false }, cached);
+        } catch (error) {
+          showError('运势展示失败，请重试。');
+        }
         return;
       }
 
       var body = Tools.horoscope.requestBody(input).value;
-      var controller = new AbortController();
+      var controller = typeof AbortController === 'function' ? new AbortController() : null;
       currentController = controller;
-      var timer = setTimeout(function () { controller.abort(); }, 15000);
+      var timer = controller ? setTimeout(function () { controller.abort(); }, 15000) : null;
       $('ho-submit').disabled = true;
       $('ho-submit').textContent = '查询中…';
       showLoading(input.sign, input.date);
-      API.post(API.endpoints.fortuneCalculate, body, { signal: controller.signal }).then(function (response) {
+      API.post(API.endpoints.fortuneCalculate, body, controller ? { signal: controller.signal } : undefined).then(function (response) {
         if (current !== sequence) return;
-        var payload = Tools.horoscope.responsePayload(response);
+        var payload = Tools.horoscope.responsePayload(response, input);
         if (!payload) {
           var message = response && String(response.code) === '0'
             ? '运势数据不完整，请稍后重试'
             : (response && response.msg ? response.msg : '运势查询失败，请稍后重试');
-          throw new Error(message);
+          var failure = new Error(message);
+          failure.business = true;
+          throw failure;
         }
         var fetchedAt = Tools.horoscope.writeCache(cache, key, payload);
-        render(payload.result, payload, { cached: false, fetchedAt: fetchedAt });
+        try {
+          render(payload.result, payload, { cached: false, fetchedAt: fetchedAt });
+        } catch (error) {
+          showError('运势展示失败，请重试。');
+        }
       }).catch(function (error) {
         if (current !== sequence) return;
-        if (fallbackStale(input.sign, input.date, key, current)) return;
-        showError(error && error.name === 'AbortError' ? '请求超时或已取消，请重试。' : (error && error.message ? error.message : '网络不可用，请稍后重试。'));
+        if (networkFailure(error) && fallbackStale(input.sign, input.date, key, current)) return;
+        var text = error && error.name === 'AbortError'
+          ? '请求超时或已取消，请重试。'
+          : (error && error.business ? error.message : '运势暂时无法显示，请稍后重试。');
+        showError(text);
       }).finally(function () {
-        clearTimeout(timer);
+        if (timer) clearTimeout(timer);
         if (current === sequence) {
           currentController = null;
           $('ho-submit').disabled = false;
@@ -305,10 +349,7 @@
 
     form.addEventListener('submit', function (event) { event.preventDefault(); query(); });
     $('ho-date').addEventListener('change', resetView);
-    if (!$('ho-date').value) {
-      var now = new Date();
-      $('ho-date').value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-    }
+    if (!$('ho-date').value) $('ho-date').value = shanghaiDateKey(new Date());
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

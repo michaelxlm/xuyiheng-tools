@@ -13,6 +13,7 @@
     "sitemap": "node scripts/build-sitemap.js",
     "llms": "node scripts/build-llms.js",
     "registry": "node scripts/generate-tool-registry.js",
+    "offline": "node scripts/build-offline-manifest.js",
     "test": "node --test tests/unit/*.test.js && npm run check",
     "check": "node scripts/check-encoding.js && node scripts/check-tool-registry.js && node scripts/check-build-artifacts.js && node scripts/check-tools-sync.js && node scripts/check-links.js && node scripts/check-wcag.js",
     "check:encoding": "node scripts/check-encoding.js",

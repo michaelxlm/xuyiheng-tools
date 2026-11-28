@@ -1,0 +1,408 @@
+/* fortune-tarot.js · 塔罗薄控制器：安全随机、按种子复现、显式留痕与分享视图 */
+(function () {
+  'use strict';
+
+  var PRESETS = [ '今日指引', '工作方向', '人际关系', '学习状态' ];
+
+  function boot() {
+    var Tools = window.Tools || {};
+    var RV = window.ToolCore && window.ToolCore.ResultView;
+    var API = window.API;
+    var form = document.getElementById('trForm');
+    if (!form || !Tools.tarot || !RV || !API) return;
+    var $ = function (id) { return document.getElementById(id); };
+    var sequence = 0;
+    var currentController = null;
+    var deleteController = null;
+    var retained = null;
+    var pendingRetainBody = null;
+    var activeBody = null;
+    var state = { seed: '', question: '今日指引', shared: false };
+
+    function node(tag, className, text) {
+      var el = document.createElement(tag);
+      if (className) el.className = className;
+      if (text != null) el.textContent = String(text);
+      return el;
+    }
+
+    function status(message, isError) {
+      $('tr-status').textContent = message || '';
+      $('tr-status').hidden = !message;
+      $('tr-status').classList.toggle('is-error', !!isError);
+    }
+
+    function showError(message) {
+      $('tr-error').textContent = message;
+      $('tr-error').hidden = false;
+      status(message, true);
+    }
+
+    function hideError() {
+      $('tr-error').textContent = '';
+      $('tr-error').hidden = true;
+    }
+
+    function clear(host) { RV.clear(host); }
+
+    function currentQuestion() {
+      var custom = ($('tr-question-custom').value || '').trim();
+      if (custom) return custom;
+      var active = $('trPresets').querySelector('.is-active');
+      return active ? active.getAttribute('data-q') : '今日指引';
+    }
+
+    function syncQuestion() {
+      state.question = currentQuestion();
+      $('tr-question').value = state.question;
+    }
+
+    function resetResult() {
+      sequence += 1;
+      if (currentController) currentController.abort();
+      currentController = null;
+      activeBody = null;
+      pendingRetainBody = null;
+      $('tr-result').hidden = true;
+      [ 'trPlain', 'trSeedNote', 'trCards', 'trReading', 'trReadingList', 'trActions', 'trGuide', 'trMeta', 'trExplain' ].forEach(function (id) { clear($(id)); });
+      hideError();
+      status('');
+    }
+
+    function renderGuide(host, guide) {
+      clear(host);
+      if (!guide || !guide.title) return;
+      var section = node('section', 'ft-plain-guide');
+      section.setAttribute('aria-label', '白话结果导读');
+      var head = node('div', 'ft-plain-head');
+      head.appendChild(node('span', 'ft-tag', '先看这里'));
+      head.appendChild(node('h2', '', guide.title));
+      head.appendChild(node('p', '', guide.intro));
+      section.appendChild(head);
+      if (Array.isArray(guide.highlights) && guide.highlights.length) {
+        var cards = node('div', 'ft-plain-highlights');
+        guide.highlights.forEach(function (item) {
+          if (!item || typeof item !== 'object') return;
+          var card = node('article', 'ft-plain-card');
+          card.appendChild(node('h3', '', item.label));
+          card.appendChild(node('p', '', item.text));
+          cards.appendChild(card);
+        });
+        section.appendChild(cards);
+      }
+      if (Array.isArray(guide.readingOrder) && guide.readingOrder.length) {
+        var order = node('div', 'ft-plain-block');
+        order.appendChild(node('h3', '', '建议阅读顺序'));
+        var ol = node('ol', 'ft-plain-steps');
+        guide.readingOrder.forEach(function (text) { ol.appendChild(node('li', '', text)); });
+        order.appendChild(ol);
+        section.appendChild(order);
+      }
+      if (Array.isArray(guide.reminders) && guide.reminders.length) {
+        var reminders = node('aside', 'ft-plain-reminders');
+        reminders.appendChild(node('strong', '', '读之前记住'));
+        var ul = node('ul');
+        guide.reminders.forEach(function (text) { ul.appendChild(node('li', '', text)); });
+        reminders.appendChild(ul);
+        section.appendChild(reminders);
+      }
+      host.appendChild(section);
+    }
+
+    function renderCard(card) {
+      var el = node('div', 'ft-tarot-card' + (card.reversed ? ' is-reversed' : ''));
+      el.appendChild(node('span', 'ft-tarot-pos', card.position));
+      el.appendChild(node('span', 'ft-tarot-num', card.numeral));
+      el.appendChild(node('strong', 'ft-tarot-name', card.name));
+      el.appendChild(node('span', 'ft-tarot-orient', card.reversed ? '逆位' : '正位'));
+      el.appendChild(node('span', 'ft-tarot-meaning', card.meaning));
+      var keywords = node('span', 'ft-tarot-keywords');
+      card.keywords.forEach(function (keyword) { keywords.appendChild(node('span', 'ft-tag', keyword)); });
+      el.appendChild(keywords);
+      el.appendChild(node('span', 'ft-tag', (card.major ? '大阿尔卡那' : card.suit) + ' · ' + card.element + '象'));
+      if (card.astro) el.appendChild(node('span', 'ft-tag', card.astro));
+      var advice = node('span', 'ft-tarot-advice');
+      advice.appendChild(document.createTextNode(card.core));
+      advice.appendChild(document.createElement('br'));
+      advice.appendChild(document.createTextNode(card.advice));
+      el.appendChild(advice);
+      return el;
+    }
+
+    function shareLink(shareId) {
+      var path = Tools.tarot.shareUrl(shareId);
+      if (!path) return '';
+      var origin = window.location && window.location.origin ? window.location.origin : '';
+      return origin + path;
+    }
+
+    function renderMeta(wrapped, payload, options) {
+      var shared = !!(options && options.shared);
+      var questionLabel = shared ? '已隐藏（分享视图）' : (payload.retained ? payload.result.question : state.question + '（未提交中台）');
+      var details = wrapped.details.map(function (item) {
+        if (item.label === '问题') return { label: '问题', value: questionLabel, note: shared ? '分享快照不保存问题文字' : '默认不留痕时问题不提交中台' };
+        return item;
+      });
+      RV.renderDetails($('trMeta'), details);
+      var data = payload.result;
+      var row = node('div', 'btn-row mt-3');
+      if (!shared && data.draw && data.draw.seed) {
+        var reproduce = node('button', 'btn btn-outline', '按种子复现');
+        reproduce.type = 'button';
+        reproduce.addEventListener('click', function () {
+          state.seed = data.draw.seed;
+          run('reproduce');
+        });
+        row.appendChild(reproduce);
+      }
+      if (row.children.length) $('trMeta').appendChild(row);
+      if (shared) {
+        $('trMeta').appendChild(node('p', 'text-sm text-muted mt-2', '这是公开分享视图：读取服务端已存快照，不重新洗牌；问题文字与复现种子均已隐藏。'));
+      } else if (!payload.retained) {
+        $('trMeta').appendChild(node('p', 'text-sm text-muted mt-2', '本次未留痕：种子仅在当前页面内存中，刷新后无法复现，也不会生成分享链接。'));
+      }
+    }
+
+    function render(payload, options) {
+      var shared = !!(options && options.shared);
+      var wrapped = shared ? Tools.tarot.wrapShareResult(payload) : Tools.tarot.wrapResult(payload);
+      if (wrapped.status === 'error') {
+        $('tr-result').hidden = false;
+        showError(wrapped.errors.join('；'));
+        return;
+      }
+      var data = payload.result;
+      resetCardArea();
+      renderGuide($('trPlain'), data.plainGuide);
+      var questionLabel = shared ? '已隐藏' : (payload.retained ? data.question : state.question + '（未提交）');
+      $('trSeedNote').textContent = '问题：' + questionLabel + ' · ' + (data.spread === 1 ? '单张指引' : '三张牌阵') + ' · 牌池 ' + data.deckSize + ' 张 · ' + data.summary;
+      clear($('trCards'));
+      data.cards.forEach(function (card) { $('trCards').appendChild(renderCard(card)); });
+      $('trReading').textContent = data.reading;
+      clear($('trReadingList'));
+      data.readingList.forEach(function (text) { $('trReadingList').appendChild(node('li', '', text)); });
+      clear($('trActions'));
+      data.actionSteps.forEach(function (text) { $('trActions').appendChild(node('div', '', text)); });
+      clear($('trGuide'));
+      data.spreadGuide.forEach(function (text) { $('trGuide').appendChild(node('li', '', text)); });
+      renderMeta(wrapped, payload, options);
+      RV.renderExplanation($('trExplain'), wrapped);
+      if (!shared && payload.shareId) {
+        var url = shareLink(payload.shareId);
+        $('tr-share-url').value = url;
+        $('tr-share').hidden = !url;
+      }
+      $('tr-delete').hidden = !retained;
+      $('tr-result').hidden = false;
+      if (shared) {
+        status('分享结果读取成功；问题与种子已隐藏，删除留痕后链接会立即失效。');
+      } else if (payload.retained) {
+        status('抽牌完成，已按你的选择留痕；分享链接 24 小时内有效。');
+      } else {
+        status('抽牌完成，本次未留痕；问题文字未提交中台。');
+      }
+      if (window.U && window.U.track) window.U.track('calc_result', { tool: 'tarot', success: true, spread: data.spread, retained: !!(payload && payload.retained) });
+    }
+
+    function resetCardArea() {
+      $('tr-result').hidden = true;
+      [ 'trPlain', 'trSeedNote', 'trCards', 'trReading', 'trReadingList', 'trActions', 'trGuide', 'trMeta', 'trExplain' ].forEach(function (id) { clear($(id)); });
+    }
+
+    function acceptRetention(payload) {
+      if (!payload || payload.retained !== true) return;
+      if (!payload.id || !payload.deleteToken) throw new Error('留痕响应缺少删除凭证，请关闭页面后等待自动清理。');
+      retained = { id: payload.id, token: payload.deleteToken };
+      $('tr-delete').hidden = false;
+    }
+
+    function run(mode) {
+      if (state.shared) return;
+      var body;
+      if (pendingRetainBody) {
+        body = { ok: true, value: pendingRetainBody };
+      } else {
+        var nextMode = mode === 'reproduce' ? 'reproduce' : 'new';
+        if (nextMode === 'reproduce' && !state.seed) {
+          showError('当前没有可复现的种子，请先抽一次牌。');
+          return;
+        }
+        if (retained) {
+          showError('请先物理删除上一次留痕，再开始新的抽牌，避免丢失删除凭证。');
+          return;
+        }
+        resetResult();
+        syncQuestion();
+        var input = { spread: Number($('tr-spread').value), mode: nextMode, question: state.question };
+        if (nextMode === 'reproduce') input.seed = state.seed;
+        body = Tools.tarot.requestBody(input, $('tr-retain').checked);
+        if (!body.ok) { showError(body.errors.join('；')); return; }
+        if (body.value.retain) pendingRetainBody = body.value;
+      }
+      var expected = {
+        spread: body.value.input.spread,
+        mode: body.value.input.mode,
+        question: body.value.input.question,
+        seed: body.value.input.seed,
+        retain: body.value.retain === true,
+      };
+      var current = sequence;
+      if (currentController) currentController.abort();
+      currentController = new AbortController();
+      activeBody = body.value;
+      var controller = currentController;
+      var timer = setTimeout(function () { controller.abort(); }, 15000);
+      $('tr-submit').disabled = true;
+      $('tr-again').disabled = true;
+      $('tr-submit').textContent = pendingRetainBody ? '同步留痕中…' : '抽牌中…';
+      status(pendingRetainBody ? '正在确认上次留痕，请勿关闭页面…' : '正在安全洗牌，请稍候…');
+      API.post(API.endpoints.fortuneCalculate, body.value, { signal: controller.signal }).then(function (response) {
+        if (current !== sequence) return;
+        var payload = Tools.tarot.responsePayload(response, expected);
+        if (!payload) {
+          var message = response && String(response.code) === '0'
+            ? '抽牌数据不完整或与输入不一致，请稍后重试'
+            : (response && response.msg ? response.msg : '抽牌失败，请稍后重试');
+          var error = new Error(message);
+          error.business = true;
+          throw error;
+        }
+        acceptRetention(payload);
+        pendingRetainBody = null;
+        if (payload.result.draw) state.seed = payload.result.draw.seed || '';
+        try {
+          render(payload, { shared: false });
+        } catch (renderError) {
+          showError('抽牌展示失败，请重试。');
+        }
+      }).catch(function (error) {
+        if (current !== sequence) return;
+        if (body.value.retain && !retained) {
+          pendingRetainBody = body.value;
+          showError('留痕结果尚未确认。请保持页面并再次点击“重试同步留痕”，系统会复用同一请求，避免重复记录。');
+        } else if (error && error.business) {
+          showError(error.message);
+        } else {
+          showError(error && error.name === 'AbortError' ? '请求超时或已取消，请重试。' : '抽牌暂时无法完成，请检查网络后重试。');
+        }
+      }).finally(function () {
+        clearTimeout(timer);
+        if (current === sequence) {
+          currentController = null;
+          activeBody = null;
+          $('tr-submit').disabled = false;
+          $('tr-again').disabled = false;
+          $('tr-submit').textContent = pendingRetainBody ? '重试同步留痕' : (Number($('tr-spread').value) === 1 ? '抽一张' : '抽三张');
+        }
+      });
+    }
+
+    function copyShare() {
+      var input = $('tr-share-url');
+      if (!input.value) return;
+      input.focus();
+      input.select();
+      var done = function () { status('分享链接已复制到剪贴板。'); };
+      var fail = function () { status('无法自动复制，请手动复制已选中的分享链接。', true); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(done).catch(fail);
+      } else {
+        try {
+          if (document.execCommand('copy')) done(); else fail();
+        } catch (error) {
+          fail();
+        }
+      }
+    }
+
+    function loadShare(shareId) {
+      if (!Tools.tarot.shareUrl(shareId)) return false;
+      state.shared = true;
+      form.hidden = true;
+      hideError();
+      status('正在读取分享结果…');
+      API.get(API.endpoints.fortuneSharedTarot + encodeURIComponent(shareId)).then(function (response) {
+        var payload = Tools.tarot.sharePayload(response);
+        if (!payload) throw new Error(response && response.msg ? response.msg : '分享已过期、已删除或不存在');
+        try {
+          render(payload, { shared: true });
+        } catch (error) {
+          showError('分享结果展示失败，请稍后重试。');
+        }
+      }).catch(function (error) {
+        form.hidden = false;
+        state.shared = false;
+        showError(error && error.message ? error.message : '分享暂时无法读取，请稍后重试。');
+      });
+      return true;
+    }
+
+    PRESETS.forEach(function (question, index) {
+      var button = node('button', 'ft-quick' + (index === 0 ? ' is-active' : ''), question);
+      button.type = 'button';
+      button.setAttribute('data-q', question);
+      button.addEventListener('click', function () {
+        Array.prototype.forEach.call($('trPresets').children, function (item) { item.className = 'ft-quick'; });
+        button.className = 'ft-quick is-active';
+        $('tr-question-custom').value = '';
+        syncQuestion();
+        resetResult();
+      });
+      $('trPresets').appendChild(button);
+    });
+
+    $('trSpreads').addEventListener('click', function (event) {
+      var button = event.target.closest('[data-spread]');
+      if (!button) return;
+      Array.prototype.forEach.call($('trSpreads').children, function (item) { item.className = 'ft-quick'; });
+      button.className = 'ft-quick is-active';
+      $('tr-spread').value = button.getAttribute('data-spread');
+      $('tr-submit').textContent = $('tr-spread').value === '1' ? '抽一张' : '抽三张';
+      resetResult();
+    });
+
+    form.addEventListener('submit', function (event) { event.preventDefault(); run('new'); });
+    form.addEventListener('input', function () { if (currentController && activeBody && !activeBody.retain) resetResult(); });
+    $('tr-question-custom').addEventListener('input', function () {
+      Array.prototype.forEach.call($('trPresets').children, function (item) { item.className = 'ft-quick'; });
+      syncQuestion();
+    });
+    $('tr-again').addEventListener('click', function () { run('new'); });
+    $('tr-copy').addEventListener('click', copyShare);
+    $('tr-delete').addEventListener('click', function () {
+      if (!retained) return;
+      var record = retained;
+      var generation = sequence;
+      var controller = new AbortController();
+      deleteController = controller;
+      var timer = setTimeout(function () { controller.abort(); }, 15000);
+      $('tr-delete').disabled = true;
+      API.post(API.endpoints.fortuneDelete, record, { signal: controller.signal }).then(function (response) {
+        if (generation !== sequence || !retained || retained.id !== record.id) return;
+        if (!response || String(response.code) !== '0' || !response.data || response.data.deleted !== true) throw new Error((response && response.msg) || '删除失败');
+        retained = null;
+        pendingRetainBody = null;
+        $('tr-delete').hidden = true;
+        $('tr-share-url').value = '';
+        $('tr-share').hidden = true;
+        status('本次留痕已物理删除，分享链接同时失效。');
+      }).catch(function (error) {
+        if (generation !== sequence || !retained || retained.id !== record.id) return;
+        status(error && error.name === 'AbortError' ? '删除请求超时，请重试。' : (error && error.message ? error.message : '删除失败，请稍后重试。'), true);
+      }).finally(function () {
+        clearTimeout(timer);
+        if (deleteController === controller) deleteController = null;
+        if (generation === sequence) $('tr-delete').disabled = false;
+      });
+    });
+
+    var params = new URLSearchParams(window.location.search || '');
+    var shareId = params.get('share') || '';
+    if (shareId && loadShare(shareId)) return;
+    syncQuestion();
+    status('');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();

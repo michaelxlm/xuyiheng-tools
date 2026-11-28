@@ -1,0 +1,253 @@
+/* ==========================================================================
+   natal.js · 本命星盘请求契约、IANA/DST 输入边界与结果解释
+   计算由 main-api 内核负责；本模块不写任何出生信息到 URL 或浏览器存储。
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('../core/result'));
+  } else {
+    root.Tools = root.Tools || {};
+    root.Tools.natal = factory(root.ToolCore.Result);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (Result) {
+  'use strict';
+
+  var SOURCE = {
+    name: '近似开普勒轨道根数、低精度月轮与整宫制',
+    standard: '1800–2050 年；IANA 时区；行星为地心黄经近似，宫位为整宫制',
+    version: '2026.11-natal-p0',
+    verifiedAt: '2026-11-28',
+    limitations: [
+      '行星位置为近似算法，不是高精度星历',
+      '占星为传统文化娱乐内容，无科学预测依据',
+    ],
+  };
+
+  var SIGNS = [ '白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手', '摩羯', '水瓶', '双鱼' ];
+  var PRECISIONS = [ 'exact', 'approximate', 'unknown' ];
+  var TIMEZONE_FORMATTERS = {};
+
+  function isObject(value) { return value && typeof value === 'object' && !Array.isArray(value); }
+
+  function realDate(value) {
+    var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
+    if (!match) return null;
+    var y = Number(match[1]); var m = Number(match[2]); var d = Number(match[3]);
+    var date = new Date(Date.UTC(y, m - 1, d));
+    if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null;
+    return { y: y, m: m, d: d };
+  }
+
+  function validTimezone(value) {
+    var timezone = String(value || '');
+    if (!timezone) return false;
+    if (TIMEZONE_FORMATTERS[timezone]) return true;
+    try {
+      TIMEZONE_FORMATTERS[timezone] = new Intl.DateTimeFormat('en-US', { timeZone: timezone });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function numberValue(value) {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string' && value.trim() !== '') return Number(value);
+    return NaN;
+  }
+
+  function timeValue(value) {
+    var match = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(String(value || ''));
+    if (!match || Number(match[1]) > 23 || Number(match[2]) > 59 || Number(match[3] || 0) > 59) return '';
+    return match[1] + ':' + match[2] + (match[3] ? ':' + match[3] : '');
+  }
+
+  function newRequestId() {
+    var cryptoApi = typeof globalThis !== 'undefined' ? globalThis.crypto : null;
+    if (!cryptoApi) return '';
+    if (cryptoApi.randomUUID) return cryptoApi.randomUUID();
+    var bytes = new Uint8Array(16);
+    cryptoApi.getRandomValues(bytes);
+    return Array.from(bytes).map(function (value) { return value.toString(16).padStart(2, '0'); }).join('');
+  }
+
+  function normalize(input) {
+    var o = input || {};
+    var errors = [];
+    var value = {
+      date: String(o.date || '').trim(),
+      timePrecision: String(o.timePrecision || 'exact'),
+      timezone: String(o.timezone || '').trim(),
+      occurrence: String(o.occurrence || '').trim(),
+    };
+    var date = realDate(value.date);
+    if (!date || date.y < 1800 || date.y > 2050) errors.push('请选择 1800–2050 年之间的有效出生日期');
+    if (PRECISIONS.indexOf(value.timePrecision) < 0) errors.push('请选择有效的时间精确度');
+    if (!validTimezone(value.timezone)) errors.push('请选择有效的 IANA 时区');
+    value.lat = numberValue(o.lat);
+    value.lon = numberValue(o.lon);
+    if (!Number.isFinite(value.lat) || value.lat < -90 || value.lat > 90) errors.push('纬度需在 -90–90 之间');
+    if (!Number.isFinite(value.lon) || value.lon < -180 || value.lon > 180) errors.push('经度需在 -180–180 之间');
+    if (value.timePrecision !== 'unknown') {
+      value.time = timeValue(o.time);
+      if (!value.time) errors.push('请填写有效的出生时间 HH:mm');
+      if (value.occurrence && [ 'first', 'second' ].indexOf(value.occurrence) < 0) errors.push('重复时间需选择第一次或第二次');
+    } else {
+      delete value.time;
+      delete value.occurrence;
+    }
+    return { ok: errors.length === 0, errors: errors, value: value };
+  }
+
+  function requestBody(input, retain) {
+    var normalized = normalize(input);
+    if (!normalized.ok) return normalized;
+    var body = { tool: 'natal', input: normalized.value, retain: retain === true };
+    if (body.retain) body.requestId = newRequestId();
+    return { ok: true, value: body };
+  }
+
+  function completePlanet(planet, timeKnown) {
+    if (!isObject(planet)) return false;
+    if (typeof planet.key !== 'string' || typeof planet.name !== 'string' || typeof planet.glyph !== 'string') return false;
+    if (typeof planet.sign !== 'string' || !Number.isFinite(planet.longitude) || !Number.isFinite(planet.degree)) return false;
+    if (!Number.isFinite(planet.speed) || typeof planet.retrograde !== 'boolean') return false;
+    if (timeKnown && (!Number.isInteger(planet.house) || planet.house < 1 || planet.house > 12)) return false;
+    if (!timeKnown && planet.house !== null && planet.house !== undefined) return false;
+    return true;
+  }
+
+  function completeResult(data) {
+    if (!isObject(data)) return false;
+    if (typeof data.sun !== 'string' || typeof data.moon !== 'string') return false;
+    if (typeof data.rising !== 'string' || typeof data.midheaven !== 'string') return false;
+    if (!isObject(data.timeResolution) || !isObject(data.calculation)) return false;
+    if (data.calculation.houseSystem !== 'whole-sign' || data.calculation.highPrecision !== false) return false;
+    var status = data.timeResolution.status;
+    if ([ 'resolved', 'unknown' ].indexOf(status) < 0) return false;
+    if (typeof data.timeResolution.timezone !== 'string' || !validTimezone(data.timeResolution.timezone)) return false;
+    var timeKnown = status !== 'unknown';
+    if (timeKnown && (!Number.isFinite(data.asc) || !Number.isFinite(data.mc))) return false;
+    if (!Array.isArray(data.planets) || data.planets.length < 10) return false;
+    if (!data.planets.every(function (planet) { return completePlanet(planet, timeKnown); })) return false;
+    if (!Array.isArray(data.aspects) || !Array.isArray(data.aspectDetail)) return false;
+    if (!Array.isArray(data.houses)) return false;
+    if (timeKnown && data.houses.length !== 12) return false;
+    if (!timeKnown && data.houses.length !== 0) return false;
+    if (!isObject(data.elements) || !isObject(data.modalities) || !isObject(data.aspectStats)) return false;
+    if (!isObject(data.moonPhase) || typeof data.moonPhase.name !== 'string' || !Number.isFinite(data.moonPhase.angle)) return false;
+    if (!Number.isFinite(data.moonPhase.illum) || typeof data.moonPhase.sentence !== 'string') return false;
+    if (!Array.isArray(data.rulers) || !Array.isArray(data.planetNotes) || !Array.isArray(data.emptyHouses)) return false;
+    if (!Array.isArray(data.retrogrades) || !Array.isArray(data.reading)) return false;
+    return data.reading.length > 0;
+  }
+
+  function responsePayload(response, expected) {
+    if (!response || String(response.code) !== '0' || !response.data || !completeResult(response.data.result)) return null;
+    if (!expected) return response.data;
+    var normalized = normalize(expected);
+    if (!normalized.ok) return null;
+    var result = response.data.result;
+    var input = response.data.input || {};
+    if (String(input.date || '') !== normalized.value.date) return null;
+    if (String(input.timezone || '') !== normalized.value.timezone) return null;
+    if (Math.abs(Number(input.lat) - normalized.value.lat) > 1e-9) return null;
+    if (Math.abs(Number(input.lon) - normalized.value.lon) > 1e-9) return null;
+    if (result.timeResolution.inputPrecision !== normalized.value.timePrecision) return null;
+    if (result.timeResolution.timezone !== normalized.value.timezone) return null;
+    if (normalized.value.timePrecision !== 'unknown') {
+      if (result.timeResolution.status !== 'resolved') return null;
+      if (String(result.timeResolution.localDateTime || '').indexOf(normalized.value.date + 'T' + normalized.value.time) !== 0) return null;
+      if (normalized.value.occurrence && result.timeResolution.occurrence !== normalized.value.occurrence) return null;
+    } else if (result.timeResolution.status !== 'unknown') {
+      return null;
+    }
+    return response.data;
+  }
+
+  function dstFailure(response) {
+    if (!response || String(response.code) === '0') return null;
+    var data = response.data || {};
+    var code = String(data.errorCode || '');
+    if (code !== 'NATAL_DST_GAP' && code !== 'NATAL_DST_FOLD') return null;
+    var details = isObject(data.details) ? data.details : {};
+    return {
+      code: code,
+      message: response.msg || (code === 'NATAL_DST_GAP' ? '该当地时间在夏令时切换中不存在' : '该当地时间出现两次'),
+      timezone: String(details.timezone || ''),
+      localDateTime: String(details.localDateTime || ''),
+      candidates: Array.isArray(details.candidates) ? details.candidates : [],
+    };
+  }
+
+  function wrapResult(payload) {
+    var data = payload && payload.result ? payload.result : payload;
+    if (!completeResult(data)) {
+      return Result.create('natal', {
+        status: 'error',
+        errors: ['服务端返回的星盘数据不完整'],
+        source: SOURCE,
+        limitations: ['未展示不完整结果'],
+      });
+    }
+    var resolution = data.timeResolution;
+    var timeKnown = resolution.status !== 'unknown';
+    var limitations = [
+      '占星无科学依据，仅供文化娱乐与自我观察，不用于医疗、投资或择业等决策。',
+      '行星黄经为近似算法，临界度数可能因出生时间误差或算法简化落入相邻星座。',
+    ];
+    if (!timeKnown) limitations.push('出生时间未知，本次不生成上升、天顶与宫位；月亮位置按当地正午锚点计算，仅供参考。');
+    else if (resolution.inputPrecision === 'approximate') limitations.push('时间精确度为“大致”，上升与宫位的置信度为中等，建议核对出生证明。');
+    if (resolution.occurrence) limitations.push('该当地时间处于夏令时重复时段，已按你选择的“' + (resolution.occurrence === 'second' ? '第二次' : '第一次') + '”解析。');
+    return Result.create('natal', {
+      metrics: {
+        sun: data.sun,
+        moon: data.moon,
+        rising: data.rising,
+        midheaven: data.midheaven,
+        retrogradeCount: data.retrogrades.length,
+        timeStatus: resolution.status,
+        retained: !!(payload && payload.retained),
+      },
+      details: [
+        Result.detail('出生日期', data.timeResolution.localDateTime ? String(data.timeResolution.localDateTime).slice(0, 10) : '未提供'),
+        Result.detail('时间精确度', resolution.inputPrecision === 'unknown' ? '未知' : (resolution.inputPrecision === 'approximate' ? '大致' : '精确到分钟')),
+        Result.detail('时区', resolution.timezone),
+        Result.detail('当地时间', resolution.localDateTime || '未提供（时间未知）'),
+        Result.detail('UTC 时刻', resolution.utcDateTime || '未解析'),
+        Result.detail('UTC 偏移', resolution.offsetLabel || '未解析'),
+        Result.detail('宫制', data.calculation.houseSystem === 'whole-sign' ? '整宫制' : data.calculation.houseSystem),
+        Result.detail('引擎版本', data.calculation.engineVersion || '未提供'),
+        Result.detail('结果生成时间', payload && payload.generatedAt ? payload.generatedAt : '未提供'),
+      ],
+      formula: '行星采用 JPL 近似开普勒轨道根数计算地心黄经，月亮采用低精度级数；上升与天顶由当地恒星时与纬度推算；宫位采用整宫制，相位按前七颗行星角距与容限判定。当地时间先按 IANA 时区规则解析为 UTC，再参与计算。',
+      assumptions: [
+        '出生时间按所选 IANA 时区的当地时间解释',
+        '时间未知时使用当地正午作为仅用于日期级行星位置的计算锚点',
+        '上升与宫位依赖出生时间与地点，时间误差会直接改变结果',
+      ],
+      source: SOURCE,
+      precision: {
+        time: timeKnown ? 'minute' : 'unknown',
+        ephemeris: 'approximate',
+        houseSystem: 'whole-sign',
+      },
+      limitations: limitations.concat(SOURCE.limitations),
+    });
+  }
+
+  return {
+    source: SOURCE,
+    signs: SIGNS.slice(),
+    precisions: PRECISIONS.slice(),
+    realDate: realDate,
+    validTimezone: validTimezone,
+    normalize: normalize,
+    requestBody: requestBody,
+    completeResult: completeResult,
+    responsePayload: responsePayload,
+    dstFailure: dstFailure,
+    wrapResult: wrapResult,
+  };
+});

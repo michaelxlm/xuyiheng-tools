@@ -46,6 +46,9 @@ function run(options) {
     for (const field of ['computationMode', 'resultVersion', 'mobileLayout']) {
       if (!tool[field]) errors.push(tool.id + ' 缺少注册属性：' + field);
     }
+    // 离线标记必须是显式布尔（不能靠「非空即真」）；与判据的一致性由
+    // check-build-artifacts → build-offline-manifest.verify() 单点核对，避免规则两处漂移。
+    if (typeof tool.offlineEligible !== 'boolean') errors.push(tool.id + ' 缺少注册属性：offlineEligible（布尔）');
     if (!Array.isArray(tool.sensitiveFields) || !Array.isArray(tool.analyticsAllowlist)) errors.push(tool.id + ' 的敏感字段或事件白名单不是数组');
   }
   if ((registry.tools || []).length !== 45) errors.push('独立工具注册数必须为 45（不含 combo/index 汇总页）');

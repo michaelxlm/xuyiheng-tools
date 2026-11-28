@@ -1,230 +1,149 @@
-        <section class="page-heading">
-          <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
-          <p>不懂占星也能看：填写出生日期、时间与城市后，先读结果顶部的白话导读。我们会把太阳、月亮、上升和相位翻译成日常语言，再保留星盘、行星与宫位明细；时区和经纬度会自动带出。占星无科学依据，仅供文化娱乐与自我观察。</p>
-        </section>
+<section class="page-heading">
+  <h1>本命星盘 · 太阳月亮上升与十星宫位</h1>
+  <p>填写出生日期、时间与地点后主动排盘。结果先用白话说明太阳、月亮、上升和主要相位，再展示星盘轮、行星与宫位明细；时区按 IANA 规则解析，夏令时跳时或重复会明确提示。占星无科学依据，仅供文化娱乐与自我观察。</p>
+</section>
 
-        <form class="card" id="ntForm">
-          <div class="ft-form-grid ft-grid-3">
-            <div class="form-group">
-              <label class="form-label" for="nt-date">出生日期</label>
-              <input class="form-input" id="nt-date" type="date" min="1800-01-01" max="2050-12-31" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="nt-time">出生时间（当地）</label>
-              <input class="form-input" id="nt-time" type="time" value="12:00" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="nt-city">出生城市</label>
-              <select class="form-select" id="nt-city">
-                <option value="39.9,116.4,8" selected>北京</option>
-                <option value="31.2,121.5,8">上海</option>
-                <option value="23.1,113.3,8">广州</option>
-                <option value="22.5,114.1,8">深圳</option>
-                <option value="30.7,104.1,8">成都</option>
-                <option value="22.3,114.2,8">香港</option>
-                <option value="25.0,121.6,8">台北</option>
-                <option value="35.7,139.7,9">东京</option>
-                <option value="51.5,-0.1,0">伦敦</option>
-                <option value="40.7,-74.0,-5">纽约</option>
-              </select>
-            </div>
-          </div>
-          <details class="ft-advanced"><summary>出生地不在列表？手动设置时区与经纬度</summary>
-            <div class="ft-form-grid">
-              <div class="form-group">
-                <label class="form-label" for="nt-tz">时区</label>
-                <select class="form-select" id="nt-tz">
-                  <option value="8" selected>UTC+8 中国</option>
-                  <option value="9">UTC+9 日本</option>
-                  <option value="7">UTC+7 东南亚</option>
-                  <option value="5.5">UTC+5:30 印度</option>
-                  <option value="0">UTC+0 伦敦</option>
-                  <option value="-5">UTC-5 纽约</option>
-                  <option value="-8">UTC-8 洛杉矶</option>
-                  <option value="10">UTC+10 悉尼</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="nt-lat">纬度（北正南负）</label>
-                <input class="form-input" id="nt-lat" type="number" step="0.1" min="-90" max="90" value="39.9">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="nt-lon">经度（东正西负）</label>
-                <input class="form-input" id="nt-lon" type="number" step="0.1" min="-180" max="180" value="116.4">
-              </div>
-            </div>
-          </details>
-          <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>一键生成</button>
-          </div>
-          <p class="text-sm text-muted mt-3">时间与城市已预填；选城市会自动带入时区与经纬度。时间越准确，上升和月亮位置越可靠；若完全不确定，可先用默认 12:00 看概览。</p>
-          <p class="ft-disclaimer">占星无科学依据，星盘仅为娱乐与文化内容，请勿用于医疗、投资或择业等决策。提交即表示同意中台处理本次出生资料用于测算与留痕。</p>
-        </form>
+<form class="card" id="ntForm" novalidate>
+  <div class="ft-form-grid ft-grid-3">
+    <div class="form-group">
+      <label class="form-label" for="nt-date">出生日期</label>
+      <input class="form-input" id="nt-date" type="date" min="1800-01-01" max="2050-12-31" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="nt-precision">时间精确度</label>
+      <select class="form-select" id="nt-precision">
+        <option value="exact">精确到分钟</option>
+        <option value="approximate">大约时间（低置信度）</option>
+        <option value="unknown">出生时间未知</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="nt-time">出生时间（当地）</label>
+      <input class="form-input" id="nt-time" type="time" value="12:00" step="60">
+    </div>
+    <div class="form-group" id="nt-occurrence-group" hidden>
+      <label class="form-label" for="nt-occurrence">夏令时重复时间</label>
+      <select class="form-select" id="nt-occurrence">
+        <option value="">请选择第一次或第二次</option>
+        <option value="first">第一次（夏令时生效前）</option>
+        <option value="second">第二次（夏令时生效后）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="nt-city">出生城市</label>
+      <select class="form-select" id="nt-city">
+        <option value="Asia/Shanghai" data-lat="39.9" data-lon="116.4" selected>北京</option>
+        <option value="Asia/Shanghai" data-lat="31.2" data-lon="121.5">上海</option>
+        <option value="Asia/Shanghai" data-lat="23.1" data-lon="113.3">广州</option>
+        <option value="Asia/Shanghai" data-lat="22.5" data-lon="114.1">深圳</option>
+        <option value="Asia/Shanghai" data-lat="30.7" data-lon="104.1">成都</option>
+        <option value="Asia/Hong_Kong" data-lat="22.3" data-lon="114.2">香港</option>
+        <option value="Asia/Taipei" data-lat="25.0" data-lon="121.6">台北</option>
+        <option value="Asia/Tokyo" data-lat="35.7" data-lon="139.7">东京</option>
+        <option value="Europe/London" data-lat="51.5" data-lon="-0.1">伦敦</option>
+        <option value="America/New_York" data-lat="40.7" data-lon="-74.0">纽约</option>
+        <option value="America/Los_Angeles" data-lat="34.1" data-lon="-118.2">洛杉矶</option>
+        <option value="Australia/Sydney" data-lat="-33.9" data-lon="151.2">悉尼</option>
+      </select>
+    </div>
+  </div>
+  <details class="ft-advanced"><summary>出生地不在列表？手动设置 IANA 时区与经纬度</summary>
+    <div class="ft-form-grid">
+      <div class="form-group">
+        <label class="form-label" for="nt-tz">IANA 时区</label>
+        <select class="form-select" id="nt-tz">
+          <option value="Asia/Shanghai" selected>Asia/Shanghai（中国标准时间）</option>
+          <option value="Asia/Hong_Kong">Asia/Hong_Kong</option>
+          <option value="Asia/Taipei">Asia/Taipei</option>
+          <option value="Asia/Tokyo">Asia/Tokyo</option>
+          <option value="Asia/Seoul">Asia/Seoul</option>
+          <option value="Asia/Singapore">Asia/Singapore</option>
+          <option value="Asia/Bangkok">Asia/Bangkok</option>
+          <option value="Asia/Kolkata">Asia/Kolkata</option>
+          <option value="Asia/Dubai">Asia/Dubai</option>
+          <option value="Europe/London">Europe/London</option>
+          <option value="Europe/Paris">Europe/Paris</option>
+          <option value="Europe/Moscow">Europe/Moscow</option>
+          <option value="America/New_York">America/New_York</option>
+          <option value="America/Chicago">America/Chicago</option>
+          <option value="America/Denver">America/Denver</option>
+          <option value="America/Los_Angeles">America/Los_Angeles</option>
+          <option value="America/Sao_Paulo">America/Sao_Paulo</option>
+          <option value="Australia/Sydney">Australia/Sydney</option>
+          <option value="Pacific/Auckland">Pacific/Auckland</option>
+          <option value="UTC">UTC</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="nt-lat">纬度（北正南负）</label>
+        <input class="form-input" id="nt-lat" type="number" step="0.1" min="-90" max="90" value="39.9">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="nt-lon">经度（东正西负）</label>
+        <input class="form-input" id="nt-lon" type="number" step="0.1" min="-180" max="180" value="116.4">
+      </div>
+    </div>
+  </details>
+  <label class="checkbox-label mt-3" for="nt-retain">
+    <input id="nt-retain" type="checkbox">
+    <span>我了解出生信息属于敏感数据，同意本次测算在服务端留痕，最长保留 24 小时，并理解关闭页面后删除凭证不会保留。</span>
+  </label>
+  <div class="btn-row mt-3">
+    <button class="btn btn-primary" id="nt-submit" type="submit" data-track="calc_click" data-track-props='{"tool":"natal"}'>一键排盘</button>
+    <button class="btn btn-outline" id="nt-delete" type="button" hidden>物理删除本次留痕</button>
+  </div>
+  <p class="text-sm text-muted mt-3">默认不留痕：出生日期、时间、时区与经纬度仅用于本次计算，不写入 URL、浏览器存储或分析事件。出生时间未知时不生成上升、天顶与宫位；时间越准确，四轴越可靠。</p>
+  <p class="ft-disclaimer">占星无科学依据，星盘仅为文化娱乐内容，请勿用于医疗、投资或择业等决策。</p>
+  <p class="form-error" id="nt-error" role="alert" hidden></p>
+  <p class="text-sm mt-2" id="nt-status" role="status" aria-live="polite" hidden></p>
+  <div id="nt-candidates" hidden>
+    <h3 class="ft-section-title">当地时间边界</h3>
+    <div id="ntCandidates"></div>
+  </div>
+</form>
 
-        <div class="result-box" id="ntResult" hidden>
-          <div id="ntPlain" aria-live="polite"></div>
-          <div class="ft-trio" id="ntTrio"></div>
-          <div class="ft-natal-grid mt-4">
-            <div id="ntWheel"></div>
-            <div>
-              <h3>行星位置</h3>
-              <table class="ft-planet-table">
-                <thead><tr><th>星体</th><th>星座</th><th>度数</th><th>宫位</th><th>运动</th></tr></thead>
-                <tbody id="ntPlanets"></tbody>
-              </table>
-              <p class="text-sm text-muted mt-3" id="ntNote"></p>
-            </div>
-          </div>
-          <h3 class="ft-section-title">月相与逆行</h3>
-          <div id="ntSky"></div>
-          <h3 class="ft-section-title">行星守护（宫主星）</h3>
-          <div id="ntRulers"></div>
-          <h3 class="ft-section-title">元素与模态分布</h3>
-          <div id="ntDist"></div>
-          <h3 class="ft-section-title">主要相位明细</h3>
-          <div id="ntAspects"></div>
-          <div class="mt-3" id="ntAspectStats"></div>
-          <div class="mt-2" id="ntEmpty"></div>
-          <h3 class="ft-section-title">行星关键词</h3>
-          <div class="ft-kv-grid" id="ntNotes"></div>
-          <h3 class="ft-section-title">十二宫落星</h3>
-          <div id="ntHouses"></div>
-          <h3 class="ft-section-title">星盘解读</h3>
-          <ul class="ft-note-list" id="ntReading"></ul>
-        </div>
+<div class="result-box" id="nt-result" hidden>
+  <div id="ntPlain" aria-live="polite"></div>
+  <div class="ft-trio" id="ntTrio"></div>
+  <dl class="result-detail mt-3" id="nt-detail"></dl>
+  <div class="ft-natal-grid mt-4">
+    <div id="ntWheel"></div>
+    <div>
+      <h3>行星位置</h3>
+      <div id="ntPlanets"></div>
+      <p class="text-sm text-muted mt-3" id="ntNote"></p>
+    </div>
+  </div>
+  <h3 class="ft-section-title">月相与逆行</h3>
+  <div id="ntSky"></div>
+  <h3 class="ft-section-title">行星守护（宫主星）</h3>
+  <div id="ntRulers"></div>
+  <h3 class="ft-section-title">元素与模态分布</h3>
+  <div id="ntDist"></div>
+  <h3 class="ft-section-title">主要相位明细</h3>
+  <div id="ntAspects"></div>
+  <div class="mt-3" id="ntAspectStats"></div>
+  <div class="mt-2" id="ntEmpty"></div>
+  <h3 class="ft-section-title">行星关键词</h3>
+  <div class="ft-kv-grid" id="ntNotes"></div>
+  <h3 class="ft-section-title">十二宫落星</h3>
+  <div id="ntHouses"></div>
+  <h3 class="ft-section-title">星盘解读</h3>
+  <ul class="ft-note-list" id="ntReading"></ul>
+  <h3 class="ft-section-title">计算口径与限制</h3>
+  <div id="ntExplain"></div>
+</div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先核对出生时间，再从太阳、月亮、上升建立整体印象，接着看行星落在哪些宫位，最后读相位与空宫。下面的 JPL 轨道、恒星时和整宫制是计算口径，供专业用户复核，不需要背。出生时间误差 15 分钟约影响上升 1°。</div></div>
-
-        <script>
-        (function () {
-          function boot() {
-            var F = window.FortuneAPI; if (!F) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
-            function bars(o) {
-              var max = Math.max.apply(null, Object.values(o)) || 1;
-              return Object.keys(o).map(function (k) {
-                return '<div class="ft-wx-row"><span>' + esc(k) + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
-                  Math.round(o[k] / max * 100) + '%"></span></span><span class="ft-wx-num">' + o[k] + '</span></div>';
-              }).join('');
-            }
-            var dateInput = $('nt-date');
-            F.fillToday(dateInput);
-            $('nt-city').addEventListener('change', function () {
-              var p = this.value.split(',');
-              $('nt-lat').value = p[0]; $('nt-lon').value = p[1]; $('nt-tz').value = p[2];
-            });
-            function point(theta, r) {
-              var a = theta * Math.PI / 180;
-              return [200 + r * Math.cos(a), 200 - r * Math.sin(a)];
-            }
-            function drawWheel(n) {
-              var s = '<svg class="ft-wheel" viewBox="0 0 400 400" role="img" aria-label="本命星盘轮盘">';
-              var c = 'var(--color-border)', ink = 'var(--color-text)', mute = 'var(--color-muted)';
-              var ascIdx = Math.max(0, F.SIGNS.indexOf(n.rising));
-              s += '<circle cx="200" cy="200" r="160" fill="none" stroke="' + c + '" stroke-width="1.5"></circle>';
-              s += '<circle cx="200" cy="200" r="112" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
-              s += '<circle cx="200" cy="200" r="56" fill="none" stroke="' + c + '" stroke-width="1"></circle>';
-              for (var k = 0; k < 12; k++) {
-                var edge = point(180 + k * 30, 160), inner = point(180 + k * 30, 56);
-                s += '<line x1="' + edge[0].toFixed(1) + '" y1="' + edge[1].toFixed(1) + '" x2="' + inner[0].toFixed(1) + '" y2="' + inner[1].toFixed(1) + '" stroke="' + c + '" stroke-width="1"></line>';
-                var mid = point(180 + k * 30 + 15, 138);
-                s += '<text x="' + mid[0].toFixed(1) + '" y="' + mid[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="' + mute + '">' +
-                  esc(F.SIGNS[(ascIdx + k) % 12]) + '</text>';
-              }
-              n.planets.forEach(function (p, i) {
-                var theta = 180 + p.longitude - n.asc;
-                var rr = i < 2 ? 92 : (i < 5 ? 132 : 84);
-                var q = point(theta, rr);
-                s += '<text x="' + q[0].toFixed(1) + '" y="' + q[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="20" fill="var(--cat-fortune-ink)">' + esc(p.glyph) + '</text>';
-                var deg = point(theta, rr - 18);
-                s += '<text x="' + deg[0].toFixed(1) + '" y="' + deg[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="' + mute + '">' + p.degree + '°</text>';
-              });
-              var a1 = point(180, 172), a2 = point(180, 148);
-              s += '<line x1="' + a1[0].toFixed(1) + '" y1="' + a1[1].toFixed(1) + '" x2="' + a2[0].toFixed(1) + '" y2="' + a2[1].toFixed(1) + '" stroke="var(--color-primary)" stroke-width="2"></line>';
-              s += '<text x="' + a1[0].toFixed(1) + '" y="' + (a1[1] - 12).toFixed(1) + '" text-anchor="middle" font-size="12" fill="var(--color-primary)">ASC</text>';
-              var mt = point(180 + n.mc - n.asc, 172);
-              s += '<text x="' + mt[0].toFixed(1) + '" y="' + mt[1].toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="var(--color-primary)">MC</text>';
-              s += '<text x="200" y="196" text-anchor="middle" font-size="12" fill="' + ink + '">本命盘</text>';
-              s += '<text x="200" y="214" text-anchor="middle" font-size="10" fill="' + mute + '">整宫制</text></svg>';
-              return s;
-            }
-            $('ntForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var p = (dateInput.value || '').split('-'), t = ($('nt-time').value || '12:00').split(':');
-              if (p.length !== 3 || t.length !== 2) { alert('请填写出生日期与时间'); return; }
-              var lat = Number($('nt-lat').value), lon = Number($('nt-lon').value);
-              if (!isFinite(lat) || !isFinite(lon)) { alert('请填写有效的经纬度'); return; }
-              F.run($('ntForm').querySelector('button[type=submit]'), 'natal', {
-                date: dateInput.value,
-                time: $('nt-time').value,
-                tz: Number($('nt-tz').value),
-                lat: lat,
-                lon: lon
-              }).then(function (n) {
-                F.renderPlainGuide($('ntPlain'), n.plainGuide);
-                $('ntTrio').innerHTML = [
-                  ['☉ 太阳', n.sun], ['☽ 月亮', n.moon], ['MC 天顶', n.midheaven], ['ASC 上升', n.rising]
-                ].map(function (x) { return '<div class="ft-trio-item"><span>' + x[0] + '</span><strong>' + esc(x[1]) + '</strong></div>'; }).join('');
-                $('ntWheel').innerHTML = drawWheel(n);
-                $('ntPlanets').innerHTML = n.planets.map(function (p) {
-                  return '<tr><td><span class="ft-planet-glyph">' + esc(p.glyph) + '</span>' + esc(p.name) + '</td><td>' + esc(p.sign) +
-                    '</td><td>' + p.degree + '°</td><td>第 ' + p.house + ' 宫</td><td>' +
-                    (p.retrograde ? '<strong>℞ 逆行</strong> ' : '') + '<span class="text-muted">' + p.speed + '°/日</span></td></tr>';
-                }).join('');
-                $('ntSky').innerHTML = '<div class="ft-kv-grid">' +
-                  kv('出生日月相 · ' + n.moonPhase.name, '日月黄经差 ' + n.moonPhase.angle + '°，月面照亮约 ' + n.moonPhase.illum + '%') +
-                  kv('逆行星体（前七星）', n.retrogrades.length ? n.retrogrades.join('、') : '无，均顺行') + '</div>' +
-                  '<p class="text-sm text-muted mt-2">' + esc(n.moonPhase.sentence) + '</p>';
-                $('ntRulers').innerHTML = '<table class="ft-ref-table"><thead><tr><th>行星</th><th>守护星座（现代）</th><th>传统守护</th></tr></thead><tbody>' +
-                  n.rulers.map(function (r) {
-                    return '<tr><td>' + esc(r.planet) + '</td><td>' + esc(r.rules) + '</td><td>' + esc(r.rulesTrad || '—') + '</td></tr>';
-                  }).join('') + '</tbody></table>';
-                $('ntDist').innerHTML = '<strong>元素</strong>' + bars(n.elements) + '<div class="mt-3"><strong>模态</strong>' + bars(n.modalities) + '</div>';
-                $('ntAspects').innerHTML = n.aspectDetail.length
-                  ? '<table class="ft-ref-table"><thead><tr><th>星体</th><th>相位</th><th>容差</th><th>说明</th></tr></thead><tbody>' +
-                    n.aspectDetail.slice(0, 10).map(function (a) {
-                      return '<tr><td>' + esc(a.a + ' · ' + a.b) + '</td><td>' + esc(a.type) +
-                        '</td><td>' + a.orb + '°</td><td>' + esc(a.note) + '</td></tr>';
-                    }).join('') + '</tbody></table>'
-                  : '<p class="text-sm text-muted">前七颗星之间无显著相位。</p>';
-                $('ntAspectStats').innerHTML = '<span class="text-sm text-muted">相位统计：</span>' +
-                  Object.keys(n.aspectStats).map(function (k) {
-                    return '<span class="ft-chip">' + esc(k) + ' ' + n.aspectStats[k] + ' 组</span>';
-                  }).join(' ');
-                $('ntEmpty').innerHTML = '<span class="text-sm text-muted">空宫：</span>' +
-                  (n.emptyHouses.length ? n.emptyHouses.map(function (h) {
-                    return '<span class="ft-chip">第 ' + h + ' 宫</span>';
-                  }).join(' ') : '<span class="ft-chip">无</span>');
-                $('ntNotes').innerHTML = n.planetNotes.map(function (p) {
-                  return kv(p.glyph + ' ' + p.name, p.sign + ' · 第' + p.house + '宫' + (p.retrograde ? ' · ℞逆行' : '') + ' · ' + p.note);
-                }).join('');
-                $('ntHouses').innerHTML = '<table class="ft-ref-table"><thead><tr><th>宫位</th><th>星座</th><th>落星</th><th>主题</th><th>宫主星</th></tr></thead><tbody>' +
-                  n.houses.map(function (h) {
-                    return '<tr><td>第 ' + h.house + ' 宫</td><td>' + esc(h.sign) + '</td><td>' +
-                      (h.planets.length ? esc(h.planets.join('、')) : '<span class="text-muted">空宫</span>') +
-                      '</td><td class="text-sm">' + esc(h.topic) + '</td><td class="text-sm">' + esc(h.ruler) + '（落第' + h.rulerHouse + '宫 · ' + esc(h.rulerSign) + '）</td></tr>';
-                  }).join('') + '</tbody></table>';
-                $('ntReading').innerHTML = n.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('ntNote').textContent = '天顶落在' + n.midheaven + '座；上升 ' + n.asc.toFixed(1) + '°。行星度数按地心黄经取整，临界度数与出生时间误差都可能改变星座归属。';
-                $('ntResult').hidden = false;
-                if (window.U && U.track) U.track('calc_result', { tool: 'natal' });
-              }).catch(function (err) { alert('生成星盘失败：' + (err && err.message ? err.message : '请稍后重试')); });
-            });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+<div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先核对出生时间与地点，再从太阳、月亮、上升建立整体印象，接着看行星落在哪些宫位，最后读相位与空宫。轮盘与表格是计算明细，供复核，不需要背。出生时间误差 15 分钟约影响上升 1°；完全不确定时间时，先补资料再判断上升与宫位。</div></div>
 
 <section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>星盘把出生时刻的天体位置画成一张象征地图：行星代表不同主题，宫位代表生活领域，相位代表主题之间的互动。本页先给通俗解读，再保留天文位置与完整表格，帮助你理解符号，而不是给自己或别人贴标签。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details><summary>为什么需要精确出生时间？</summary><p>上升星座约每两小时换一个，时间偏差会直接改变第一宫与行星宫位；不确定时可用整点近似，但结果仅作概览。</p></details>
-          <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动填入时区与大致经纬度；若出生地不在列表，可展开「手动设置」填写当地经纬度与时区。</p></details>
-          <details><summary>行星度数会随时间变化吗？</summary><p>会。月亮每天约行 13°，因此出生时间对月亮影响明显；外行星变化很慢，日期准确即可。</p></details>
-          <details><summary>第一次看星盘，要先看什么？</summary><p>先看白话导读中的太阳、月亮、上升，再看落星较多的宫位，最后看相位。不要只用一个太阳星座定义自己，也不需要一次记住所有术语。</p></details>
-          <details><summary>刑、冲、逆行和空宫代表坏运气吗？</summary><p>不代表。刑冲描述主题之间的张力，逆行是视运动现象，空宫只是没有行星直接落入。它们都不是吉凶判定，也不能预测具体事件。</p></details>
-          <details><summary>为什么显示「整宫制」？</summary><p>整宫制把每个星座整体作为一个宫位，上升所在星座即第一宫，规则简单、便于阅读；其他分宫制会给出不同宫位边界。</p></details>
-        </section>
+  <h2>关于本工具</h2>
+  <p>星盘把出生时刻的天体位置画成一张象征地图：行星代表不同主题，宫位代表生活领域，相位代表主题之间的互动。本页先给通俗解读，再保留天文位置与完整表格，帮助你理解符号，而不是给自己或别人贴标签。</p>
+  <h2 style="margin-top:1.5em">常见问题</h2>
+  <details><summary>为什么需要精确出生时间？</summary><p>上升星座约每两小时换一个，时间偏差会直接改变第一宫与行星宫位。时间不确定时可选“大约时间”降低置信度标注，或选“出生时间未知”只排日期级行星，不生成上升与宫位。</p></details>
+  <details><summary>时区和夏令时怎么处理？</summary><p>本页要求 IANA 时区（例如 Asia/Shanghai、America/New_York），由中台按当地历史规则解析为 UTC。若当地时间在夏令时跳时中不存在，会给出跳时前后的候选时间；若同一当地时间出现两次，会让你确认第一次或第二次。</p></details>
+  <details><summary>城市选择后还需要改经纬度吗？</summary><p>选城市会自动带入 IANA 时区与大致经纬度；出生地不在列表时，请在“手动设置”中选择最近的 IANA 时区并填写当地经纬度。经纬度只影响上升、天顶与宫位。</p></details>
+  <details><summary>行星度数会随时间变化吗？</summary><p>会。月亮每天约行 13°，因此出生时间对月亮影响明显；外行星变化很慢，日期准确即可。</p></details>
+  <details><summary>刑、冲、逆行和空宫代表坏运气吗？</summary><p>不代表。刑冲描述主题之间的张力，逆行是视运动现象，空宫只是没有行星直接落入。它们都不是吉凶判定，也不能预测具体事件。</p></details>
+  <details><summary>出生信息会被保存吗？</summary><p>默认不会。只有主动勾选同意后才会在服务端留痕，最长保留 24 小时；删除凭证仅在当前页面内存中有效，关闭或刷新后无法再删除。出生信息不写入 URL、浏览器存储或分析事件。</p></details>
+</section>

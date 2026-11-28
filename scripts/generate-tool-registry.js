@@ -18,7 +18,7 @@ const SENSITIVE = {
   'buy-house': ['price', 'area', 'houseCount', 'policyDate', 'deedBasis', 'customDeedRatePct', 'downPct', 'years', 'commercialSharePct', 'commercialRatePct', 'fundRatePct', 'agentRatePct', 'buyerSharePct', 'otherCosts', 'monthlyIncome', 'otherMonthlyExpense', 'availableCash', 'emergencyMonths', 'incomeShockPct', 'rateShockPct'],
   'buy-car': ['guidePrice', 'invoicePrice', 'invoicePriceExVat', 'purchaseDate', 'taxReductionEligible', 'downPct', 'annualRatePct', 'years', 'purchaseFees', 'insurance', 'annualKm', 'energyUsePer100', 'energyPrice', 'monthlyIncome', 'otherMonthlyExpense'],
   bazi: ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate'], ziwei: ['birthDate', 'birthTime', 'gender'],
-  natal: ['date', 'time', 'timePrecision', 'timezone', 'lat', 'lon', 'occurrence'], horoscope: ['zodiac', 'date'],
+  natal: ['date', 'time', 'timePrecision', 'timezone', 'lat', 'lon', 'occurrence'], horoscope: ['sign', 'date'],
   'zodiac-match': ['birthDate', 'zodiac'], tarot: ['question', 'seed'],
 };
 const POLICIES = {
@@ -70,6 +70,11 @@ function buildRegistry() {
       module: MODULES[id] || null,
       computationMode: LOCAL.includes(id) ? 'local' : API.includes(id) ? 'api' : HYBRID.includes(id) ? 'hybrid' : 'local',
       sensitiveFields: SENSITIVE[id] || [],
+      // 离线可用判据（唯一事实源：scripts/build-offline-manifest.js 由它生成预缓存清单，
+      // 并经 check-build-artifacts 反向核对本字段与判据一致）：必须「纯本地计算」且「无敏感输入字段」，
+      // 两者缺一不可——api/hybrid 断网算不出结果，缓存它等于伪装可离线；
+      // local 但敏感的页（个税、社保、提前还款、出生信息、健康测量等）不把输入副本落到设备共享缓存。
+      offlineEligible: LOCAL.includes(id) && !(SENSITIVE[id] || []).length,
       policyDependencies: POLICIES[id] || [],
       resultVersion: '2026.11',
       analyticsAllowlist: EVENTS[id] || ['mode', 'success', 'resultType'],

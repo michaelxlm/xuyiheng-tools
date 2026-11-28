@@ -29,6 +29,8 @@ const healthCheck = require('../../assets/js/tools/health-check');
 const lifePlan = require('../../assets/js/tools/life-plan');
 const bazi = require('../../assets/js/tools/bazi');
 const horoscope = require('../../assets/js/tools/horoscope');
+const natal = require('../../assets/js/tools/natal');
+const tarot = require('../../assets/js/tools/tarot');
 const taxPolicy = require('../../data/policies/individual-income-tax.json');
 const socialPolicy = require('../../data/policies/social-insurance.json');
 const aqiPolicy = require('../../data/policies/aqi.json');
@@ -1183,7 +1185,11 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
    assert.ok(wrapped.limitations.some(item => item.includes('不是高精度星历')));
    assert.ok(payload.result.transits.every(item => item.aspect === '无'
      ? item.orb === null
-     : Math.abs(item.orb - Math.abs(item.separation - item.aspectAngle)) <= 0.11));
+     : Math.abs(item.orb - Math.abs(item.separation - item.aspectAngle)) <= 0.001));
+   const response = { code: 0, data: payload };
+   assert.ok(horoscope.responsePayload(response, { sign: '白羊', date: '2026-11-23' }));
+   assert.equal(horoscope.responsePayload(response, { sign: '白羊', date: '2026-11-22' }), null);
+   assert.equal(horoscope.responsePayload(response, { sign: '金牛', date: '2026-11-23' }), null);
    const incomplete = JSON.parse(JSON.stringify(payload));
    delete incomplete.result.calculation;
    assert.equal(horoscope.wrapResult(incomplete).status, 'error');
@@ -1204,6 +1210,145 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
    assert.equal(horoscope.readCache(cache, horoscope.cacheKey('白羊', '2026-11-24'), 1000), null);
  });
 
+ test('本命星盘请求默认不留痕、校验 IANA 时区与时间精确度', () => {
+   const body = natal.requestBody({
+     date: '1990-06-15', timePrecision: 'exact', time: '11:30',
+     timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4,
+   });
+   assert.equal(body.ok, true);
+   assert.equal(body.value.retain, false);
+   assert.equal(body.value.requestId, undefined);
+   assert.equal(body.value.input.timezone, 'Asia/Shanghai');
+   for (const input of [
+     { date: '1990-06-15', time: '11:30', timezone: 'UTC+8', lat: 39.9, lon: 116.4 },
+     { date: '1799-12-31', time: '11:30', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4 },
+     { date: '1990-06-15', time: '24:00', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4 },
+     { date: '1990-06-15', time: '11:30', timezone: 'Asia/Shanghai', lat: 91, lon: 116.4 },
+     { date: '1990-06-15', time: '11:30', timezone: 'Asia/Shanghai', lat: 39.9, lon: 181 },
+     { date: '1990-06-15', timePrecision: 'guess', time: '11:30', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4 },
+   ]) assert.equal(natal.requestBody(input).ok, false);
+   const unknown = natal.requestBody({
+     date: '1990-06-15', timePrecision: 'unknown', time: '11:30',
+     timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4,
+   });
+   assert.equal(unknown.ok, true);
+   assert.equal(unknown.value.input.time, undefined);
+   assert.equal(unknown.value.input.occurrence, undefined);
+   const kept = natal.requestBody({
+     date: '1990-06-15', time: '11:30', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4,
+   }, true);
+   assert.equal(kept.value.retain, true);
+   assert.ok(/^[A-Za-z0-9_-]{16,80}$/.test(kept.value.requestId));
+ });
+ 
+ test('本命星盘真实后端结果可包装，未知时间不伪造宫位', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   const exactInput = { date: '1990-06-15', time: '11:30', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4 };
+   const exact = engine.compute('natal', exactInput);
+   assert.equal(natal.completeResult(exact.result), true);
+   const wrapped = natal.wrapResult(exact);
+   assert.equal(wrapped.status, 'success');
+   assert.equal(wrapped.metrics.timeStatus, 'resolved');
+   assert.ok(wrapped.details.some(item => item.value === 'Asia/Shanghai'));
+   assert.ok(wrapped.limitations.some(item => item.includes('占星无科学依据')));
+   const response = { code: 0, data: exact };
+   assert.ok(natal.responsePayload(response, exactInput));
+   assert.equal(natal.responsePayload(response, Object.assign({}, exactInput, { date: '1990-06-16' })), null);
+   assert.equal(natal.responsePayload(response, Object.assign({}, exactInput, { timezone: 'Asia/Tokyo' })), null);
+   const unknownInput = { date: '1990-06-15', timePrecision: 'unknown', timezone: 'Asia/Shanghai', lat: 39.9, lon: 116.4 };
+   const unknown = engine.compute('natal', unknownInput);
+   assert.equal(unknown.result.timeResolution.status, 'unknown');
+   assert.equal(unknown.result.houses.length, 0);
+   assert.equal(unknown.result.rising, '未确定');
+   assert.ok(unknown.result.planets.every(planet => planet.house === null));
+   assert.equal(natal.wrapResult(unknown).status, 'success');
+   assert.ok(natal.responsePayload({ code: 0, data: unknown }, unknownInput));
+   const incomplete = JSON.parse(JSON.stringify(exact));
+   delete incomplete.result.houses;
+   assert.equal(natal.wrapResult(incomplete).status, 'error');
+ });
+ 
+ test('本命星盘识别夏令时跳时与重复时间候选', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   function failureFor(input) {
+     try {
+       engine.compute('natal', input);
+     } catch (error) {
+       return { code: 1, msg: error.message, data: { errorCode: error.code, details: error.details } };
+     }
+     return null;
+   }
+   const gap = failureFor({ date: '2026-03-08', time: '02:30', timezone: 'America/New_York', lat: 40.7, lon: -74 });
+   assert.equal(gap.data.errorCode, 'NATAL_DST_GAP');
+   const gapView = natal.dstFailure(gap);
+   assert.equal(gapView.code, 'NATAL_DST_GAP');
+   assert.equal(gapView.candidates.length, 2);
+   assert.ok(gapView.candidates.every(item => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(item.localDateTime)));
+   const fold = failureFor({ date: '2026-11-01', time: '01:30', timezone: 'America/New_York', lat: 40.7, lon: -74 });
+   assert.equal(fold.data.errorCode, 'NATAL_DST_FOLD');
+   const foldView = natal.dstFailure(fold);
+   assert.equal(foldView.code, 'NATAL_DST_FOLD');
+   assert.deepEqual(foldView.candidates.map(item => item.occurrence), [ 'first', 'second' ]);
+   const resolved = engine.compute('natal', { date: '2026-11-01', time: '01:30', occurrence: 'second', timezone: 'America/New_York', lat: 40.7, lon: -74 });
+   assert.equal(resolved.result.timeResolution.occurrence, 'second');
+   assert.ok(natal.wrapResult(resolved).limitations.some(item => item.includes('第二次')));
+   assert.equal(natal.dstFailure({ code: 0, data: {} }), null);
+   assert.equal(natal.dstFailure({ code: 1, data: { errorCode: 'OTHER' } }), null);
+ });
+ 
+ test('塔罗默认不留痕不提交问题，留痕与复现字段边界正确', () => {
+   const plain = tarot.requestBody({ spread: 3, question: '这周先推进哪件事' }, false);
+   assert.equal(plain.ok, true);
+   assert.deepEqual(plain.value, { tool: 'tarot', input: { spread: 3, mode: 'new' }, retain: false });
+   const kept = tarot.requestBody({ spread: 1, question: '工作方向' }, true);
+   assert.equal(kept.value.input.question, '工作方向');
+   assert.equal(kept.value.retain, true);
+   assert.ok(/^[A-Za-z0-9_-]{16,80}$/.test(kept.value.requestId));
+   const seed = require('node:crypto').randomBytes(32).toString('base64url');
+   const reproduce = tarot.requestBody({ spread: 3, mode: 'reproduce', seed: seed, question: '人际关系' }, false);
+   assert.equal(reproduce.value.input.seed, seed);
+   assert.equal(reproduce.value.input.question, undefined);
+   assert.equal(reproduce.value.retain, false);
+   for (const input of [
+     { spread: 2 },
+     { spread: 1, mode: 'shuffle' },
+     { spread: 1, mode: 'reproduce', seed: 'short' },
+     { spread: 1, question: '换行\n问题' },
+   ]) assert.equal(tarot.requestBody(input).ok, false);
+ });
+ 
+ test('塔罗真实后端结果可包装、响应回显可校验且分享快照隐藏问题与种子', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   const payload = engine.compute('tarot', { spread: 3 });
+   assert.equal(tarot.completeResult(payload.result), true);
+   assert.equal(payload.result.question, '今日指引');
+   assert.ok(/^[A-Za-z0-9_-]{43}$/.test(payload.result.draw.seed));
+   const wrapped = tarot.wrapResult(payload);
+   assert.equal(wrapped.status, 'success');
+   assert.ok(wrapped.limitations.some(item => item.includes('未留痕')));
+   const response = { code: 0, data: payload };
+   assert.ok(tarot.responsePayload(response, { spread: 3, mode: 'new' }));
+   assert.equal(tarot.responsePayload(response, { spread: 1, mode: 'new' }), null);
+   assert.equal(tarot.responsePayload(response, { spread: 3, mode: 'reproduce', seed: 'x'.repeat(43) }), null);
+   const reproduced = engine.compute('tarot', { spread: 3, mode: 'reproduce', seed: payload.result.draw.seed });
+   assert.equal(reproduced.result.cards.map(card => card.name).join('|'), payload.result.cards.map(card => card.name).join('|'));
+   assert.ok(tarot.responsePayload({ code: 0, data: reproduced }, { spread: 3, mode: 'reproduce', seed: payload.result.draw.seed }));
+   const snapshot = JSON.parse(JSON.stringify(payload.result));
+   snapshot.question = '已隐藏';
+   delete snapshot.draw.seed;
+   snapshot.readingList[0] = '本次问题已隐藏；采用过去 · 现在 · 未来，共 3 张牌。';
+   assert.equal(tarot.completeResult(snapshot), false);
+   assert.equal(tarot.completeSharedResult(snapshot), true);
+   const shared = tarot.sharePayload({ code: 0, data: { shareId: 'a'.repeat(43), result: snapshot, summary: '摘要' } });
+   assert.ok(shared);
+   assert.equal(tarot.sharePayload({ code: 0, data: { shareId: 'bad', result: snapshot } }), null);
+   const shareWrapped = tarot.wrapShareResult({ result: snapshot, generatedAt: '2026-11-28T00:00:00.000Z', expiresAt: '2026-11-29T00:00:00.000Z' });
+   assert.equal(shareWrapped.status, 'success');
+   assert.ok(shareWrapped.details.every(item => item.label !== '复现种子'));
+   assert.match(tarot.shareUrl('b'.repeat(43)), /^\/fortune\/tarot\.html\?share=/);
+   assert.equal(tarot.shareUrl('bad'), '');
+ });
+ 
  test('注册表包含 45 个独立工具与十五个 P0 工具模块', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
   assert.equal(registry.tools.length, 45);
@@ -1229,7 +1374,16 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   assert.deepEqual(byId.get('bazi').analyticsAllowlist, ['success', 'certainty', 'retained']);
   assert.equal(byId.get('horoscope').module, 'horoscope');
   assert.equal(byId.get('horoscope').entryScript, 'assets/js/pages/fortune-horoscope.js');
+  assert.deepEqual(byId.get('horoscope').sensitiveFields, ['sign', 'date']);
   assert.deepEqual(byId.get('horoscope').analyticsAllowlist, ['success', 'cached']);
+  assert.equal(byId.get('natal').module, 'natal');
+  assert.equal(byId.get('natal').entryScript, 'assets/js/pages/fortune-natal.js');
+  assert.deepEqual(byId.get('natal').sensitiveFields, ['date', 'time', 'timePrecision', 'timezone', 'lat', 'lon', 'occurrence']);
+  assert.deepEqual(byId.get('natal').analyticsAllowlist, ['success', 'timePrecision', 'retained']);
+  assert.equal(byId.get('tarot').module, 'tarot');
+  assert.equal(byId.get('tarot').entryScript, 'assets/js/pages/fortune-tarot.js');
+  assert.deepEqual(byId.get('tarot').sensitiveFields, ['question', 'seed']);
+  assert.deepEqual(byId.get('tarot').analyticsAllowlist, ['success', 'spread', 'retained']);
   for (const field of ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate']) {
     assert.ok(byId.get('bazi').sensitiveFields.includes(field));
   }
@@ -1259,6 +1413,8 @@ test('P0/P1 控制器引用的 DOM ID 均存在于模板', () => {
     ['combo-life-plan', 'combo-life-plan'],
     ['fortune-bazi', 'fortune-bazi'],
     ['fortune-horoscope', 'fortune-horoscope'],
+    ['fortune-natal', 'fortune-natal'],
+    ['fortune-tarot', 'fortune-tarot'],
   ];
   for (const [controller, template] of pairs) {
     const js = fs.readFileSync(path.join(ROOT, 'assets/js/pages', controller + '.js'), 'utf8');
@@ -1323,6 +1479,21 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(baziHtml, /默认不留痕/);
   assert.match(baziHtml, /id="bz-precision"/);
   assert.match(baziHtml, /id="bz-retain"/);
+  const natalHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/fortune-natal.html'), 'utf8');
+  const natalController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/fortune-natal.js'), 'utf8');
+  const tarotHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/fortune-tarot.html'), 'utf8');
+  const tarotController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/fortune-tarot.js'), 'utf8');
+  assert.doesNotMatch(natalHtml, /<script>|innerHTML/);
+  assert.match(natalHtml, /默认不留痕/);
+  assert.match(natalHtml, /id="nt-precision"/);
+  assert.match(natalHtml, /id="nt-retain"/);
+  assert.match(natalHtml, /Asia\/Shanghai/);
+  assert.doesNotMatch(natalController, /innerHTML|localStorage|sessionStorage/);
+  assert.doesNotMatch(tarotHtml, /<script>|innerHTML|alert\(/);
+  assert.match(tarotHtml, /默认不留痕/);
+  assert.match(tarotHtml, /id="tr-retain"/);
+  assert.match(tarotHtml, /id="tr-share"/);
+  assert.doesNotMatch(tarotController, /innerHTML|localStorage|sessionStorage|Math\.random/);
 
   assert.match(randomController, /\.step = float \? 'any' : '1'/);
   const aqiController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/tool-air-quality.js'), 'utf8');

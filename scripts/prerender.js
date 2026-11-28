@@ -533,6 +533,10 @@ function renderRoute(site, route, ctx) {
   scriptTags.push('    <script src="' + assetUrl('assets/js/tool-state.min.js', manifest) + '" defer></script>');
   // 场景联盟位：localStorage 本地热度排序，替代六站共用 ad-slots.js 的 next 位
   scriptTags.push('    <script src="' + assetUrl('assets/js/combo-popularity.js', manifest) + '" defer></script>');
+  // 离线 PWA：只注册站点根 /sw.js（预缓存清单由 build-offline-manifest 在构建期内联，
+  // 判据是工具注册表的 offlineEligible）。放全部业务脚本之后、注册推迟到 window load，
+  // 不与首屏计算/埋点抢带宽；注册失败静默降级，不影响在线行为。
+  scriptTags.push('    <script src="' + assetUrl('assets/js/sw-register.min.js', manifest) + '" defer></script>');
   // WO-146 工具站 AI 兜底问答（右下角气泡 + 面板）：共享 widget 由 main-api 侧 /public/ai-widget.js 提供，
   // 分站灰度开关与 prompt 分派全在中台，前端只靠 data-site 识别站点。中台默认关。
   scriptTags.push('    <script src="https://api.xuyiheng.com/public/ai-widget.js" data-site="xuyihengTools" defer onerror="this.remove()"></script>');

@@ -55,7 +55,7 @@
     if (![ 'overall', 'love', 'career', 'money', 'health' ].every(function (key) {
       return Number.isInteger(data.scores[key]) && data.scores[key] >= 1 && data.scores[key] <= 5;
     })) return false;
-    if (!Array.isArray(data.transits) || data.transits.length !== 10) return false;
+    if (!Array.isArray(data.transits) || data.transits.length < 10) return false;
     if (!Array.isArray(data.reading) || !Array.isArray(data.doList) || !Array.isArray(data.avoidList)) return false;
     if (typeof data.mood !== 'string' || typeof data.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(data.colorHex)) return false;
     if (!Number.isInteger(data.number) || typeof data.direction !== 'string' || typeof data.moonSign !== 'string' || typeof data.moonPhase !== 'string') return false;
@@ -73,8 +73,14 @@
     });
   }
 
-  function responsePayload(response) {
+  function responsePayload(response, expected) {
     if (!response || String(response.code) !== '0' || !response.data || !completeResult(response.data.result)) return null;
+    if (expected) {
+      var normalized = normalize(expected);
+      var data = response.data;
+      if (!normalized.ok || data.result.sign !== normalized.value.sign || data.result.date !== normalized.value.date) return null;
+      if (String(data.result.calculation.anchorLocalDateTime || '').indexOf(normalized.value.date + 'T') !== 0) return null;
+    }
     return response.data;
   }
 

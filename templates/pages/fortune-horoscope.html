@@ -13,7 +13,7 @@
   <div class="btn-row mt-3">
     <button class="btn btn-primary" id="ho-submit" type="submit" data-track="calc_click" data-track-props='{"tool":"horoscope"}'>查询运势</button>
   </div>
-  <p class="text-sm text-muted mt-3">默认不留痕：仅提交所选星座与日期用于本次计算，不写入 URL、浏览器存储或分析事件。页面内存缓存最多保留 30 分钟，刷新即清空。</p>
+  <p class="text-sm text-muted mt-3">默认不留痕：仅提交所选星座与日期用于本次计算，服务端不保存测算结果。星座与日期不会写入 URL、localStorage 或分析事件；分析仅上报工具名、计算成功状态与是否命中缓存。页面内存缓存最多保留 30 分钟，刷新即清空。</p>
   <p class="ft-disclaimer">纯娱乐内容，与真实事件没有因果关系，请勿据此做重要决定。</p>
   <p class="form-error" id="ho-error" role="alert" hidden></p>
   <p class="text-sm mt-2" id="ho-status" role="status" aria-live="polite" hidden></p>
@@ -50,10 +50,10 @@
   <p>星座运势由所选日期 12:00（UTC+8）的近似行星黄经与太阳星座中点的传统相位规则推导。本页先把结果翻译成“这一天怎么安排”的日常提示，再保留过境表供复核。它不预测真实事件，也不能代替你对工作、关系、健康或财务的判断。</p>
   <h2 style="margin-top:1.5em">常见问题</h2>
   <details><summary>结果每天都会变吗？</summary><p>会。星级由所选日期的行星过境相位推导，月亮每天移动约 13°，因此换日期通常会变；同一天同一星座按同一规则可复核。页面标题会明确区分“今日运势”和其他日期运势。</p></details>
-  <details><summary>为什么不同网站运势不一样？</summary><p>各站规则不同：本页公开相位容限与权重口径（见「星级怎么来的」与行运明细表），不用随机生成，也不声称准确。</p></details>
+  <details><summary>为什么不同网站运势不一样？</summary><p>各站规则不同：本页公开相位容限与计算式，并列出参与计算的成相行（见「星级怎么来的」与行运明细表），不用随机生成，也不声称准确。</p></details>
   <details><summary>星级和百分比是什么意思？</summary><p>星级把传统规则结果压缩成 1–5 星，百分比只是星级的可视化进度。它们都不是好运概率，也不能换算成某件事发生的可能性。</p></details>
   <details><summary>实际角距、相位标准角和允许误差有什么区别？</summary><p>实际角距是行星黄经与太阳星座中点的夹角；相位标准角是合、六合、刑、拱、冲的理论角度；允许误差是判定成相的范围；实际误差是实际角距偏离理论角度的距离。四者分开展示，避免把“离你有多远”误读成“离标准相位有多远”。</p></details>
   <details><summary>第一次看运势，要怎么看？</summary><p>先看白话导读，再找相对突出和需要放缓的领域，最后选一条具体建议执行。不要因为低星级推迟必要工作、沟通或就医。</p></details>
   <details><summary>十二星座按什么日期划分？</summary><p>日常星座按阳历出生日期的黄道区间划分，本页选项卡直接对应这十二个星座名称。</p></details>
-  <details><summary>会收集我的星座或日期吗？</summary><p>查询时会向中台提交所选星座与日期用于生成结果，默认不留痕。页面不写入 URL、localStorage 或分析事件；内存缓存只保留在当前页面，刷新即清空。</p></details>
+  <details><summary>会收集我的星座或日期吗？</summary><p>查询时会向中台提交所选星座与日期用于生成结果，默认不留痕，服务端不保存测算结果。星座与日期不写入 URL、localStorage 或分析事件；内存缓存只保留在当前页面，刷新即清空。</p></details>
 </section>

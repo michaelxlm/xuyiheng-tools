@@ -94,6 +94,11 @@ function run() {
       }
     }
   }
+
+  // 离线 PWA 产物：sw.js 与离线清单同为构建产物，按当前注册表/页面重算逐字比对，
+  // 并同时断言安全不变量（不含接口/跨域/敏感工具页）——改了注册表或模板而未重建即红。
+  for (const error of require('./build-offline-manifest').verify()) errors.push(error);
+
   if (errors.length) {
     console.error('[check-build-artifacts] 失败：\n  ' + errors.join('\n  '));
     process.exitCode = 1;

@@ -9,7 +9,8 @@
      3. fingerprint → 生成 assets/manifest.json（资源版本 token）
      4. prerender → 逐路由渲染静态 HTML，写入 ROOT/<output>（根级 index.html + 显式 .html 页）
      5. build-sitemap → sitemap.xml
-     6. apply-site-shell + inject-scripts（守卫）+ 注册表/源产物/死链/WCAG 门禁
+     6. build-offline-manifest → data/offline-manifest.json + 根级 sw.js（离线白名单）
+     7. apply-site-shell + inject-scripts（守卫）+ 注册表/源产物/死链/WCAG 门禁
    产物即部署内容：仓库根目录 = 站点根（deploy 同步 . → /www/wwwroot/uni-web/）。
    用法：node scripts/build.js（发布路径始终执行完整门禁，不支持跳过）
    ========================================================================== */
@@ -100,6 +101,11 @@ async function main() {
   buildSitemap.run();
   buildLlms.run();
   require('./apply-site-shell').run();
+
+  // 离线 PWA 清单：必须在 prerender 与 apply-site-shell 之后运行（要读已渲染、已套壳的
+  // 根级 HTML 才能拿到带 ?v= 令牌的真实资源 URL），且必须在门禁之前（清单本身要被校验）。
+  const offlineResult = require('./build-offline-manifest').run();
+  if (offlineResult.errors.length) throw new Error('离线清单生成失败，已停止后续检查');
 
   require('@xuyiheng/static-build-kit/inject-scripts').run(); // WO-164 ④ 私有包化
   const artifactRegistryErrors = require('./check-tool-registry').run({ phase: 'artifacts' });

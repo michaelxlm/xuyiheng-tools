@@ -93,7 +93,8 @@
 
   function restoreState() {
     var h = String(global.location.hash || '');
-    if (isSensitive()) { if (h.indexOf('#s=') === 0) clearHash(); return; }
+    // 敏感页只允许经验证的显式桥接（__bridge），普通分享态一律清除；
+    // 桥接字段经 Core.bridge.allowed 白名单收敛，回填后立即清 hash，不落 URL。
     if (h.indexOf('#s=') !== 0) return;
     var obj;
     try { obj = JSON.parse(decodeURIComponent(h.slice(3))); } catch (e) { if (isSensitive()) clearHash(); return; }

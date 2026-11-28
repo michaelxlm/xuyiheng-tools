@@ -1,128 +1,70 @@
-        <section class="page-heading">
-          <h1>塔罗占卜 · 完整 78 张牌阵</h1>
-          <p>点选问题方向即可抽牌，无需输入文字。结果顶部会先把每张牌翻译成日常语言，说明正逆位怎么理解、整组牌如何连起来看，以及今天可以尝试的小动作。塔罗不是未来答案，而是一种整理思绪的文化工具；无科学依据，仅供娱乐与自我反思。</p>
-        </section>
+<section class="page-heading">
+  <h1>塔罗占卜 · 完整 78 张牌阵</h1>
+  <p>点选问题方向后主动抽牌，无需手填文字。结果会先把每张牌翻译成日常语言，说明正逆位怎么理解、整组牌如何连起来看，以及今天可以尝试的小动作。塔罗不是未来答案，而是一种整理思绪的文化工具；无科学依据，仅供娱乐与自我反思。</p>
+</section>
 
-        <form class="card" id="trForm">
-          <p class="text-sm text-muted mt-0">点选一个问题方向即可抽牌，无需手填。问题越具体，越容易把牌面转成行动，例如“这周先推进哪件事”比“我未来会怎样”更适合阅读。</p>
-          <div class="ft-quick-row" id="trPresets"></div>
-          <div class="ft-quick-row mt-3" id="trSpreads">
-            <button type="button" class="ft-quick is-active" data-spread="1">今日一张</button>
-            <button type="button" class="ft-quick" data-spread="3">过去 · 现在 · 未来</button>
-          </div>
-          <select id="tr-spread" hidden aria-hidden="true"><option value="1" selected>1</option><option value="3">3</option></select>
-          <input id="tr-question" type="hidden" value="今日指引">
-          <details class="ft-advanced"><summary>自定义问题（可选，会作为洗牌种子）</summary>
-            <div><input class="form-input" id="tr-question-custom" type="text" maxlength="60" placeholder="例如：这周该把精力放在哪？"></div>
-          </details>
-          <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"tarot"}'>抽一张</button>
-            <button class="btn btn-outline" type="button" id="tr-again">换一组</button>
-          </div>
-          <p class="ft-disclaimer">塔罗无科学依据，正逆位关键词仅供娱乐与自我反思，请勿据此做重大决定。提交即表示同意中台处理本次问题文字用于测算与留痕。</p>
-        </form>
+<form class="card" id="trForm" novalidate>
+  <p class="text-sm text-muted mt-0">点选一个问题方向，再点击“抽牌”。默认不留痕：问题文字只留在当前页面，不提交中台；只有主动勾选同意留痕后，问题才会随请求发送并最长保留 24 小时。问题越具体，越容易把牌面转成行动。</p>
+  <div class="ft-quick-row" id="trPresets" role="group" aria-label="选择问题方向"></div>
+  <div class="ft-quick-row mt-3" id="trSpreads" role="group" aria-label="选择牌阵">
+    <button type="button" class="ft-quick is-active" data-spread="1">今日一张</button>
+    <button type="button" class="ft-quick" data-spread="3">过去 · 现在 · 未来</button>
+  </div>
+  <select id="tr-spread" hidden aria-hidden="true"><option value="1" selected>1</option><option value="3">3</option></select>
+  <input id="tr-question" type="hidden" value="今日指引">
+  <details class="ft-advanced"><summary>自定义问题（可选，默认不提交中台）</summary>
+    <div><input class="form-input" id="tr-question-custom" type="text" maxlength="60" placeholder="例如：这周该把精力放在哪？"></div>
+  </details>
+  <label class="checkbox-label mt-3" for="tr-retain">
+    <input id="tr-retain" type="checkbox">
+    <span>我了解问题文字可能包含敏感信息，同意本次抽牌在服务端留痕并生成分享快照，最长保留 24 小时；关闭页面后删除凭证不会保留。</span>
+  </label>
+  <div class="btn-row mt-3">
+    <button class="btn btn-primary" id="tr-submit" type="submit" data-track="calc_click" data-track-props='{"tool":"tarot"}'>抽一张</button>
+    <button class="btn btn-outline" id="tr-again" type="button">换一组</button>
+    <button class="btn btn-outline" id="tr-delete" type="button" hidden>物理删除本次留痕</button>
+  </div>
+  <p class="ft-disclaimer">塔罗无科学依据，正逆位关键词仅供娱乐与自我反思，请勿据此做重大决定。</p>
+  <div id="tr-share" hidden>
+    <label class="form-label" for="tr-share-url">分享链接（24 小时内有效，问题与种子已隐藏）</label>
+    <div class="btn-row">
+      <input class="form-input" id="tr-share-url" type="text" readonly>
+      <button class="btn btn-outline" id="tr-copy" type="button">复制链接</button>
+    </div>
+  </div>
+</form>
 
-        <div class="result-box" id="trResult" hidden>
-          <div id="trPlain" aria-live="polite"></div>
-          <p class="text-sm text-muted mt-0" id="trSeedNote"></p>
-          <div class="ft-tarot-cards" id="trCards"></div>
-          <h3 class="ft-section-title">整体解读</h3>
-          <p class="text-sm" id="trReading"></p>
-          <ul class="ft-note-list" id="trReadingList"></ul>
-          <h3 class="ft-section-title">行动建议</h3>
-          <div class="ft-tip-list" id="trActions"></div>
-          <h3 class="ft-section-title">牌阵说明</h3>
-          <ul class="ft-note-list" id="trGuide"></ul>
-        </div>
+<p class="form-error" id="tr-error" role="alert" hidden></p>
+<p class="text-sm mt-2" id="tr-status" role="status" aria-live="polite" hidden></p>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看问题是否具体，再逐张理解牌位，最后寻找共同关键词并选一个小动作。单张牌只看一个角度，三张牌要连起来读。下面的 78 张牌池、元素与星象对应是规则明细，供专业用户复核，不需要背诵。</div></div>
+<div class="result-box" id="tr-result" hidden>
+  <div id="trPlain" aria-live="polite"></div>
+  <p class="text-sm text-muted mt-0" id="trSeedNote"></p>
+  <div class="ft-tarot-cards" id="trCards"></div>
+  <h3 class="ft-section-title">整体解读</h3>
+  <p class="text-sm" id="trReading"></p>
+  <ul class="ft-note-list" id="trReadingList"></ul>
+  <h3 class="ft-section-title">行动建议</h3>
+  <div class="ft-tip-list" id="trActions"></div>
+  <h3 class="ft-section-title">牌阵说明</h3>
+  <ul class="ft-note-list" id="trGuide"></ul>
+  <h3 class="ft-section-title">抽取明细</h3>
+  <div id="trMeta"></div>
+  <h3 class="ft-section-title">计算口径与限制</h3>
+  <div id="trExplain"></div>
+</div>
 
-        <script>
-        (function () {
-          function boot() {
-            var F = window.FortuneAPI; if (!F) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-            var nonce = 0;
-            var presets = [ '今日指引', '工作方向', '人际关系', '学习状态' ];
-            function syncQuestion() {
-              var custom = ($('tr-question-custom').value || '').trim();
-              var active = $('trPresets').querySelector('.is-active');
-              $('tr-question').value = custom || (active ? active.getAttribute('data-q') : '今日指引');
-            }
-            $('trPresets').innerHTML = presets.map(function (q, i) {
-              return '<button type="button" class="ft-quick' + (i === 0 ? ' is-active' : '') + '" data-q="' + q + '">' + q + '</button>';
-            }).join('');
-            $('trPresets').addEventListener('click', function (e) {
-              var b = e.target.closest('[data-q]'); if (!b) return;
-              Array.prototype.forEach.call(this.children, function (x) { x.className = 'ft-quick'; });
-              b.className = 'ft-quick is-active';
-              $('tr-question-custom').value = '';
-              syncQuestion();
-              nonce++;
-              draw(b);
-            });
-            $('trSpreads').addEventListener('click', function (e) {
-              var b = e.target.closest('[data-spread]'); if (!b) return;
-              Array.prototype.forEach.call(this.children, function (x) { x.className = 'ft-quick'; });
-              b.className = 'ft-quick is-active';
-              $('tr-spread').value = b.getAttribute('data-spread');
-              $('trForm').querySelector('button[type=submit]').textContent = b.getAttribute('data-spread') === '1' ? '抽一张' : '抽三张';
-            });
-            $('tr-question-custom').addEventListener('input', syncQuestion);
-            function draw(btn) {
-              syncQuestion();
-              var q = ($('tr-question').value || '今日指引').trim();
-              var count = Number($('tr-spread').value);
-              var dateKey = F.today();
-              F.run(btn, 'tarot', {
-                question: q,
-                spread: count,
-                date: dateKey,
-                seed: String(nonce)
-              }).then(function (d) {
-                F.renderPlainGuide($('trPlain'), d.plainGuide);
-                $('trCards').innerHTML = d.cards.map(function (c) {
-                  return '<div class="ft-tarot-card' + (c.reversed ? ' is-reversed' : '') + '">' +
-                    '<span class="ft-tarot-pos">' + esc(c.position) + '</span>' +
-                    '<span class="ft-tarot-num">' + esc(c.numeral) + '</span>' +
-                    '<strong class="ft-tarot-name">' + esc(c.name) + '</strong>' +
-                    '<span class="ft-tarot-orient">' + (c.reversed ? '逆位' : '正位') + '</span>' +
-                    '<span class="ft-tarot-meaning">' + esc(c.meaning) + '</span>' +
-                    '<span class="ft-tarot-keywords">' + c.keywords.map(function (k) {
-                      return '<span class="ft-tag">' + esc(k) + '</span>';
-                    }).join(' ') + '</span>' +
-                    '<span class="ft-tag">' + esc(c.major ? '大阿尔卡那' : c.suit) + ' · ' + esc(c.element) + '象</span>' +
-                    (c.astro ? '<span class="ft-tag">' + esc(c.astro) + '</span>' : '') +
-                    '<span class="ft-tarot-advice">' + esc(c.core) + '<br>' + esc(c.advice) + '</span></div>';
-                }).join('');
-                $('trReading').textContent = d.reading;
-                $('trReadingList').innerHTML = d.readingList.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('trActions').innerHTML = d.actionSteps.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('');
-                $('trGuide').innerHTML = d.spreadGuide.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('trSeedNote').textContent = '问题：' + d.question + ' · ' + dateKey + ' · ' + (d.spread === 1 ? '单张指引' : '三张牌阵') + ' · 牌池 ' + d.deckSize + ' 张 · ' + d.summary;
-                $('trResult').hidden = false;
-                if (window.U && U.track) U.track('calc_result', { tool: 'tarot' });
-              }).catch(function (err) { alert('抽牌失败：' + (err && err.message ? err.message : '请稍后重试')); });
-            }
-            $('trForm').addEventListener('submit', function (e) {
-              e.preventDefault(); nonce++;
-              draw($('trForm').querySelector('button[type=submit]'));
-            });
-            $('tr-again').addEventListener('click', function () { nonce++; draw(this); });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+<div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先确认问题是否具体，再逐张理解牌位，最后寻找共同关键词并选一个小动作。单张牌只看一个角度，三张牌要连起来读。公开分享只包含牌面与解读，不包含你的问题文字与复现种子。</div></div>
 
 <section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>塔罗牌是一种文化性的自我反思工具。本页从完整 78 张牌中抽牌，先用白话解释每张牌在当前问题里的含义，再提供行动提示和专业牌义。它不读取别人的想法，不保证未来结果，也不能替你做重大决定。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details><summary>问题文字会影响结果吗？</summary><p>会，问题文字参与中台洗牌种子；不想填写时直接点选问题方向即可。</p></details>
-          <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>
-          <details><summary>第一次抽牌，应该怎么读？</summary><p>先看白话导读中的问题与逐张解释，再读整体解读，最后选一条行动建议。不要只凭一张牌或一个关键词给自己下结论。</p></details>
-          <details><summary>问题怎样问更容易理解？</summary><p>把范围缩小到当下能行动的层面，例如“我今天怎样沟通”“这周先做哪一步”。避免要求牌面保证某个人喜欢你、某件事必然成功或替你决定重大事项。</p></details>
-          <details><summary>为什么每次抽牌不一样？</summary><p>每次抽牌都会加入新的刷新种子，因此结果会变化；这正好说明它不构成稳定预测。</p></details>
-          <details><summary>会保存我输入的问题吗？</summary><p>问题文字会随本次请求提交到中台，作为洗牌种子并留痕以便复核；页面不写入本地存储。请勿填写姓名、联系方式等与占卜无关的敏感信息。</p></details>
-        </section>
+  <h2>关于本工具</h2>
+  <p>塔罗牌是一种文化性的自我反思工具。本页从完整 78 张牌中抽牌，先用白话解释每张牌在当前问题里的含义，再提供行动提示和专业牌义。它不读取别人的想法，不保证未来结果，也不能替你做重大决定。</p>
+  <h2 style="margin-top:1.5em">常见问题</h2>
+  <details><summary>抽牌是随机的吗？</summary><p>是安全随机。服务端用 crypto 生成 256 位种子，再以 SHA-256 计数流对完整 78 张牌池洗牌。同一种子与牌阵必得同一组牌，因此留痕后可以复现核对。</p></details>
+  <details><summary>问题文字会影响结果吗？</summary><p>不会参与洗牌。问题文字只用于展示与留痕；默认不留痕时问题不提交中台，因此结果里的“本次问题”可能显示为默认的“今日指引”。需要完整保留问题语境时，请主动勾选留痕。</p></details>
+  <details><summary>默认不留痕时，还能复现同一组牌吗？</summary><p>可以，只要页面还保留本次种子。点击结果下方的“按种子复现”即可重放同一组牌，但问题文字不会随请求提交，牌义解读会按默认问题生成。关闭或刷新页面后种子不会保留。</p></details>
+  <details><summary>正位和逆位代表吉凶吗？</summary><p>不代表。这里只是两种不同倾向的关键词，用于换个角度看问题，没有好坏之分。</p></details>
+  <details><summary>为什么每次抽牌不一样？</summary><p>每次新抽都由服务端生成新的随机种子，因此结果会变化；这正好说明它不构成稳定预测。</p></details>
+  <details><summary>分享链接包含什么？</summary><p>只有留痕后才会生成分享链接，链接指向服务端快照，24 小时内有效；问题文字与种子在快照中已隐藏。删除留痕后分享立即失效。</p></details>
+  <details><summary>会保存我输入的问题吗？</summary><p>默认不会。只有主动勾选同意留痕后，问题文字才会提交并在服务端最长保留 24 小时；删除凭证仅在当前页面内存中有效，关闭或刷新后无法再删除。请不要填写姓名、联系方式等与占卜无关的敏感信息。</p></details>
+</section>

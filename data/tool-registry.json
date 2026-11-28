@@ -17,6 +17,7 @@
         "insurance",
         "deductions"
       ],
+      "offlineEligible": false,
       "policyDependencies": [
         "individual-income-tax"
       ],
@@ -39,6 +40,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -59,6 +61,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -81,6 +84,7 @@
       "sensitiveFields": [
         "datetime"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -100,6 +104,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -124,6 +129,7 @@
         "birthDate",
         "name"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -146,6 +152,7 @@
       "sensitiveFields": [
         "message"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -164,6 +171,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -188,6 +196,7 @@
         "height",
         "circumferences"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -208,6 +217,7 @@
       "module": "scientific",
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -228,6 +238,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -248,6 +259,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -275,6 +287,7 @@
         "income",
         "expense"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -299,6 +312,7 @@
         "contributionBase",
         "deductions"
       ],
+      "offlineEligible": false,
       "policyDependencies": [
         "individual-income-tax",
         "social-insurance"
@@ -321,6 +335,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -341,6 +356,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -361,6 +377,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -381,6 +398,7 @@
       "module": "percentage",
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -400,6 +418,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -420,6 +439,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -440,6 +460,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -460,6 +481,7 @@
       "module": null,
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -480,6 +502,7 @@
       "module": null,
       "computationMode": "hybrid",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -500,6 +523,7 @@
       "module": null,
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -520,6 +544,7 @@
       "module": null,
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -561,6 +586,7 @@
         "incomeShockPct",
         "rateShockPct"
       ],
+      "offlineEligible": false,
       "policyDependencies": [
         "deed-tax"
       ],
@@ -598,6 +624,7 @@
         "monthlyIncome",
         "otherMonthlyExpense"
       ],
+      "offlineEligible": false,
       "policyDependencies": [
         "vehicle-purchase-tax"
       ],
@@ -631,6 +658,7 @@
         "hip",
         "date"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -653,6 +681,7 @@
         "birthDate",
         "answers"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -676,6 +705,7 @@
         "assets",
         "income"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -712,6 +742,7 @@
         "debtAnnualRatePct",
         "debtRemainingMonths"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -731,6 +762,7 @@
       "module": null,
       "computationMode": "hybrid",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -751,6 +783,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -771,6 +804,7 @@
       "module": "random",
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -792,6 +826,7 @@
       "module": "vision",
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -812,6 +847,7 @@
       "module": "air-quality",
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [
         "aqi"
       ],
@@ -834,6 +870,7 @@
       "module": null,
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -854,6 +891,7 @@
       "module": null,
       "computationMode": "api",
       "sensitiveFields": [],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -874,6 +912,7 @@
       "module": null,
       "computationMode": "local",
       "sensitiveFields": [],
+      "offlineEligible": true,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -903,6 +942,7 @@
         "lateZi",
         "asOfDate"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -927,6 +967,7 @@
         "birthTime",
         "gender"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -943,7 +984,7 @@
       "url": "/fortune/natal.html",
       "category": "fortune",
       "template": "templates/pages/fortune-natal.html",
-      "entryScript": null,
+      "entryScript": "assets/js/pages/fortune-natal.js",
       "module": "natal",
       "computationMode": "api",
       "sensitiveFields": [
@@ -955,6 +996,7 @@
         "lon",
         "occurrence"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -975,9 +1017,10 @@
       "module": "horoscope",
       "computationMode": "api",
       "sensitiveFields": [
-        "zodiac",
+        "sign",
         "date"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -1000,6 +1043,7 @@
         "birthDate",
         "zodiac"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
@@ -1016,13 +1060,14 @@
       "url": "/fortune/tarot.html",
       "category": "fortune",
       "template": "templates/pages/fortune-tarot.html",
-      "entryScript": null,
+      "entryScript": "assets/js/pages/fortune-tarot.js",
       "module": "tarot",
       "computationMode": "api",
       "sensitiveFields": [
         "question",
         "seed"
       ],
+      "offlineEligible": false,
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [

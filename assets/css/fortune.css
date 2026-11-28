@@ -77,6 +77,9 @@
 .ft-match-vs { color: var(--color-muted); font-size: var(--text-lg); }
 .ft-match-score { margin-top: var(--space-4); font-size: var(--text-sm); }
 .ft-match-score b { font-size: var(--text-2xl); color: var(--cat-fortune-ink); }
+.ft-table-wrap { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ft-table-wrap:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.ft-table-wrap .ft-ref-table { min-width: 680px; }
 .ft-ref-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); margin-top: var(--space-3); }
 .ft-ref-table th, .ft-ref-table td { padding: 7px 8px; border-bottom: 1px solid var(--color-border); text-align: left; }
 
