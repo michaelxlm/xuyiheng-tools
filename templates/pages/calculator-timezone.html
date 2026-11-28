@@ -8,12 +8,12 @@
         .tz-table th{color:var(--color-muted);font-weight:600}
         .tz-del{min-height:30px;padding:4px 10px;font-size:var(--text-xs)}
         .tz-slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--space-3)}
-        .tz-slot{border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;font-size:var(--text-sm);background:var(--color-surface-2)}
+        .tz-slot{border:1px solid var(--color-border);border-radius:8px;padding:8px 12px;font-size:var(--text-sm);background:var(--color-surface-2);max-width:100%;overflow-wrap:anywhere}
         </style>
 
         <section class="page-heading">
           <h1>时区转换器 · 跨时区会议规划</h1>
-          <p>两地时刻换算、同一时刻的全时区对照，并自动找出两个时区都在工作时段内的重叠窗口；可保存常用会议时间并导出 CSV。</p>
+          <p>基于 IANA 时区数据库进行两地换算，自动识别夏令时跳空与重复时间；支持全时区对照、分钟级工作重叠窗口、本地会议记录、CSV 与 ICS 导出。</p>
         </section>
 
         <form class="card" id="tzForm">
@@ -29,15 +29,21 @@
             <button class="btn btn-secondary" type="button" id="tz-swap">⇄ 交换时区</button>
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"timezone"}'>换算</button>
             <button class="btn btn-secondary" type="button" id="tz-save">保存会议时间</button>
+            <button class="btn btn-secondary" type="button" id="tz-ics">导出当前会议 ICS</button>
           </div>
+          <p id="tz-error" class="form-error" role="alert" hidden></p>
         </form>
 
-        <div class="result-box" id="tz-result" hidden>
+        <p id="tz-status" class="form-status" role="status" hidden></p>
+        <div id="tz-candidates" class="btn-row" hidden></div>
+
+        <div class="result-box" id="tz-result" hidden aria-live="polite">
           <div class="result-row">
             <div><div class="result-label" id="tz-slabel">源时间</div><div class="result-value" id="tz-src" style="font-size:var(--text-lg)">--</div></div>
             <div><div class="result-label" id="tz-tlabel">目标时间</div><div class="result-value" id="tgt" style="font-size:var(--text-lg)">--</div></div>
           </div>
           <dl class="result-detail" id="tz-detail"></dl>
+          <div id="tz-explain" class="mt-4"></div>
         </div>
 
         <section class="card mt-4" id="tz-all-wrap" hidden>
@@ -73,142 +79,23 @@
         <h3 class="card-title mt-4">🌍 世界时钟（现在）</h3>
         <div class="clock-grid" id="tz-clocks"></div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>时区偏移为常见标准值（不自动处理夏令时），换算以「所选时刻即该地墙上时间」为基准。重叠窗口按整点、两地当地时间均落在工作时段内计算；重要时间请以官方时刻表为准。</div></div>
-
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U, C = window.Core; if (!U || !C) return;
-            var $ = function (id) { return document.getElementById(id); };
-            var T = C.timezone, Z = T.ZONES, KEY = 'timezone-meetings';
-            var last = null;
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-            function pad(n) { return (n < 10 ? '0' : '') + n; }
-            function offLabel(o) { return 'UTC' + (o >= 0 ? '+' : '−') + Math.abs(o); }
-            function zone(i) { return Z[+i] || Z[0]; }
-
-            function fill(sel, idx) {
-              sel.innerHTML = Z.map(function (z, i) { return '<option value="' + i + '"' + (i === idx ? ' selected' : '') + '>' + z.name + ' (' + offLabel(z.off) + ')</option>'; }).join('');
-            }
-            fill($('tz-from'), 0); fill($('tz-to'), 11);
-            function setDefault() {
-              var n = new Date();
-              $('tz-date').value = n.getFullYear() + '-' + pad(n.getMonth() + 1) + '-' + pad(n.getDate());
-              $('tz-time').value = pad(n.getHours()) + ':' + pad(n.getMinutes());
-            }
-
-            function calc() {
-              if (!$('tz-date').value || !$('tz-time').value) { alert('请选择日期与时间'); return null; }
-              var p = $('tz-date').value.split('-').map(Number), t = $('tz-time').value.split(':').map(Number);
-              var fz = zone($('tz-from').value), tz = zone($('tz-to').value);
-              var utc = T.wallToUtc(p[0], p[1], p[2], t[0], t[1], fz.off);
-              var src = T.fmtWall(utc, fz.off), tgt = T.fmtWall(utc, tz.off);
-              last = { src: src, tgt: tgt, from: fz.name, to: tz.name, diff: tz.off - fz.off, fromOff: fz.off, toOff: tz.off, utc: utc };
-              $('tz-slabel').textContent = fz.name + ' (' + offLabel(fz.off) + ')';
-              $('tz-tlabel').textContent = tz.name + ' (' + offLabel(tz.off) + ')';
-              $('tz-src').textContent = src;
-              $('tgt').textContent = tgt;
-              var diff = tz.off - fz.off;
-              $('tz-detail').innerHTML =
-                row('时差', (diff >= 0 ? '+' : '−') + Math.abs(diff) + ' 小时') +
-                row('相对方向', diff >= 0 ? '目标时区更早看到这一时刻（时间更晚）' : '目标时区时间更早') +
-                row('UTC 时刻', T.fmtWall(utc, 0));
-              $('tz-result').hidden = false;
-
-              $('tz-all').innerHTML = T.at(utc).map(function (x) {
-                return '<div class="clock-item"><div class="c-city">' + esc(x.name) + ' ' + offLabel(x.off) + '</div><div class="c-time">' + esc(x.local.slice(5)) + '</div></div>';
-              }).join('');
-              $('tz-all-wrap').hidden = false;
-              U.track('calc_result', { tool: 'timezone' });
-              return last;
-            }
-
-            function findOverlap() {
-              var f = zone($('tz-from').value), t = zone($('tz-to').value);
-              var start = +$('tz-start').value, end = +$('tz-end').value;
-              var hours = T.overlap(f.off, t.off, start, end);
-              if (!hours.length) {
-                $('tz-slots').innerHTML = '';
-                $('tz-slots-hint').textContent = '这两个时区在 ' + start + ':00–' + end + ':00 的工作时段没有重叠，建议调整时段或改约其他时间。';
-                return;
-              }
-              $('tz-slots-hint').textContent = '两地当地时间均在 ' + start + ':00–' + end + ':00 的整点窗口：';
-              $('tz-slots').innerHTML = hours.map(function (utc) {
-                var h1 = ((utc + f.off) % 24 + 24) % 24;
-                var h2 = ((utc + t.off) % 24 + 24) % 24;
-                return '<div class="tz-slot"><b>' + pad(h1) + ':00</b> ' + esc(f.name) + ' ⇄ <b>' + pad(h2) + ':00</b> ' + esc(t.name) + '</div>';
-              }).join('');
-              U.track('calc_result', { tool: 'timezone', mode: 'overlap' });
-            }
-
-            function list() { return C.history.list(KEY); }
-            function renderMeetings() {
-              var rows = list();
-              $('tz-meet-wrap').hidden = rows.length === 0;
-              if (!rows.length) return;
-              $('tz-tbody').innerHTML = rows.map(function (r, i) {
-                return '<tr><td>' + esc(r.from) + ' · ' + esc(r.src) + '</td><td>' + esc(r.to) + ' · ' + esc(r.tgt) + '</td><td>' + (r.diff >= 0 ? '+' : '−') + Math.abs(r.diff) + ' h</td><td><button type="button" class="btn btn-secondary tz-del" data-idx="' + i + '" aria-label="删除会议">删除</button></td></tr>';
-              }).join('');
-            }
-
-            $('tzForm').addEventListener('submit', function (e) { e.preventDefault(); calc(); });
-            $('tz-swap').addEventListener('click', function () {
-              var a = $('tz-from').value; $('tz-from').value = $('tz-to').value; $('tz-to').value = a;
-              if (!$('tz-result').hidden) calc();
-              findOverlap();
-            });
-            $('tz-find').addEventListener('click', findOverlap);
-            $('tz-save').addEventListener('click', function () {
-              var r = calc(); if (!r) return;
-              C.history.add(KEY, { src: r.src, tgt: r.tgt, from: r.from, to: r.to, diff: r.diff }, 20);
-              renderMeetings();
-              U.track('save_result', { tool: 'timezone' });
-            });
-            $('tz-tbody').addEventListener('click', function (e) {
-              var btn = e.target.closest('.tz-del'); if (!btn) return;
-              var rows = list(), i = +btn.getAttribute('data-idx');
-              if (!isFinite(i) || !rows[i]) return;
-              rows.splice(i, 1);
-              try { localStorage.setItem(C.history.key(KEY), JSON.stringify(rows)); } catch (err) {}
-              renderMeetings();
-            });
-            $('tz-export').addEventListener('click', function () {
-              C.csv.download('会议时间.csv', list().map(function (r) { return [r.from, r.src, r.to, r.tgt, r.diff]; }), ['源时区', '源时间', '目标时区', '目标时间', '时差(h)']);
-              U.track('export_result', { tool: 'timezone' });
-            });
-            $('tz-clear').addEventListener('click', function () {
-              if (!confirm('确定清空本机保存的会议时间？')) return;
-              C.history.clear(KEY); renderMeetings();
-            });
-            function clocks() {
-              var now = new Date();
-              $('tz-clocks').innerHTML = T.at(now.getTime()).slice(0, 8).map(function (x) {
-                return '<div class="clock-item"><div class="c-city">' + esc(x.name) + '</div><div class="c-time">' + esc(x.local.slice(11)) + '</div></div>';
-              }).join('');
-            }
-            setDefault(); clocks(); findOverlap(); renderMeetings();
-            setInterval(clocks, 30000);
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>转换使用浏览器内置的 IANA 时区数据库，并自动处理夏令时。若所选当地时间不存在或出现两次，页面会要求调整或确认；重要会议请同时核对 UTC 时刻和当地官方规定。</div></div>
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>时区转换器支持两地时刻换算、全时区同刻对照、工作时间重叠窗口查找与常用会议时间本地保存，适合安排跨国会议与出行。</p>
+          <p>时区转换器使用 IANA 时区数据库处理两地时刻、夏令时和分钟级工作重叠窗口，可本地保存会议并导出 CSV 或 ICS，适合安排跨国会议与出行。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>会考虑夏令时吗？</summary>
-            <p>按各时区常见标准偏移计算，不自动处理夏令时切换，请以官方时区数据为准。</p>
+            <p>会。工具使用浏览器内置的 IANA 时区数据库；夏令时导致当地时间不存在或出现两次时，会要求你调整或确认。</p>
           </details>
           <details>
             <summary>重叠窗口怎么算？</summary>
-            <p>按整点枚举 UTC 时刻，若两地对应当地时间都在所设工作时段内即列为候选；无重叠时会明确提示。</p>
+            <p>以源时区所选日期为基准，同时检查目标时区前一日、当日和后一日的工作时段，求 UTC 区间交集；边界精确到分钟，结果显示完整日期，无重叠时会明确提示。</p>
           </details>
           <details>
             <summary>会议时间存在哪里？</summary>
-            <p>仅存在当前浏览器本地，可导出 CSV；清空浏览器数据会一并删除。</p>
+            <p>仅存在当前浏览器本地，可导出 CSV；当前换算还可导出 ICS。清空浏览器数据会一并删除。</p>
           </details>
           <details>
             <summary>可作航班或合同时间依据吗？</summary>

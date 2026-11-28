@@ -20,6 +20,9 @@ const secretMessage = require('../../assets/js/tools/secret-message');
 const airQuality = require('../../assets/js/tools/air-quality');
 const tax = require('../../assets/js/tools/tax');
 const socialInsurance = require('../../assets/js/tools/social-insurance');
+const scientific = require('../../assets/js/tools/scientific');
+const percentage = require('../../assets/js/tools/percentage');
+const timezone = require('../../assets/js/tools/timezone');
 const taxPolicy = require('../../data/policies/individual-income-tax.json');
 const socialPolicy = require('../../data/policies/social-insurance.json');
 const aqiPolicy = require('../../data/policies/aqi.json');
@@ -310,11 +313,100 @@ test('社保支持基数夹取并拒绝非法费率与上下限', () => {
   }
 });
 
-test('注册表包含 45 个独立工具与七个 P0 本地模块', () => {
+test('科学计算器区分 DEG/RAD、atan 比值输入与未定义边界', () => {
+  const tan90 = scientific.calculate({ value: 90, method: 'tan', angleMode: 'deg' });
+  assert.equal(tan90.status, 'invalid');
+  assert.match(tan90.errors.join('；'), /无定义/);
+
+  const atan90 = scientific.calculate({ value: 90, method: 'atan', angleMode: 'deg' });
+  assert.equal(atan90.status, 'success');
+  close(atan90.metrics.value, 89.363406, 0.001);
+  assert.equal(atan90.metrics.resultUnit, '°');
+  close(scientific.calculate({ value: 1, method: 'atan', angleMode: 'rad' }).metrics.value, Math.PI / 4);
+  close(scientific.calculate({ value: 90, method: 'sin', angleMode: 'deg' }).metrics.value, 1);
+
+  for (const input of [
+    { value: -1, method: 'sqrt' },
+    { value: 0, method: 'log' },
+    { value: 710, method: 'exp' },
+    { value: 171, method: 'factorial' },
+    { value: '', method: 'abs' },
+  ]) assert.equal(scientific.calculate(input).status, 'invalid');
+});
+
+test('百分比覆盖百分点、相对变化与 -100% 还原奇点', () => {
+  const points = percentage.calculate({ mode: 'points', a: 5, b: 8 });
+  assert.equal(points.status, 'success');
+  assert.equal(points.metrics.value, 3);
+  assert.equal(points.metrics.unit, '个百分点');
+  assert.equal(points.metrics.relativeChange, 60);
+
+  const restore = percentage.calculate({ mode: 'restore', a: -100, b: 0 });
+  assert.equal(restore.status, 'invalid');
+  assert.match(restore.errors.join('；'), /不存在有限原值/);
+  assert.equal(percentage.calculate({ mode: 'growth', a: 0, b: 1 }).status, 'invalid');
+  assert.equal(percentage.calculate({ mode: 'share', a: 1, b: 0 }).status, 'invalid');
+  close(percentage.calculate({ mode: 'growth', a: 100, b: 0 }).metrics.value, -100);
+
+  const extremeGrowth = percentage.calculate({ mode: 'growth', a: -1e308, b: 1e308 });
+  assert.equal(extremeGrowth.status, 'success');
+  close(extremeGrowth.metrics.value, -200);
+  assert.equal(Object.prototype.hasOwnProperty.call(extremeGrowth.metrics, 'change'), false);
+  assert.equal(percentage.calculate({ mode: 'share', a: 1e308, b: 1e-308 }).status, 'invalid');
+  assert.equal(percentage.calculate({ mode: 'points', a: -1e308, b: 1e308 }).status, 'invalid');
+  close(percentage.calculate({ mode: 'value', a: 1e308, b: 1e-308 }).metrics.value, 0.01, 1e-12);
+});
+
+test('时区使用 IANA 规则识别 DST 跳空、重复与半小时偏移', () => {
+  assert.equal(timezone.resolve({ date: '2026-03-08', time: '02:30', from: 'America/New_York' }).status, 'nonexistent');
+  const fold = timezone.resolve({ date: '2026-11-01', time: '01:30', from: 'America/New_York' });
+  assert.equal(fold.status, 'ambiguous');
+  assert.equal(fold.candidates.length, 2);
+
+  const converted = timezone.calculate({ date: '2026-11-01', time: '01:30', from: 'America/New_York', to: 'Asia/Kolkata', candidateIndex: 0 });
+  assert.equal(converted.status, 'success');
+  assert.equal(converted.metrics.target, '2026-11-01 11:00:00');
+  assert.equal(converted.metrics.differenceMinutes, 570);
+  assert.equal(converted.metrics.targetOffset, 'UTC+05:30');
+  assert.equal(timezone.resolve({ date: '2026-02-31', time: '10:00', from: 'Asia/Shanghai' }).status, 'invalid');
+
+  const emptyWindows = timezone.overlap({ date: '2026-11-02', from: 'Asia/Shanghai', to: 'America/New_York', start: '09:00', end: '18:00' });
+  assert.deepEqual(emptyWindows, []);
+
+  const windows = timezone.overlap({ date: '2026-11-02', from: 'Europe/London', to: 'Europe/Paris', start: '09:00', end: '18:00' });
+  assert.equal(windows.length, 1);
+  assert.equal(windows[0].fromStart, '2026-11-02 09:00:00');
+  assert.equal(windows[0].fromEnd, '2026-11-02 17:00:00');
+  assert.equal(windows[0].toStart, '2026-11-02 10:00:00');
+  assert.equal(windows[0].toEnd, '2026-11-02 18:00:00');
+  assert.ok(windows[0].endUtcMs > windows[0].startUtcMs);
+
+  const previousDay = timezone.overlap({ date: '2026-01-15', from: 'Asia/Shanghai', to: 'America/Los_Angeles', start: '09:00', end: '18:00' });
+  assert.equal(previousDay.length, 1);
+  assert.equal(previousDay[0].fromStart, '2026-01-15 09:00:00');
+  assert.equal(previousDay[0].fromEnd, '2026-01-15 10:00:00');
+  assert.equal(previousDay[0].toStart, '2026-01-14 17:00:00');
+  assert.equal(previousDay[0].toEnd, '2026-01-14 18:00:00');
+  assert.equal(previousDay[0].utc, '2026-01-15 01:00:00 ~ 2026-01-15 02:00:00');
+
+  const nextDay = timezone.overlap({ date: '2026-01-15', from: 'America/Los_Angeles', to: 'Asia/Shanghai', start: '09:00', end: '18:00' });
+  assert.equal(nextDay.length, 1);
+  assert.equal(nextDay[0].fromStart, '2026-01-15 17:00:00');
+  assert.equal(nextDay[0].fromEnd, '2026-01-15 18:00:00');
+  assert.equal(nextDay[0].toStart, '2026-01-16 09:00:00');
+  assert.equal(nextDay[0].toEnd, '2026-01-16 10:00:00');
+  assert.equal(nextDay[0].utc, '2026-01-16 01:00:00 ~ 2026-01-16 02:00:00');
+
+  const ics = timezone.ics({ startUtcMs: Date.UTC(2026, 10, 2, 9), endUtcMs: Date.UTC(2026, 10, 2, 10), title: '测试会议' });
+  assert.match(ics, /BEGIN:VCALENDAR/);
+  assert.match(ics, /DTSTART:\d{8}T\d{6}Z/);
+});
+
+test('注册表包含 45 个独立工具与十个 P0 本地模块', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
   assert.equal(registry.tools.length, 45);
   const byId = new Map(registry.tools.map((tool) => [tool.id, tool]));
-  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay']) {
+  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay', 'scientific', 'percentage', 'timezone']) {
     const tool = byId.get(id);
     assert.ok(tool, `缺少 ${id}`);
     assert.equal(tool.module, id);
@@ -325,7 +417,7 @@ test('注册表包含 45 个独立工具与七个 P0 本地模块', () => {
   assert.ok(byId.get('prepay').sensitiveFields.includes('income'));
 });
 
-test('七个 P0 控制器引用的 DOM ID 均存在于模板', () => {
+test('十个 P0 控制器引用的 DOM ID 均存在于模板', () => {
   const pairs = [
     ['random', 'random'],
     ['vision', 'vision'],
@@ -334,6 +426,9 @@ test('七个 P0 控制器引用的 DOM ID 均存在于模板', () => {
     ['calculator-tax', 'calculator-tax'],
     ['calculator-social-insurance', 'calculator-social-insurance'],
     ['calculator-prepay', 'calculator-prepay'],
+    ['calculator-scientific', 'calculator-scientific'],
+    ['calculator-percentage', 'calculator-percentage'],
+    ['calculator-timezone', 'calculator-timezone'],
   ];
   for (const [controller, template] of pairs) {
     const js = fs.readFileSync(path.join(ROOT, 'assets/js/pages', controller + '.js'), 'utf8');
@@ -369,4 +464,5 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(aqiController, /var current = \+\+sequence;\s*\$\('aq-query'\)\.disabled = false;/);
   const toolState = fs.readFileSync(path.join(ROOT, 'assets/js/tool-state.js'), 'utf8');
   assert.match(toolState, /'calculator-prepay': 1/);
+  assert.match(toolState, /'calculator-timezone': 1/);
 });

@@ -19,13 +19,13 @@
 - [个人所得税计算器](https://xuyiheng.com/calculator/tax.html): 在线个税计算器，输入工资快速计算税后收入和应缴税额，支持专项附加扣除。
 - [单位换算](https://xuyiheng.com/calculator/unit.html): 在线单位换算工具，支持长度、重量、面积、温度、速度、存储六类单位双向互转，含摄氏华氏开尔文温度换算。
 - [养老金计算器](https://xuyiheng.com/calculator/pension.html): 在线养老金计算器，根据缴费年限和基数估算退休后每月可领取的养老金。
-- [时区转换器](https://xuyiheng.com/calculator/timezone.html): 在线时区转换器，支持全球主要时区之间的时间转换，出国旅行必备。
+- [时区转换器](https://xuyiheng.com/calculator/timezone.html): 基于 IANA 时区数据库的跨时区转换与会议规划工具，自动处理夏令时跳空和重复时间，支持分钟级工作重叠窗口、CSV 与 ICS 导出。
 - [装修计算器](https://xuyiheng.com/calculator/decoration.html): 在线装修计算器，根据面积估算装修费用，包含材料费和人工费预算。
 - [宝宝取名](https://xuyiheng.com/calculator/baby-name.html): 宝宝取名工具，提供寓意美好的宝宝名字推荐，帮新生儿起一个好名字。
 - [密语](https://xuyiheng.com/calculator/secret-message.html): 密语，写下你想说的话生成专属链接分享给朋友，TA打开即可查看。
 - [衣服尺码对照表](https://xuyiheng.com/calculator/size.html): 国际衣服尺码对照表，支持中美欧日韩尺码换算，网购衣服不再选错码。
 - [基础代谢与体脂率计算器](https://xuyiheng.com/calculator/body-fat.html): 在线基础代谢率计算器，采用 Mifflin-St Jeor 公式算 BMR 与每日消耗 TDEE，并用美国海军法估算体脂率。
-- [科学计算器](https://xuyiheng.com/calculator/scientific.html): 在线科学计算器，支持阶乘、平方根、正弦余弦正切、反正切、自然对数、指数与取整运算；联网由天行接口计算，离线自动切换本地引擎。
+- [科学计算器](https://xuyiheng.com/calculator/scientific.html): 本地科学计算器，支持阶乘、平方根、三角函数、对数、指数与取整；明确区分 DEG/RAD，并对未定义、非法输入和溢出给出内联错误。
 - [折扣到手价计算](https://xuyiheng.com/calculator/discount.html): 在线折扣计算器，支持单折扣、折上折、满减叠加三种模式，快速算出到手价、共省金额与相当于几折。
 - [日期计算器](https://xuyiheng.com/calculator/date-calc.html): 在线日期计算器，快速计算两个日期之间的间隔天数，日期加减天数推算，查询任意日期是星期几。
 - [房贷提前还款计算器](https://xuyiheng.com/calculator/prepay.html): 在线房贷提前还款计算器，输入贷款总额、利率、年限与已还期数，算清等额本息/等额本金剩余本金与利息。
@@ -33,7 +33,7 @@
 - [预产期计算器](https://xuyiheng.com/calculator/due-date.html): 在线预产期计算器，输入末次月经首日与月经周期，按内格勒法则推算预产期，实时查询当前孕周。
 - [跑步配速计算器](https://xuyiheng.com/calculator/pace.html): 在线跑步配速计算器，支持距离与用时算配速、距离与配速预算完赛时间、用时与配速算距离。
 - [宠物年龄换算](https://xuyiheng.com/calculator/pet-age.html): 在线宠物年龄换算工具，输入猫或犬的实际年龄，按通用对照口径换算为人类年龄，附生命阶段说明。
-- [百分比计算器](https://xuyiheng.com/calculator/percentage.html): 在线百分比计算器，支持占比计算、增长率计算、百分比值计算与按变化幅度还原原值。
+- [百分比计算器](https://xuyiheng.com/calculator/percentage.html): 百分比计算器支持占比、增长率、百分比值、原值还原，以及百分点与相对变化双口径比较；除零和 -100% 还原奇点会明确提示。
 - [加班费计算器](https://xuyiheng.com/calculator/overtime.html): 在线加班费计算器，输入月工资与加班时长，按劳动法1.5倍、2倍、3倍倍率算清加班费。
 - [儿童身高预测](https://xuyiheng.com/calculator/height-predict.html): 在线儿童身高预测工具，输入父母身高与孩子性别，按遗传靶身高公式预测孩子成年身高范围。
 - [油耗计算器](https://xuyiheng.com/calculator/fuel-cost.html): 在线油耗计算器，输入行驶里程与加油量算出百公里油耗与每公里油费。

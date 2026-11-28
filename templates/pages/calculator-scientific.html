@@ -1,6 +1,6 @@
         <section class="page-heading">
           <h1>科学计算器</h1>
-          <p>支持阶乘、平方根、三角函数、对数、指数与取整等科学运算。优先由天行数据接口计算，离线时自动切换本地引擎，结果始终可用。</p>
+          <p>支持阶乘、平方根、三角函数、对数、指数与取整等科学运算。全部在浏览器本地计算，明确区分 DEG/RAD、未定义和溢出，不依赖网络接口。</p>
         </section>
 
         <form class="card" id="scForm">
@@ -29,142 +29,49 @@
           <div class="form-group" id="sc-angle-wrap" hidden>
             <label class="form-label" for="sc-angle">三角函数角度单位</label>
             <select class="form-select" id="sc-angle">
-              <option value="rad">弧度（接口原生口径）</option>
-              <option value="deg">角度（先转为弧度）</option>
+              <option value="deg">DEG：sin/cos/tan 输入角度，atan 输出角度</option>
+              <option value="rad" selected>RAD：sin/cos/tan 输入弧度，atan 输出弧度</option>
             </select>
           </div>
+          <p id="sc-error" class="form-error" role="alert" hidden></p>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"scientific"}'>计算</button>
+            <button class="btn btn-secondary" type="button" id="sc-clear-history">清空历史</button>
           </div>
         </form>
+
+        <p id="sc-status" class="form-status" role="status" hidden></p>
 
         <div class="card mt-3">
           <div class="text-sm text-muted mb-2">快捷运算（点击即算）</div>
           <div id="sc-chips" style="display:flex;flex-wrap:wrap;gap:.5rem"></div>
         </div>
 
-        <div class="result-box" id="sc-result" hidden>
+        <div class="result-box" id="sc-result" hidden aria-live="polite">
           <div class="result-row">
             <div><div class="result-label">计算结果</div><div class="result-value" id="sc-value">--</div></div>
             <div><div class="result-label">计算引擎</div><div class="result-value" id="sc-engine">--</div></div>
           </div>
           <dl class="result-detail" id="sc-detail"></dl>
+          <div class="btn-row"><button class="btn btn-secondary" type="button" id="sc-copy">复制完整精度</button></div>
+          <div id="sc-explain" class="mt-4"></div>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>正弦、余弦、正切、反正切的数值按弧度口径计算；选择“角度”时页面会先把输入换算为弧度再提交。自然对数 ln(n) 要求 n&gt;0，平方根要求 n≥0，阶乘仅支持 0~170 的整数。</div></div>
+        <section class="card mt-4">
+          <h2 class="card-title">本次页面历史</h2>
+          <ul id="sc-history" class="text-sm"></ul>
+          <p class="text-sm text-muted">历史仅保存在当前页面内存中，刷新或关闭页面后清除。</p>
+        </section>
 
-        <script>
-        (function () {
-          var METHODS = {
-            factorial: '阶乘', sqrt: '平方根', sin: '正弦', cos: '余弦', tan: '正切',
-            atan: '反正切', log: '自然对数', exp: '指数', abs: '绝对值', round: '四舍五入', ceil: '向上取整'
-          };
-          var TRIG = { sin: 1, cos: 1, tan: 1, atan: 1 };
-
-          function boot() {
-            var U = window.U; if (!U) return;
-            var $ = function (id) { return document.getElementById(id); };
-            var API = window.API;
-            var seq = 0;
-
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-
-            function localCalc(num, m) {
-              switch (m) {
-                case 'factorial':
-                  if (!Number.isInteger(num) || num < 0 || num > 170) return null;
-                  var r = 1; for (var i = 2; i <= num; i++) r *= i; return r;
-                case 'sqrt': return num >= 0 ? Math.sqrt(num) : null;
-                case 'sin': return Math.sin(num);
-                case 'cos': return Math.cos(num);
-                case 'tan': return Math.tan(num);
-                case 'atan': return Math.atan(num);
-                case 'log': return num > 0 ? Math.log(num) : null;
-                case 'exp': return num <= 709 ? Math.exp(num) : null;
-                case 'abs': return Math.abs(num);
-                case 'round': return Math.round(num);
-                case 'ceil': return Math.ceil(num);
-                default: return null;
-              }
-            }
-
-            function fmt(v) {
-              if (v == null || !Number.isFinite(Number(v))) return String(v);
-              var n = Number(v);
-              if (n !== 0 && (Math.abs(n) >= 1e15 || Math.abs(n) < 1e-6)) return n.toExponential(8);
-              return String(U.round(n, 10));
-            }
-
-            function updateAngle() { $('sc-angle-wrap').hidden = !TRIG[$('sc-method').value]; }
-            $('sc-method').addEventListener('change', updateAngle);
-            updateAngle();
-
-            var chips = $('sc-chips');
-            Object.keys(METHODS).forEach(function (m) {
-              var b = document.createElement('button');
-              b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.textContent = METHODS[m];
-              b.addEventListener('click', function () {
-                $('sc-method').value = m; updateAngle();
-                if ($('scForm').requestSubmit) $('scForm').requestSubmit(); else calc();
-              });
-              chips.appendChild(b);
-            });
-
-            function render(value, engine, num, m, tip) {
-              $('sc-value').textContent = fmt(value);
-              $('sc-engine').textContent = engine;
-              var detail = row('运算', METHODS[m] + '（' + m + '）') + row('输入', fmt(num));
-              if (tip) detail += row('接口提示', tip);
-              $('sc-detail').innerHTML = detail;
-              $('sc-result').hidden = false;
-            }
-
-            function fallback(num, m, reason) {
-              var v = localCalc(num, m);
-              if (v == null) { alert(reason || '当前数值不适用于该运算'); return; }
-              render(v, '本地引擎（接口不可用）', num, m, reason || '');
-              U.track('calc_result', { tool: 'scientific', method: m, engine: 'local' });
-            }
-
-            function calc() {
-              var num = U.numInput($('sc-num')), m = $('sc-method').value;
-              if (!Number.isFinite(num)) { alert('请输入数值'); return; }
-              if (m === 'factorial' && (!Number.isInteger(num) || num < 0 || num > 170)) { alert('阶乘仅支持 0~170 的整数'); return; }
-              if (m === 'sqrt' && num < 0) { alert('平方根要求数值 ≥ 0'); return; }
-              if (m === 'log' && num <= 0) { alert('自然对数要求数值 > 0'); return; }
-
-              var inNum = num;
-              if (TRIG[m] && $('sc-angle').value === 'deg') inNum = num * Math.PI / 180;
-              var my = ++seq;
-
-              if (!API) { fallback(inNum, m, '接口脚本未加载'); return; }
-              $('sc-value').textContent = '计算中…'; $('sc-engine').textContent = '天行接口';
-              API.get(API.endpoints.tianapi, { type: 'scncalc', num: inNum, method: m }).then(function (res) {
-                if (my !== seq) return;
-                var d = (res && res.data) || {};
-                var ok = String(res && res.code) === '0' && d && d.tip === 'normal' && d.value !== '' && d.value != null;
-                if (!ok) { fallback(inNum, m, (d && d.tip) || (res && res.msg) || '接口无有效结果'); return; }
-                render(d.value, '天行接口', num, m, '');
-                U.track('calc_result', { tool: 'scientific', method: m, engine: 'tianapi' });
-              }).catch(function () {
-                if (my !== seq) return;
-                fallback(inNum, m, '网络不可用');
-              });
-            }
-
-            $('scForm').addEventListener('submit', function (e) { e.preventDefault(); calc(); });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>DEG 模式下 sin/cos/tan 的输入按角度解释，atan 的输入始终是正切比值、输出为角度；RAD 模式对应使用弧度。tan(90°)、负数平方根、ln(0) 和溢出会显示行内错误，不返回伪实数或 Infinity。</div></div>
 
 <section class="tool-info">
           <h2>关于科学计算器</h2>
-          <p>科学计算器提供阶乘、平方根、三角函数、反三角函数、自然对数、指数与取整等常见科学运算。联网时结果由天行数据接口计算，离线或接口异常时自动切换到本地 JavaScript 引擎，减少对网络的依赖。</p>
+          <p>科学计算器使用本地 JavaScript 数学内核，提供阶乘、平方根、三角函数、反三角函数、自然对数、指数与取整等常见科学运算。页面明确区分角度与弧度，并对未定义、非法输入和溢出给出内联错误。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
             <summary>三角函数用角度还是弧度？</summary>
-            <p>接口原生按弧度计算。选择“角度（先转为弧度）”后，页面会先把输入乘以 π/180 再提交，结果与常见科学计算器的 DEG 模式一致。</p>
+            <p>DEG 模式下 sin/cos/tan 的输入按角度解释；atan 的输入始终是正切比值，输出为角度。RAD 模式对应使用弧度。</p>
           </details>
           <details>
             <summary>为什么阶乘只到 170？</summary>
@@ -176,6 +83,6 @@
           </details>
           <details>
             <summary>离线时结果还准吗？</summary>
-            <p>本地引擎使用与接口一致的标准数学函数，结果与联网时一致；“计算引擎”一栏会标明本次结果的来源。</p>
+            <p>结果由浏览器本地生成，断网不影响计算；计算引擎一栏会标明本次结果来源。</p>
           </details>
         </section>

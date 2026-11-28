@@ -1,0 +1,118 @@
+/* ==========================================================================
+   percentage.js · 百分比、百分点与相对变化纯计算内核（无 DOM）
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('../core/result'));
+  else {
+    root.Tools = root.Tools || {};
+    root.Tools.percentage = factory(root.ToolCore.Result);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (Result) {
+  'use strict';
+
+  var MODES = {
+    share: '占比',
+    growth: '增长率',
+    value: '百分比值',
+    restore: '还原原值',
+    points: '百分点与相对变化',
+  };
+  var source = { name: '四则运算与百分比定义', standard: '百分比 = 每一百份中的份数', version: '2026.11' };
+
+  function numberValue(value, label) {
+    if (value == null || String(value).trim() === '') throw new Error('请输入' + label);
+    var n = Number(value);
+    if (!Number.isFinite(n)) throw new Error(label + '必须是有限数值');
+    return n;
+  }
+
+  function display(value, digits) {
+    if (!Number.isFinite(value)) return '不存在有限值';
+    return String(Number(value.toFixed(digits == null ? 10 : digits)));
+  }
+
+  function percentChange(a, b) {
+    var difference = b - a;
+    return Number.isFinite(difference) ? difference / a * 100 : (b / a - 1) * 100;
+  }
+
+  function calculate(options) {
+    var o = options || {};
+    try {
+      var mode = String(o.mode || '');
+      if (!MODES[mode]) throw new Error('请选择支持的百分比计算方式');
+      var a = numberValue(o.a, mode === 'points' ? '百分比 A' : '数值 A');
+      var b = numberValue(o.b, mode === 'points' ? '百分比 B' : '数值 B');
+      var metrics;
+      var details;
+      var formula;
+      var assumptions = ['所有输入按有限实数处理', '显示值可能四舍五入，复制值保留完整计算精度'];
+      var limitations = ['百分比描述相对关系，不等同于绝对数量变化'];
+
+      if (mode === 'share') {
+        if (b === 0) throw new Error('整体值不能为 0，无法计算占比');
+        var share = a / b * 100;
+        if (!Number.isFinite(share)) throw new Error('占比结果超出可表示范围');
+        metrics = { value: share, unit: '%', inputA: a, inputB: b };
+        details = [Result.detail('算式', display(a) + ' ÷ ' + display(b) + ' × 100%'), Result.detail('占比', display(share, 10), '%')];
+        formula = '占比 = A ÷ B × 100%';
+      } else if (mode === 'growth') {
+        if (a === 0) throw new Error('原值为 0，不存在有限增长率');
+        var change = b - a;
+        var growth = percentChange(a, b);
+        if (!Number.isFinite(growth)) throw new Error('增长率结果超出可表示范围');
+        metrics = { value: growth, unit: '%', inputA: a, inputB: b };
+        if (Number.isFinite(change)) metrics.change = change;
+        details = [
+          Result.detail('变化量', Number.isFinite(change) ? display(change, 10) : '超出双精度浮点数可表示范围'),
+          Result.detail('增长率', display(growth, 10), '%'),
+          Result.detail('方向', growth > 0 ? '增长' : (growth < 0 ? '下降' : '不变')),
+        ];
+        formula = '增长率 = (B ÷ A − 1) × 100%';
+        if (a < 0) assumptions.push('原值为负数时按代数公式计算，增长/下降的直观方向可能与日常语言相反');
+      } else if (mode === 'value') {
+        var value = b * (a / 100);
+        if (!Number.isFinite(value)) throw new Error('百分比值结果超出可表示范围');
+        metrics = { value: value, unit: '', inputA: a, inputB: b };
+        details = [Result.detail('算式', display(a) + '% × ' + display(b)), Result.detail('百分比值', display(value, 10))];
+        formula = '百分比值 = B × X ÷ 100';
+      } else if (mode === 'restore') {
+        var denominator = 1 + a / 100;
+        if (Math.abs(denominator) < 1e-12) throw new Error('变化率为 -100%，不存在有限原值');
+        var base = b / denominator;
+        if (!Number.isFinite(base)) throw new Error('还原结果超出可表示范围');
+        metrics = { value: base, unit: '', changeRate: a, result: b, inputA: a, inputB: b };
+        details = [Result.detail('算式', display(b) + ' ÷ (1 + ' + display(a) + '%)'), Result.detail('还原原值', display(base, 10))];
+        formula = '原值 A = 变化后的值 B ÷ (1 + 变化率 r)';
+        limitations.push('变化率为 -100% 时，任何有限新值都不能反推出有限原值');
+      } else {
+        var points = b - a;
+        var relative = a === 0 ? null : percentChange(a, b);
+        if (!Number.isFinite(points) || (relative != null && !Number.isFinite(relative))) throw new Error('百分点或相对变化结果超出可表示范围');
+        metrics = { value: points, unit: '个百分点', percentagePoints: points, relativeChange: relative, inputA: a, inputB: b };
+        details = [
+          Result.detail('百分点差', display(points, 10), '个百分点'),
+          Result.detail('相对变化', relative == null ? '原百分比为 0，不存在有限相对变化' : display(relative, 10) + '%'),
+        ];
+        formula = '百分点差 = B% − A%；相对变化 = (B% − A%) ÷ A% × 100%';
+        assumptions.push('百分点用于直接比较两个百分率；相对变化用于描述从一个百分率到另一个百分率的改变幅度');
+        limitations.push('百分点与百分比不能混称；例如 5% 到 8% 是增加 3 个百分点，同时相对增长 60%');
+      }
+
+      return Result.create('percentage', {
+        metrics: metrics,
+        details: details,
+        formula: formula,
+        assumptions: assumptions,
+        source: source,
+        precision: { decimalPlaces: 10 },
+        limitations: limitations,
+      });
+    } catch (error) {
+      return Result.invalid('percentage', error.message || '百分比参数不合法', source);
+    }
+  }
+
+  return { calculate: calculate, modes: MODES };
+});

@@ -27,6 +27,7 @@
     'calculator-tax': 1,
     'calculator-social-insurance': 1,
     'calculator-prepay': 1,
+    'calculator-timezone': 1,
     'vision': 1
   };
 

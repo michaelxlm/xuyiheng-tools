@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 
-const LOCAL = ['tax', 'unit', 'pension', 'decoration', 'size', 'scientific', 'discount', 'date-calc', 'prepay', 'social-insurance', 'due-date', 'pace', 'pet-age', 'percentage', 'overtime', 'height-predict', 'fuel-cost', 'probability', 'random', 'vision', 'secret-message', 'lotto'];
-const API = ['baby-name', 'body-fat', 'timezone', 'solar-term', 'daily-guide', 'countdown', 'air-quality', 'idiom', 'polyphone', 'bazi', 'ziwei', 'natal', 'horoscope', 'zodiac-match', 'tarot'];
+const LOCAL = ['tax', 'unit', 'pension', 'timezone', 'decoration', 'size', 'scientific', 'discount', 'date-calc', 'prepay', 'social-insurance', 'due-date', 'pace', 'pet-age', 'percentage', 'overtime', 'height-predict', 'fuel-cost', 'probability', 'random', 'vision', 'secret-message', 'lotto'];
+const API = ['baby-name', 'body-fat', 'solar-term', 'daily-guide', 'countdown', 'air-quality', 'idiom', 'polyphone', 'bazi', 'ziwei', 'natal', 'horoscope', 'zodiac-match', 'tarot'];
 const HYBRID = ['calendar', 'buy-house', 'buy-car', 'health-check', 'fun-test', 'finance-toolkit', 'life-plan', 'color-lab'];
 const SENSITIVE = {
   tax: ['salary', 'insurance', 'deductions'], 'social-insurance': ['salary', 'contributionBase', 'deductions'],
@@ -26,12 +26,15 @@ const POLICIES = {
 const MODULES = {
   tax: 'tax', random: 'random', vision: 'vision', 'secret-message': 'secret-message',
   'air-quality': 'air-quality', 'social-insurance': 'social-insurance', prepay: 'prepay',
+  scientific: 'scientific', percentage: 'percentage', timezone: 'timezone',
 };
 const EVENTS = {
   tax: ['mode', 'success', 'resultType'], random: ['type', 'unique', 'count', 'success'],
   vision: ['eye', 'success', 'resultType'], 'secret-message': ['success'],
   'air-quality': ['success', 'cached', 'resultType'], 'social-insurance': ['mode', 'success'],
   prepay: ['method', 'mode', 'success'],
+  scientific: ['method', 'angleMode', 'success'], percentage: ['mode', 'success'],
+  timezone: ['success', 'mode'],
 };
 
 function slugOf(route) {

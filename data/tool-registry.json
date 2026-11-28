@@ -75,18 +75,17 @@
       "url": "/calculator/timezone.html",
       "category": "calculator",
       "template": "templates/pages/calculator-timezone.html",
-      "entryScript": null,
-      "module": null,
-      "computationMode": "api",
+      "entryScript": "assets/js/pages/calculator-timezone.js",
+      "module": "timezone",
+      "computationMode": "local",
       "sensitiveFields": [
         "datetime"
       ],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
         "success",
-        "resultType"
+        "mode"
       ],
       "mobileLayout": "stacked-cards"
     },
@@ -205,16 +204,16 @@
       "url": "/calculator/scientific.html",
       "category": "calculator",
       "template": "templates/pages/calculator-scientific.html",
-      "entryScript": null,
-      "module": null,
+      "entryScript": "assets/js/pages/calculator-scientific.js",
+      "module": "scientific",
       "computationMode": "local",
       "sensitiveFields": [],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
-        "success",
-        "resultType"
+        "method",
+        "angleMode",
+        "success"
       ],
       "mobileLayout": "stacked-cards"
     },
@@ -378,16 +377,15 @@
       "url": "/calculator/percentage.html",
       "category": "calculator",
       "template": "templates/pages/calculator-percentage.html",
-      "entryScript": null,
-      "module": null,
+      "entryScript": "assets/js/pages/calculator-percentage.js",
+      "module": "percentage",
       "computationMode": "local",
       "sensitiveFields": [],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
         "mode",
-        "success",
-        "resultType"
+        "success"
       ],
       "mobileLayout": "stacked-cards"
     },
