@@ -890,20 +890,25 @@
       "url": "/fortune/bazi.html",
       "category": "fortune",
       "template": "templates/pages/fortune-bazi.html",
-      "entryScript": null,
-      "module": null,
+      "entryScript": "assets/js/pages/fortune-bazi.js",
+      "module": "bazi",
       "computationMode": "api",
       "sensitiveFields": [
         "birthDate",
         "birthTime",
-        "gender"
+        "gender",
+        "timePrecision",
+        "timeBasis",
+        "longitude",
+        "lateZi",
+        "asOfDate"
       ],
       "policyDependencies": [],
       "resultVersion": "2026.11",
       "analyticsAllowlist": [
-        "mode",
         "success",
-        "resultType"
+        "certainty",
+        "retained"
       ],
       "mobileLayout": "scroll-table"
     },

@@ -27,6 +27,7 @@ const buyHouse = require('../../assets/js/tools/buy-house');
 const buyCar = require('../../assets/js/tools/buy-car');
 const healthCheck = require('../../assets/js/tools/health-check');
 const lifePlan = require('../../assets/js/tools/life-plan');
+const bazi = require('../../assets/js/tools/bazi');
 const taxPolicy = require('../../data/policies/individual-income-tax.json');
 const socialPolicy = require('../../data/policies/social-insurance.json');
 const aqiPolicy = require('../../data/policies/aqi.json');
@@ -1073,16 +1074,99 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
    assert.equal(payload.__bridge.source, 'life-plan');
  });
 
- test('注册表包含 45 个独立工具与十四个 P0 本地模块', () => {
+ test('八字请求默认不留痕，未知时辰移除时间字段并拒绝非法组合', () => {
+   const input = { date: '1990-06-15', hour: 11, minute: 30, asOfDate: '2026-11-28', gender: 'unknown' };
+   const body = bazi.requestBody(input);
+   assert.equal(body.ok, true);
+   assert.equal(body.value.tool, 'bazi');
+   assert.equal(body.value.retain, false);
+   assert.equal(body.value.input.hour, 11);
+   assert.equal(body.value.input.minute, 30);
+   assert.equal(body.value.input.gender, 'unknown');
+   assert.equal(bazi.requestBody(input, true).value.retain, true);
+   assert.match(bazi.requestBody(input, true).value.requestId, /^[A-Za-z0-9_-]{16,80}$/);
+
+   const unknown = bazi.requestBody(Object.assign({}, input, { timePrecision: 'unknown', hour: '', minute: '' }));
+   assert.equal(unknown.ok, true);
+   assert.equal(Object.prototype.hasOwnProperty.call(unknown.value.input, 'hour'), false);
+   assert.equal(Object.prototype.hasOwnProperty.call(unknown.value.input, 'minute'), false);
+   assert.equal(Object.prototype.hasOwnProperty.call(unknown.value.input, 'longitude'), false);
+
+   for (const invalid of [
+     Object.assign({}, input, { date: '2026-02-30' }),
+     Object.assign({}, input, { hour: 24 }),
+     Object.assign({}, input, { minute: 60 }),
+     Object.assign({}, input, { timeBasis: 'true-solar', longitude: 181 }),
+     Object.assign({}, input, { timePrecision: 'unknown', timeBasis: 'true-solar', longitude: 120 }),
+   ]) {
+     assert.equal(bazi.requestBody(invalid).ok, false);
+   }
+ });
+
+ test('八字结果包装披露历法版本、候选边界与未知信息限制', () => {
+   const payload = {
+     retained: false,
+     result: {
+       dayMaster: '己', dayElement: '土', tendency: '中和', strengthIndex: 50,
+       certainty: 'ambiguous', timePillar: { unknown: true },
+       dayun: { enabled: false, direction: '不排', reason: '时辰未知，无法确定起运时间', items: [] },
+       calendar: { version: 'lunar-javascript@1.7.3', timeBasis: 'beijing', inputTimeKnown: false, adjustedDateTime: null, lateZiRule: 'same-day', asOfDate: '2026-11-28', note: '输入与交节时刻均按北京时间处理' },
+       pillars: [
+         { name: '年柱', ganzhi: '丙午', hidden: [], nayin: '天河水', chengSheng: '临官', god: '伤官' },
+         { name: '月柱', ganzhi: '庚寅', hidden: [], nayin: '松柏木', chengSheng: '死', god: '比肩' },
+         { name: '日柱', ganzhi: '己酉', hidden: [], nayin: '大驿土', chengSheng: '长生', god: '日主' },
+       ],
+       weighted: [1, 2, 3, 4, 5], count: [1, 1, 1, 1, 1], candidates: [], shenSha: [], branchRels: [], pillarNotes: [],
+       pattern: { name: '待确定', text: '' }, yongshen: { label: '待确定', element: '—' }, jishen: { label: '待确定', element: '—' },
+       gods: {}, godBriefs: {}, hiddenGods: {}, wuxingFlow: { top: '土', low: '金' }, liuNian: { year: 2026, ganzhi: '丙午', god: '正印' },
+       liuNianList: [], reading: [], preferences: { trait: '稳重', color: '黄', direction: '中央', fields: [] }, jie: { name: '立春', day: 4, time: '04:01:51' },
+       tendencyText: '候选未确定。', zodiac: '马',
+     },
+   };
+   const result = bazi.wrapResult(payload);
+   assert.equal(result.status, 'success');
+   assert.equal(result.metrics.certainty, 'ambiguous');
+   assert.equal(result.metrics.retained, false);
+   assert.ok(result.details.some((item) => item.value === 'lunar-javascript@1.7.3'));
+   assert.ok(result.details.some((item) => item.value === '北京时间'));
+   assert.ok(result.details.some((item) => item.value === '未知'));
+   assert.ok(result.limitations.some((item) => item.includes('候选')));
+   assert.ok(result.limitations.some((item) => item.includes('不生成精确时柱')));
+   assert.ok(result.limitations.some((item) => item.includes('不排大运')));
+   assert.equal(result.precision.time, 'unknown');
+   assert.equal(bazi.wrapResult({}).status, 'error');
+   const incomplete = JSON.parse(JSON.stringify(payload));
+   delete incomplete.result.weighted;
+   assert.equal(bazi.wrapResult(incomplete).status, 'error');
+   const missingBriefs = JSON.parse(JSON.stringify(payload));
+   delete missingBriefs.result.godBriefs;
+   assert.equal(bazi.wrapResult(missingBriefs).status, 'error');
+ });
+
+ test('八字真实后端结果可直接进入静态站结果契约', () => {
+   const engine = require(path.join(ROOT, '../main-api/app/lib/fortune-engine'));
+   const cases = [
+     { date: '1990-06-15', hour: 11, minute: 30, asOfDate: '2026-11-28' },
+     { date: '2026-02-04', hour: 4, minute: 1, asOfDate: '2026-11-28' },
+     { date: '2026-02-04', timePrecision: 'unknown', asOfDate: '2026-11-28' },
+   ];
+   for (const input of cases) {
+     const payload = engine.compute('bazi', input);
+     assert.ok(Array.isArray(payload.result.preferences.fields));
+     assert.equal(bazi.wrapResult(payload).status, 'success');
+   }
+ });
+
+ test('注册表包含 45 个独立工具与十五个 P0 工具模块', () => {
   const registry = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/tool-registry.json'), 'utf8'));
   assert.equal(registry.tools.length, 45);
   const byId = new Map(registry.tools.map((tool) => [tool.id, tool]));
-  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay', 'scientific', 'percentage', 'timezone', 'buy-house', 'buy-car', 'health-check', 'life-plan']) {
+  for (const id of ['random', 'vision', 'secret-message', 'air-quality', 'tax', 'social-insurance', 'prepay', 'scientific', 'percentage', 'timezone', 'buy-house', 'buy-car', 'health-check', 'life-plan', 'bazi']) {
     const tool = byId.get(id);
     assert.ok(tool, `缺少 ${id}`);
     assert.equal(tool.module, id);
     assert.ok(tool.entryScript, `${id} 缺少入口脚本`);
-    assert.equal(tool.computationMode, id === 'air-quality' ? 'api' : 'local');
+    assert.equal(tool.computationMode, [ 'air-quality', 'bazi' ].includes(id) ? 'api' : 'local');
   }
   assert.deepEqual(byId.get('buy-house').policyDependencies, ['deed-tax']);
   assert.deepEqual(byId.get('buy-car').policyDependencies, ['vehicle-purchase-tax']);
@@ -1095,6 +1179,10 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   assert.deepEqual(byId.get('health-check').analyticsAllowlist, ['success', 'resultType']);
   assert.deepEqual(byId.get('life-plan').policyDependencies, []);
   assert.deepEqual(byId.get('life-plan').analyticsAllowlist, ['success', 'resultType']);
+  assert.deepEqual(byId.get('bazi').analyticsAllowlist, ['success', 'certainty', 'retained']);
+  for (const field of ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate']) {
+    assert.ok(byId.get('bazi').sensitiveFields.includes(field));
+  }
   for (const field of ['income', 'expense', 'debtPayment', 'assets', 'goalAnnualExpense', 'debtPrincipal']) {
     assert.ok(byId.get('life-plan').sensitiveFields.includes(field));
   }
@@ -1103,7 +1191,7 @@ test('健康旧记录不向儿童或未知年龄回显成人体脂与 TDEE', () 
   }
 });
 
-test('十四个 P0 控制器引用的 DOM ID 均存在于模板', () => {
+test('十五个 P0 控制器引用的 DOM ID 均存在于模板', () => {
   const pairs = [
     ['random', 'random'],
     ['vision', 'vision'],
@@ -1119,6 +1207,7 @@ test('十四个 P0 控制器引用的 DOM ID 均存在于模板', () => {
     ['combo-buy-car', 'combo-buy-car'],
     ['combo-health-check', 'combo-health-check'],
     ['combo-life-plan', 'combo-life-plan'],
+    ['fortune-bazi', 'fortune-bazi'],
   ];
   for (const [controller, template] of pairs) {
     const js = fs.readFileSync(path.join(ROOT, 'assets/js/pages', controller + '.js'), 'utf8');
@@ -1146,6 +1235,8 @@ test('P0 模板保留关键隐私与安全边界', () => {
   const healthController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/combo-health-check.js'), 'utf8');
   const lifeHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/combo-life-plan.html'), 'utf8');
   const lifeController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/combo-life-plan.js'), 'utf8');
+  const baziHtml = fs.readFileSync(path.join(ROOT, 'templates/pages/fortune-bazi.html'), 'utf8');
+  const baziController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/fortune-bazi.js'), 'utf8');
   const randomController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/random.js'), 'utf8');
   assert.doesNotMatch(randomController, /Math\.random/);
   assert.doesNotMatch(visionHtml, /maxPass\s*=\s*1\.0/);
@@ -1175,6 +1266,12 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(lifeHtml, /id="lp-debt-principal"/);
   assert.match(lifeHtml, /id="lp-timing"/);
   assert.match(lifeHtml, /有效年收益率/);
+  assert.doesNotMatch(baziHtml, /<script>|innerHTML|value="12"|<option value="male" selected/);
+  assert.match(baziHtml, /<option value="unknown">/);
+  assert.doesNotMatch(baziController, /innerHTML|localStorage|sessionStorage/);
+  assert.match(baziHtml, /默认不留痕/);
+  assert.match(baziHtml, /id="bz-precision"/);
+  assert.match(baziHtml, /id="bz-retain"/);
 
   assert.match(randomController, /\.step = float \? 'any' : '1'/);
   const aqiController = fs.readFileSync(path.join(ROOT, 'assets/js/pages/tool-air-quality.js'), 'utf8');
@@ -1186,6 +1283,7 @@ test('P0 模板保留关键隐私与安全边界', () => {
   assert.match(toolState, /'combo-buy-car': 1/);
   assert.match(toolState, /'combo-health-check': 1/);
   assert.match(toolState, /'combo-life-plan': 1/);
+  assert.match(toolState, /'fortune-bazi': 1/);
   assert.match(toolState, /'buy-car': '买车全攻略'/);
   assert.match(toolState, /Core\.bridge\.allowed/);
 });

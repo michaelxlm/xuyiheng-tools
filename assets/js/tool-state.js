@@ -32,6 +32,7 @@
     'combo-buy-house': 1,
     'combo-buy-car': 1,
     'combo-life-plan': 1,
+    'fortune-bazi': 1,
     'combo-finance-toolkit': 1,
     'vision': 1
   };

@@ -17,7 +17,7 @@ const SENSITIVE = {
   'finance-toolkit': ['assets', 'income'], 'life-plan': ['income', 'expense', 'debtPayment', 'assets', 'annualRatePct', 'lowRatePct', 'highRatePct', 'years', 'inflationPct', 'withdrawalRatePct', 'goalAnnualExpense', 'timing', 'debtPrincipal', 'debtAnnualRatePct', 'debtRemainingMonths'],
   'buy-house': ['price', 'area', 'houseCount', 'policyDate', 'deedBasis', 'customDeedRatePct', 'downPct', 'years', 'commercialSharePct', 'commercialRatePct', 'fundRatePct', 'agentRatePct', 'buyerSharePct', 'otherCosts', 'monthlyIncome', 'otherMonthlyExpense', 'availableCash', 'emergencyMonths', 'incomeShockPct', 'rateShockPct'],
   'buy-car': ['guidePrice', 'invoicePrice', 'invoicePriceExVat', 'purchaseDate', 'taxReductionEligible', 'downPct', 'annualRatePct', 'years', 'purchaseFees', 'insurance', 'annualKm', 'energyUsePer100', 'energyPrice', 'monthlyIncome', 'otherMonthlyExpense'],
-  bazi: ['birthDate', 'birthTime', 'gender'], ziwei: ['birthDate', 'birthTime', 'gender'],
+  bazi: ['birthDate', 'birthTime', 'gender', 'timePrecision', 'timeBasis', 'longitude', 'lateZi', 'asOfDate'], ziwei: ['birthDate', 'birthTime', 'gender'],
   natal: ['birthDate', 'birthTime', 'birthPlace'], horoscope: ['zodiac', 'date'],
   'zodiac-match': ['birthDate', 'zodiac'], tarot: ['question'],
 };
@@ -29,7 +29,7 @@ const MODULES = {
   tax: 'tax', random: 'random', vision: 'vision', 'secret-message': 'secret-message',
   'air-quality': 'air-quality', 'social-insurance': 'social-insurance', prepay: 'prepay',
   scientific: 'scientific', percentage: 'percentage', timezone: 'timezone', 'buy-house': 'buy-house', 'buy-car': 'buy-car',
-  'health-check': 'health-check', 'life-plan': 'life-plan',
+  'health-check': 'health-check', 'life-plan': 'life-plan', bazi: 'bazi',
 };
 const EVENTS = {
   tax: ['mode', 'success', 'resultType'], random: ['type', 'unique', 'count', 'success'],
@@ -39,7 +39,7 @@ const EVENTS = {
   scientific: ['method', 'angleMode', 'success'], percentage: ['mode', 'success'],
   timezone: ['success', 'mode'], 'buy-house': ['success', 'resultType'],
   'buy-car': ['success', 'resultType', 'energy'], 'health-check': ['success', 'resultType'],
-  'life-plan': ['success', 'resultType'],
+  'life-plan': ['success', 'resultType'], bazi: ['success', 'certainty', 'retained'],
 };
 
 function slugOf(route) {

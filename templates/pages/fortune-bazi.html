@@ -1,188 +1,122 @@
-        <section class="page-heading">
-          <h1>八字排盘 · 四柱干支与五行</h1>
-          <p>不懂八字也能看：填写出生日期后，先读结果顶部的“白话导读”，再查看四柱与专业明细。我们会用日常语言解释日主、格局、五行和当前阶段，并说明常见误区；时辰与性别已预填，不确定时可保留默认值。传统命理无科学依据，仅供文化娱乐与自我观察。</p>
-        </section>
+<section class="page-heading">
+  <h1>八字排盘 · 四柱干支与五行</h1>
+  <p>填写出生日期与时间后主动排盘。结果先给白话导读，再展示四柱、五行、格局与大运；未知时辰不会伪造时柱，交节边界会给出候选。传统命理无科学依据，仅供文化娱乐与自我观察。</p>
+</section>
 
-        <form class="card" id="bzForm">
-          <div class="ft-form-grid">
-            <div class="form-group">
-              <label class="form-label" for="bz-date">公历出生日期</label>
-              <input class="form-input" id="bz-date" type="date" min="1900-01-01" max="2050-12-31" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="bz-hour">出生时辰</label>
-              <select class="form-select" id="bz-hour">
-                <option value="0">子时 23:00–01:00</option>
-                <option value="1">丑时 01:00–03:00</option>
-                <option value="3">寅时 03:00–05:00</option>
-                <option value="5">卯时 05:00–07:00</option>
-                <option value="7">辰时 07:00–09:00</option>
-                <option value="9">巳时 09:00–11:00</option>
-                <option value="11" selected>午时 11:00–13:00</option>
-                <option value="13">未时 13:00–15:00</option>
-                <option value="15">申时 15:00–17:00</option>
-                <option value="17">酉时 17:00–19:00</option>
-                <option value="19">戌时 19:00–21:00</option>
-                <option value="21">亥时 21:00–23:00</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="bz-gender">性别（用于大运顺逆）</label>
-              <select class="form-select" id="bz-gender">
-                <option value="male" selected>男</option>
-                <option value="female">女</option>
-              </select>
-            </div>
-          </div>
-          <div class="btn-row mt-3">
-            <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>一键排盘</button>
-          </div>
-          <p class="text-sm text-muted mt-3">时辰、性别均已预填；不确定时辰时直接用默认值午时即可，性别只影响大运顺逆。</p>
-          <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。提交即表示同意中台处理本次出生信息用于测算与留痕。</p>
-        </form>
+<form class="card" id="bzForm" novalidate>
+  <div class="ft-form-grid">
+    <div class="form-group">
+      <label class="form-label" for="bz-date">公历出生日期</label>
+      <input class="form-input" id="bz-date" type="date" min="1900-01-01" max="2050-12-31" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-precision">时间精确度</label>
+      <select class="form-select" id="bz-precision">
+        <option value="exact">精确到分钟</option>
+        <option value="approximate">大约时间（低置信度）</option>
+        <option value="unknown">时辰未知</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-hour">出生小时</label>
+      <input class="form-input" id="bz-hour" type="number" min="0" max="23" step="1" inputmode="numeric" value="0" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-minute">出生分钟</label>
+      <input class="form-input" id="bz-minute" type="number" min="0" max="59" step="1" inputmode="numeric" value="0" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-basis">时间口径</label>
+      <select class="form-select" id="bz-basis">
+        <option value="beijing">北京时间（UTC+8）</option>
+        <option value="true-solar">真太阳时（经度近似）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-longitude">出生地经度（真太阳时必填）</label>
+      <input class="form-input" id="bz-longitude" type="number" min="-180" max="180" step="0.0001" inputmode="decimal" placeholder="例如北京 116.4074" disabled>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-late-zi">晚子时规则</label>
+      <select class="form-select" id="bz-late-zi">
+        <option value="same-day">23:00 不换日</option>
+        <option value="next-day">23:00 换日</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-gender">性别（仅用于大运顺逆）</label>
+      <select class="form-select" id="bz-gender">
+        <option value="unknown">未知／不排大运</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="bz-asof">大运与流年对照日期</label>
+      <input class="form-input" id="bz-asof" type="date" min="1900-01-01" max="2050-12-31" required>
+    </div>
+  </div>
+  <label class="checkbox-label mt-3" for="bz-retain">
+    <input id="bz-retain" type="checkbox">
+    <span>我了解出生信息属于敏感数据，同意本次测算在服务端留痕，最长保留 24 小时，并理解关闭页面后删除凭证不会保留。</span>
+  </label>
+  <div class="btn-row mt-3">
+    <button class="btn btn-primary" id="bz-submit" type="submit" data-track="calc_click" data-track-props='{"tool":"bazi"}'>一键排盘</button>
+    <button class="btn btn-outline" id="bz-delete" type="button" hidden>物理删除本次留痕</button>
+  </div>
+  <p class="text-sm text-muted mt-3">默认不留痕：出生信息仅用于本次计算，不写入 URL、浏览器存储或分析事件。真太阳时只做经度修正，不含均时差；交节时刻仍按北京时间判定。</p>
+  <p class="ft-disclaimer">传统文化娱乐内容，无科学依据，请勿据此做重大决定。</p>
+  <p class="form-error" id="bz-error" role="alert" hidden></p>
+  <p class="text-sm mt-2" id="bz-status" role="status" aria-live="polite" hidden></p>
+</form>
 
-        <div class="result-box" id="bzResult" hidden>
-          <div id="bzPlain" aria-live="polite"></div>
-          <div class="ft-pillars" id="bzPillars"></div>
-          <dl class="result-detail mt-3" id="bzDetail"></dl>
-          <h3 class="mt-4" id="bzWuxingTitle">五行分布（藏干加权：本气60／中气30／余气10）</h3>
-          <div id="bzWuxing"></div>
-          <h3 class="ft-section-title">格局与用神</h3>
-          <div id="bzPattern"></div>
-          <h3 class="ft-section-title">神煞</h3>
-          <div id="bzShenSha"></div>
-          <h3 class="ft-section-title">地支关系（刑冲合害破）</h3>
-          <div id="bzBranchRels"></div>
-          <h3 class="ft-section-title">十神结构</h3>
-          <div class="ft-kv-grid" id="bzGods"></div>
-          <h3 class="ft-section-title">四柱定位</h3>
-          <div class="ft-kv-grid" id="bzPillarNotes"></div>
-          <h3 class="ft-section-title">藏干十神</h3>
-          <div class="ft-kv-grid" id="bzHiddenGods"></div>
-          <h3 class="ft-section-title">五行生克参考</h3>
-          <div id="bzFlow"></div>
-          <h3 class="ft-section-title">当前大运与流年</h3>
-          <div class="ft-kv-grid" id="bzNow"></div>
-          <div class="mt-3" id="bzLiuNian"></div>
-          <h3 class="ft-section-title">排盘解读</h3>
-          <ul class="ft-note-list" id="bzReading"></ul>
-          <div class="mt-3" id="bzPref"></div>
-          <h3 class="ft-section-title">大运一览（每十年一运）</h3>
-          <div id="bzDayun"></div>
-          <p class="text-sm text-muted mt-3" id="bzNote"></p>
-        </div>
+<div class="result-box" id="bz-result" hidden>
+  <div id="bzPlain" aria-live="polite"></div>
+  <div class="ft-pillars" id="bzPillars"></div>
+  <dl class="result-detail mt-3" id="bzDetail"></dl>
+  <div id="bz-candidate-title" hidden>
+    <h3 class="ft-section-title">交节边界候选</h3>
+    <div id="bzCandidates"></div>
+  </div>
+  <h3 class="mt-4">五行分布（藏干加权：本气60／中气30／余气10）</h3>
+  <div id="bzWuxing"></div>
+  <h3 class="ft-section-title">格局与用神</h3>
+  <div id="bzPattern"></div>
+  <h3 class="ft-section-title">神煞</h3>
+  <div id="bzShenSha"></div>
+  <h3 class="ft-section-title">地支关系（刑冲合害破）</h3>
+  <div id="bzBranchRels"></div>
+  <h3 class="ft-section-title">十神结构</h3>
+  <div class="ft-kv-grid" id="bzGods"></div>
+  <h3 class="ft-section-title">四柱定位</h3>
+  <div class="ft-kv-grid" id="bzPillarNotes"></div>
+  <h3 class="ft-section-title">藏干十神</h3>
+  <div class="ft-kv-grid" id="bzHiddenGods"></div>
+  <h3 class="ft-section-title">五行生克参考</h3>
+  <div id="bzFlow"></div>
+  <h3 class="ft-section-title">当前大运与流年</h3>
+  <div class="ft-kv-grid" id="bzNow"></div>
+  <div class="mt-3" id="bzLiuNian"></div>
+  <h3 class="ft-section-title">排盘解读</h3>
+  <ul class="ft-note-list" id="bzReading"></ul>
+  <div class="mt-3" id="bzPref"></div>
+  <h3 class="ft-section-title">大运一览（每十年一运）</h3>
+  <div id="bzDayun"></div>
+  <h3 class="ft-section-title">计算口径与限制</h3>
+  <div id="bzExplain"></div>
+  <p class="text-sm text-muted mt-3" id="bz-note"></p>
+</div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看日主与整体倾向，再看格局、用神，最后看大运、流年和神煞。下面的藏干权重、节气换柱等是计算口径，供专业用户复核，第一次阅读可以跳过。恰在交节当天或 23 点前后出生者，请以当年精确节气与当地真太阳时复核。</div></div>
-
-        <script>
-        (function () {
-          function boot() {
-            var F = window.FortuneAPI; if (!F) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>'; }
-            function kv(k, v) { return '<div class="ft-kv"><span>' + esc(k) + '</span><strong>' + esc(v) + '</strong></div>'; }
-            var dateInput = $('bz-date');
-            F.fillToday(dateInput);
-            $('bzForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var p = (dateInput.value || '').split('-');
-              if (p.length !== 3) { alert('请选择出生日期'); return; }
-              var btn = $('bzForm').querySelector('button[type=submit]');
-              F.run(btn, 'bazi', {
-                date: dateInput.value,
-                hour: Number($('bz-hour').value),
-                gender: $('bz-gender').value
-              }).then(function (b) {
-                F.renderPlainGuide($('bzPlain'), b.plainGuide);
-                var html = '';
-                b.pillars.forEach(function (d, i) {
-                  html += '<div class="ft-pillar' + (i === 2 ? ' is-day' : '') + '">' +
-                    '<div class="ft-label">' + esc(d.name) + '</div>' +
-                    '<div class="ft-gz"><span class="s">' + esc(d.ganzhi.charAt(0)) + '</span><span>' + esc(d.ganzhi.charAt(1)) + '</span></div>' +
-                    '<div class="ft-sub">藏干 ' + esc(d.hidden.join('、')) + '</div>' +
-                    '<div class="ft-sub">' + esc(d.nayin) + ' · ' + esc(d.chengSheng) + '</div>' +
-                    '<span class="ft-god">' + esc(d.god) + '</span></div>';
-                });
-                $('bzPillars').innerHTML = html;
-                $('bzDetail').innerHTML = row('日主', b.dayMaster + '（' + b.dayElement + '）') +
-                  row('农历', b.lunar || '超出中台农历表范围') +
-                  row('生肖', b.zodiac) +
-                  row('同党 / 异党（加权）', b.support + ' / ' + b.drain + ' · 强弱指数 ' + b.strengthIndex) +
-                  row('三得', (b.sanDe.deLing ? '得令' : '失令') + ' · ' + (b.sanDe.deDi.length ? '得地（' + b.sanDe.deDi.join('、') + '）' : '未得地') + ' · ' + (b.sanDe.deShi ? '得势' : '未得势')) +
-                  row('强弱倾向', b.tendency) +
-                  row('旬空', b.xunkong.join('、')) +
-                  row('月令节气', b.jie.name + '（约 ' + b.jie.day + ' 日）');
-                var max = Math.max.apply(null, b.weighted) || 1;
-                $('bzWuxing').innerHTML = F.WUXING.map(function (w, i) {
-                  return '<div class="ft-wx-row"><span>' + w + '</span><span class="ft-wx-track"><span class="ft-wx-fill" style="width:' +
-                    Math.round(b.weighted[i] / max * 100) + '%"></span></span><span class="ft-wx-num">' + b.weighted[i] +
-                    (b.count[i] ? '' : '（缺）') + '</span></div>';
-                }).join('');
-                var th = b.tiaohou || { need: '—', satisfied: true, note: '' };
-                $('bzPattern').innerHTML = '<div class="ft-kv-grid">' +
-                  kv('格局 · ' + b.pattern.name, b.pattern.how) +
-                  kv('用神（' + b.yongshen.way + '）', b.yongshen.label + ' · 五行' + b.yongshen.element) +
-                  kv('忌神', b.jishen.label + ' · 五行' + b.jishen.element) +
-                  kv('调候', th.need + (th.satisfied ? '（原局已见）' : '（原局未现）')) + '</div>' +
-                  '<p class="text-sm mt-2">' + esc(b.pattern.text) + '</p>' +
-                  '<p class="text-sm text-muted mt-1">' + esc(th.note) + '</p>';
-                $('bzShenSha').innerHTML = '<table class="ft-ref-table"><thead><tr><th>神煞</th><th>基准</th><th>命局</th><th>释义</th></tr></thead><tbody>' +
-                  b.shenSha.map(function (s) {
-                    return '<tr' + (s.present ? ' class="is-active"' : '') + '><td>' + esc(s.name) + '</td><td>' + esc(s.key) +
-                      '</td><td>' + (s.present ? esc(s.foundIn.join('、')) : '<span class="text-muted">不见</span>') +
-                      '</td><td class="text-sm">' + esc(s.note) + '</td></tr>';
-                  }).join('') + '</tbody></table>';
-                $('bzBranchRels').innerHTML = b.branchRels.length
-                  ? '<div class="ft-kv-grid">' + b.branchRels.map(function (r) {
-                      return kv(r.pair, r.rels.join('、')); }).join('') + '</div>'
-                  : '<p class="text-sm text-muted">四柱地支之间未见六合／三合／相冲／相刑／相害／相破。</p>';
-                $('bzGods').innerHTML = Object.keys(b.gods).sort(function (x, y) { return b.gods[y] - b.gods[x]; })
-                  .map(function (k) { return kv(k + ' × ' + b.gods[k], b.godBriefs[k] || ''); }).join('');
-                $('bzPillarNotes').innerHTML = b.pillarNotes.map(function (p) {
-                  return kv(p.name + ' · ' + p.ganzhi, p.role);
-                }).join('');
-                $('bzHiddenGods').innerHTML = Object.keys(b.hiddenGods).sort(function (x, y) { return b.hiddenGods[y] - b.hiddenGods[x]; })
-                  .map(function (k) { return kv(k + ' × ' + b.hiddenGods[k], b.godBriefs[k] || ''); }).join('');
-                $('bzFlow').innerHTML = '<div class="ft-kv-grid">' + kv('较多五行', b.wuxingFlow.top + '（' + b.wuxingFlow.maxCount + '处）') +
-                  kv('较少五行', b.wuxingFlow.low + '（' + b.wuxingFlow.minCount + '处）') + '</div>' +
-                  '<p class="text-sm text-muted mt-3">相生：' + esc(b.wuxingFlow.generate) + '<br>相克：' + esc(b.wuxingFlow.control) + '</p>';
-                $('bzNow').innerHTML = kv('当前大运', b.dayun.current ? b.dayun.current.ganzhi + '（' + b.dayun.current.god + ' · ' + b.dayun.current.age + '岁）' : '未起运') +
-                  kv('流年 ' + b.liuNian.year, b.liuNian.ganzhi + ' · ' + b.liuNian.god) +
-                  kv('起运', b.dayun.direction + ' · 约 ' + b.dayun.startAge + ' 岁');
-                $('bzLiuNian').innerHTML = '<table class="ft-ref-table"><thead><tr><th>年份</th><th>干支</th><th>十神</th></tr></thead><tbody>' +
-                  b.liuNianList.map(function (d) {
-                    return '<tr' + (d.isNow ? ' class="is-active"' : '') + '><td>' + d.year + '</td><td>' + esc(d.ganzhi) +
-                      '</td><td>' + esc(d.god) + '</td></tr>';
-                  }).join('') + '</tbody></table>';
-                $('bzReading').innerHTML = b.reading.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-                $('bzPref').innerHTML = [ '倾向 ' + b.preferences.trait, '色系 ' + b.preferences.color,
-                  '方位 ' + b.preferences.direction, '参考领域 ' + b.preferences.fields ]
-                  .map(function (s) { return '<span class="ft-chip">' + esc(s) + '</span>'; }).join('');
-                $('bzDayun').innerHTML = '<table class="ft-ref-table"><thead><tr><th>运次</th><th>干支</th><th>十神</th><th>起岁</th><th>约年</th></tr></thead><tbody>' +
-                  b.dayun.items.map(function (d, i) {
-                    return '<tr' + (d.ganzhi === b.dayun.current.ganzhi ? ' class="is-active"' : '') + '><td>' + (i + 1) +
-                      '</td><td>' + esc(d.ganzhi) + '</td><td>' + esc(d.god) + '</td><td>' + d.age + ' 岁</td><td>' + d.year + '</td></tr>';
-                  }).join('') + '</tbody></table>';
-                $('bzNote').textContent = b.tendencyText + '「' + b.tendency + '」仅按五行个数对比得出，是结构描述而非命运判断。';
-                $('bzResult').hidden = false;
-                if (window.U && U.track) U.track('calc_result', { tool: 'bazi' });
-              }).catch(function (err) { alert('排盘失败：' + (err && err.message ? err.message : '请稍后重试')); });
-            });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+<div class="info-box mt-4"><span>ℹ️</span><div><strong>怎么读：</strong>先看日主与整体倾向，再看格局、用神，最后看大运、流年和神煞。恰在交节当天或 23 点前后出生者，请优先补全分钟、选择晚子时规则，并以权威历法复核。候选四柱不是算命结论更准，而是承认输入精度不足。</div></div>
 
 <section class="tool-info">
-          <h2>关于本工具</h2>
-          <p>八字排盘把出生的年月日时配成四组干支，再用传统五行关系整理成一张观察地图。本页先给白话导读，再保留四柱、十神、用神、大运等完整数据，方便你按自己的节奏阅读或复核。它不定义你的性格，也不预测人生走向。</p>
-          <h2 style="margin-top:1.5em">常见问题</h2>
-          <details><summary>年柱为什么按立春而不是春节？</summary><p>命理排盘通常以立春作为一年起点，与民俗中以农历正月初一换年的口径不同，立春前后出生者两种口径会不一致。</p></details>
-          <details><summary>藏干和十神是什么意思？</summary><p>藏干是地支中暗含的天干，十神是相对日主与其他天干的生克关系名称，用来描述结构，不代表吉凶结论。</p></details>
-          <details><summary>23 点出生算哪一天？</summary><p>本工具把 23:00–01:00 作为子时，归入当日的时柱。部分流派主张晚子时换日，请以你采用的口径复核。</p></details>
-          <details><summary>第一次看结果，要从哪里开始？</summary><p>先看结果顶部的白话导读，按“盘心—整体倾向—格局—当前阶段”的顺序读。下面的表格是计算明细，不需要一次全部看懂。</p></details>
-          <details><summary>五行缺什么就要补什么吗？</summary><p>不是。五行数量只是传统结构统计，用神也不是“缺什么补什么”的生活清单。不要据此购买物品、选择颜色或安排重大事项。</p></details>
-          <details><summary>偏弱、偏旺或相冲代表运气不好吗？</summary><p>不代表。它们只是不同传统规则的标签，没有绝对好坏，也不能据此判断健康、财富、感情或人生结果。</p></details>
-          <details><summary>隐私如何保障？</summary><p>出生日期、时辰与性别仅用于本次中台测算并在服务端留痕，便于审计与复核；浏览器端不再保存这些输入，页面也不写入本地存储。请勿在输入框填写与测算无关的敏感信息。</p></details>
-        </section>
+  <h2>关于本工具</h2>
+  <p>八字排盘把出生时间换成四组干支，再用传统五行关系整理成一张观察地图。计算使用带交节时刻的寿星万年历口径，支持北京时间与经度真太阳时近似；未知时辰只排三柱，未知性别不排大运。它不定义性格，也不预测人生走向。</p>
+  <h2 style="margin-top:1.5em">常见问题</h2>
+  <details><summary>为什么不再默认午时和男性？</summary><p>默认值会把未知信息伪装成已知输入。现在必须主动选择时间精确度和性别；未知时辰不生成时柱，未知性别不排大运。</p></details>
+  <details><summary>交节前后为什么会显示候选？</summary><p>输入只精确到分钟，而交节发生在某一秒。若出生分钟可能跨越交节，年柱或月柱就会不同，因此同时列出候选；时辰未知且恰逢交节日时，也会列出当天可能的年月柱。</p></details>
+  <details><summary>真太阳时和北京时间有什么区别？</summary><p>真太阳时按出生地经度相对东经120度修正，每度约4分钟。本工具未加入均时差，属于近似口径；交节表本身仍按北京时间。</p></details>
+  <details><summary>23 点出生算哪一天？</summary><p>可在“晚子时规则”中选择 23:00 换日或不换日。不同流派口径不同，结果会固定显示你的选择。</p></details>
+  <details><summary>出生信息会被保存吗？</summary><p>默认不会。只有主动勾选同意后才会在服务端留痕，最长保留 24 小时；删除凭证仅在当前页面内存中有效，关闭或刷新后无法再删除。请不要在无关设备或共享浏览器上主动留痕。</p></details>
+  <details><summary>五行缺什么就要补什么吗？</summary><p>不是。五行数量只是传统结构统计，用神也不是“缺什么补什么”的生活清单。不要据此购买物品、选择颜色或安排重大事项。</p></details>
+</section>
