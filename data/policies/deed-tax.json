@@ -1,0 +1,46 @@
+{
+  "id": "deed-tax",
+  "title": "住房交易契税与购房成本参数快照",
+  "jurisdiction": "中国内地",
+  "version": "2024.12-2026.11",
+  "effectiveDate": "2024-12-01",
+  "verifiedAt": "2026-11-28",
+  "thresholdAreaM2": 140,
+  "rates": {
+    "first": { "upTo": 0.01, "above": 0.015 },
+    "second": { "upTo": 0.01, "above": 0.02 }
+  },
+  "thirdOrMore": {
+    "requiresCustomRate": true,
+    "minRate": 0.03,
+    "maxRate": 0.05
+  },
+  "mortgageDefaults": {
+    "commercialRatePct": null,
+    "fundRatePct": null,
+    "commercialSharePct": 100,
+    "note": "商业贷款年利率必须填写银行实际报价；公积金利率按贷款发放日期、套数、期限与当地政策核对。本工具不把示例利率称为当前 LPR。"
+  },
+  "sources": [
+    {
+      "title": "财政部 税务总局 住房城乡建设部公告2024年第16号：关于促进房地产市场平稳健康发展有关税收政策的公告",
+      "url": "http://fgk.mof.gov.cn/ui/src/views/law_html/1862056228917706754.html"
+    },
+    {
+      "title": "中国人民银行关于调整商业性个人住房贷款利率政策的通知（银发〔2024〕103号）",
+      "url": "https://camlmac.pbc.gov.cn/zhengwugongkai/4081330/4406346/4693549/5523556/index.html"
+    },
+    {
+      "title": "住房和城乡建设部 市场监管总局关于规范房地产经纪服务的意见（建房规〔2023〕2号）",
+      "url": "https://zjj.pingliang.gov.cn/zfxxgk/fdzdgknr/lzyj/sjzc/art/2024/art_822eb21bba5a479dba8b91e9d28df8de.html"
+    }
+  ],
+  "limitations": [
+    "首套指家庭唯一住房，二套指家庭第二套住房；家庭成员包括购房人、配偶及未成年子女。",
+    "140平方米包含本数；面积、套数与计税依据以购房所在地房地产管理部门和税务机关认定为准。",
+    "第三套及以上不适用首套、二套优惠税率，必须填写当地适用税率。",
+    "2024年12月1日前已发生但尚未申报缴纳且符合新公告条件的交易，可由税务机关确认是否适用新政策。",
+    "商业房贷自2024年5月18日起取消全国层面首套、二套利率政策下限，实际利率由城市政策与银行报价确定。",
+    "中介服务收费由交易各方协商确定，没有全国统一法定费率；留空仅表示未计入，不表示免费。"
+  ]
+}

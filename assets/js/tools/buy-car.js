@@ -1,0 +1,264 @@
+/* ==========================================================================
+   buy-car.js · 购车税贷、落地支出与持有期用车成本纯计算模块
+   ========================================================================== */
+(function (root, factory) {
+  'use strict';
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(globalThis, require('../tool-core'), require('../core/result'), require('../../../data/policies/vehicle-purchase-tax.json'));
+  } else {
+    root.Tools = root.Tools || {};
+    root.Tools.buyCar = factory(root, root.Core, root.ToolCore.Result, (root.__TOOL_POLICIES__ || {})['vehicle-purchase-tax']);
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (global, Core, Result, defaultPolicy) {
+  'use strict';
+  var D = Result.detail;
+  var MAX_MONEY = 1e12;
+
+  function numeric(value, fallback, required, errors, label, min, max) {
+    if (value == null || String(value).trim() === '') {
+      if (required) errors.push(label + '不能为空');
+      return fallback;
+    }
+    var n = Number(value);
+    if (!isFinite(n)) {
+      errors.push(label + '必须是有限数');
+      return fallback;
+    }
+    if (min != null && n < min) errors.push(label + '不能小于 ' + min);
+    if (max != null && n > max) errors.push(label + '不能大于 ' + max);
+    return n;
+  }
+
+  function validDate(value) {
+    var text = String(value || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false;
+    var parts = text.split('-').map(Number);
+    if (parts[0] < 1900) return false;
+    var date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    return date.getUTCFullYear() === parts[0] && date.getUTCMonth() === parts[1] - 1 && date.getUTCDate() === parts[2];
+  }
+
+  function truthy(value) {
+    return value === true || value === '1' || value === 'true';
+  }
+
+  function purchaseTax(taxablePrice, energyType, eligible, seats, purchaseDate, policy) {
+    var p = policy || defaultPolicy;
+    if (!p || !p.newEnergyReduction || !(Number(taxablePrice) > 0)) return NaN;
+    if (!validDate(purchaseDate) || purchaseDate < p.coverageStartDate || purchaseDate > p.coverageEndDate) return NaN;
+    var base = taxablePrice * Number(p.baseRate);
+    if (energyType !== 'ev' || !eligible) return base;
+    if (!(Number(seats) > 0 && Number(seats) <= p.newEnergyReduction.passengerSeatLimit)) return NaN;
+    var reduction = Math.min(base * Number(p.newEnergyReduction.reductionRate), Number(p.newEnergyReduction.passengerReductionCap));
+    return base - reduction;
+  }
+
+  function calculate(input, policyOverride) {
+    var o = input || {};
+    var policy = policyOverride || defaultPolicy;
+    var errors = [];
+    if (!policy || !policy.sources || !policy.newEnergyReduction) {
+      return Result.invalid('buy-car', '缺少车辆购置税政策快照', {});
+    }
+
+    var guidePrice = numeric(o.guidePrice, null, false, errors, '车辆指导价', 0, MAX_MONEY);
+    var invoicePrice = numeric(o.invoicePrice, NaN, true, errors, '含税开票价格', 0, MAX_MONEY);
+    var invoicePriceExVat = numeric(o.invoicePriceExVat, null, false, errors, '不含税开票价格', 0, MAX_MONEY);
+    var vatRatePct = numeric(o.vatRatePct, policy.defaultVatRatePct, false, errors, '发票增值税率', 0, 100);
+    var energyType = ['fuel', 'ev'].indexOf(o.energyType) >= 0 ? o.energyType : 'fuel';
+    if (o.energyType != null && ['fuel', 'ev'].indexOf(o.energyType) < 0) errors.push('能源类型必须是燃油车或新能源');
+    var eligible = truthy(o.taxReductionEligible);
+    var seats = numeric(o.seats, null, eligible, errors, '座位数', 1, 99);
+    if (seats != null && Math.floor(seats) !== seats) errors.push('座位数必须按整数填写');
+    if (eligible && energyType !== 'ev') errors.push('燃油车不能勾选新能源购置税减免资格');
+    if (eligible && seats > policy.newEnergyReduction.passengerSeatLimit) errors.push('新能源乘用车减税限额仅适用于不超过 9 座的车辆');
+
+    var purchaseDate = String(o.purchaseDate || '');
+    if (!validDate(purchaseDate)) errors.push('购置日期必须是有效的 YYYY-MM-DD 日期');
+    else if (purchaseDate < policy.coverageStartDate || purchaseDate > policy.coverageEndDate) {
+      errors.push('购置日期超出已核验政策覆盖期 ' + policy.coverageStartDate + ' 至 ' + policy.coverageEndDate);
+    }
+    if (invoicePrice <= 0) errors.push('含税开票价格必须大于 0');
+    if (guidePrice != null && guidePrice <= 0) errors.push('车辆指导价必须大于 0');
+    if (invoicePriceExVat != null && invoicePriceExVat <= 0) errors.push('不含税开票价格必须大于 0');
+    if (invoicePriceExVat != null && invoicePriceExVat > invoicePrice) errors.push('不含税开票价格不能大于含税开票价格');
+    if (invoicePriceExVat == null && vatRatePct >= 100) errors.push('使用含税价换算时增值税率必须小于 100%');
+
+    var taxablePrice = invoicePriceExVat != null ? invoicePriceExVat : invoicePrice / (1 + vatRatePct / 100);
+    var baseTax = taxablePrice * Number(policy.baseRate);
+    var reduction = eligible && energyType === 'ev' && !errors.length ? Math.min(baseTax * Number(policy.newEnergyReduction.reductionRate), Number(policy.newEnergyReduction.passengerReductionCap)) : 0;
+    var tax = purchaseTax(taxablePrice, energyType, eligible, seats, purchaseDate, policy);
+
+    var downPct = numeric(o.downPct, 30, false, errors, '首付比例', 0, 100);
+    var years = numeric(o.years, 3, false, errors, '贷款年限', 1, 7);
+    if (Math.floor(years) !== years) errors.push('贷款年限必须按整年填写');
+    var months = Math.round(years * 12);
+    var annualRatePct = numeric(o.annualRatePct, NaN, false, errors, '车贷年利率', 0, 100);
+    var downPayment = invoicePrice * downPct / 100;
+    var loanPrincipal = Math.max(0, invoicePrice - downPayment);
+    if (loanPrincipal > 0 && !isFinite(annualRatePct)) errors.push('贷款金额大于 0 时必须填写车贷年利率');
+
+    var registrationFee = numeric(o.registrationFee, 0, false, errors, '上牌及登记费', 0, MAX_MONEY);
+    var serviceFee = numeric(o.serviceFee, 0, false, errors, '服务及金融服务费', 0, MAX_MONEY);
+    var decorationFee = numeric(o.decorationFee, 0, false, errors, '装饰及加装费', 0, MAX_MONEY);
+    var chargerFee = numeric(o.chargerFee, 0, false, errors, '充电桩及安装费', 0, MAX_MONEY);
+    var otherPurchaseFees = numeric(o.otherPurchaseFees, 0, false, errors, '其他购车费用', 0, MAX_MONEY);
+    var compulsoryInsurance = numeric(o.compulsoryInsurance, 0, false, errors, '交强险', 0, MAX_MONEY);
+    var commercialInsurance = numeric(o.commercialInsurance, 0, false, errors, '商业险', 0, MAX_MONEY);
+    var vehicleVesselTax = numeric(o.vehicleVesselTax, 0, false, errors, '车船税', 0, MAX_MONEY);
+    var firstYearInsurance = compulsoryInsurance + commercialInsurance + vehicleVesselTax;
+    var purchaseFees = registrationFee + serviceFee + decorationFee + chargerFee + otherPurchaseFees;
+    var upfrontExtras = purchaseFees + firstYearInsurance + tax;
+
+    var holdYears = numeric(o.holdYears, 3, false, errors, '持有年限', 1, 30);
+    if (Math.floor(holdYears) !== holdYears) errors.push('持有年限必须按整年填写');
+    var annualKm = numeric(o.annualKm, 0, false, errors, '年行驶里程', 0, 1000000);
+    var energyUsePer100 = numeric(o.energyUsePer100, 0, false, errors, '百公里能耗', 0, 1000);
+    var energyPrice = numeric(o.energyPrice, 0, false, errors, '能源单价', 0, 10000);
+    var maintenancePerYear = numeric(o.maintenancePerYear, 0, false, errors, '年保养费用', 0, MAX_MONEY);
+    var parkingPerMonth = numeric(o.parkingPerMonth, 0, false, errors, '月停车费用', 0, MAX_MONEY);
+    var otherAnnualCost = numeric(o.otherAnnualCost, 0, false, errors, '其他年用车成本', 0, MAX_MONEY);
+    var renewalInsurancePerYear = numeric(o.renewalInsurancePerYear, firstYearInsurance, false, errors, '后续年均保险与车船税', 0, MAX_MONEY);
+    var monthlyIncome = numeric(o.monthlyIncome, null, false, errors, '税后月收入', 0, MAX_MONEY);
+    var otherMonthlyExpense = numeric(o.otherMonthlyExpense, 0, false, errors, '其他月支出', 0, MAX_MONEY);
+    if (errors.length) return Result.invalid('buy-car', errors.join('；'), policy);
+
+    var monthlyPayment = loanPrincipal > 0 ? Core.loan.annuity(loanPrincipal, annualRatePct, months) : 0;
+    var totalInterest = loanPrincipal > 0 ? Math.max(0, monthlyPayment * months - loanPrincipal) : 0;
+    if (!isFinite(monthlyPayment) || !isFinite(totalInterest) || !isFinite(tax)) {
+      return Result.invalid('buy-car', '计算结果超出可表示范围，请检查输入金额与期限', policy);
+    }
+    var energyAnnual = annualKm * energyUsePer100 / 100 * energyPrice;
+    var maintenanceAnnual = maintenancePerYear;
+    var parkingAnnual = parkingPerMonth * 12;
+    var otherAnnual = otherAnnualCost;
+    var operatingAnnual = energyAnnual + maintenanceAnnual + parkingAnnual + otherAnnual;
+    var recurringAnnual = operatingAnnual + renewalInsurancePerYear;
+    var recurringDuringHold = operatingAnnual * holdYears + renewalInsurancePerYear * (holdYears - 1);
+    var monthlyOwnershipCost = recurringAnnual / 12;
+    var cashUpfront = downPayment + upfrontExtras;
+    var landingPrice = invoicePrice + upfrontExtras;
+    var fullCashOwnershipTotal = landingPrice + recurringDuringHold;
+    var paidMonths = Math.min(months, holdYears * 12);
+    var loanPaymentsDuringHold = monthlyPayment * paidMonths;
+    var remainingPrincipalAtSale = loanPrincipal > 0
+      ? Core.loan.balanceAfter(loanPrincipal, annualRatePct, months, paidMonths)
+      : 0;
+    var loanOwnershipTotal = cashUpfront + loanPaymentsDuringHold + remainingPrincipalAtSale + recurringDuringHold;
+    var monthlyBurden = monthlyPayment + monthlyOwnershipCost;
+    var cashflow = {
+      provided: monthlyIncome != null,
+      status: monthlyIncome == null ? 'not_provided' : 'provided',
+      income: monthlyIncome,
+      otherExpense: otherMonthlyExpense,
+      debtToIncomePct: monthlyIncome != null && monthlyIncome > 0 ? monthlyBurden / monthlyIncome * 100 : null,
+      monthlySurplus: monthlyIncome == null ? null : monthlyIncome - otherMonthlyExpense - monthlyBurden,
+    };
+
+    var details = [
+      D('车辆指导价', guidePrice == null ? '未填写' : guidePrice, guidePrice == null ? '仅用于与开票价比较' : '元'),
+      D('含税开票价格', invoicePrice, '元'),
+      D('购置税计税价格', taxablePrice, invoicePriceExVat == null ? '元，按含税价除以 1+' + vatRatePct + '% 换算' : '元，采用发票不含税价'),
+      D('基准应纳税额', baseTax, '元，计税价格 × 10%'),
+      D('新能源减税额', reduction, eligible && energyType === 'ev' ? '元，减半但受 15000 元限额约束' : '元，未确认减免资格或非新能源'),
+      D('车辆购置税', tax, '元'),
+      D('贷款本金', loanPrincipal, '元'),
+      D('车贷月供', monthlyPayment, '元/月，等额本息'),
+      D('贷款总利息', totalInterest, '元，完整贷款期限口径'),
+      D('持有期内已还月供', loanPaymentsDuringHold, '元，按持有年限与贷款期限取较短月数'),
+      D('期末结清剩余本金', remainingPrincipalAtSale, '元，假设持有期结束时结清贷款'),
+      D('首付金额', downPayment, '元'),
+      D('上牌及登记费', registrationFee, '元，未填时未计入'),
+      D('服务及金融服务费', serviceFee, '元，未填时未计入'),
+      D('装饰及加装费', decorationFee, '元，未填时未计入'),
+      D('充电桩及安装费', chargerFee, '元，未填时未计入'),
+      D('其他购车费用', otherPurchaseFees, '元，未填时未计入'),
+      D('首年保险与车船税', firstYearInsurance, '元，未填时未计入'),
+      D('签约前现金需求', cashUpfront, '元，含首付、税费、购车费用与首年保险'),
+      D('落地价格', landingPrice, '元，不含贷款利息与后续用车成本'),
+      D('年能源费用', energyAnnual, '元/年'),
+      D('年保养费用', maintenanceAnnual, '元/年'),
+      D('年停车费用', parkingAnnual, '元/年'),
+      D('其他年用车成本', otherAnnual, '元/年'),
+      D('后续年均保险与车船税', renewalInsurancePerYear, '元/年，留空时沿用首年报价'),
+      D('月均用车成本', monthlyOwnershipCost, '元/月，含能源、保养、停车、其他与后续年均保险'),
+      D('持有期后续用车成本', recurringDuringHold, '元，首年保险已计入落地价格，此处仅含后续保险与用车费用'),
+      D('全款持有期总成本', fullCashOwnershipTotal, '元，含落地价格与持有期后续用车成本'),
+      D('贷款持有期总成本', loanOwnershipTotal, '元，含首付、持有期本息、期末结清剩余本金、税费与后续用车成本'),
+    ];
+    if (cashflow.provided) {
+      details.push(
+        D('月供与用车成本合计', monthlyBurden, '元/月'),
+        D('月度负担收入比', cashflow.debtToIncomePct, '%'),
+        D('月度结余', cashflow.monthlySurplus, '元/月')
+      );
+    } else {
+      details.push(D('现金流测算', '未填写税后月收入，未生成月度结余', '填写收入后可计算月度负担收入比'));
+    }
+
+    return Result.create('buy-car', {
+      metrics: {
+        guidePrice: guidePrice,
+        invoicePrice: invoicePrice,
+        taxablePrice: taxablePrice,
+        purchaseDate: purchaseDate,
+        energyType: energyType,
+        taxReductionEligible: eligible,
+        baseTax: baseTax,
+        taxReduction: reduction,
+        purchaseTax: tax,
+        downPayment: downPayment,
+        loanPrincipal: loanPrincipal,
+        annualRatePct: loanPrincipal > 0 ? annualRatePct : null,
+        months: months,
+        monthlyPayment: monthlyPayment,
+        totalInterest: totalInterest,
+        paidMonths: paidMonths,
+        loanPaymentsDuringHold: loanPaymentsDuringHold,
+        remainingPrincipalAtSale: remainingPrincipalAtSale,
+        purchaseFees: purchaseFees,
+        firstYearInsurance: firstYearInsurance,
+        upfrontExtras: upfrontExtras,
+        cashUpfront: cashUpfront,
+        landingPrice: landingPrice,
+        energyAnnual: energyAnnual,
+        maintenanceAnnual: maintenanceAnnual,
+        parkingAnnual: parkingAnnual,
+        otherAnnual: otherAnnual,
+        renewalInsurancePerYear: renewalInsurancePerYear,
+        recurringDuringHold: recurringDuringHold,
+        monthlyOwnershipCost: monthlyOwnershipCost,
+        fullCashOwnershipTotal: fullCashOwnershipTotal,
+        loanOwnershipTotal: loanOwnershipTotal,
+        monthlyBurden: monthlyBurden,
+        holdYears: holdYears,
+        cashflow: cashflow,
+      },
+      details: details,
+      formula: '购置税基准税额 = 不含增值税计税价格 × 10%；2026—2027 年符合条件的新能源乘用车减税额 = min(基准税额 × 50%, 15000 元)。车贷采用等额本息；签约前现金需求 = 首付 + 税费 + 已填购车费用 + 首年保险；落地价格 = 开票价 + 税费 + 已填购车费用 + 首年保险；贷款持有期总成本 = 首付及前期费用 + 持有期内已还本息 + 期末结清剩余本金 + 后续用车成本。',
+      assumptions: [
+        '车贷仅以车辆含税开票价格为贷款本金，税费、加装和保险默认不计入贷款。',
+        '贷款持有期总成本假设在持有期结束时结清剩余贷款；只比较相同持有年限和相同期末结清假设的结果。',
+        '能源费用 = 年行驶里程 × 百公里能耗 ÷ 100 × 能源单价；能耗与单价在持有期内保持不变。',
+        '后续保险留空时沿用首年保险与车船税报价，仅作为可修改的静态情景假设。',
+        '所有费用留空均表示未计入，不表示免费或不存在。',
+      ],
+      source: {
+        name: '车辆购置税政策快照',
+        title: policy.title,
+        version: policy.version,
+        jurisdiction: policy.jurisdiction,
+        effectiveDate: policy.coverageStartDate,
+        sources: policy.sources,
+      },
+      precision: { money: 2, ratePct: 2 },
+      limitations: policy.limitations.concat([
+        '车贷采用等额本息和固定利率，未计金融服务费的实际年化成本、提前还款、违约金与银行舍入差异。',
+        '持有期总成本不包含折旧、车辆残值、融资机会成本、事故损失和税费政策变化；提前结清违约金与银行舍入差异未计入。',
+        '月均用车成本是静态平均，不代表每年实际现金流；新能源减免勾选前须核对车型目录与减免税标识。',
+      ]),
+    });
+  }
+
+  return { calculate: calculate, purchaseTax: purchaseTax };
+});

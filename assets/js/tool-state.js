@@ -28,6 +28,11 @@
     'calculator-social-insurance': 1,
     'calculator-prepay': 1,
     'calculator-timezone': 1,
+    'combo-health-check': 1,
+    'combo-buy-house': 1,
+    'combo-buy-car': 1,
+    'combo-life-plan': 1,
+    'combo-finance-toolkit': 1,
     'vision': 1
   };
 
@@ -78,25 +83,57 @@
     }
   }
 
+  function clearHash() {
+    try { global.history.replaceState(null, '', global.location.pathname + global.location.search); } catch (e) {}
+  }
+
   function restoreState() {
-    if (isSensitive()) return;
     var h = String(global.location.hash || '');
     if (h.indexOf('#s=') !== 0) return;
     var obj;
-    try { obj = JSON.parse(decodeURIComponent(h.slice(3))); } catch (e) { return; }
-    if (!obj || typeof obj !== 'object') return;
+    try { obj = JSON.parse(decodeURIComponent(h.slice(3))); } catch (e) { if (isSensitive()) clearHash(); return; }
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) { if (isSensitive()) clearHash(); return; }
+    var explicit = obj.__bridge;
+    if (isSensitive() && !explicit) { clearHash(); return; }
+    if (explicit && (explicit.version !== '1' || explicit.target !== global.location.pathname || !/^[a-z0-9-]{1,40}$/.test(String(explicit.source || '')))) {
+      clearHash();
+      return;
+    }
+    if (explicit) {
+      if (!global.Core || !global.Core.bridge || !global.Core.bridge.allowed) {
+        clearHash();
+        return;
+      }
+      obj = global.Core.bridge.allowed(global.location.pathname, obj);
+    }
     var touched = [];
+    var previous = {};
     var forms = {};
     Object.keys(obj).forEach(function (id) {
+      if (id === '__bridge') return;
       var el = doc.getElementById(id);
-      if (!el || (el.closest && !el.closest('#main'))) return;
+      if (!el || (el.closest && !el.closest('#main')) || el.disabled || el.readOnly) return;
       var type = (el.type || '').toLowerCase();
-      if (type === 'checkbox' || type === 'radio') { el.checked = obj[id] === '1'; }
-      else { el.value = obj[id]; }
+      if (SKIP_TYPE[type]) return;
+      if (type === 'number' && !isFinite(Number(obj[id]))) return;
+      if (type === 'checkbox' || type === 'radio') {
+        if (obj[id] !== '1' && obj[id] !== '0') return;
+        previous[id] = el.checked ? '1' : '0';
+        el.checked = obj[id] === '1';
+      } else {
+        if (el.tagName === 'SELECT' && !Array.prototype.some.call(el.options, function (option) { return option.value === String(obj[id]); })) return;
+        previous[id] = el.value;
+        el.value = String(obj[id]);
+      }
       touched.push(el);
       var f = el.form;
       if (f) forms[Object.keys(forms).length] = f;
     });
+    if (explicit) {
+      clearHash();
+      showBridgeNotice(explicit.source, touched, previous);
+      return;
+    }
     // WO-133：本脚本以 defer 加载，init() 在 readyState==='interactive' 即执行，早于各工具页内联的
     // DOMContentLoaded→boot()（页面在 boot 里才给表单绑定 submit→preventDefault+计算、或 input→重算 处理器）。
     // 若此刻同步派发 input/change 或 requestSubmit：处理器尚未就位 → 结果不重算；更蹩的是 requestSubmit
@@ -117,6 +154,39 @@
       });
     }
     setTimeout(replay, 0);
+  }
+
+  function showBridgeNotice(source, touched, previous) {
+    if (!touched.length) return;
+    var mainInner = qs('#main .main-inner') || qs('#main');
+    var form = mainInner && qs('form', mainInner);
+    if (!mainInner || !form) return;
+    var labels = { 'buy-house': '买房全攻略', 'buy-car': '买车全攻略', prepay: '房贷提前还款', 'life-plan': '人生规划' };
+    var box = doc.createElement('div');
+    box.className = 'info-box mt-4';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-live', 'polite');
+    var text = doc.createElement('div');
+    text.textContent = '已从' + (labels[source] || '其他工具') + '带入 ' + touched.length + ' 项参数。请核对后手动计算；可清除带入并恢复原值。';
+    var button = doc.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-secondary mt-4';
+    button.textContent = '清除带入参数';
+    button.addEventListener('click', function () {
+      touched.forEach(function (el) {
+        var type = (el.type || '').toLowerCase();
+        if (type === 'checkbox' || type === 'radio') el.checked = previous[el.id] === '1';
+        else el.value = previous[el.id];
+        try {
+          el.dispatchEvent(new global.Event('input', { bubbles: true }));
+          el.dispatchEvent(new global.Event('change', { bubbles: true }));
+        } catch (e) {}
+      });
+      if (box.parentNode) box.parentNode.removeChild(box);
+    });
+    box.appendChild(text);
+    box.appendChild(button);
+    mainInner.insertBefore(box, form);
   }
 
   /* ---------------- 复制链接按钮（注入结果区之后） ---------------- */
@@ -190,8 +260,8 @@
   // 首页「最近使用」由 layout.js 统一渲染为 .tool-card（#recent / #recent-grid）。
   // 这里曾另注入一份 .xt-recent-home 纯文本区块，既没有样式又与卡片版重复，已移除。
   function init() {
-    if (isSensitive()) return;
     restoreState();
+    if (isSensitive()) return;
     bindSave();
     addShareButton();
   }

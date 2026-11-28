@@ -645,30 +645,88 @@
        → '/combo/life-plan.html#s=%7B%22lp-debt%22%3A%224890%22%7D'
      Core.bindBridge(container, [{ trigger:'#btn', href:'...', values:{...} }])
      values 支持函数（调用时求值，用于取当前测算结果）。 */
-  var bridge = {
-    link: function (path, values) {
-      var o = {};
-      Object.keys(values || {}).forEach(function (k) {
-        var v = typeof values[k] === 'function' ? values[k]() : values[k];
-        if (v !== null && v !== undefined && v !== '') o[k] = String(v);
-      });
-      var keys = Object.keys(o);
-      if (!keys.length) return path;
-      try { return path + '#s=' + encodeURIComponent(JSON.stringify(o)); } catch (e) { return path; }
-    },
-    bind: function (root, items) {
-      var scope = root && root.querySelector ? root : global.document;
-      (items || []).forEach(function (it) {
-        var btn = scope.querySelector(it.trigger);
-        if (!btn || btn.__bridgeBound) return;
-        btn.__bridgeBound = true;
-        btn.addEventListener('click', function () {
-          var href = bridge.link(it.href, it.values);
-          if (it.track && global.U && global.U.track) global.U.track('bridge_click', { from: it.from || '', to: it.href });
-          try { global.location.href = href; } catch (e) {}
-        });
-      });
+  var bridgeRules = {
+      '/combo/life-plan.html': {
+        'lp-income': { type: 'number', min: 0 }, 'lp-expense': { type: 'number', min: 0 },
+        'lp-debt': { type: 'number', min: 0 }, 'lp-assets': { type: 'number', min: 0 }
+      },
+      '/calculator/prepay.html': {
+        'pp-loan': { type: 'number', min: 0.01 }, 'pp-rate': { type: 'number', min: 0, max: 100 },
+        'pp-term': { type: 'number', min: 1 / 12, max: 50 }, 'pp-paid': { type: 'integer', min: 0 },
+        'pp-method': { type: 'enum', values: ['equal', 'principal'] },
+        'pp-mode': { type: 'enum', values: ['reduce', 'shorten'] },
+        'pp-prepay': { type: 'number', min: 0 }, 'pp-income': { type: 'number', min: 0 },
+        'pp-expense': { type: 'number', min: 0 }
+      },
+      '/combo/finance-toolkit.html': {
+        'ci-p': { type: 'number', min: 0 }, 'ci-m': { type: 'number', min: 0 },
+        'ci-r': { type: 'number', min: -100, max: 1000 }, 'ci-y': { type: 'number', min: 0.01, max: 100 }
+      }
+    };
+
+    function bridgeSource(value) {
+      var pathname = global.location && global.location.pathname ? global.location.pathname : '';
+      var slug = value == null ? String(pathname).split('/').pop().replace(/\.html$/, '') : String(value);
+      return /^[a-z0-9-]{1,40}$/.test(slug) ? slug : 'unknown';
     }
+
+    function bridgeValue(value, rule) {
+      if (value == null || value === '') return null;
+      if (rule.type === 'enum') return rule.values.indexOf(String(value)) >= 0 ? String(value) : null;
+      var n = Number(value);
+      if (!isFinite(n) || (rule.min != null && n < rule.min) || (rule.max != null && n > rule.max)) return null;
+      if (rule.type === 'integer' && Math.floor(n) !== n) return null;
+      return n;
+    }
+
+    var bridge = {
+      link: function (path, values, options) {
+        var target = String(path || '').split('#')[0];
+        var rules = bridgeRules[target];
+        if (!rules) return path;
+        var o = {};
+        Object.keys(values || {}).forEach(function (k) {
+          if (!rules[k]) return;
+          var raw = typeof values[k] === 'function' ? values[k]() : values[k];
+          var v = bridgeValue(raw, rules[k]);
+          if (v !== null) o[k] = v;
+        });
+        if (!Object.keys(o).length) return path;
+        o.__bridge = {
+          version: '1',
+          source: bridgeSource(options && options.source ? options.source : null),
+          target: target
+        };
+        try {
+          var encoded = encodeURIComponent(JSON.stringify(o));
+          return encoded.length <= 2000 ? target + '#s=' + encoded : path;
+        } catch (e) { return path; }
+      },
+      allowed: function (path, values) {
+        var target = String(path || '').split('#')[0];
+        var rules = bridgeRules[target];
+        var o = {};
+        if (!rules) return o;
+        Object.keys(values || {}).forEach(function (k) {
+          if (!rules[k] || k === '__bridge') return;
+          var v = bridgeValue(values[k], rules[k]);
+          if (v !== null) o[k] = v;
+        });
+        return o;
+      },
+      bind: function (root, items) {
+        var scope = root && root.querySelector ? root : global.document;
+        (items || []).forEach(function (it) {
+          var btn = scope.querySelector(it.trigger);
+          if (!btn || btn.__bridgeBound) return;
+          btn.__bridgeBound = true;
+          btn.addEventListener('click', function () {
+            var href = bridge.link(it.href, it.values, { source: it.from });
+            if (it.track && global.U && global.U.track) global.U.track('bridge_click', { from: it.from || '', to: it.href });
+            try { global.location.href = href; } catch (e) {}
+          });
+        });
+      }
   };
 
   /* ------------------------------ CSV / 历史记录 ------------------------------ */

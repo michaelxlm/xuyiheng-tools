@@ -1,97 +1,119 @@
         <section class="page-heading">
           <h1>买房全攻略</h1>
-          <p>一站算清买房核心账目：首付与贷款额度、等额本息月供与总利息、契税与主要交易税费，帮你在签约前对总预算心里有数。</p>
+          <p>分开计算首付、商业贷款、公积金贷款、契税与交易成本，同时比较签约前现金需求和购房总成本。填写实际银行报价后，还可测算收入下降、利率上浮时的现金流缓冲。</p>
         </section>
 
-        <form class="card" id="bhForm">
-          <div class="form-group"><label class="form-label" for="bh-price">房屋总价</label><div class="input-with-unit"><input class="form-input" id="bh-price" type="number" inputmode="decimal" min="0" placeholder="如 2000000"><span class="unit-tag">元</span></div></div>
-          <div class="field-grid">
-            <div class="form-group"><label class="form-label" for="bh-down">首付比例</label><div class="input-with-unit"><input class="form-input" id="bh-down" type="number" inputmode="decimal" min="15" max="80" value="30"><span class="unit-tag">%</span></div></div>
-            <div class="form-group"><label class="form-label" for="bh-rate">贷款年利率</label><div class="input-with-unit"><input class="form-input" id="bh-rate" type="number" inputmode="decimal" min="0" step="0.01" value="3.85"><span class="unit-tag">%</span></div></div>
-            <div class="form-group"><label class="form-label" for="bh-years">贷款年限</label><div class="input-with-unit"><input class="form-input" id="bh-years" type="number" inputmode="numeric" min="1" max="30" value="30"><span class="unit-tag">年</span></div></div>
+        <form class="card" id="bhForm" novalidate>
+          <h2 class="card-title">房屋与契税</h2>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bh-price">房屋总价</label><div class="input-with-unit"><input class="form-input" id="bh-price" type="number" inputmode="decimal" step="any" min="0.01" max="1000000000000" placeholder="如 2000000" required><span class="unit-tag">元</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-area">建筑面积</label><div class="input-with-unit"><input class="form-input" id="bh-area" type="number" inputmode="decimal" step="any" min="0.01" max="1000000" placeholder="如 100" required><span class="unit-tag">㎡</span></div></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label" for="bh-area">建筑面积</label><div class="input-with-unit"><input class="form-input" id="bh-area" type="number" inputmode="decimal" min="0" placeholder="㎡"><span class="unit-tag">㎡</span></div></div>
-            <div class="form-group"><label class="form-label" for="bh-count">购房套数</label><select class="form-select" id="bh-count"><option value="1">首套</option><option value="2">二套</option></select></div>
+            <div class="form-group"><label class="form-label" for="bh-count">家庭住房套数</label><select class="form-select" id="bh-count"><option value="first">首套（家庭唯一住房）</option><option value="second">二套（家庭第二套住房）</option><option value="third">第三套及以上</option></select></div>
+            <div class="form-group"><label class="form-label" for="bh-policy-date">契税适用日期（选填）</label><input class="form-input" id="bh-policy-date" type="date" min="1900-01-01" aria-describedby="bh-deed-help"><small class="form-help" id="bh-deed-help">留空按 2024-12-01 起规则估算；早于该日期须填写当地确认税率。</small></div>
           </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bh-deed-basis">契税计税依据（选填）</label><div class="input-with-unit"><input class="form-input" id="bh-deed-basis" type="number" inputmode="decimal" step="any" min="0" max="1000000000000" placeholder="留空按房屋总价"><span class="unit-tag">元</span></div></div>
+            <div class="form-group" id="bh-custom-wrap" hidden><label class="form-label" for="bh-custom-rate">当地确认的契税税率</label><div class="input-with-unit"><input class="form-input" id="bh-custom-rate" type="number" inputmode="decimal" step="any" min="0" max="5" placeholder="第三套通常为 3%–5%"><span class="unit-tag">%</span></div></div>
+          </div>
+
+          <h2 class="card-title mt-4">贷款与月供</h2>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bh-down">首付比例</label><div class="input-with-unit"><input class="form-input" id="bh-down" type="number" inputmode="decimal" step="any" min="0" max="100" value="30"><span class="unit-tag">%</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-years">贷款年限</label><div class="input-with-unit"><input class="form-input" id="bh-years" type="number" inputmode="numeric" step="1" min="1" max="50" value="30"><span class="unit-tag">年</span></div></div>
+            <div class="form-group"><label class="form-label" for="bh-commercial-share">商业贷款占贷款比例</label><div class="input-with-unit"><input class="form-input" id="bh-commercial-share" type="number" inputmode="decimal" step="any" min="0" max="100" value="100"><span class="unit-tag">%</span></div></div>
+          </div>
+          <p class="form-help">商业贷款占比 100% 表示仅商业贷款，0% 表示仅公积金贷款，中间值表示组合贷款。</p>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label" for="bh-commercial-rate">商业贷款年利率</label><div class="input-with-unit"><input class="form-input" id="bh-commercial-rate" type="number" inputmode="decimal" step="any" min="0" max="100" placeholder="填写银行实际报价"><span class="unit-tag">%</span></div><small class="form-help">有商业贷款时必填；不把示例利率称为当前 LPR。</small></div>
+            <div class="form-group"><label class="form-label" for="bh-fund-rate">公积金贷款年利率</label><div class="input-with-unit"><input class="form-input" id="bh-fund-rate" type="number" inputmode="decimal" step="any" min="0" max="100" placeholder="有公积金贷款时填写"><span class="unit-tag">%</span></div><small class="form-help">按贷款发放日期、套数、期限与当地政策核对。</small></div>
+          </div>
+
+          <details class="mt-4">
+            <summary>交易成本与前期费用</summary>
+            <div class="form-row mt-4">
+              <div class="form-group"><label class="form-label" for="bh-agent-rate">中介服务费率（选填）</label><div class="input-with-unit"><input class="form-input" id="bh-agent-rate" type="number" inputmode="decimal" step="any" min="0" max="100" placeholder="留空表示未计入"><span class="unit-tag">%</span></div><small class="form-help">由交易各方协商，没有全国统一法定百分比。</small></div>
+              <div class="form-group"><label class="form-label" for="bh-buyer-share">买方承担比例</label><div class="input-with-unit"><input class="form-input" id="bh-buyer-share" type="number" inputmode="decimal" step="any" min="0" max="100" value="100"><span class="unit-tag">%</span></div></div>
+              <div class="form-group"><label class="form-label" for="bh-other">其他前期成本（选填）</label><div class="input-with-unit"><input class="form-input" id="bh-other" type="number" inputmode="decimal" step="any" min="0" max="1000000000000" placeholder="如评估、登记等已知费用"><span class="unit-tag">元</span></div></div>
+            </div>
+          </details>
+
+          <details class="mt-4">
+            <summary>现金流压力测试（选填）</summary>
+            <div class="form-row mt-4">
+              <div class="form-group"><label class="form-label" for="bh-income">税后月收入</label><div class="input-with-unit"><input class="form-input" id="bh-income" type="number" inputmode="decimal" step="any" min="0" max="1000000000000" placeholder="留空不生成压力结论"><span class="unit-tag">元/月</span></div></div>
+              <div class="form-group"><label class="form-label" for="bh-expense">其他月支出</label><div class="input-with-unit"><input class="form-input" id="bh-expense" type="number" inputmode="decimal" step="any" min="0" max="1000000000000" value="0"><span class="unit-tag">元/月</span></div></div>
+              <div class="form-group"><label class="form-label" for="bh-cash">可用于签约的现金</label><div class="input-with-unit"><input class="form-input" id="bh-cash" type="number" inputmode="decimal" step="any" min="0" max="1000000000000" placeholder="留空不计算资金缺口"><span class="unit-tag">元</span></div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="bh-emergency">应急储备目标</label><div class="input-with-unit"><input class="form-input" id="bh-emergency" type="number" inputmode="numeric" step="1" min="0" max="36" value="6"><span class="unit-tag">个月</span></div></div>
+              <div class="form-group"><label class="form-label" for="bh-income-shock">压力情景收入降幅</label><div class="input-with-unit"><input class="form-input" id="bh-income-shock" type="number" inputmode="decimal" step="any" min="0" max="100" value="20"><span class="unit-tag">%</span></div></div>
+              <div class="form-group"><label class="form-label" for="bh-rate-shock">两类贷款利率上浮</label><div class="input-with-unit"><input class="form-input" id="bh-rate-shock" type="number" inputmode="decimal" step="any" min="0" max="20" value="1"><span class="unit-tag">个百分点</span></div></div>
+            </div>
+            <p class="form-help">默认收入下降 20%、两类贷款利率各上浮 1 个百分点仅为可修改的情景假设，不是收入或利率预测。</p>
+          </details>
+
+          <p id="bh-error" class="form-error" role="alert" hidden></p>
+          <p id="bh-status" class="form-status" role="status" aria-live="polite" hidden></p>
           <div class="btn-row">
             <button class="btn btn-primary" type="submit" data-track="calc_click" data-track-props='{"tool":"buy-house"}'>开始测算</button>
           </div>
         </form>
 
-        <div class="result-box" id="bh-result" hidden>
+        <div class="result-box" id="bh-result" hidden aria-live="polite">
           <div class="result-row">
-            <div><div class="result-label">月供（等额本息）</div><div class="result-value" id="bh-monthly">--</div></div>
-            <div><div class="result-label">首付金额</div><div class="result-value" id="bh-downamt">--</div></div>
-            <div><div class="result-label">购房总花费</div><div class="result-value" id="bh-total">--</div></div>
+            <div><div class="result-label">组合贷款月供</div><div class="result-value" id="bh-monthly">--</div></div>
+            <div><div class="result-label">签约前现金需求</div><div class="result-value" id="bh-upfront">--</div></div>
+            <div><div class="result-label">购房总成本</div><div class="result-value" id="bh-total">--</div></div>
           </div>
           <dl class="result-detail" id="bh-detail"></dl>
+          <div id="bh-explain" class="mt-4"></div>
           <div class="btn-row mt-4">
-            <a class="btn btn-secondary" href="#" id="bh-to-plan">月供带入人生规划 →</a>
+            <button class="btn btn-secondary" type="button" id="bh-copy">复制测算摘要</button>
+            <button class="btn btn-secondary" type="button" id="bh-export">导出明细 CSV</button>
+            <a class="btn btn-secondary" href="#" id="bh-to-plan">月供与已填收支带入人生规划 →</a>
             <a class="btn btn-secondary" href="#" id="bh-to-prepay">去算提前还款 →</a>
           </div>
+          <p class="form-help mt-4" id="bh-prepay-note"></p>
         </div>
 
-        <div class="info-box mt-4"><span>ℹ️</span><div>契税按常见政策估算：首套 ≤90㎡ 1%、>90㎡ 1.5%；二套 3%（各地不同）。月供按等额本息公式计算。实际税费、中介费与贷款利率以当地政策及银行合同为准。</div></div>
+        <section class="card mt-4" id="bh-stress" hidden aria-live="polite">
+          <h2 class="card-title">现金流压力结论</h2>
+          <p id="bh-stress-status" class="form-status"></p>
+          <dl class="result-detail" id="bh-stress-detail"></dl>
+        </section>
 
-        <script>
-        (function () {
-          function boot() {
-            var U = window.U, C = window.Core; if (!U || !C) return;
-            var $ = function (id) { return document.getElementById(id); };
-            function row(k, v) { return '<div class="result-detail-row"><dt>' + k + '</dt><dd>' + v + '</dd></div>'; }
-            $('bhForm').addEventListener('submit', function (e) {
-              e.preventDefault();
-              var price = U.numInput($('bh-price'));
-              if (!(price > 0)) { alert('请输入房屋总价'); return; }
-              var down = U.numInput($('bh-down')); if (!Number.isFinite(down)) down = 30;
-              var rate = U.numInput($('bh-rate')) || 0, years = U.numInput($('bh-years')) || 30, area = U.numInput($('bh-area')) || 0, count = $('bh-count').value;
-              var downAmt = price * down / 100, loan = price - downAmt, n = Math.round(years * 12);
-              var monthly = C.loan.annuity(loan, rate, n);
-              var totalInterest = monthly * n - loan;
-              var deedRate = count === '1' ? (area > 90 ? 0.015 : 0.01) : 0.03;
-              var deed = price * deedRate;
-              var agent = price * 0.01;
-              var total = downAmt + monthly * n + deed + agent;
-              $('bh-monthly').textContent = U.money(monthly);
-              $('bh-downamt').textContent = U.money(downAmt);
-              $('bh-total').textContent = U.money(total);
-              $('bh-detail').innerHTML =
-                row('贷款总额', U.money(loan)) +
-                row('还款总期数', n + ' 期（' + years + ' 年）') +
-                row('支付总利息', U.money(totalInterest)) +
-                row('契税（' + (deedRate * 100) + '%）', U.money(deed)) +
-                row('中介费（约 1%）', U.money(agent));
-              $('bh-result').hidden = false;
-              $('bh-to-plan').href = C.bridge.link('/combo/life-plan.html', { 'lp-income': 20000, 'lp-expense': 8000, 'lp-debt': U.round(monthly, 2), 'lp-assets': U.round(downAmt, 2) });
-              $('bh-to-prepay').href = C.bridge.link('/calculator/prepay.html', { 'pp-loan': U.round(loan, 2), 'pp-rate': rate, 'pp-term': years });
-              U.track('calc_result', { tool: 'buy-house' });
-            });
-          }
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-        })();
-        </script>
+        <div class="info-box mt-4"><span aria-hidden="true">i</span><div>2024-12-01 起，家庭唯一住房和第二套住房均以 140㎡ 为界：不超过 140㎡ 适用 1%，超过后首套为 1.5%、二套为 2%；140㎡ 包含本数。第三套及以上须填写当地适用税率。政策快照核验于 2026-11-28，实际以购房所在地税务机关认定为准。</div></div>
 
         <div class="ad-slot" data-ad-slot="next"></div>
 
 <section class="tool-info">
           <h2>关于本工具</h2>
-          <p>买房全攻略整合房贷月供、税费估算与装修预算，帮助买房决策一站测算；各项以输入参数与当地政策为准，结果仅供参考。</p>
+          <p>买房全攻略在浏览器本地拆分商业贷款与公积金贷款，统一计算月供、利息、契税和已填交易成本，并分别展示签约前现金需求与购房总成本。输入不会上传；跨页链接只携带本次结果及你主动填写的收支参数。</p>
           <h2 style="margin-top:1.5em">常见问题</h2>
           <details>
-            <summary>包含哪些测算？</summary>
-            <p>通常有房贷月供、相关税费与装修预算估算。</p>
+            <summary>契税的 140㎡ 分界如何计算？</summary>
+            <p>2024-12-01 起，首套和第二套不超过 140㎡均按 1%；超过 140㎡时首套按 1.5%、二套按 2%。面积包含 140㎡ 本数，套数按家庭唯一、第二套等口径认定。</p>
           </details>
           <details>
-            <summary>税费算得准吗？</summary>
-            <p>契税、增值税等受面积、套数与城市政策影响大，工具为估算，实际以当地规定为准。</p>
+            <summary>为什么没有默认商业贷款利率？</summary>
+            <p>全国层面已取消首套、二套商业房贷利率政策下限，实际报价受城市政策、银行和借款人情况影响。工具要求填写实际报价，不把历史或示例利率称为当前 LPR。</p>
           </details>
           <details>
-            <summary>需要输入哪些？</summary>
-            <p>房价、面积、贷款参数与税费相关选项等。</p>
+            <summary>签约前现金需求和购房总成本有什么区别？</summary>
+            <p>签约前现金需求是首付、契税、买方承担的中介费与其他前期成本；购房总成本是房屋总价加贷款利息和已计税费成本，不重复叠加首付。</p>
           </details>
           <details>
-            <summary>可作购房决策唯一依据吗？</summary>
-            <p>不能，请结合资金、政策与专业人士意见综合判断。</p>
+            <summary>中介费按什么比例计算？</summary>
+            <p>没有全国统一法定百分比。请填写协商或合同约定费率及买方承担比例；留空仅表示未计入，不表示免费。</p>
+          </details>
+          <details>
+            <summary>压力测试通过就能保证还得起吗？</summary>
+            <p>不能。压力测试只是在给定收入、支出、利率上浮和储备月数下的情景演算，不代替银行审批，也不预测未来收入、利率或房价。</p>
+          </details>
+          <details>
+            <summary>带入其他工具的数据会自动计算吗？</summary>
+            <p>不会。目标页会显示来源并等待你核对后手动计算，也可以一键清除带入参数并恢复原值；财务页不会使用通用自动分享链接。</p>
           </details>
         </section>
