@@ -27,5 +27,8 @@
   },
   "dependencies": {
     "@xuyiheng/static-build-kit": "file:../packages/static-build-kit"
+  },
+  "devDependencies": {
+    "lunar-javascript": "^1.7.3"
   }
 }

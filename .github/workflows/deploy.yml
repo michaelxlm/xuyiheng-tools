@@ -64,6 +64,22 @@ jobs:
           [ -x "$NODE" ] || NODE=node
           $NODE scripts/check-wcag.js
 
+      - name: Checkout sibling main-api (fortune contract tests)
+        shell: bash
+        env:
+          MAIN_API_DEPLOY_KEY: ${{ secrets.MAIN_API_DEPLOY_KEY }}
+        run: |
+          set -e
+          TOP="$(dirname "$GITHUB_WORKSPACE")"
+          rm -rf "$TOP/main-api"
+          mkdir -p /tmp/xuyiheng-main-api-key && chmod 700 /tmp/xuyiheng-main-api-key
+          printf '%s\n' "$MAIN_API_DEPLOY_KEY" > /tmp/xuyiheng-main-api-key/id_ed25519
+          chmod 600 /tmp/xuyiheng-main-api-key/id_ed25519
+          export GIT_SSH_COMMAND='ssh -i /tmp/xuyiheng-main-api-key/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new'
+          git clone --depth 1 git@github.com:michaelxlm/main-api.git "$TOP/main-api"
+          # fortune-engine 从自身目录向上找 node_modules；本站 devDependency 已由 npm ci 装到工作区
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$TOP/main-api/node_modules"
+
       - name: Unit tests
         shell: bash
         run: |
